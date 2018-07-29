@@ -1,0 +1,28 @@
+{
+  "name": "virtualmixerproject",
+  "version": "1.0.0",
+  "description": "Build your own video mixers in javascript.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Sense-Studios/VirtualMixerProject.git"
+  },
+  "keywords": [
+    "VJ",
+    "VMA",
+    "Video",
+    "Mixer",
+    "Videomixer",
+    "javascript",
+    "WebGL"
+  ],
+  "author": "XangadiX",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sense-Studios/VirtualMixerProject/issues"
+  },
+  "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme"
+}
