@@ -1,0 +1,11 @@
+body {
+  padding: 50px;
+  font: 14px "Verdana", Helvetica, Arial, sans-serif;
+  color: black; }
+
+#info {
+  position: absolute;
+  top: 50px;
+  left: 10px; }
+
+/*# sourceMappingURL=style.css.map */
