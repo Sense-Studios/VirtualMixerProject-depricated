@@ -1,11 +1,29 @@
 body {
   padding: 50px;
   font: 14px "Verdana", Helvetica, Arial, sans-serif;
-  color: black; }
+  color: black;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; }
 
 #info {
   position: absolute;
   top: 50px;
-  left: 10px; }
+  left: 10px;
+  color: rgba(220, 220, 220, 0.82);
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.42); }
+
+.blink {
+  background-color: red;
+  opacity: 1;
+  display: inline-block;
+  left: 10px;
+  top: 10px;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  float: left;
+  border-radius: 6px;
+  z-index: 9001; }
 
 /*# sourceMappingURL=style.css.map */
