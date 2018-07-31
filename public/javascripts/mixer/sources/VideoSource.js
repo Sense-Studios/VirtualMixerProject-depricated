@@ -43,6 +43,7 @@ function VideoSource(renderer, options) {
     // create video element
     videoElement = document.createElement('video');
     videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.muted= true
 
     // set the source
     if ( options.src == undefined ) {
