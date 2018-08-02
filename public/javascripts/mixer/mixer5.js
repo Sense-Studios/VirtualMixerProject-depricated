@@ -30,23 +30,33 @@ var RenderTree = {
 
 var renderer = new GlRenderer();
 
+// ## SOURCES ##################################################################
+
 // create sources
 var testSource1 = new GifSource(   renderer, { src: '//nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif' } );
-var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
+var testSource2 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
+var testSource3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
+var testSource4 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
 
 // solid
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
 
+// text
+var testSource6 = new TextSource( renderer, {} );
+
+// ## MODULES ##################################################################
+
 // create 2 mixers, A/B and mixer/B
-var mixer1 = new Mixer( renderer, { source1: testSource2, source2: testSource3 } );
+var mixer1 = new Mixer( renderer, { source1: testSource6, source2: testSource3 } );
 var mixer3 = new Mixer( renderer, { source1: testSource1, source2: mixer1 } );
 mixer3.mixMode(3) // NAM
 
 // create a mixer, simple a/b
 var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
 var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
+
+// ## ADDONS ##################################################################
+
 // create the filemanager addon for the sources
 var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager2 = new FileManager( testSource2 )
@@ -60,8 +70,13 @@ var bpm = new BPM( renderer )
 bpm.add( mixer4.pod )
 bpm.add( mixer1.pod )
 
+// ## OUTPUT ###################################################################
+
 // set the output node (needs to be last!)
 var output = new Output( renderer, switcher1 )
+//var output = new Output( renderer, testSource6 )
+
+// ## CONTROLLERS ##############################################################
 
 // add a controller to mixer and bpm
 var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
@@ -80,9 +95,13 @@ numpad1.addMixer( mixer4 )
 // firebase1.addMixer( mixer3 ) ?
 // firebase1.addFileManager( filemanager1) ?
 
+// ## RENDER ###################################################################
+
 // -----------------------------------------------------------------------------
 renderer.init();         // init
 renderer.render();       // start update & animation
+
+// ## DELAYED START ############################################################
 
 // -----------------------------------------------------------------------------
 // AFTER LOAD Settings
@@ -94,27 +113,22 @@ setTimeout( function() {
   console.log("GO GO GO")
   switcher1.doSwitch(0)
   mixer3.pod(0)
-  filemanager2.change()
-  filemanager3.change()
+  //filemanager2.change()
+  //filemanager3.change()
 }, 3200)
-
-
-// ---------------------------------------------------------------------------
-
-// this be my audio analisis unit
-
 
 // ---------------------------------------------------------------------------
 // Testscripts ("Behaviours?")
 
 var changez_mod = 32000
-var jump_mod = 64000
+var jump_mod = 12000
 var scratch_mod = 64000
 var blend_mod = 16000
 
 // this is a hokey pokey controller
 // call this a behaviour?
 
+/*
 function changez() {
   if (Math.random() > 0.5 ) {
     filemanager2.change("awesome")
@@ -129,6 +143,8 @@ function changez() {
   }, r )
 };
 changez()
+
+*/
 
 function change_blendmode() {
   //var r = Math.floor( Math.random() * blend_mod )

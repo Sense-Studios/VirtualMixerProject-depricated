@@ -3,34 +3,46 @@ html
   head
     title= title
 
+    // VENDOR
     // THREE.js, TWEEN (needs to move)
-    script(src='http://nabu.sense-studios.com/assets/tween/tween.js')
-    script(src='http://nabu.sense-studios.com/assets/threejs/three.js')
+    // script(src='http://nabu.sense-studios.com/assets/tween/tween.js')
+    script(src='/javascripts/vendor/tween.js')
+    // script(src='http://nabu.sense-studios.com/assets/threejs/three.js')
+    script(src='/javascripts/vendor/three.js')
 
     // JQUERY, need to update my requests, sorry
     // script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=' crossorigin='anonymous')
-    script(src='https://code.jquery.com/jquery-1.12.4.min.js')
+    // script(src='https://code.jquery.com/jquery-1.12.4.min.js')
+    script(src='/javascripts/vendor/jquery.js')
+    
+    // Experimental, bodymovin for SVG
+    // https://github.com/airbnb/lottie-web
+    // https://codepen.io/airnan/project/editor/ZeNONO
+    // script(src='https://cdnjs.cloudflare.com/ajax/libs/bodymovin/4.13.0/bodymovin.js')
+    script(src='/javascripts/vendor/bodymovin.js')
 
     // Some PROGRAMS from the marduq Database
     script(src='/javascripts/programs.js')
 
-
-    // Firebase
+    // FIREBASE
+    // Firebase (remove)
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase.js')
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js')
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js')
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js')
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js')
 
-    // Gif source helpers
-    script(src='/javascripts/mixer/gif/libgif.js')
-    script(src='/javascripts/mixer/gif/rubbable.js')
-
     // SOURCES
+    // Gif source helpers
+    script(src='/javascripts/mixer/sources/gif/libgif.js')
+    script(src='/javascripts/mixer/sources/gif/rubbable.js')
+    
+    // Sources
     script(src='/javascripts/mixer/sources/_source.js')
     script(src='/javascripts/mixer/sources/GifSource.js')
     script(src='/javascripts/mixer/sources/VideoSource.js')
     script(src='/javascripts/mixer/sources/SolidSource.js')
+    script(src='/javascripts/mixer/sources/TextSource.js')
 
     // MODULES
     script(src='/javascripts/mixer/modules/Chain.js')
