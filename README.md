@@ -221,10 +221,31 @@ abc
 
 ### Modules
 #### Output
+
+```
+var output = new Output( renderer, Source )
+```
+
 #### Mixer
+
+```
+var mixer1 = new Mixer( renderer, { source1: Source, source2: Source } );
+
+mixer1.mixMode( _num )
+mixer1.blendMode( _num )
+
+mixer3.pod()
+```
+
 #### Chain
+WIP
+
 #### Switch
-abc
+A switch 
+
+```
+var switcher1 = new Switcher( renderer, [ Source, Source ] );
+```
 
 ### Effects
 #### BlackAndWhite
@@ -240,19 +261,67 @@ abc
 
 ### Addons
 #### BPM
+The BPM now has two functions;
+1) it allows for tapped beat-control
+2) it analyses the music and tries to come up with a BPM number
+
+```
+// create a bpm addon
+var bpm = new BPM( renderer )
+bpm.tap()
+bpm.render()
+bpm.bpm
+bpm.bps
+bpm.bpm_float
+
+bpm.mod 
+bpm.modUp 
+bpm.modDown
+
+bpm.useAutoBpm
+bpm.audio_src
+bpm.useMicrophone
+
+// add the bpm to the mixer's pod
+bpm.add( mixer1.pod )
+bpm.add( mixer2.pod )
+```
+
 #### AudioAnalysis
+WIP, the audio analysis is now actually all in the BPM addon. But I want to try and detect more, beside the beat, so it should all move over here.
+
 #### Filemanager
+A Filemanager downloads a large number of mp4 with metadata and plugs into a _VideoSource_. It allows for changing videos on the fly. You can set it to a button or a timer. It can select based on tags, or just random.
+The Current Filemanager should be more aptly called MarduqFileManager as it takes it's content from my dayjobs' servers.
+
+```
+var filemanager = new FileManager( VideoSource )
+filemanager.change()
+```
+
 #### GyphyManager
-abc
+This Addon is much like the Filemanager, as that it changes the source files for the _GifSource_.
+It takes a collection from Gyphy, based on a given tag; and allows switching between them.
+
+```
+var giphymanager = new GiphyManager( GifSource )
+giphymanager.change()
+```
 
 ### Editors
 TODO
 
-# Roadmap
+## Considerations
+When running on your own machine, you should not have an issue with playback. I get even a decent framerate out of my three-year-old mobile phone. Having said that, when you put it on a webserver, you'll notice that seek-hiccups occur. Which basically means you can't
+jump around in videos. I have tried every possible combination of Cloudflare configuration, Amazon S3 settings, and what have you. It's almost unsolvable to request a random in point and not have a delay when the video is not loaded at that point.  It annoys me so much that I've started experimenting with an VideoSource that actually loads multiple videos and jumps between them to switch. It works okayish, but it eats a hell of a load of bandwidth.
+
+
+## Roadmap
 
 * Set up a Node editor
 * Hook up Midi controller
 * add configuration for Firebase
 * Phase out express for lightweight server/ templating
+
 
 # But Why?!
