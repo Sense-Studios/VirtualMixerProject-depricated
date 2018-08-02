@@ -1,10 +1,10 @@
 # VirtualMixerProject
 
-Build your own video mixers in javascript. The application takes a number of _sources_ (video, gif) and mixes them together, with a blendmode through through a _mixer_.
-As module output nodes are sources as, mixers and other modules can be 'chained' together to build ever more elaborate mixers.
+Build your own video mixers in javascript. The application takes a number of _sources_ (video, gif) and mixes them together, with a Blendmode through a _mixer_.
+As module output nodes are sources as mixers and other modules can be 'chained' together to build ever more elaborate mixers.
 Modules expose a number of variables that can be changed and controlled in runtime through a _controller_
 
-The VirtualMixerProject is a virtual videomixer that is driven by a chainable interface language and runs in WebGL.
+The VirtualMixerProject is a virtual video mixer that is driven by a chainable interface language and runs in WebGL.
 A demo can be found here; http://nabu.sense-studios.com/channel/sense_beta/mixer5.
 
 
@@ -27,7 +27,7 @@ point your browser to `127.0.0.1:3000` and enjoy the show.
 
 ## Introduction
 
-The most basic mixer setup is laid out hereunder in ascii art:
+The most basic mixer setup is laid out hereunder in ASCII art:
 
 ```
         ______________
@@ -60,7 +60,7 @@ This particular configuration is now described as
 
 ```
 
-But in the future I want to describe it as shown below, and be able to edit it
+But in the future, I want to describe it as shown below and be able to edit it
 in a (simple) node editor.
 
 ```
@@ -147,7 +147,7 @@ After the configuration is loaded, the shader is applied to a surface in a
 
 ## chaining components
 
-The configuration can be extended, so we can swap Source 2 with another mixer
+The configuration can be extended so we can swap Source 2 with another mixer
 and have an additional source.
 
 ```
@@ -179,7 +179,7 @@ __________     _________
 abc
 
 ### The Renderer
-Loads all components, builds the shaders and starts rendering them.
+It loads all components, it builds the shaders and starts rendering them.
 
 ```
   add( module )
