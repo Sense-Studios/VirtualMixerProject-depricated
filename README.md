@@ -176,8 +176,6 @@ __________     _________
        ----------     ----------
 ```
 
-
-
 ## Breaking it down
 So it breaks down to three main components; a _Renderer_ (output), _Modules_ (ie. mixers) and _Sources_ (ie. video or gif) in our demo. As you can see, a mixer is actually **also** a _Source_.
 
