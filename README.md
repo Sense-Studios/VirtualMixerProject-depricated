@@ -4,6 +4,9 @@ Build your own video mixers in javascript. The application takes a number of _so
 As module output nodes are sources as, mixers and other modules can be 'chained' together to build ever more elaborate mixers.
 Modules expose a number of variables that can be changed and controlled in runtime through a _controller_
 
+The VirtualMixerProject is a virtual videomixer that is driven by a chainable interface language and runs in WebGL.
+A demo can be found here; http://nabu.sense-studios.com/channel/sense_beta/mixer5.
+
 
 ## Installation
 
@@ -19,36 +22,48 @@ Modules expose a number of variables that can be changed and controlled in runti
 
 ` npm start `
 
-You might want to test the program with `npm test`
-
+You might want to test the program with `npm test`.
+point your browser to `127.0.0.1:3000` and enjoy the show.
 
 ## Introduction
 
 The most basic mixer setup is laid out hereunder in ascii art:
 
 ```
-      ______________
-      |  Renderer  |
-      --------------
-            |
-            |
-        _________   <--- Pod
-        | Mixer |   <--- Mixmode
-        ---------   <--- Blendmode
-           / \
-          /   \
-         /     \
-__________     __________
-| Source |     | Source |
-----------     ----------
-
+        ______________
+        |  Renderer  |
+        --------------
+              |
+              |
+          _________   <--- Pod
+          | Mixer |   <--- Mixmode
+          ---------   <--- Blendmode
+             / \
+            /   \
+           /     \            
+  __________     __________   <--- somefile.mp4
+  | Source |     | Source |   <--- play, pause, currentTime, etc. (html5 interface)
+  ----------     ----------   
 ```
 This diagram flows from bottom to top; two
+This particular configuration is now described as
 
-This particular configuration can be described as:
+```
+  var renderer = new GlRenderer();
+  var testSource1 = new GifSource(   renderer, { src: 'somefile.gif' } );
+  var testSource2 = new VideoSource( renderer, { src: 'somefile.mp4' } );
+  var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
+  var output = new Output( renderer, mixer1 )
+
+  renderer.init();
+  renderer.render();
 
 ```
 
+But in the future I want to describe it as shown below, and be able to edit it
+in a (simple) node editor.
+
+```
   var my_renderer = {
     my_source_1 = {
       type = VideoSource,
@@ -67,19 +82,73 @@ This particular configuration can be described as:
       blendmode: 1
     }
   }
-
-
-
 ```
 
-Note that configuration files are interpreted from top to bottom; so make sure that `my_source_1`
-is defined before you plug it into `my_mixer_1`
+This configuration compiles to a fragment shader, that can be retrieved from
+the renderer with 'renderer.fragmentShader'. This will output the shader:
 
-After the configuration is loaded, it will generate a fragment shader,
-which is applied to a surface in a 3D scene.
+```
+uniform sampler2D textureTest;
+uniform float wave;
+uniform sampler2D GifSource_1b3cc459;
+uniform vec3 GifSource_1b3cc459_output;
+uniform float GifSource_1b3cc459_alpha;
+uniform sampler2D VideoSource_39ce9958;
+uniform vec3 VideoSource_39ce9958_output;
+uniform float VideoSource_39ce9958_alpha;
+uniform int Mixer_54ba1ab5_mixmode;
+uniform int Mixer_54ba1ab5_blendmode;
+uniform float Mixer_54ba1ab5_alpha1;
+uniform float Mixer_54ba1ab5_alpha2;
+uniform vec4 Mixer_54ba1ab5_output;
+/* custom_uniforms */
 
 
-The most
+vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
+  if ( blendmode ==  1 ) return src + dst;
+  if ( blendmode ==  2 ) return src - dst;
+  if ( blendmode ==  3 ) return src * dst;
+  if ( blendmode ==  4 ) return min(src, dst);
+  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));
+  if ( blendmode ==  6 ) return (src + dst) - 1.0;
+  if ( blendmode ==  7 ) return max(src, dst);
+  if ( blendmode ==  8 ) return (src + dst) - (src * dst);
+  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));
+  if ( blendmode == 10 ) return src + dst;
+  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));
+  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));
+  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));
+  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));
+  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
+  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));
+  if ( blendmode == 17 ) return abs(dst - src);
+  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
+  return src + dst;
+}
+/* custom_helpers */
+
+varying vec2 vUv;
+void main() {
+  vec3 GifSource_1b3cc459_output = ( texture2D( GifSource_1b3cc459, vUv ).xyz * GifSource_1b3cc459_alpha );
+  vec3 VideoSource_39ce9958_output = ( texture2D( VideoSource_39ce9958, vUv ).xyz * VideoSource_39ce9958_alpha );
+  vec3 Mixer_54ba1ab5_output = blend( GifSource_1b3cc459_output * Mixer_54ba1ab5_alpha1,VideoSource_39ce9958_output * Mixer_54ba1ab5_alpha2, Mixer_54ba1ab5_blendmode );
+
+  gl_FragColor = vec4( Mixer_54ba1ab5_output, 1.0 );
+
+
+}
+```
+
+Don't be fooled by all the math in the Blend function, it's put there by the Mixer
+and allows for blending the images together.
+
+After the configuration is loaded, the shader is applied to a surface in a
+3D scene and shown on screen.
+
+## chaining components
+
+The configuration can be extended, so we can swap Source 2 with another mixer
+and have an additional source.
 
 ```
       ______________
@@ -94,7 +163,7 @@ The most
           /   \
          /     \
 __________     _________
-| Source |     | Mixer |
+| Source |     | Mixer |      <--
 ----------     ---------
                   / \
                  /   \
@@ -102,30 +171,78 @@ __________     _________
        __________     __________
        | Source |     | Source |
        ----------     ----------
-
-
-
 ```
 
-## Elements
+
+
+## Breaking it down
 abc
 
 ### The Renderer
-abc
+Loads all components, builds the shaders and starts rendering them.
+
+```
+  add( module )
+  nodes
+  dispose()
+  init()
+  render()
+  camera
+  PerspectiveCamera
+  scene
+  flatGeometry
+  PlaneGeometry
+  surface
+  Mesh
+  fragmentShader
+  vertexShader
+  customDefines
+  customUniforms
+  shaderMaterial
+  ShaderMaterial
+```
 
 ### Sources
+
+#### VideoSource
+abc
+
+#### GifSource
+abc
+
+#### Solidcolor
+abc
+
+#### SVGSource
+abc
+
+#### TextSource
 abc
 
 ### Modules
+#### Output
+#### Mixer
+#### Chain
+#### Switch
 abc
 
 ### Effects
+#### BlackAndWhite
 abc
 
 ### Controllers
+#### Firebase
+#### Keyboard
+#### Numpad
+#### Gamepad
+#### Midi
 abc
 
 ### Addons
+#### BPM
+#### AudioAnalysis
+#### Filemanager
+#### GyphyManager
 abc
 
 ### Editors
@@ -137,3 +254,5 @@ TODO
 * Hook up Midi controller
 * add configuration for Firebase
 * Phase out express for lightweight server/ templating
+
+# But Why?!
