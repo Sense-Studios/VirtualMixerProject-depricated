@@ -127,8 +127,11 @@ function BPM( renderer ) {
 
   // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
-  // audio.src =  'http://37.220.36.51:8906';
-  audio.src = '/audio/rage_hard.mp3'
+  //audio.setAttribute('crossorigin', 'anonymous');
+  // audio.src =  'http://37.220.36.53:7904';
+  audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  // audio.src = '/audio/rage_hard2.mp3'
+
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
@@ -139,7 +142,9 @@ function BPM( renderer ) {
   audio.autoplay = true;
 
   bandpassFilter.type = "lowpass";
-  bandpassFilter.frequency.value = 350 //(settings.passFreq ? settings.passFreq : 400);
+
+  // or as argument(settings.passFreq ? settings.passFreq : 350);
+  bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
 
   analyser.fftSize = 128;
@@ -156,7 +161,10 @@ function BPM( renderer ) {
   var initializeAudio = new Promise( function( resolve, reject ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
-    source.connect(context.destination);
+
+    // COMMENT THIS OUT FOR NOW SOUND
+    // source.connect(context.destination);
+
     resolve(audio);
     reject(err);
   })
@@ -209,7 +217,6 @@ function BPM( renderer ) {
       start = Date.now()
       d = 0
     }
-
   }
 
   // blink on the beat
