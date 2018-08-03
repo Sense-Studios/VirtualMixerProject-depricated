@@ -1,8 +1,8 @@
 # VirtualMixerProject
 
-Build your own video mixers in javascript. The application takes a number of ~sources~ and mixes them together through through a ~mixer~.
+Build your own video mixers in javascript. The application takes a number of _sources_ (video, gif) and mixes them together, with a blendmode through through a _mixer_.
 As module output nodes are sources as, mixers and other modules can be 'chained' together to build ever more elaborate mixers.
-Modules expose a number of variables that can be changed and controlled in runtime through a ~controller~
+Modules expose a number of variables that can be changed and controlled in runtime through a _controller_
 
 
 ## Installation
