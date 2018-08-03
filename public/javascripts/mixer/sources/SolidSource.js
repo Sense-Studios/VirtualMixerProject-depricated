@@ -23,7 +23,7 @@ function SolidSource(renderer, options) {
 
   // set options
   var _options;
-  var color = { r:0.0, g:0.0, b:0.0 }
+  var color = { r:0.0, g:0.0, b:0.0 } // add alpha
 
   if ( options != undefined ) _options = options;
 

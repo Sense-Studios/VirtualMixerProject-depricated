@@ -60,6 +60,7 @@ function VideoSource(renderer, options) {
     videoElement.load();              // must call after setting/changing source
     _self.firstplay = false
 
+    // Here we wait for a user to click and take over
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         var r = Math.random() * videoElement.duration
