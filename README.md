@@ -45,8 +45,8 @@ The most basic mixer setup is laid out hereunder in ASCII art:
   | Source |     | Source |   <--- play, pause, currentTime, etc. (html5 interface)
   ----------     ----------   
 ```
-This diagram flows from bottom to top; two
-This particular configuration is now described as
+This diagram flows from bottom to top; 
+This particular configuration can be described as
 
 ```
   var renderer = new GlRenderer();
