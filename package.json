@@ -12,15 +12,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/Sense-Studios/VirtualMixerProject.git"
   },
-  "keywords": [
-    "VJ",
-    "VMA",
-    "Video",
-    "Mixer",
-    "Videomixer",
-    "javascript",
-    "WebGL"
-  ],
+  "keywords": [ "VJ", "VMA", "Video", "Mixer", "Videomixer", "javascript", "WebGL" ],
   "author": "XangadiX",
   "license": "ISC",
   "dependencies": {
