@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./bin/www",
+    "build": "./node_modules/.bin/gulp",
     "test": "node test"
   },
   "repository": {
@@ -35,5 +36,11 @@
   "bugs": {
     "url": "https://github.com/Sense-Studios/VirtualMixerProject/issues"
   },
-  "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme"
+  "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme",
+  "devDependencies": {
+    "glob": "^3.10.10",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify": "^3.1.0"
+  }
 }

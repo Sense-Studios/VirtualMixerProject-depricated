@@ -10,6 +10,10 @@ html
     // script(src='http://nabu.sense-studios.com/assets/threejs/three.js')
     script(src='/javascripts/vendor/three.js')
 
+    // Gif source helpers    )
+    script(src='/javascripts/vendor/gif/libgif.js')
+    script(src='/javascripts/vendor/gif/rubbable.js')
+
     // JQUERY, need to update my requests, sorry
     // script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=' crossorigin='anonymous')
     // script(src='https://code.jquery.com/jquery-1.12.4.min.js')
@@ -32,39 +36,35 @@ html
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js')
     script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js')
 
-    // SOURCES
-    // Gif source helpers
-    script(src='/javascripts/mixer/sources/gif/libgif.js')
-    script(src='/javascripts/mixer/sources/gif/rubbable.js')
-    
+    // SOURCES        
     // Sources
-    script(src='/javascripts/mixer/sources/_source.js')
-    script(src='/javascripts/mixer/sources/GifSource.js')
-    script(src='/javascripts/mixer/sources/VideoSource.js')
-    script(src='/javascripts/mixer/sources/SolidSource.js')
-    script(src='/javascripts/mixer/sources/TextSource.js')
+    script(src='/javascripts/src/sources/_source.js')
+    script(src='/javascripts/src/sources/GifSource.js')
+    script(src='/javascripts/src/sources/VideoSource.js')
+    script(src='/javascripts/src/sources/SolidSource.js')
+    script(src='/javascripts/src/sources/TextSource.js')
 
     // MODULES
-    script(src='/javascripts/mixer/modules/Chain.js')
-    script(src='/javascripts/mixer/modules/Mixer.js')
-    script(src='/javascripts/mixer/modules/Switcher.js')
-    script(src='/javascripts/mixer/modules/Output.js')
+    script(src='/javascripts/src/modules/Chain.js')
+    script(src='/javascripts/src/modules/Mixer.js')
+    script(src='/javascripts/src/modules/Switcher.js')
+    script(src='/javascripts/src/modules/Output.js')
 
     // CONTROLLERS
-    script(src='/javascripts/mixer/controllers/GamePad.js')
-    script(src='/javascripts/mixer/controllers/FireBaseControl.js')
-    script(src='/javascripts/mixer/controllers/NumPadBPMMixerControl.js')
+    script(src='/javascripts/src/controllers/GamePad.js')
+    script(src='/javascripts/src/controllers/FireBaseControl.js')
+    script(src='/javascripts/src/controllers/NumPadBPMMixerControl.js')
 
     // EFFECTS
-    script(src='/javascripts/mixer/effects/BlackAndWhite.js')
+    script(src='/javascripts/src/effects/BlackAndWhite.js')
 
     // ADD-ONS
-    script(src='/javascripts/mixer/addons/BPM.js')
-    script(src='/javascripts/mixer/addons/FileManager.js')
-    script(src='/javascripts/mixer/addons/GiphyManager.js')
+    script(src='/javascripts/src/addons/BPM.js')
+    script(src='/javascripts/src/addons/FileManager.js')
+    script(src='/javascripts/src/addons/GiphyManager.js')
 
     // RENDERER
-    script(src='/javascripts/mixer/GlRenderer.js')
+    script(src='/javascripts/src/GlRenderer.js')
 
 
   body
