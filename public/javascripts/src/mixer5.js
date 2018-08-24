@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 
 
-// Proposed configuration 1
+// Proposed configuration 1 (not working yet)
 
 var RenderTree = {
   type: Mixer,
@@ -117,8 +117,14 @@ setTimeout( function() {
   //filemanager3.change()
 }, 3200)
 
+
 // ---------------------------------------------------------------------------
-// Testscripts ("Behaviours?")
+// Below are a series of scripts that I'd like to call "behaviours"
+// they will be moved from the main funcite into an Addon, but I'm not entirely
+// ready for that yet.
+// ---------------------------------------------------------------------------
+
+// Testscripts
 
 var changez_mod = 32000
 var jump_mod = 12000
@@ -153,7 +159,8 @@ function change_blendmode() {
     change_blendmode()
   }, r )
 
-  var use = [ 1, 2, 7, 8, 9, 10, 11, 13, 17, 18 ]
+  // only use a subset of the mixmodes
+  var use = [ 1, 2, 7, 8, 9, 10, 13, 17, 18 ]
   var br = use[Math.floor( Math.random() * use.length )]
   mixer1.blendMode( br );
   console.log("BLENDMODE", br)
@@ -194,7 +201,7 @@ function jumps() {
 };
 jumps()
 
-
+// be careful with scratch, especially running online it runs with bad performance
 function scratch() {
   var r =  ( Math.random() * scratch_mod ) * bpm.bps
   setTimeout( function() {
