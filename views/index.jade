@@ -9,9 +9,13 @@ block content
   .blink
   pre#info
 
+  script.
+    var giphy_id = '#{environment}'
+    var marduq_key = '#{environment}'
+
   // YOUR CODE
   script(src='/javascripts/main.js')
-  script(src='/javascripts/mixer/mixer5.js')
+  script(src='/javascripts/mixers/mixer5.js')
 
   // YOUR STYLE
   link(rel='stylesheet', href='/stylesheets/style.css')
