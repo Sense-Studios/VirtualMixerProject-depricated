@@ -200,7 +200,7 @@ function BPM( renderer ) {
     bandpassFilter.connect(analyser);
 
     // COMMENT THIS OUT FOR NOW SOUND
-    // source.connect(context.destination);
+    source.connect(context.destination);
 
     resolve(audio);
     reject(err);
@@ -842,7 +842,8 @@ function GamePadVerticalControl( renderer ) {
 }
 
 
-// based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+// refers to ...
+// https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
 
 function MidiController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
@@ -1090,9 +1091,7 @@ var GlRenderer = function() {
 
   var _self = this
 
-  _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
-
-  // set up threejs scene
+  // set up threejs scene  
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20
@@ -1126,6 +1125,7 @@ var GlRenderer = function() {
   // ---------------------------------------------------------------------------
   _self.init = function(  ) {
     console.log("init renderer")
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
 
     // init nodes
     _self.nodes.forEach(function(n){ n.init() });
@@ -1425,7 +1425,7 @@ scratch()
 // -----------------------------------------------------------------------------
 
 
-// Proposed configuration 1
+// Proposed configuration 1 (not working yet)
 
 var RenderTree = {
   type: Mixer,
@@ -1541,8 +1541,14 @@ setTimeout( function() {
   //filemanager3.change()
 }, 3200)
 
+
 // ---------------------------------------------------------------------------
-// Testscripts ("Behaviours?")
+// Below are a series of scripts that I'd like to call "behaviours"
+// they will be moved from the main funcite into an Addon, but I'm not entirely
+// ready for that yet.
+// ---------------------------------------------------------------------------
+
+// Testscripts
 
 var changez_mod = 32000
 var jump_mod = 12000
@@ -1577,7 +1583,8 @@ function change_blendmode() {
     change_blendmode()
   }, r )
 
-  var use = [ 1, 2, 7, 8, 9, 10, 11, 13, 17, 18 ]
+  // only use a subset of the mixmodes
+  var use = [ 1, 2, 7, 8, 9, 10, 13, 17, 18 ]
   var br = use[Math.floor( Math.random() * use.length )]
   mixer1.blendMode( br );
   console.log("BLENDMODE", br)
@@ -1618,7 +1625,7 @@ function jumps() {
 };
 jumps()
 
-
+// be careful with scratch, especially running online it runs with bad performance
 function scratch() {
   var r =  ( Math.random() * scratch_mod ) * bpm.bps
   setTimeout( function() {
