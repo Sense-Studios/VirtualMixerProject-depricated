@@ -12,15 +12,15 @@ A demo can be found here; http://nabu.sense-studios.com/channel/sense_beta/mixer
 
 1) clone the package, defaults to VirtualMixerProject/
 
-` git clone git@github.com:Sense-Studios/VirtualMixerProject.git `
+`$ git clone git@github.com:Sense-Studios/VirtualMixerProject.git `
 
 2) run the installer
 
-` npm install `
+`$ VirtualMixerProject/ npm install `
 
 3) start the app
 
-` npm start `
+`$ VirtualMixerProject/  npm start `
 
 You might want to test the program with `npm test`.
 point your browser to `127.0.0.1:3000` and enjoy the show.
@@ -45,7 +45,7 @@ The most basic mixer setup is laid out hereunder in ASCII art:
   | Source |     | Source |   <--- play, pause, currentTime, etc. (html5 interface)
   ----------     ----------   
 ```
-This diagram flows from bottom to top; 
+This diagram flows from bottom to top;
 This particular configuration can be described as
 
 ```

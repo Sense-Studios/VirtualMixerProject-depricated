@@ -9,6 +9,7 @@ function GiphyManager( _source ) {
   _self.program
   _self.renderer = renderer // do we even need this ?!!
 
+  // set in environment
   var key = "tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu"
 
   _self.needle = function( _needle ) {
@@ -40,6 +41,6 @@ function GiphyManager( _source ) {
     _self.change()
   }
 
-  // load it up with defauilts
+  // load it up with defaults
   _self.needle("vj")
 }
