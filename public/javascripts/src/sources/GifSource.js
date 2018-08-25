@@ -73,6 +73,8 @@ function GifSource( renderer, options ) {
   }
 
   _self.update = function() {
+
+    // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
       canvasElementContext.clearRect(0, 0, 1024, 1024);
@@ -88,7 +90,7 @@ function GifSource( renderer, options ) {
   }
 
 
-  // control interface
+  // Interface -----------------------------------------------------------------
 
   // Helpers
   _self.src = function( _file ) {
