@@ -419,3 +419,8 @@ jump around in videos. I have tried every possible combination of Cloudflare con
 
 
 # But Why?!
+
+```
+"Any application that can be written in JavaScript, will eventually be written in JavaScript."
+-- Jeff Atwood
+```

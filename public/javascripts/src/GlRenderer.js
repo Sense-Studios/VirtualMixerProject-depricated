@@ -4,9 +4,7 @@ var GlRenderer = function() {
 
   var _self = this
 
-  _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
-
-  // set up threejs scene
+  // set up threejs scene  
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20
@@ -40,6 +38,7 @@ var GlRenderer = function() {
   // ---------------------------------------------------------------------------
   _self.init = function(  ) {
     console.log("init renderer")
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
 
     // init nodes
     _self.nodes.forEach(function(n){ n.init() });

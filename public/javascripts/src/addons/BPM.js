@@ -163,7 +163,7 @@ function BPM( renderer ) {
     bandpassFilter.connect(analyser);
 
     // COMMENT THIS OUT FOR NOW SOUND
-    // source.connect(context.destination);
+    source.connect(context.destination);
 
     resolve(audio);
     reject(err);
