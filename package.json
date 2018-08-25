@@ -6,13 +6,22 @@
   "scripts": {
     "start": "node ./bin/www",
     "build": "./node_modules/.bin/gulp",
+    "docs": "node_modules/.bin/jsdoc public/javascripts/src/ -R README.md -r --debug",
     "test": "node test"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/Sense-Studios/VirtualMixerProject.git"
   },
-  "keywords": [ "VJ", "VMA", "Video", "Mixer", "Videomixer", "javascript", "WebGL" ],
+  "keywords": [
+    "VJ",
+    "VMA",
+    "Video",
+    "Mixer",
+    "Videomixer",
+    "javascript",
+    "WebGL"
+  ],
   "author": "XangadiX",
   "license": "ISC",
   "dependencies": {
@@ -30,9 +39,10 @@
   },
   "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme",
   "devDependencies": {
-    "glob": "^3.10.10",
+    "glob": "^3.1.10",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
-    "gulp-minify": "^3.1.0"
+    "gulp-minify": "^3.1.0",
+    "jsdoc": "^3.5.5"
   }
 }

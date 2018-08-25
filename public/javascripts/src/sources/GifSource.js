@@ -3,7 +3,12 @@
 GifSource.prototype = new Source(); // assign prototype to marqer
 GifSource.constructor = GifSource;  // re-assign constructor
 
-
+/**
+ * @implements Source
+ * @constructor Source#GifSource
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 function GifSource( renderer, options ) {
 
   // create and instance

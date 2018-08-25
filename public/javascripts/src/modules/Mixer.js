@@ -1,4 +1,14 @@
-function Mixer(renderer, options) {
+/**
+ * A mixer mixes two sources together. It can crossfade the sources with different MixModes and BlendModes
+ *
+ * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
+ * @constructor Mixer
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * requires source1 and source 2 in options param with a source
+ */
+
+function Mixer( renderer, options ) {
 
   // create and instance
   var _self = this;
@@ -104,11 +114,21 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   _self.alpha1 = function() { return alpha1 }
   _self.alpha2 = function() { return alpha2 }
 
+  /**
+   * @description total 8; 1: NORMAL (default), 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+   * @function Mixer#mixMode
+   * @param {number} Number of the mixmode
+   */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
     return mixmode
   }
 
+  /**
+   * @description total of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+   * @function Mixer#blendMode
+   * @param {number} Number of the blendMode
+   */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
       blendmode = _num
@@ -117,7 +137,11 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
     return blendmode
   }
 
-  // sets the position of the handle, fader or pod. 0 is left, 1 is right
+  /**
+   * @description the position of the handle, fader or pod. 0 is left, 1 is right
+   * @function Mixer#pod
+   * @param {float} position of the handle, between 0 and 1
+   */
   _self.pod = function( _num ) {
     if ( _num != undefined ) {
 

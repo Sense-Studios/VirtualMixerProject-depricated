@@ -1,4 +1,3 @@
-
 VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
@@ -9,6 +8,13 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
   // var videoTextures = [];   // videoTexture1, videoTextures,  ...
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
+/**
+ * @implements Source
+ * @constructor Source#VideoSource
+ * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 function VideoSource(renderer, options) {
 
   // create and instance
