@@ -131,9 +131,9 @@ function BPM( renderer ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  audio.src = '/audio/fulke_absurd.mp3'
   //audio.src = '/audio/rage_hard.mp3'
-
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
