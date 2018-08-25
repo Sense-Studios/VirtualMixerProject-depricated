@@ -15,7 +15,7 @@ function SolidSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  // allow bypass
+  // no updates 
   _self.bypass = true;
 
   // add to renderer

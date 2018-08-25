@@ -4,6 +4,7 @@ function BPM( renderer ) {
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  window["bpm_" + _self.uuid]
   _self.type = "Addon"
   _self.bpm = 128              // beats per minute
   _self.bps = 2.133333         // beats per second
@@ -125,12 +126,13 @@ function BPM( renderer ) {
   var treshold = 1;
   var intervalCounts = [];
 
+  // this should be set externally (at createion)
   // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
   audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/rage_hard2.mp3'
+  //audio.src = '/audio/rage_hard.mp3'
 
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'

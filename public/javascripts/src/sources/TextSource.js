@@ -42,7 +42,7 @@ function TextSource(renderer, options) {
 
     // create video element
     divElement = document.createElement('DIV');
-    divElement.innerHTML = "<h1>IF I FELL IN EFFECT</h1>"
+    divElement.innerHTML = "<h1> Awaiting text </h1>"
     //divElement.setAttribute("crossorigin","anonymous")
     //divElement.muted= true
 
@@ -52,7 +52,7 @@ function TextSource(renderer, options) {
     //} else {
     //  divElement.src = options.src
     //}
-    console.log('created div element: ', divElement )
+    // console.log('created div element: ', divElement )
 
     // set properties
     divElement.height = 1024
@@ -120,82 +120,10 @@ function TextSource(renderer, options) {
     _self.bypass = false
   }
 
+  // this should be set externally, of course
+  var text = null; $.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d })
 
-  // var text = "the Duke, ..., will die, before these eyes..., and he'll know, ......, he'll know..........., ..., that it is I, ....., Baron Vladimir Harkonnen, ......, who, encompasses, his, doom!..............................., ..............,"
-  var text = "BACK...., WITH THE, HEAVY WEIGHTS, ..., BACK...., WITH THE, HEAVY WEIGHTS, ..., JAMMS........,"
-  //var text = "2 A BEGINNING, IS A VARY\n DELICATE TIME., KNOW THEN, THAT THE YEAR IS, TEN THOUSAND, ONE NINETY NINE., THE KNOWN UNIVERSE, IS RULED, BY THE PADASISHA EMPEROR, SHADDAMM VI........., MY FATHER."
-
-  /*
-  var text = "A beginning is, a very delicate time.,\
-    Know then, that is, is the year, 10191.,\
-    The known universe, is ruled, by the Padishah Emperor, Shaddam the Fourth,\
-    my father., In this time, the most precious substance, in the universe, is the spice Melange.,\
-    The spice, extends life., The spice, expands consciousness.,\
-    A product of the Spice, the red Sapho juice, stains the lips, of the Mentats, but\
-    allows them, to be, human computers, as thinking machines, have been outlawed.\
-    The spice is vital, to space travel., The Spacing Guild, and its navigators,\
-    who the spice, has mutated, over 4000 years, use the, orange spice gas,\
-    which gives them, the ability, to fold space.,"
-  */
-
-/*
-  That is, travel, to any part, of the universe, without moving.,
-  Because the Guild controls all interplanetary travel,\
-  they are the highest power in the Universe.\
-  The Spice also plays a very secret role in the Bene Gesserit sisterhood,\
-  of which I am a part. The sisterhood has been interfering with the marriages,\
-  and the children thereof, of the great Houses of the Universe,\
-  cleverly intermixing one bloodline with another to form the Kwisatz Haderach,\
-  a super being. They plan to control this super being and use his powers for their own selfish purposes.\
-  The breeding plan has been carried out in a strict manner for 90 generations.\
-  The goal of the super being is in sight.\
-  But now, so close to the prize, a Bene Gesserit woman, Jessica,\
-  the bound concubine of Duke Leto Atreides,\
-  who has been ordered to bear only daughters,\
-  has given birth to a son. Oh, yes. I forgot to tell you.\
-  The spice exists on only one planet in the entire universe.\
-  A desolate, dry planet with vast deserts.\
-  Hidden away within the rocks of these deserts are a people known as the Fremen,\
-  who have long held a prophecy that a man would come,\
-  a messiah, who would lead them to true freedom.\
-  The planet is Arrakis, also known as Dune."
-  */
-
-
-  var text ="Fear...,\
-    Is the, mind, killer,\
-    ..................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    ..................................................................,\
-    A feeling, without limits, that you cannot, ENGINEER!,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................................................,\
-    Whoever said, we're not, supposed to get, ECSTATIC?,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the, MIND, KILLER\
-    ...........................................................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,"  
-
+  // textbehaviour should be loaded externally too
   var text_c = 0
   var current_text = ""
   var current_text_num = 0;
@@ -209,6 +137,7 @@ function TextSource(renderer, options) {
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
+    if ( text == null ) return
     // alert('oi')
     //if ( divElement.readyState === divElement.HAVE_ENOUGH_DATA ) {
     //canvasElementContext.drawImage( divElement, 0, 0, 1024, 1024 );
