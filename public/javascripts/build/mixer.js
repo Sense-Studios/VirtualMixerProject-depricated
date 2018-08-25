@@ -41,6 +41,7 @@ function BPM( renderer ) {
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  window["bpm_" + _self.uuid]
   _self.type = "Addon"
   _self.bpm = 128              // beats per minute
   _self.bps = 2.133333         // beats per second
@@ -162,12 +163,13 @@ function BPM( renderer ) {
   var treshold = 1;
   var intervalCounts = [];
 
+  // this should be set externally (at createion)
   // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
   audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/rage_hard2.mp3'
+  //audio.src = '/audio/rage_hard.mp3'
 
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
@@ -200,7 +202,7 @@ function BPM( renderer ) {
     bandpassFilter.connect(analyser);
 
     // COMMENT THIS OUT FOR NOW SOUND
-    // source.connect(context.destination);
+    source.connect(context.destination);
 
     resolve(audio);
     reject(err);
@@ -842,7 +844,8 @@ function GamePadVerticalControl( renderer ) {
 }
 
 
-// based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+// refers to ...
+// https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
 
 function MidiController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
@@ -1090,9 +1093,7 @@ var GlRenderer = function() {
 
   var _self = this
 
-  _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
-
-  // set up threejs scene
+  // set up threejs scene  
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20
@@ -1126,6 +1127,7 @@ var GlRenderer = function() {
   // ---------------------------------------------------------------------------
   _self.init = function(  ) {
     console.log("init renderer")
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
 
     // init nodes
     _self.nodes.forEach(function(n){ n.init() });
@@ -1196,449 +1198,6 @@ var GlRenderer = function() {
   }
 }
 
-// -----------------------------------------------------------------------------
-// SETTINGS
-
-// -----------------------------------------------------------------------------
-// create the renderr
-// var renderer = new GlRenderer();
-
-
-// -----------------------------------------------------------------------------
-// add your sources
-// var gifSource = new GifSource(  renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-
-//var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource5 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource6 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource7 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource8 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource9 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource10 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource11 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource12 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource13 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource14 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-//var testSource15 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-
-// there is a maximum of 16 sources (samplers)
-
-
-//  var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/5611abde6465762b80000000/720p_h264.mp4', uuid: 'testSource2' } );
-//  var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/5611abde6465762b80000000/720p_h264.mp4', uuid: 'testSource3' } );
-//  var videosource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/557c48876465763a3b000004/720p_h264.mp4' } );
-//  var videosource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/5519f9a66465764a1f8b0000/720p_h264.mp4' } );
-//  var videosource2 = new VideoSource(renderer, {} );
-
-// -----------------------------------------------------------------------------
-// add your modules
-//var mixer1 = new Mixer( renderer, { source1: videosource3, source2: testSource2 } );
-//var mixer2 = new Mixer( renderer, { source1: mixer1, source2: testSource1 } );
-
-// examples
-// var filemanager1 = new Filemanager( testSource1, { tags: ['awesome', 'manga']} )
-// var filemanager2 = new Filemanager( testSource2, { tags: ['runner', 'clutter']} )
-// var mixer1 = new Mixer(renderer, testSource1, testSource1 );
-// var chain = new Chain( renderer, { "sources": [ testSource1, testSource2, videosource3 ], "alphas": [ 1.0, 1.0, 1.0 ] } );
-// var feedback = new Feedback( renderer, source )
-// var black_and_white  = BlackAndWhite( renderer, source )
-
-// crete renderer
-
-var renderer = new GlRenderer();
-
-// create sources
-// var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource1 = new GifSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-
-// var testSource1 = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
-// var testSource2 = new SolidSource( renderer, { color: { r: 0.0, g: 1.0, b: 0.0 } } );
-// var testSource3 = new SolidSource( renderer, { color: { r: 0.0, g: 0.0, b: 1.0 } } );
-// var testSource4 = new SolidSource( renderer, { color: { r: 1.0, g: 1.0, b: 0.0 } } );
-
-// solid
-var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
-
-// create a mixer
-var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
-var mixer2 = new Mixer( renderer, { source1: testSource3, source2: testSource4 } );
-var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 } );
-
-var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
-
-
-var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
-
-
-// create the filemanager addon for the sources
-var giphymanager1 = new GiphyManager( testSource1 )
-var filemanager2 = new FileManager( testSource2 )
-var filemanager3 = new FileManager( testSource3 )
-var filemanager4 = new FileManager( testSource4 )
-
-// create a bpm addon
-var bpm = new BPM( renderer )
-
-// add the bpm to the mixer (-pod)
-bpm.add( mixer4.pod )
-
-
-// -----------------------------------------------------------------------------
-// set the output node (needs to be last!)
-var output = new Output( renderer, switcher1 )
-//var output = new Output( renderer, testSource1 )
-
-// -----------------------------------------------------------------------------
-// add a controller to mixer and bpm
-var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
-numpad1.addBpm(bpm)
-numpad1.addMixer( mixer1 )
-numpad1.addMixer( mixer2 )
-numpad1.addMixer( mixer3 )
-numpad1.addMixer( mixer4 )
-// nupad1.addFileManager
-
-//var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
-
-// var gamepad = new GamePad( renderer, mixer1, mixer2, mixer3 )
-// var gamepad1 = new GamePadDiagonalControl( renderer, mixer1, mixer2, mixer3 )
-// var gamepad2 = new GamePadVerticalControl( renderer, mixer1, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7 )
-var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
-// firebase1.addMixer( mixer1 ) ?
-// firebase1.addMixer( mixer2 ) ?
-// firebase1.addMixer( mixer3 ) ?
-// firebase1.addFileManager( filemanager1) ?
-
-// -----------------------------------------------------------------------------
-renderer.init();         // init
-renderer.render();       // start update & animation
-
-
-// -----------------------------------------------------------------------------
-
-/*
-// here is what a reset looks like:
-renderer.dispose()
-var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
-var output = new Output( renderer, testSource5 )
-renderer.init();         // init
-renderer.render();       // start update & animation
-*/
-
-/*
-// here is what a bpm composition looks like
-renderer.dispose()
-var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
-var bpm = new BPM( renderer )
-bpm.add( mixer1.pod )
-var output = new Output( renderer, testSource5 )
-renderer.init();         // init
-renderer.render();       // start update & animation
-*/
-
-setTimeout( function() {
-  //filemanager1.change()
-  //filemanager2.change()
-  //filemanager3.change()
-  //filemanager4.change()
-
-}, 12000)
-
-
-
-
-
-// -----------------------------------------------------------------------------
-// Testscripts ("Behaviours?")
-
-
-var changez_mod = 42000
-var jump_mod = 7200
-var scratch_mod = 12000
-
-// this is a hokey pokey controller
-// call this a behaviour?
-/*
-function changez() {
-  if (Math.random() > 0.5 ) {
-    filemanager1.change()
-  }else{
-    filemanager2.change()
-  }
-  var r = Math.floor( Math.random() * changez_mod )
-  setTimeout( function() {
-    changez()
-  }, r )
-};
-changez()
-*/
-
-/*
-function jumps() {
-  var r = Math.floor( Math.random() * jump_mod )
-  setTimeout( function() {
-    jumps()
-  }, r )
-
-  try {
-    if (Math.random() > 0.5 ) {
-      testSource1.video.currentTime = Math.random() * testSource1.video.duration
-      console.log("src 1 jumps")
-    }else{
-      testSource2.video.currentTime = Math.random() * testSource2.video.duration
-      console.log("src 2 jumps")
-    }
-  }catch(err) {}
-};
-jumps()
-
-
-function scratch() {
-  var r = Math.floor( Math.random() * scratch_mod )
-  setTimeout( function() {
-    scratch()
-  }, r )
-
-  try {
-    var rq = ( Math.random() * 0.6 ) + 0.7
-    //var rq = Math.pow( (Math.random() * 0.5), 0.3 )
-    if ( Math.random() > 0.5 ) {
-      testSource1.video.playbackRate = rq //+ 0.7
-      console.log("src 1 scxratches", rq)
-    }else{
-      testSource2.video.playbackRate = rq //+ 0.7
-      console.log("src 1 scxratches", rq)
-    }
-  }catch(err) { console.log("err:", err)}
-};
-scratch()
-*/
-
-// -----------------------------------------------------------------------------
-
-
-// Proposed configuration 1
-
-var RenderTree = {
-  type: Mixer,
-  src1: {
-    type: Mixer,
-    pod: 0,
-    blendmode: 1,
-    mix: 4,
-    src1: {
-      type: VideoSource,
-      src: ""
-    },
-    src2: {
-      type: VideoSource,
-      src: ""
-    }
-  },
-  src2: "",
-  pod: {
-    type: BPM,
-    name: "BPM"
-  }
-}
-
-
-
-var renderer = new GlRenderer();
-
-// ## SOURCES ##################################################################
-
-// create sources
-var testSource1 = new GifSource(   renderer, { src: '//nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif' } );
-var testSource2 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
-var testSource3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
-var testSource4 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
-
-// solid
-var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
-
-// text
-var testSource6 = new TextSource( renderer, {} );
-
-// ## MODULES ##################################################################
-
-// create 2 mixers, A/B and mixer/B
-var mixer1 = new Mixer( renderer, { source1: testSource6, source2: testSource3 } );
-var mixer3 = new Mixer( renderer, { source1: testSource1, source2: mixer1 } );
-mixer3.mixMode(3) // NAM
-
-// create a mixer, simple a/b
-var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
-var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
-
-// ## ADDONS ##################################################################
-
-// create the filemanager addon for the sources
-var giphymanager1 = new GiphyManager( testSource1 )
-var filemanager2 = new FileManager( testSource2 )
-var filemanager3 = new FileManager( testSource3 )
-var filemanager4 = new FileManager( testSource4 )
-
-// create a bpm addon
-var bpm = new BPM( renderer )
-
-// add the bpm to the mixer (-pod)
-bpm.add( mixer4.pod )
-bpm.add( mixer1.pod )
-
-// ## OUTPUT ###################################################################
-
-// set the output node (needs to be last!)
-var output = new Output( renderer, switcher1 )
-//var output = new Output( renderer, testSource6 )
-
-// ## CONTROLLERS ##############################################################
-
-// add a controller to mixer and bpm
-var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
-numpad1.addBpm( bpm )
-numpad1.addMixer( mixer1 )
-numpad1.addMixer( mixer4 )
-
-//var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
-
-// var gamepad = new GamePad( renderer, mixer1, mixer2, mixer3 )
-// var gamepad1 = new GamePadDiagonalControl( renderer, mixer1, mixer2, mixer3 )
-// var gamepad2 = new GamePadVerticalControl( renderer, mixer1, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7 )
-// var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
-// firebase1.addMixer( mixer1 ) ?
-// firebase1.addMixer( mixer2 ) ?
-// firebase1.addMixer( mixer3 ) ?
-// firebase1.addFileManager( filemanager1) ?
-
-// ## RENDER ###################################################################
-
-// -----------------------------------------------------------------------------
-renderer.init();         // init
-renderer.render();       // start update & animation
-
-// ## DELAYED START ############################################################
-
-// -----------------------------------------------------------------------------
-// AFTER LOAD Settings
-setTimeout( function() {
-  //filemanager1.change()
-  //filemanager2.change()
-  //filemanager3.change()
-  //filemanager4.change()
-  console.log("GO GO GO")
-  switcher1.doSwitch(0)
-  mixer3.pod(0)
-  //filemanager2.change()
-  //filemanager3.change()
-}, 3200)
-
-// ---------------------------------------------------------------------------
-// Testscripts ("Behaviours?")
-
-var changez_mod = 32000
-var jump_mod = 12000
-var scratch_mod = 64000
-var blend_mod = 16000
-
-// this is a hokey pokey controller
-// call this a behaviour?
-
-/*
-function changez() {
-  if (Math.random() > 0.5 ) {
-    filemanager2.change("awesome")
-    console.log("CAHNGEZ 2")
-  }else{
-    filemanager3.change("runner")
-    console.log("CAHNGEZ 3")
-  }
-  var r = changez_mod / bpm.bps
-  setTimeout( function() {
-    changez()
-  }, r )
-};
-changez()
-
-*/
-
-function change_blendmode() {
-  //var r = Math.floor( Math.random() * blend_mod )
-  var r = blend_mod / bpm.bps
-  setTimeout( function() {
-    change_blendmode()
-  }, r )
-
-  var use = [ 1, 2, 7, 8, 9, 10, 11, 13, 17, 18 ]
-  var br = use[Math.floor( Math.random() * use.length )]
-  mixer1.blendMode( br );
-  console.log("BLENDMODE", br)
-    // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
-    // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
-    // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
-    // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
-}
-change_blendmode()
-
-function change_mixmode() {
-  var r =  ( Math.random() * blend_mod ) / bpm.bps
-  setTimeout( function() {
-    change_mixmode()
-  }, r )
-
-  var mr = Math.ceil( Math.random() * 9 )
-  mixer1.mixMode( mr );
-  console.log("MIXMODE", mr)
-}
-change_mixmode()
-
-function jumps() {
-  var r =  ( Math.random() * jump_mod ) / bpm.bps
-  setTimeout( function() {
-    jumps()
-  }, r )
-
-  try {
-    if (Math.random() > 0.5 ) {
-      testSource2.video.currentTime = Math.random() * testSource2.video.duration
-      console.log("src 2 jumps")
-    }else{
-      testSource3.video.currentTime = Math.random() * testSource3.video.duration
-      console.log("src 3 jumps")
-    }
-  }catch(err) {}
-};
-jumps()
-
-
-function scratch() {
-  var r =  ( Math.random() * scratch_mod ) * bpm.bps
-  setTimeout( function() {
-    scratch()
-  }, r )
-
-  try {
-    var rq = ( Math.random() * 0.6 ) + 0.7
-    //var rq = Math.pow( (Math.random() * 0.5), 0.3 )
-    if ( Math.random() > 0.5 ) {
-      testSource2.video.playbackRate = rq //+ 0.7
-      console.log("src 1 scxratches", rq)
-    }else{
-      testSource3.video.playbackRate = rq //+ 0.7
-      console.log("src 1 scxratches", rq)
-    }
-  }catch(err) { console.log("err:", err)}
-};
-scratch()
-
 function Chain(renderer, options) {
 
   // THIS IS DEPRICATED
@@ -1704,16 +1263,18 @@ function Mixer(renderer, options) {
   var alpha2 = 0
   var pod = 0
   var mixmode = 1
-  // of 8 NORMAL, HARD, NAM, FAM, LEFT, RIGHT, CENTER, BOOM
+  // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+  //var transmodes = [ 1, 2, 3 ]
+  //var transmodes = 1
+
+
   var blendmode = 1
   // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
   // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
   // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
   // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
   _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ]
-  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-  //var transmodes = [ 1, 2, 3 ]
-  //var transmodes = 1
 
   var source1, source2
   source1 = options.source1
@@ -2065,6 +1626,8 @@ function GifSource( renderer, options ) {
   }
 
   _self.update = function() {
+
+    // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
       canvasElementContext.clearRect(0, 0, 1024, 1024);
@@ -2080,7 +1643,7 @@ function GifSource( renderer, options ) {
   }
 
 
-  // control interface
+  // Interface -----------------------------------------------------------------
 
   // Helpers
   _self.src = function( _file ) {
@@ -2123,7 +1686,7 @@ function SolidSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  // allow bypass
+  // no updates 
   _self.bypass = true;
 
   // add to renderer
@@ -2169,6 +1732,13 @@ function SolidSource(renderer, options) {
   // create and instance
 
 
+SVGSource.prototype = new Source(); // assign prototype to marqer
+SVGSource.constructor = SVGSource;  // re-assign constructor
+
+// TODO
+// hook Lottie up
+
+
 TextSource.prototype = new Source(); // assign prototype to marqer
 TextSource.constructor = TextSource;  // re-assign constructor
 
@@ -2212,7 +1782,7 @@ function TextSource(renderer, options) {
 
     // create video element
     divElement = document.createElement('DIV');
-    divElement.innerHTML = "<h1>IF I FELL IN EFFECT</h1>"
+    divElement.innerHTML = "<h1> Awaiting text </h1>"
     //divElement.setAttribute("crossorigin","anonymous")
     //divElement.muted= true
 
@@ -2222,7 +1792,7 @@ function TextSource(renderer, options) {
     //} else {
     //  divElement.src = options.src
     //}
-    console.log('created div element: ', divElement )
+    // console.log('created div element: ', divElement )
 
     // set properties
     divElement.height = 1024
@@ -2290,82 +1860,10 @@ function TextSource(renderer, options) {
     _self.bypass = false
   }
 
+  // this should be set externally, of course
+  var text = null; $.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d })
 
-  // var text = "the Duke, ..., will die, before these eyes..., and he'll know, ......, he'll know..........., ..., that it is I, ....., Baron Vladimir Harkonnen, ......, who, encompasses, his, doom!..............................., ..............,"
-  var text = "BACK...., WITH THE, HEAVY WEIGHTS, ..., BACK...., WITH THE, HEAVY WEIGHTS, ..., JAMMS........,"
-  //var text = "2 A BEGINNING, IS A VARY\n DELICATE TIME., KNOW THEN, THAT THE YEAR IS, TEN THOUSAND, ONE NINETY NINE., THE KNOWN UNIVERSE, IS RULED, BY THE PADASISHA EMPEROR, SHADDAMM VI........., MY FATHER."
-
-  /*
-  var text = "A beginning is, a very delicate time.,\
-    Know then, that is, is the year, 10191.,\
-    The known universe, is ruled, by the Padishah Emperor, Shaddam the Fourth,\
-    my father., In this time, the most precious substance, in the universe, is the spice Melange.,\
-    The spice, extends life., The spice, expands consciousness.,\
-    A product of the Spice, the red Sapho juice, stains the lips, of the Mentats, but\
-    allows them, to be, human computers, as thinking machines, have been outlawed.\
-    The spice is vital, to space travel., The Spacing Guild, and its navigators,\
-    who the spice, has mutated, over 4000 years, use the, orange spice gas,\
-    which gives them, the ability, to fold space.,"
-  */
-
-/*
-  That is, travel, to any part, of the universe, without moving.,
-  Because the Guild controls all interplanetary travel,\
-  they are the highest power in the Universe.\
-  The Spice also plays a very secret role in the Bene Gesserit sisterhood,\
-  of which I am a part. The sisterhood has been interfering with the marriages,\
-  and the children thereof, of the great Houses of the Universe,\
-  cleverly intermixing one bloodline with another to form the Kwisatz Haderach,\
-  a super being. They plan to control this super being and use his powers for their own selfish purposes.\
-  The breeding plan has been carried out in a strict manner for 90 generations.\
-  The goal of the super being is in sight.\
-  But now, so close to the prize, a Bene Gesserit woman, Jessica,\
-  the bound concubine of Duke Leto Atreides,\
-  who has been ordered to bear only daughters,\
-  has given birth to a son. Oh, yes. I forgot to tell you.\
-  The spice exists on only one planet in the entire universe.\
-  A desolate, dry planet with vast deserts.\
-  Hidden away within the rocks of these deserts are a people known as the Fremen,\
-  who have long held a prophecy that a man would come,\
-  a messiah, who would lead them to true freedom.\
-  The planet is Arrakis, also known as Dune."
-  */
-
-
-  var text ="Fear...,\
-    Is the, mind, killer,\
-    ..................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    ..................................................................,\
-    A feeling, without limits, that you cannot, ENGINEER!,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................................................,\
-    Whoever said, we're not, supposed to get, ECSTATIC?,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the, MIND, KILLER\
-    ...........................................................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,"  
-
+  // textbehaviour should be loaded externally too
   var text_c = 0
   var current_text = ""
   var current_text_num = 0;
@@ -2379,6 +1877,7 @@ function TextSource(renderer, options) {
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
+    if ( text == null ) return
     // alert('oi')
     //if ( divElement.readyState === divElement.HAVE_ENOUGH_DATA ) {
     //canvasElementContext.drawImage( divElement, 0, 0, 1024, 1024 );
@@ -2477,7 +1976,8 @@ VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
   // TODO: implement these as arrays ?
-  // This is new, but better
+  // This is new, but better?
+  // Or let file manager handle it?
   // var videos =        [];   // video1, video2, video3, ...
   // var videoTextures = [];   // videoTexture1, videoTextures,  ...
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
@@ -2546,14 +2046,17 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    // firstload for mobile
+    // firstload handler for mobile; neest at least 1 user click
     $("body").click(function() {
       videoElement.play();
       _self.firstplay = true
     });
 
     videoElement.volume = 0;
-    //videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
 
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
@@ -2634,7 +2137,9 @@ function VideoSource(renderer, options) {
       return _num;
     }
 
-  }  // seconds
+  }
+
+  // seconds
   _self.duration =     function() { return videoElement.duration }    // seconds
 
   // ===========================================================================

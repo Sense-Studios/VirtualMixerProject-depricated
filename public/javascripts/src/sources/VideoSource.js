@@ -3,7 +3,8 @@ VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
   // TODO: implement these as arrays ?
-  // This is new, but better
+  // This is new, but better?
+  // Or let file manager handle it?
   // var videos =        [];   // video1, video2, video3, ...
   // var videoTextures = [];   // videoTexture1, videoTextures,  ...
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
@@ -72,14 +73,17 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    // firstload for mobile
+    // firstload handler for mobile; neest at least 1 user click
     $("body").click(function() {
       videoElement.play();
       _self.firstplay = true
     });
 
     videoElement.volume = 0;
-    //videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
 
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
@@ -160,7 +164,9 @@ function VideoSource(renderer, options) {
       return _num;
     }
 
-  }  // seconds
+  }
+
+  // seconds
   _self.duration =     function() { return videoElement.duration }    // seconds
 
   // ===========================================================================

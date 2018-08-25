@@ -3,6 +3,7 @@
 
 // Proposed configuration 1 (not working yet)
 
+/*
 var RenderTree = {
   type: Mixer,
   src1: {
@@ -25,7 +26,7 @@ var RenderTree = {
     name: "BPM"
   }
 }
-
+*/
 
 
 var renderer = new GlRenderer();
@@ -37,6 +38,9 @@ var testSource1 = new GifSource(   renderer, { src: '//nabu.sense-studios.com/as
 var testSource2 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
 var testSource3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
 var testSource4 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
+
+var clutter = new VideoSource( renderer, { src: '/video/16MMDUSTproc.mp4' } );
+
 
 // solid
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
@@ -53,7 +57,10 @@ mixer3.mixMode(3) // NAM
 
 // create a mixer, simple a/b
 var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
-var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
+var mixer5 = new Mixer( renderer, { source1: mixer1, source2: clutter } );
+mixer5.mixMode(9)
+
+var switcher1 = new Switcher( renderer, [ mixer5, mixer3  ] );
 
 // ## ADDONS ##################################################################
 
@@ -160,7 +167,7 @@ function change_blendmode() {
   }, r )
 
   // only use a subset of the mixmodes
-  var use = [ 1, 2, 7, 8, 9, 10, 13, 17, 18 ]
+  var use = [ 1, 7, 8, 9, 10, 13, 17, 18 ]
   var br = use[Math.floor( Math.random() * use.length )]
   mixer1.blendMode( br );
   console.log("BLENDMODE", br)
@@ -174,7 +181,8 @@ change_blendmode()
 function change_mixmode() {
   var r =  ( Math.random() * blend_mod ) / bpm.bps
   setTimeout( function() {
-    change_mixmode()
+    var use = [ 0, 1, 2, 3, 6, 7]
+    change_mixmode( use[ Math.floor(Math.random()*use.length)] );
   }, r )
 
   var mr = Math.ceil( Math.random() * 9 )
