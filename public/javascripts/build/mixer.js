@@ -163,12 +163,13 @@ function BPM( renderer ) {
   var treshold = 1;
   var intervalCounts = [];
 
+  // this should be set externally (at createion)
   // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
   audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/rage_hard2.mp3'
+  //audio.src = '/audio/rage_hard.mp3'
 
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
@@ -1262,16 +1263,18 @@ function Mixer(renderer, options) {
   var alpha2 = 0
   var pod = 0
   var mixmode = 1
-  // of 8 NORMAL, HARD, NAM, FAM, LEFT, RIGHT, CENTER, BOOM
+  // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+  //var transmodes = [ 1, 2, 3 ]
+  //var transmodes = 1
+
+
   var blendmode = 1
   // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
   // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
   // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
   // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
   _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ]
-  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-  //var transmodes = [ 1, 2, 3 ]
-  //var transmodes = 1
 
   var source1, source2
   source1 = options.source1
@@ -1623,6 +1626,8 @@ function GifSource( renderer, options ) {
   }
 
   _self.update = function() {
+
+    // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
       canvasElementContext.clearRect(0, 0, 1024, 1024);
@@ -1638,7 +1643,7 @@ function GifSource( renderer, options ) {
   }
 
 
-  // control interface
+  // Interface -----------------------------------------------------------------
 
   // Helpers
   _self.src = function( _file ) {
@@ -1681,7 +1686,7 @@ function SolidSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  // allow bypass
+  // no updates 
   _self.bypass = true;
 
   // add to renderer
@@ -1727,6 +1732,13 @@ function SolidSource(renderer, options) {
   // create and instance
 
 
+SVGSource.prototype = new Source(); // assign prototype to marqer
+SVGSource.constructor = SVGSource;  // re-assign constructor
+
+// TODO
+// hook Lottie up
+
+
 TextSource.prototype = new Source(); // assign prototype to marqer
 TextSource.constructor = TextSource;  // re-assign constructor
 
@@ -1770,7 +1782,7 @@ function TextSource(renderer, options) {
 
     // create video element
     divElement = document.createElement('DIV');
-    divElement.innerHTML = "<h1>IF I FELL IN EFFECT</h1>"
+    divElement.innerHTML = "<h1> Awaiting text </h1>"
     //divElement.setAttribute("crossorigin","anonymous")
     //divElement.muted= true
 
@@ -1780,7 +1792,7 @@ function TextSource(renderer, options) {
     //} else {
     //  divElement.src = options.src
     //}
-    console.log('created div element: ', divElement )
+    // console.log('created div element: ', divElement )
 
     // set properties
     divElement.height = 1024
@@ -1848,82 +1860,10 @@ function TextSource(renderer, options) {
     _self.bypass = false
   }
 
+  // this should be set externally, of course
+  var text = null; $.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d })
 
-  // var text = "the Duke, ..., will die, before these eyes..., and he'll know, ......, he'll know..........., ..., that it is I, ....., Baron Vladimir Harkonnen, ......, who, encompasses, his, doom!..............................., ..............,"
-  var text = "BACK...., WITH THE, HEAVY WEIGHTS, ..., BACK...., WITH THE, HEAVY WEIGHTS, ..., JAMMS........,"
-  //var text = "2 A BEGINNING, IS A VARY\n DELICATE TIME., KNOW THEN, THAT THE YEAR IS, TEN THOUSAND, ONE NINETY NINE., THE KNOWN UNIVERSE, IS RULED, BY THE PADASISHA EMPEROR, SHADDAMM VI........., MY FATHER."
-
-  /*
-  var text = "A beginning is, a very delicate time.,\
-    Know then, that is, is the year, 10191.,\
-    The known universe, is ruled, by the Padishah Emperor, Shaddam the Fourth,\
-    my father., In this time, the most precious substance, in the universe, is the spice Melange.,\
-    The spice, extends life., The spice, expands consciousness.,\
-    A product of the Spice, the red Sapho juice, stains the lips, of the Mentats, but\
-    allows them, to be, human computers, as thinking machines, have been outlawed.\
-    The spice is vital, to space travel., The Spacing Guild, and its navigators,\
-    who the spice, has mutated, over 4000 years, use the, orange spice gas,\
-    which gives them, the ability, to fold space.,"
-  */
-
-/*
-  That is, travel, to any part, of the universe, without moving.,
-  Because the Guild controls all interplanetary travel,\
-  they are the highest power in the Universe.\
-  The Spice also plays a very secret role in the Bene Gesserit sisterhood,\
-  of which I am a part. The sisterhood has been interfering with the marriages,\
-  and the children thereof, of the great Houses of the Universe,\
-  cleverly intermixing one bloodline with another to form the Kwisatz Haderach,\
-  a super being. They plan to control this super being and use his powers for their own selfish purposes.\
-  The breeding plan has been carried out in a strict manner for 90 generations.\
-  The goal of the super being is in sight.\
-  But now, so close to the prize, a Bene Gesserit woman, Jessica,\
-  the bound concubine of Duke Leto Atreides,\
-  who has been ordered to bear only daughters,\
-  has given birth to a son. Oh, yes. I forgot to tell you.\
-  The spice exists on only one planet in the entire universe.\
-  A desolate, dry planet with vast deserts.\
-  Hidden away within the rocks of these deserts are a people known as the Fremen,\
-  who have long held a prophecy that a man would come,\
-  a messiah, who would lead them to true freedom.\
-  The planet is Arrakis, also known as Dune."
-  */
-
-
-  var text ="Fear...,\
-    Is the, mind, killer,\
-    ..................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    ..................................................................,\
-    A feeling, without limits, that you cannot, ENGINEER!,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................................................,\
-    Whoever said, we're not, supposed to get, ECSTATIC?,\
-    ..................................................................,\
-    Fear is, the mind, killer.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    ..................................,\
-    NO........, FEAR.......,\
-    ..................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the, MIND, KILLER\
-    ...........................................................................,\
-    It's a, media-induced, comatose, ANAESTHETIC!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,\
-    In, the, space, of, the, heart..., is, a, place, of, no, FEAR...!,\
-    .............................................,\
-    Fear is, the mind, killer.......,\
-    .............................................,"  
-
+  // textbehaviour should be loaded externally too
   var text_c = 0
   var current_text = ""
   var current_text_num = 0;
@@ -1937,6 +1877,7 @@ function TextSource(renderer, options) {
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
+    if ( text == null ) return
     // alert('oi')
     //if ( divElement.readyState === divElement.HAVE_ENOUGH_DATA ) {
     //canvasElementContext.drawImage( divElement, 0, 0, 1024, 1024 );
@@ -2035,7 +1976,8 @@ VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
   // TODO: implement these as arrays ?
-  // This is new, but better
+  // This is new, but better?
+  // Or let file manager handle it?
   // var videos =        [];   // video1, video2, video3, ...
   // var videoTextures = [];   // videoTexture1, videoTextures,  ...
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
@@ -2104,14 +2046,17 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    // firstload for mobile
+    // firstload handler for mobile; neest at least 1 user click
     $("body").click(function() {
       videoElement.play();
       _self.firstplay = true
     });
 
     videoElement.volume = 0;
-    //videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
 
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
@@ -2192,7 +2137,9 @@ function VideoSource(renderer, options) {
       return _num;
     }
 
-  }  // seconds
+  }
+
+  // seconds
   _self.duration =     function() { return videoElement.duration }    // seconds
 
   // ===========================================================================

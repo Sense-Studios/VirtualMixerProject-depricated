@@ -1,0 +1,6 @@
+// var text = "the Duke, ..., will die, before these eyes..., and he'll know, ......, he'll know..........., ..., that it is I, ....., Baron Vladimir Harkonnen, ......, who, encompasses, his, doom!..............................., ..............,"
+/*
+var text = "BACK...., WITH THE, HEAVY WEIGHTS, ..., BACK...., WITH THE, HEAVY....., WEIGHTS.........., ..., SENSE.................................................................,\
+.................................................................,\
+.................................................................,"
+*/
