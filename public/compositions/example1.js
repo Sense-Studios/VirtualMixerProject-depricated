@@ -16,6 +16,8 @@ var output = new Output( renderer, mixer1 )
 renderer.init();         // init
 renderer.render();       // start update & animation
 
+var bpm = new BPM( renderer, { audio: '/audio/rage_hard.mp3' } )
+
 // add a function that moves the mixer handle from left to right.
 var c = 0;
 setInterval( function() {

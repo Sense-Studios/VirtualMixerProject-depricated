@@ -10,11 +10,11 @@
  * @param source:Source
  * @author Sense Studios
  */
-function Switcher(renderer, _sources ) {
+
+function Switcher(renderer, options ) {
 
   // create and instance
   var _self = this;
-  _self.sources = _sources // array
 
   // set or get uid
   _self.uuid = "Switcher_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -23,9 +23,15 @@ function Switcher(renderer, _sources ) {
   // add to renderer
   renderer.add(_self)
 
-  // add source
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options
 
-  _self.active_source = 0
+  // add source
+  if (_options.source1 && _options.source2) {
+    _self.sources = [ _options.source1, _options.source2 ]; // array
+    _self.active_source = 0
+  }
 
   _self.init = function() {
 

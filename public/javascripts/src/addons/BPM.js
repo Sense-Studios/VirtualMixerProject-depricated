@@ -3,16 +3,15 @@
  *   BPM (Audio analysis)
  *
  * @example
- *   let mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- *   let bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
- *   bpm.add( mixer1.pod )
+ * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ * var bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ * bpm.add( mixer1.pod )
  * @constructor Addon#BPM
  * @implements Addon
  * @param {GlRenderer} renderer
- * @param {File} audio optional
- * @author Sense Studios
+ * @param {Object} options optional
  */
-function BPM( renderer ) {
+function BPM( renderer, options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -21,29 +20,46 @@ function BPM( renderer ) {
   window["bpm_" + _self.uuid]
   _self.type = "Addon"
 
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  /**
+   * @description Beats Per Minute
+   * @member Addon#BPM#bpm
+   * @param {number} Beats per minute
+  */
+  _self.bpm = 128              // beats per minute
+
   /**
    * @description Tapping beat control
-   * @member BPM#bpm
-   * @member BPM#bps
-   * @member BPM#sec
-   * @member BPM#bpm_float
-   * @member BPM#mod
-   */
-
-  _self.bpm = 128              // beats per minute
+   * @member Addon#BPM#bps
+  */
   _self.bps = 2.133333         // beats per second
   _self.sec = 0                // second counter, from which the actual float is calculated
+
+  /**
+   * @description
+   *  BPM Float, current *position* of the BPM
+   *  If the BMP is a Sinus going up and down, the float shows up where it is on the curve
+   *  'up' is 1 and down is '0', oscillating.
+   * @member Addon#BPM#bpm_float
+  */
   _self.bpm_float = 0.46875    // 60 / 128, current float of bpm
+
+  /**
+   * @description Tapping beat control
+   * @member Addon#BPM#mod
+  */
   _self.mod = 1                // 0.25, 0.5, 1, 2, 4, etc.
 
   /**
    * @description Audio analysis
-   * @member BPM#useAutoBpm#
-   * @member BPM#autoBpmData#
-   * @member BPM#useMicrophone
-   * @member BPM#audio_src
+   * @member Addon#BPM#useAutoBpm#
+   * @member Addon#BPM#autoBpmData#
+   * @member Addon#BPM#useMicrophone
+   * @member Addon#BPM#audio_src
    */
-
   _self.useAutoBpm = true      // auto bpm
   _self.autoBpmData = {}       // info object for the auto bpm
   _self.useMicrophone = false  // use useMicrophone for autoBPM
@@ -99,11 +115,19 @@ function BPM( renderer ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2 // Math.sin( 128 / 60 )
   }
 
-  // half or double the bpm
+  /**
+   * @description double the bpm
+   * @function Addon#BPM#modUp
+  */
   _self.modUp = function() { _self.mod *= 2; }
+
+  /**
+   * @description half the bpm
+   * @function Addon#BPM#modDown
+  */
   _self.modDown = function() { _self.mod *= .5; }
 
-  // add nodes
+  // add nodes, implicit
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -140,6 +164,7 @@ function BPM( renderer ) {
   // ---------------------------------------------------------------------------
   // AUTO BPM
   // because of timing issues, autobpm runs seperate from the update call
+  // ---------------------------------------------------------------------------
 
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
@@ -169,6 +194,8 @@ function BPM( renderer ) {
   // audio.src =  'http://37.220.36.53:7904';
   //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   audio.src = '/audio/fulke_absurd.mp3'
+  if ( _options.audio ) audio.src = _options.audio
+
   //audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'

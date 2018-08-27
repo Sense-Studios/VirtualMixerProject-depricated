@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: FileManager</title>
+    <title>JSDoc: Class: NumpadBpmMixerControl</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: FileManager</h1>
+    <h1 class="page-title">Class: NumpadBpmMixerControl</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="Addon.html">Addon</a>#</span>FileManager<span class="signature">(renderer, source)</span><span class="type-signature"></span></h2>
+            <span class="ancestors"><a href="Controller.html">Controller</a>#</span>NumpadBpmMixerControl<span class="signature">(renderer, mixer, bpm)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -42,7 +42,7 @@
     
 
     
-    <h4 class="name" id="FileManager"><span class="type-signature"></span>new FileManager<span class="signature">(renderer, source)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="NumpadBpmMixerControl"><span class="type-signature"></span>new NumpadBpmMixerControl<span class="signature">(renderer, mixer, bpm)</span><span class="type-signature"></span></h4>
     
 
     
@@ -50,7 +50,7 @@
 
 
 <div class="description">
-    <p>FileManager</p>
+    <p>Test en demo controller NumpadBpmMixerControl</p>
 </div>
 
 
@@ -102,20 +102,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>GlRenderer object</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>source</code></td>
+                <td class="name"><code>mixer</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">VideoSource</span>
+<span class="param-type"><a href="Module_Mixer.html">Module#Mixer</a></span>
 
 
             
@@ -125,7 +125,30 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>a Mixer instance</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bpm</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Addon_BPM.html">Addon#BPM</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>a BPM instance</p></td>
         </tr>
 
     
@@ -153,7 +176,7 @@
     <dt class="implements">Implements:</dt>
     <dd class="implements"><ul>
         
-            <li><a href="Addon.html">Addon</a></li>
+            <li><a href="Controller.html">Controller</a></li>
         
     </ul></dd>
     
@@ -173,7 +196,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line1">line 1</a>
+        <a href="controllers_NumPadBPMMixerControl.js.html">controllers/NumPadBPMMixerControl.js</a>, <a href="controllers_NumPadBPMMixerControl.js.html#line4">line 4</a>
     </li></ul></dd>
     
 
@@ -202,7 +225,7 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>let filemanager1 = new FileManager( renderer, { audio: 'mymusic.mp3' } );</code></pre>
+    <pre class="prettyprint"><code>var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );</code></pre>
 
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: sources/_source.js</title>
+    <title>JSDoc: Source: controllers/_controllers.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: sources/_source.js</h1>
+    <h1 class="page-title">Source: controllers/_controllers.js</h1>
 
     
 
@@ -27,35 +27,26 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @constructor Source
+ * @constructor Controller
  * @interface
  */
 
-function Source( renderer, options ) {
+function Controller( renderer, options ) {
   var _self = this
 
-  /*
-    renderer
-  */
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
 
-
-  _self.type = "Source"
-
-  // override these
+  _self.type = "Controller"
 
   // program interface
   _self.init =         function() {}
   _self.update =       function() {}
   _self.render =       function() {}
-  _self.start =        function() {}
+  _self.add =        function() {}
+  //_self.start =        function() {}
 
-  // control interface
-  _self.src =          function( _file ) {} // .gif
-  _self.play =         function() {}
-  _self.pause =        function() {}
-  _self.paused =       function() {}
-  _self.currentFrame = function( _num ) {}  // seconds
-  _self.duration =     function() {}        // seconds
 }
 </code></pre>
         </article>
