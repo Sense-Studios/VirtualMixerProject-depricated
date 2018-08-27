@@ -54,7 +54,8 @@ var renderer = new GlRenderer();
 
 // create sources
 // var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
-var testSource1 = new GifSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
+//var testSource1 = new GifSource( renderer, { src: '' } );
+var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
 var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
 var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
 var testSource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
@@ -80,6 +81,7 @@ var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
 
 // create the filemanager addon for the sources
 var giphymanager1 = new GiphyManager( testSource1 )
+var filemanager1 = new FileManager( testSource1 )
 var filemanager2 = new FileManager( testSource2 )
 var filemanager3 = new FileManager( testSource3 )
 var filemanager4 = new FileManager( testSource4 )
@@ -162,18 +164,22 @@ setTimeout( function() {
 // Testscripts ("Behaviours?")
 
 
-var changez_mod = 42000
+var changez_mod = 12000
 var jump_mod = 7200
 var scratch_mod = 12000
 
 // this is a hokey pokey controller
 // call this a behaviour?
-/*
+
 function changez() {
-  if (Math.random() > 0.5 ) {
-    filemanager1.change()
+  if (Math.random() > 0.25 ) {
+    filemanager1.change();
+  }else if (Math.random() > 0.50 ) {
+    filemanager2.change();
+  }else if (Math.random() > 0.75 ) {
+    filemanager3.change();
   }else{
-    filemanager2.change()
+    filemanager4.change();
   }
   var r = Math.floor( Math.random() * changez_mod )
   setTimeout( function() {
@@ -181,7 +187,7 @@ function changez() {
   }, r )
 };
 changez()
-*/
+
 
 /*
 function jumps() {

@@ -1,3 +1,17 @@
+/**
+ * @description
+ *   Output
+ *
+ * @example
+ *  let myChain = new output( renderer, source );
+ *  renderer.init()
+ *  renderer.render()
+ * @implements Module
+ * @constructor Module#Output
+ * @param renderer:GlRenderer
+ * @param source:Source
+ * @author Sense Studios
+ */
 function Output(renderer, _source ) {
 
   // create and instance
@@ -6,7 +20,7 @@ function Output(renderer, _source ) {
   // set or get uid
   _self.uuid = "Output_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Module"
-  
+
   // add to renderer
   renderer.add(_self)
 

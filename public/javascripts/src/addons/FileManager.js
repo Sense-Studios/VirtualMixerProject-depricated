@@ -1,3 +1,15 @@
+/**
+ * @description
+ *   FileManager
+ *
+ * @example
+ *  let filemanager1 = new FileManager( renderer, { audio: 'mymusic.mp3' } );
+ * @implements Addon
+ * @constructor Addon#FileManager
+ * @param {GlRenderer} renderer
+ * @param {Source}  source
+ * @author Sense Studios
+ */
 function FileManager( _source ) {
 
   var _self = this

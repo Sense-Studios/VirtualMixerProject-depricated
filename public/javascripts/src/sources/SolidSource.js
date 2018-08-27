@@ -4,6 +4,13 @@
 SolidSource.prototype = new Source(); // assign prototype to marqer
 SolidSource.constructor = SolidSource;  // re-assign constructor
 
+/**
+ * @implements Source
+ * @constructor Source#SolidSource
+ * @example var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 
 function SolidSource(renderer, options) {
   // vec3( 1.0, 0.0, 0.0 )
@@ -15,7 +22,7 @@ function SolidSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  // no updates 
+  // no updates
   _self.bypass = true;
 
   // add to renderer
@@ -47,7 +54,15 @@ function SolidSource(renderer, options) {
 
   // ---------------------------------------------------------------------------
   // Helpers
-
+  /**
+  * @implements Source
+  * @function Source#SolidSource#color
+  * @example red.color( { r: 0.0, g: 0.0, b: 1.0 } );
+  * @param {float} r - red value
+  * @param {float} g - green value
+  * @param {float} b - blue value
+  * @returns color
+  */
   _self.color = function( c ) {
     if ( c != undefined ) {
       color = c

@@ -1,0 +1,4 @@
+/**
+ * @constructor Addon
+ * @interface
+ */
