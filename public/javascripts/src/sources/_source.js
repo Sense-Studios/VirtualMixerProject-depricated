@@ -1,5 +1,6 @@
 /**
  * @constructor Source
+ * @interface
  */
 
 function Source( renderer, options ) {

@@ -1,8 +1,6 @@
 {
-    "plugins": ["plugins/markdown"],
     "recurseDepth": 10,
     "source": {
-        "include": ["."],
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern ": ""
     },
@@ -14,5 +12,14 @@
     "templates": {
         "cleverLinks": false,
         "monospaceLinks": false
+    },
+    "opts": {
+       "destination": "./docs/reference"
+    },
+    "plugins": ["plugins/markdown"],
+    "markdown": {
+      "excludeTags": [],
+      "tags": ["markdown"],
+      "hardwrap": true
     }
 }

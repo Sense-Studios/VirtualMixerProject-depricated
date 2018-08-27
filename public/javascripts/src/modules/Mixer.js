@@ -1,12 +1,27 @@
 /**
- * A mixer mixes two sources together. It can crossfade the sources with different MixModes and BlendModes
+ * @summary
+ *    A mixer mixes two sources together.
+ *
+ * @description
+ *   It can crossfade the sources with different _MixModes_ and _BlendModes_
+ *   requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
- * @constructor Mixer
+ * @constructor Module#Mixer
+ * @implements Module
  * @param renderer:GlRenderer
  * @param options:Object
- * requires source1 and source 2 in options param with a source
+ * @author Sense Studios
  */
+
+
+ // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
+ // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
+ // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
+ // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+
+ // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+
 
 function Mixer( renderer, options ) {
 
@@ -28,29 +43,23 @@ function Mixer( renderer, options ) {
   if ( options != undefined ) _options = options
 
   // set type
-  _self.type = "Module"
+  _self.type = "Module";
 
   // add local variables
-  var alpha1 = 1
-  var alpha2 = 0
-  var pod = 0
-  var mixmode = 1
-  // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
-  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-  //var transmodes = [ 1, 2, 3 ]
-  //var transmodes = 1
+  var alpha1 = 1;
+  var alpha2 = 0;
+  var pod = 0;
 
+  var mixmode = 1;
+  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 
-  var blendmode = 1
-  // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
-  // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
-  // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
-  // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
-  _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ]
+  var blendmode = 1;
+  _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
 
-  var source1, source2
-  source1 = options.source1
-  source2 = options.source2
+  var source1, source2;
+  source1 = options.source1;   // Mandatory
+  source2 = options.source2;   // Mandatory
+
 
   _self.init = function() {
 
@@ -115,9 +124,21 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   _self.alpha2 = function() { return alpha2 }
 
   /**
-   * @description total 8; 1: NORMAL (default), 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
-   * @function Mixer#mixMode
-   * @param {number} Number of the mixmode
+   * @description
+   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-8;
+   *  ```
+   *  1: NORMAL (default),
+   *  2: HARD,
+   *  3: NAM,
+   *  4: FAM,
+   *  5: LEFT,
+   *  6: RIGHT,
+   *  7: CENTER,
+   *  8: BOOM
+   *  ```
+   *
+   * @function Module#Mixer#mixMode
+   * @param {number} mixmode index of the Mixmode
    */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
@@ -125,9 +146,30 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   }
 
   /**
-   * @description total of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
-   * @function Mixer#blendMode
-   * @param {number} Number of the blendMode
+   * @description
+   *  gets or sets the _blendMode_, there are 18 Blendmodes available, numbered 1-18;
+   *  ```
+   *  1 ADD (default),
+   *  2 SUBSTRACT,
+   *  3 MULTIPLY,
+   *  4 DARKEN,
+   *  5 COLOUR BURN,
+   *  6 LINEAR_BURN,
+   *  7 LIGHTEN,
+   *  8 SCREEN,
+   *  9 COLOUR_DODGE,
+   *  10 LINEAR_DODGE,
+   *  11 OVERLAY,
+   *  12 SOFT_LIGHT,
+   *  13 HARD_LIGHT,
+   *  14 VIVID_LIGHT,
+   *  15 LINEAR_LIGHT,
+   *  16 PIN_LIGHT,
+   *  17 DIFFERENCE,
+   *  18 EXCLUSION
+   *  ```
+   * @function Module#Mixer#blendMode
+   * @param {number} blendmode index of the Blendmode
    */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
@@ -139,8 +181,8 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
 
   /**
    * @description the position of the handle, fader or pod. 0 is left, 1 is right
-   * @function Mixer#pod
-   * @param {float} position of the handle, between 0 and 1
+   * @function Module#Mixer#pod
+   * @param {float} position - position of the handle
    */
   _self.pod = function( _num ) {
     if ( _num != undefined ) {
