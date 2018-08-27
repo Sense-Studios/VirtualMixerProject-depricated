@@ -1,10 +1,30 @@
+
+/**
+ * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ * @constructor GlRenderer
+ * @example
+ *    <!-- a Canvas element with id: glcanvas is required! -->
+ *    <canvas id="glcanvas"></canvas>
+ *
+ *
+ *    <script>
+ *      let renderer = new GlRenderer();
+ *
+ *      var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+ *      let output = new Output( renderer, red )
+ *
+ *      renderer.init();
+ *      renderer.render();
+ *    </script>
+ */
+
 var GlRenderer = function() {
 
   console.log("created renderer")
 
   var _self = this
-
-  // set up threejs scene  
+  /** This is a description of the foo function. */
+  // set up threejs scene
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20
@@ -36,11 +56,17 @@ var GlRenderer = function() {
 \n}"
 
   // ---------------------------------------------------------------------------
+  /** @function GlRenderer.init */
   _self.init = function(  ) {
     console.log("init renderer")
     _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
 
     // init nodes
+    // reset the renderer, for a new lay out
+    /**
+     * All the nodes currently added to this renderer
+     * @member GlRenderer#nodes
+     */
     _self.nodes.forEach(function(n){ n.init() });
 
     // create the shader
@@ -59,11 +85,16 @@ var GlRenderer = function() {
     _self.surface = new THREE.Mesh( _self.flatGeometry, _self.shaderMaterial );
     // surface.position.set(60,50,150);
 
+    /**
+     * A reference to the threejs scene
+     * @member GlRenderer#scene
+     */
     _self.scene.add( _self.surface );
   }
 
   // ---------------------------------------------------------------------------
   var r = Math.round(Math.random()*100)
+  /** @function GlRenderer.render */
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
@@ -75,11 +106,16 @@ var GlRenderer = function() {
   // Helpers
 
   // adds nodes to the renderer
+  // function is implicit, and is colled by the modules
   _self.add = function( module ) {
     _self.nodes.push( module )
   }
 
   // reset the renderer, for a new lay out
+  /**
+   * Disposes the renderer
+   * @function GlRenderer#dispose
+   */
   _self.dispose = function() {
     _self.shaderMaterial
     _self.flatGeometry
@@ -88,6 +124,11 @@ var GlRenderer = function() {
     _self.customUniforms = {}
     _self.customDefines = {}
     // base vertexShader
+
+    /**
+     * The vertex shader
+     * @member GlRenderer#vertexShader
+     */
     _self.vertexShader = "\
   \nvarying vec2 vUv;\
   \nvoid main() {\
@@ -95,6 +136,10 @@ var GlRenderer = function() {
   \n  vUv = uv;\
   \n}"
 
+  /**
+   * The fragment shader
+   * @member GlRenderer#fragmentShader
+   */
     // base fragment shader
     _self.fragmentShader = "\
   \nuniform sampler2D textureTest;\

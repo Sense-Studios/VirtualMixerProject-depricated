@@ -1,3 +1,15 @@
+/**
+ * @description
+ *   Switcher
+ *
+ * @example
+ *  let mySwitcher = new Switcher( renderer, [ source1, source2 ]] );
+ * @constructor Module#Switcher
+ * @implements Module
+ * @param renderer:GlRenderer
+ * @param source:Source
+ * @author Sense Studios
+ */
 function Switcher(renderer, _sources ) {
 
   // create and instance

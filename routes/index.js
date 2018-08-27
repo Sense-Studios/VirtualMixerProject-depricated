@@ -14,11 +14,15 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/example1', function(req, res, next) {
-  res.render('example1', { title: 'Express' });
+  res.render('compositions/example1', { title: 'Express' });
 });
 
 router.get('/mixer5', function(req, res, next) {
-  res.render('mixer5', { title: 'Express' });
+  res.render('compositions/mixer5', { title: 'Express' });
+});
+
+router.get('/notv', function(req, res, next) {
+  res.render('compositions/notv', { title: 'Express' });
 });
 
 

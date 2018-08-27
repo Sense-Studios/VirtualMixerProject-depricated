@@ -1,3 +1,17 @@
+/**
+ * @description
+ *   BPM (Audio analysis)
+ *
+ * @example
+ *   let mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ *   let bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ *   bpm.add( mixer1.pod )
+ * @constructor Addon#BPM
+ * @implements Addon
+ * @param {GlRenderer} renderer
+ * @param {File} audio optional
+ * @author Sense Studios
+ */
 function BPM( renderer ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -6,11 +20,29 @@ function BPM( renderer ) {
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   window["bpm_" + _self.uuid]
   _self.type = "Addon"
+
+  /**
+   * @description Tapping beat control
+   * @member BPM#bpm
+   * @member BPM#bps
+   * @member BPM#sec
+   * @member BPM#bpm_float
+   * @member BPM#mod
+   */
+
   _self.bpm = 128              // beats per minute
   _self.bps = 2.133333         // beats per second
   _self.sec = 0                // second counter, from which the actual float is calculated
   _self.bpm_float = 0.46875    // 60 / 128, current float of bpm
   _self.mod = 1                // 0.25, 0.5, 1, 2, 4, etc.
+
+  /**
+   * @description Audio analysis
+   * @member BPM#useAutoBpm#
+   * @member BPM#autoBpmData#
+   * @member BPM#useMicrophone
+   * @member BPM#audio_src
+   */
 
   _self.useAutoBpm = true      // auto bpm
   _self.autoBpmData = {}       // info object for the auto bpm
@@ -88,6 +120,10 @@ function BPM( renderer ) {
   var time = 0;
   var avg = 0;
 
+  /**
+   * @description Tapping beat control
+   * @function BPM#tap
+   */
   _self.tap = function() {
     useAutoBPM = false
     time  = Number(new Date()) - last
@@ -131,9 +167,9 @@ function BPM( renderer ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  audio.src = '/audio/fulke_absurd.mp3'
   //audio.src = '/audio/rage_hard.mp3'
-
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.<br>A demo can be found here: <a href="http://nabu.sense-studios.com/channel/sense_beta/mixer5">Demo</a>.</p>
+<p><img src="../images/occupy_chaos_screenshot.jpg" alt="Screenshot"><br>This particular mixer is build with Material from my 'Occupy Chaos'-set, that I performed with in 2011.<br>But you can add any video library or setup any mixer configuration you want.</p>
+<p>With these tools, you can Build your own video mixers in JavaScript. The application takes a number of <em>sources</em> ( video, gif, svg,  whathaveyou ) and allows you to crossfades them.<br>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>.<br>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers.</p>
+<p>Modules expose a number of variables that can be changed and controlled in runtime through a <em>controller</em>.<br>A <em>controller</em> connects a set of keys on the keyboard or the input of a gamepad with variables on the mixers and modules.</p>
+<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs<br>Or continue with the Quick start</p>
+<h2>Quickstart</h2><p>Make sure you include the build files. (and in this order) from the <code>/build</code> directory:</p>
+<pre class="prettyprint source"><code>  vendor-min.js
+  mixer-min.js
+</code></pre><p>Write a minimum of Webpage:</p>
+<pre class="prettyprint source"><code>
+&lt;html>
+  &lt;head>
+    &lt;script src=&quot;path/to//vendor-min.js&quot;>&lt;/script>
+    &lt;script src=&quot;path/to/mixer-min.js&quot;>&lt;/script>
+  &lt;/head>
+  &lt;body>
+    &lt;canvas/>
+  &lt;/body>
+&lt;/html>
+</code></pre><p>And some javascript add the end of the <code>body</code></p>
+<pre class="prettyprint source"><code>&lt;html>
+  &lt;head>
+    &lt;script src=&quot;path/to/vendor-min.js&quot;>&lt;/script>
+    &lt;script src=&quot;path/to/mixer-min.js&quot;>&lt;/script>    
+  &lt;/head>
+  &lt;body>
+    &lt;canvas/>
+    &lt;script>
+
+      var renderer = new GlRenderer();
+      var testSource1 = new GifSource(   renderer, { src: 'path/to/somefile.gif' } );
+      var testSource2 = new VideoSource( renderer, { src: 'path/to/somefile.mp4' } );
+      var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
+      var output = new Output( renderer, mixer1 )
+
+      renderer.init();
+      renderer.render();
+    &lt;/script>
+  &lt;/body>
+&lt;/html>
+</code></pre><p>The most basic mixer setup is laid out hereunder in ASCII art:</p>
+<pre class="prettyprint source"><code>          ______________
+          |  Renderer  |
+          --------------
+                |
+                |
+            _________   &lt;--- Pod (float)
+            | Mixer |   &lt;--- Mixmode (number)
+            ---------   &lt;--- Blendmode (number)
+               / \
+              /   \
+             /     \            
+  ____________     ____________   &lt;--- somefile.mp4
+  | Source 1 |     | Source 2 |   &lt;--- play, pause, currentTime, etc. (html5 interface)
+  ------------     ------------   </code></pre><p>This diagram flows from bottom to top. By defauld the <a href="Mixer.html#pod"><strong><code>pod</code></strong></a> of the <em>mixer</em> is set to 0, so we see <code>Source 1</code> in our <code>renderer</code>.<br>Set the <code>pod</code> to 1 to show the <code>Source 2</code>. Or set it to any value in between to mix the two sources together.</p>
+<pre class="prettyprint source"><code>mixer1.pod(0)    // default shows Source 1
+mixer1.pod(1)    // shows Source 2
+mixer1.pod(0.5)  // shows both sources at 50%, not that this is darker as both add to only ~75% opacity
+mixer1.pod(0.75) // shows Source 1 at ~25% opacity and Source 2 at ~75% opacity ( ~90% total opacity )
+
+// add a function that moves the mixer handle from left to right.
+var c = 0;
+setInterval( function() {
+  c += 0.01
+  mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+})
+</code></pre><h3>Mixmode</h3><p>Mixers support a <a href="Mixer.html#mixMode"><code>Mixmode</code></a>.<br>The Mixmode defines the curvature of the crossfade.</p>
+<p>In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is <strong>darker</strong> in the middle of  the crossfade then it is at both ends. This is the default <em>Mixmode</em>, the other modes play with these settings</p>
+<ul>
+<li>1: <strong>NORMAL</strong> (default),   regular, linear crossfade</li>
+<li>2: <strong>HARD</strong>,               switches with a hard cut at 50%</li>
+<li>3: <strong>NAM</strong>,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)</li>
+<li>4: <strong>FAM</strong>,                fades with a downward curve, forcing a 'overlay' period</li>
+<li>5: <strong>LEFT</strong>,               forces the pod on 0 (locks pod)</li>
+<li>6: <strong>RIGHT</strong>,              forces the pod on 1 (locks pod)</li>
+<li>7: <strong>CENTER</strong>,             forces both sources at ~66% (locks pod)</li>
+<li>8: <strong>BOOM</strong>                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</li>
+</ul>
+<h3>Blendmode</h3><p>Mixers also support a <a href="Mixer.html#blendMode"><code>Blendmode</code></a>.<br>Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.</p>
+<pre class="prettyprint source"><code>  1 ADD (default),
+  2 SUBSTRACT,
+  3 MULTIPLY,
+  4 DARKEN,
+  5 COLOUR BURN,
+  6 LINEAR_BURN,
+  7 LIGHTEN,
+  8 SCREEN,
+  9 COLOUR_DODGE,
+  10 LINEAR_DODGE,
+  11 OVERLAY,
+  12 SOFT_LIGHT,
+  13 HARD_LIGHT,
+  14 VIVID_LIGHT,
+  15 LINEAR_LIGHT,
+  16 PIN_LIGHT,
+  17 DIFFERENCE,
+  18 EXCLUSION</code></pre><p>Switch both mixer and blendmode in realtime:</p>
+<pre class="prettyprint source"><code>mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
+mixer1.mixMode(8)      // set MixMode to BOOM
+mixer1.blendMode(1)    // set blendmode to ADD (default)
+mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT</code></pre><h2>Installation</h2><p>1) clone the package, defaults to VirtualMixerProject/</p>
+<p><code>git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></p>
+<p>2) run the installer</p>
+<p><code>npm install</code></p>
+<p>3) start the app</p>
+<p><code>npm start</code></p>
+<p>You might want to test the program with <code>npm test</code>.<br>point your browser to <code>127.0.0.1:3000</code> and enjoy the show.</p>
+<p>check out the docs for more info</p>
+<h2>Roadmap</h2><ul>
+<li>Set up a Node editor</li>
+<li>Hook up Midi controller</li>
+<li>add configuration for Firebase</li>
+<li>Phase out express for lightweight server/ templating</li>
+<li>Phase out jQuery</li>
+<li>Phase out ThreeJS</li>
+</ul>
+<h1>But Why?!</h1><pre class="prettyprint source"><code>&quot;Any application that can be written in JavaScript, will eventually be written in JavaScript.&quot;
+-- Jeff Atwood</code></pre></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Aug 27 2018 03:00:50 GMT+0200 (DST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

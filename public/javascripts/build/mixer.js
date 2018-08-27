@@ -1,3 +1,159 @@
+
+/**
+ * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ * @constructor GlRenderer
+ * @example
+ *    <!-- a Canvas element with id: glcanvas is required! -->
+ *    <canvas id="glcanvas"></canvas>
+ *
+ *
+ *    <script>
+ *      let renderer = new GlRenderer();
+ *
+ *      var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+ *      let output = new Output( renderer, red )
+ *
+ *      renderer.init();
+ *      renderer.render();
+ *    </script>
+ */
+
+var GlRenderer = function() {
+
+  console.log("created renderer")
+
+  var _self = this
+  /** This is a description of the foo function. */
+  // set up threejs scene
+  _self.scene = new THREE.Scene();
+  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  _self.camera.position.z = 20
+
+  // container for all elements that inherit init() and update()
+  _self.nodes = [] // sources modules and effects
+
+  // containers for custom uniforms and cosutomDefines
+  _self.customUniforms = {}
+  _self.customDefines = {}
+
+  // base vertexShader
+  _self.vertexShader = "\
+\nvarying vec2 vUv;\
+\nvoid main() {\
+\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+\n  vUv = uv;\
+\n}"
+
+  // base fragment shader
+  _self.fragmentShader = "\
+\nuniform sampler2D textureTest;\
+\nuniform float wave;\
+\n/* custom_uniforms */\n\
+\n/* custom_helpers */\n\
+\nvarying vec2 vUv;\
+\nvoid main() {\
+\n  /* custom_main */\n\
+\n}"
+
+  // ---------------------------------------------------------------------------
+  /** @function GlRenderer#init */
+  _self.init = function(  ) {
+    console.log("init renderer")
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
+
+    // init nodes
+    // reset the renderer, for a new lay out
+    /**
+     * All the nodes currently added to this renderer
+     * @member GlRenderer#nodes
+     */
+    _self.nodes.forEach(function(n){ n.init() });
+
+    // create the shader
+    _self.shaderMaterial = new THREE.ShaderMaterial({
+       uniforms: _self.customUniforms,
+       defines: _self.customDefines,
+       vertexShader: _self.vertexShader,
+       fragmentShader: _self.fragmentShader,
+       side: THREE.DoubleSide,
+       transparent: true
+    })
+
+    // apply the shader material to a surface
+    _self.flatGeometry = new THREE.PlaneGeometry( 67, 38 );
+    _self.flatGeometry.translate( 0, 0, 0 );
+    _self.surface = new THREE.Mesh( _self.flatGeometry, _self.shaderMaterial );
+    // surface.position.set(60,50,150);
+
+    /**
+     * A reference to the threejs scene
+     * @member GlRenderer#scene
+     */
+    _self.scene.add( _self.surface );
+  }
+
+  // ---------------------------------------------------------------------------
+  var r = Math.round(Math.random()*100)
+  /** @function GlRenderer#render */
+  _self.render = function() {
+  	requestAnimationFrame( _self.render );
+  	_self.glrenderer.render( _self.scene, _self.camera );
+    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.nodes.forEach( function(n) { n.update() } );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+
+  // adds nodes to the renderer
+  // function is implicit, and is colled by the modules
+  _self.add = function( module ) {
+    _self.nodes.push( module )
+  }
+
+  // reset the renderer, for a new lay out
+  /**
+   * Disposes the renderer
+   * @function GlRenderer#dispose
+   */
+  _self.dispose = function() {
+    _self.shaderMaterial
+    _self.flatGeometry
+    _self.scene.remove(_self.surface)
+    _self.glrenderer.resetGLState()
+    _self.customUniforms = {}
+    _self.customDefines = {}
+    // base vertexShader
+
+    /**
+     * The vertex shader
+     * @member GlRenderer#vertexShader
+     */
+    _self.vertexShader = "\
+  \nvarying vec2 vUv;\
+  \nvoid main() {\
+  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+  \n  vUv = uv;\
+  \n}"
+
+  /**
+   * The fragment shader
+   * @member GlRenderer#fragmentShader
+   */
+    // base fragment shader
+    _self.fragmentShader = "\
+  \nuniform sampler2D textureTest;\
+  \nuniform float wave;\
+  \n/* custom_uniforms */\n\
+  \n/* custom_helpers */\n\
+  \nvarying vec2 vUv;\
+  \nvoid main() {\
+  \n  /* custom_main */\n\
+  \n}"
+    _self.nodes = []
+  }
+}
+
 function AudioAnalysis( renderer ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -168,9 +324,9 @@ function BPM( renderer ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  audio.src = '/audio/fulke_absurd.mp3'
   //audio.src = '/audio/rage_hard.mp3'
-
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
@@ -1087,117 +1243,6 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
   }
 }
 
-var GlRenderer = function() {
-
-  console.log("created renderer")
-
-  var _self = this
-
-  // set up threejs scene  
-  _self.scene = new THREE.Scene();
-  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-  _self.camera.position.z = 20
-
-  // container for all elements that inherit init() and update()
-  _self.nodes = [] // sources modules and effects
-
-  // containers for custom uniforms and cosutomDefines
-  _self.customUniforms = {}
-  _self.customDefines = {}
-
-  // base vertexShader
-  _self.vertexShader = "\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-\n  vUv = uv;\
-\n}"
-
-  // base fragment shader
-  _self.fragmentShader = "\
-\nuniform sampler2D textureTest;\
-\nuniform float wave;\
-\n/* custom_uniforms */\n\
-\n/* custom_helpers */\n\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  /* custom_main */\n\
-\n}"
-
-  // ---------------------------------------------------------------------------
-  _self.init = function(  ) {
-    console.log("init renderer")
-    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
-
-    // init nodes
-    _self.nodes.forEach(function(n){ n.init() });
-
-    // create the shader
-    _self.shaderMaterial = new THREE.ShaderMaterial({
-       uniforms: _self.customUniforms,
-       defines: _self.customDefines,
-       vertexShader: _self.vertexShader,
-       fragmentShader: _self.fragmentShader,
-       side: THREE.DoubleSide,
-       transparent: true
-    })
-
-    // apply the shader material to a surface
-    _self.flatGeometry = new THREE.PlaneGeometry( 67, 38 );
-    _self.flatGeometry.translate( 0, 0, 0 );
-    _self.surface = new THREE.Mesh( _self.flatGeometry, _self.shaderMaterial );
-    // surface.position.set(60,50,150);
-
-    _self.scene.add( _self.surface );
-  }
-
-  // ---------------------------------------------------------------------------
-  var r = Math.round(Math.random()*100)
-  _self.render = function() {
-  	requestAnimationFrame( _self.render );
-  	_self.glrenderer.render( _self.scene, _self.camera );
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
-    _self.nodes.forEach( function(n) { n.update() } );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  // adds nodes to the renderer
-  _self.add = function( module ) {
-    _self.nodes.push( module )
-  }
-
-  // reset the renderer, for a new lay out
-  _self.dispose = function() {
-    _self.shaderMaterial
-    _self.flatGeometry
-    _self.scene.remove(_self.surface)
-    _self.glrenderer.resetGLState()
-    _self.customUniforms = {}
-    _self.customDefines = {}
-    // base vertexShader
-    _self.vertexShader = "\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-  \n  vUv = uv;\
-  \n}"
-
-    // base fragment shader
-    _self.fragmentShader = "\
-  \nuniform sampler2D textureTest;\
-  \nuniform float wave;\
-  \n/* custom_uniforms */\n\
-  \n/* custom_helpers */\n\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  /* custom_main */\n\
-  \n}"
-    _self.nodes = []
-  }
-}
-
 function Chain(renderer, options) {
 
   // THIS IS DEPRICATED
@@ -1236,7 +1281,17 @@ function Chain(renderer, options) {
   _self.update = function() {}
 }
 
-function Mixer(renderer, options) {
+/**
+ * A mixer mixes two sources together. It can crossfade the sources with different MixModes and BlendModes
+ *
+ * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
+ * @constructor Mixer
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * requires source1 and source 2 in options param with a source
+ */
+
+function Mixer( renderer, options ) {
 
   // create and instance
   var _self = this;
@@ -1342,11 +1397,21 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   _self.alpha1 = function() { return alpha1 }
   _self.alpha2 = function() { return alpha2 }
 
+  /**
+   * @description total 8; 1: NORMAL (default), 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+   * @function Mixer#mixMode
+   * @param {number} Number of the mixmode
+   */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
     return mixmode
   }
 
+  /**
+   * @description total of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+   * @function Mixer#blendMode
+   * @param {number} Number of the blendMode
+   */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
       blendmode = _num
@@ -1355,7 +1420,11 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
     return blendmode
   }
 
-  // sets the position of the handle, fader or pod. 0 is left, 1 is right
+  /**
+   * @description the position of the handle, fader or pod. 0 is left, 1 is right
+   * @function Mixer#pod
+   * @param {float} position of the handle, between 0 and 1
+   */
   _self.pod = function( _num ) {
     if ( _num != undefined ) {
 
@@ -1524,39 +1593,17 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
   }
 }
 
-function Source( renderer, options ) {
-  var _self = this
-
-  /*
-    renderer
-  */
-
-
-  _self.type = "Source"
-
-  // override these
-
-  // program interface
-  _self.init =         function() {}
-  _self.update =       function() {}
-  _self.render =       function() {}
-  _self.start =        function() {}
-
-  // control interface
-  _self.src =          function( _file ) {} // .gif
-  _self.play =         function() {}
-  _self.pause =        function() {}
-  _self.paused =       function() {}
-  _self.currentFrame = function( _num ) {}  // seconds
-  _self.duration =     function() {}        // seconds
-}
-
 
 
 GifSource.prototype = new Source(); // assign prototype to marqer
 GifSource.constructor = GifSource;  // re-assign constructor
 
-
+/**
+ * @implements Source
+ * @constructor Source#GifSource
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 function GifSource( renderer, options ) {
 
   // create and instance
@@ -1669,12 +1716,28 @@ function GifSource( renderer, options ) {
   _self.duration =     function() { return supergifelement.get_length() }        // seconds
 };
 
+
+SVGSource.prototype = new Source(); // assign prototype to marqer
+SVGSource.constructor = SVGSource;  // re-assign constructor
+
+// TODO
+// hook Lottie up
+
+function SVGSource(renderer, options) {}
+
 //function SolidSource
 // https://github.com/mrdoob/three.js/wiki/Uniforms-types
 
 SolidSource.prototype = new Source(); // assign prototype to marqer
 SolidSource.constructor = SolidSource;  // re-assign constructor
 
+/**
+ * @implements Source
+ * @constructor Source#SolidSource
+ * @example var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 
 function SolidSource(renderer, options) {
   // vec3( 1.0, 0.0, 0.0 )
@@ -1686,7 +1749,7 @@ function SolidSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  // no updates 
+  // no updates
   _self.bypass = true;
 
   // add to renderer
@@ -1718,7 +1781,15 @@ function SolidSource(renderer, options) {
 
   // ---------------------------------------------------------------------------
   // Helpers
-
+  /**
+  * @implements Source
+  * @function Source#SolidSource#color
+  * @example red.color( { r: 0.0, g: 0.0, b: 1.0 } );
+  * @param {float} r - red value
+  * @param {float} g - green value
+  * @param {float} b - blue value
+  * @returns color
+  */
   _self.color = function( c ) {
     if ( c != undefined ) {
       color = c
@@ -1730,13 +1801,6 @@ function SolidSource(renderer, options) {
 
 
   // create and instance
-
-
-SVGSource.prototype = new Source(); // assign prototype to marqer
-SVGSource.constructor = SVGSource;  // re-assign constructor
-
-// TODO
-// hook Lottie up
 
 
 TextSource.prototype = new Source(); // assign prototype to marqer
@@ -1971,7 +2035,6 @@ function TextSource(renderer, options) {
   // _self.init()
 }
 
-
 VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
@@ -1982,6 +2045,13 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
   // var videoTextures = [];   // videoTexture1, videoTextures,  ...
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
+/**
+ * @implements Source
+ * @constructor Source#VideoSource
+ * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
 function VideoSource(renderer, options) {
 
   // create and instance
@@ -2160,3 +2230,43 @@ function VideoSource(renderer, options) {
 
   // _self.init()
 }
+
+/**
+ * @constructor Source
+ */
+
+function Source( renderer, options ) {
+  var _self = this
+
+  /*
+    renderer
+  */
+
+
+  _self.type = "Source"
+
+  // override these
+
+  // program interface
+  _self.init =         function() {}
+  _self.update =       function() {}
+  _self.render =       function() {}
+  _self.start =        function() {}
+
+  // control interface
+  _self.src =          function( _file ) {} // .gif
+  _self.play =         function() {}
+  _self.pause =        function() {}
+  _self.paused =       function() {}
+  _self.currentFrame = function( _num ) {}  // seconds
+  _self.duration =     function() {}        // seconds
+}
+
+// hackity, jsdocs fails on _ at the beginning
+// so here is the source documentation
+
+// program interface
+
+/** Defines the interface for the Sources
+ * @constructor Source
+ */

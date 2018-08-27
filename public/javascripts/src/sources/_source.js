@@ -1,3 +1,8 @@
+/**
+ * @constructor Source
+ * @interface
+ */
+
 function Source( renderer, options ) {
   var _self = this
 
