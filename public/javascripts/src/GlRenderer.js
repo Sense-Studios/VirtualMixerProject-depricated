@@ -56,7 +56,7 @@ var GlRenderer = function() {
 \n}"
 
   // ---------------------------------------------------------------------------
-  /** @function GlRenderer#init */
+  /** @function GlRenderer.init */
   _self.init = function(  ) {
     console.log("init renderer")
     _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
@@ -94,7 +94,7 @@ var GlRenderer = function() {
 
   // ---------------------------------------------------------------------------
   var r = Math.round(Math.random()*100)
-  /** @function GlRenderer#render */
+  /** @function GlRenderer.render */
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );

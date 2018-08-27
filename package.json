@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "build": "./node_modules/.bin/gulp",
-    "docs": "node_modules/.bin/jsdoc public/javascripts/src/ -R README.md -r --debug",
+    "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -R README.md --debug",
     "test": "node test"
   },
   "repository": {

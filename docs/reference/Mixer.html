@@ -49,7 +49,7 @@
 
 
 <div class="description">
-    A mixer mixes two sources together. It can crossfade the sources with different MixModes and BlendModes
+    <p>A mixer mixes two sources together.<br>  It can crossfade the sources with different <em>MixModes</em> and <em>BlendModes</em><br>   requires <code>source1</code> and <code>source2</code> in <code>options</code> both with a <a href="Source.html">Source</a> (or another <em>Module</em> like a <a href="Mixer.html">Mixer</a>)</p>
 </div>
 
 
@@ -114,7 +114,7 @@
 
             
 
-            <td class="description last">requires source1 and source 2 in options param with a source</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -144,6 +144,13 @@
 
     
 
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Sense Studios</li>
+        </ul>
+    </dd>
     
 
     
@@ -214,7 +221,7 @@
     
 
     
-    <h4 class="name" id="blendMode"><span class="type-signature"></span>blendMode<span class="signature">(Number)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="blendMode"><span class="type-signature"></span>blendMode<span class="signature">(blendmode)</span><span class="type-signature"></span></h4>
     
 
     
@@ -222,7 +229,25 @@
 
 
 <div class="description">
-    total of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+    <p>gets or sets the <em>blendMode</em>, there are 18 Blendmodes available, numbered 1-18;</p>
+<pre class="prettyprint source"><code> 1 ADD (default),
+ 2 SUBSTRACT,
+ 3 MULTIPLY,
+ 4 DARKEN,
+ 5 COLOUR BURN,
+ 6 LINEAR_BURN,
+ 7 LIGHTEN,
+ 8 SCREEN,
+ 9 COLOUR_DODGE,
+ 10 LINEAR_DODGE,
+ 11 OVERLAY,
+ 12 SOFT_LIGHT,
+ 13 HARD_LIGHT,
+ 14 VIVID_LIGHT,
+ 15 LINEAR_LIGHT,
+ 16 PIN_LIGHT,
+ 17 DIFFERENCE,
+ 18 EXCLUSION</code></pre>
 </div>
 
 
@@ -258,7 +283,7 @@
 
         <tr>
             
-                <td class="name"><code>Number</code></td>
+                <td class="name"><code>blendmode</code></td>
             
 
             <td class="type">
@@ -274,7 +299,7 @@
 
             
 
-            <td class="description last">of the blendMode</td>
+            <td class="description last"><p>index of the Blendmode</p></td>
         </tr>
 
     
@@ -315,7 +340,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line127">line 127</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -349,7 +374,7 @@
     
 
     
-    <h4 class="name" id="mixMode"><span class="type-signature"></span>mixMode<span class="signature">(Number)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="mixMode"><span class="type-signature"></span>mixMode<span class="signature">(mixmode)</span><span class="type-signature"></span></h4>
     
 
     
@@ -357,7 +382,15 @@
 
 
 <div class="description">
-    total 8; 1: NORMAL (default), 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+    <p>gets or sets the <em>mixMode</em>, there are 8 MixModes available, numbered 1-8;</p>
+<pre class="prettyprint source"><code> 1: NORMAL (default),
+ 2: HARD,
+ 3: NAM,
+ 4: FAM,
+ 5: LEFT,
+ 6: RIGHT,
+ 7: CENTER,
+ 8: BOOM</code></pre>
 </div>
 
 
@@ -393,7 +426,7 @@
 
         <tr>
             
-                <td class="name"><code>Number</code></td>
+                <td class="name"><code>mixmode</code></td>
             
 
             <td class="type">
@@ -409,7 +442,7 @@
 
             
 
-            <td class="description last">of the mixmode</td>
+            <td class="description last"><p>index of the Mixmode</p></td>
         </tr>
 
     
@@ -450,7 +483,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line117">line 117</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -492,7 +525,7 @@
 
 
 <div class="description">
-    the position of the handle, fader or pod. 0 is left, 1 is right
+    <p>the position of the handle, fader or pod. 0 is left, 1 is right</p>
 </div>
 
 
@@ -544,7 +577,7 @@
 
             
 
-            <td class="description last">of the handle, between 0 and 1</td>
+            <td class="description last"><p>position of the handle</p></td>
         </tr>
 
     
@@ -585,7 +618,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line140">line 140</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line179">line 179</a>
     </li></ul></dd>
     
 
@@ -629,13 +662,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Mixer.html">Mixer</a></li><li><a href="Source.html">Source</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Chain.html">Chain</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Mixer.html">Mixer</a></li><li><a href="Output.html">Output</a></li><li><a href="Source.html">Source</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Switcher.html">Switcher</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Aug 26 2018 01:19:45 GMT+0200 (DST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Aug 27 2018 02:51:05 GMT+0200 (DST)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: addons/BPM.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: addons/BPM.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @description
  *   BPM (Audio analysis)
  *
@@ -128,7 +156,7 @@ function BPM( renderer ) {
     useAutoBPM = false
     time  = Number(new Date()) - last
     last = Number(new Date());
-    if ( time < 10000 && time > 10 ) {
+    if ( time &lt; 10000 &amp;&amp; time > 10 ) {
       bpms.splice(0,1)
       bpms.push( 60000/time )
       avg = bpms.reduce(function(a, b) { return a + b; }) / bpms.length;
@@ -220,9 +248,9 @@ function BPM( renderer ) {
 
   var sampler = function() {
     if ( !_self.useAutoBpm ) return;
-    if ( _self.audio_src != "" && !_self.useMicrophone ) return;
+    if ( _self.audio_src != "" &amp;&amp; !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
-    // if  no src && no mic -- return
+    // if  no src &amp;&amp; no mic -- return
     // if ... -- return
 
     var dataArray = new Uint8Array(bufferLength);
@@ -248,7 +276,7 @@ function BPM( renderer ) {
       // drawData(dataSet) // DEPRICATED
       //if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
 
-      // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + window.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
+      // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: &lt;strong>"+ Math.round(window.bpm) + " &lt;/strong> ("+Math.round(window.bpm2)+") \t\tconfidence: &lt;em>" + window.confidence + " &lt;strong>" + window.calibrating + "&lt;/strong>&lt;/em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
       // console.log(" ### AUTOBPM: ",  window.calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
       window.bpm_test = tempoData.bpm
       _self.sec = c * Math.PI * tempoData.bpm / 60
@@ -274,8 +302,8 @@ function BPM( renderer ) {
     peaks = new Array( _data.length )  // reset peaks
 
     // find peaks
-    for ( var i = 0; i < _data.length; i++ ) {
-      if ( _data[i] !== undefined && _data[i][1] > ( treshold * 128 ) ) {
+    for ( var i = 0; i &lt; _data.length; i++ ) {
+      if ( _data[i] !== undefined &amp;&amp; _data[i][1] > ( treshold * 128 ) ) {
         peaks[i] = [ dataSet[i][0], 1 ];           // update in peaks
         foundpeaks.push( [ _data[i][0], 1 ] );     // add to foundpeaks
         i += 50;                                   // += 0.4s, to move past this peak
@@ -283,10 +311,10 @@ function BPM( renderer ) {
     }
 
     // make sure we have enough peaks by adjusting the treshhold
-    if ( foundpeaks.length < peak_min ) treshold -= 0.05;
+    if ( foundpeaks.length &lt; peak_min ) treshold -= 0.05;
     if ( foundpeaks.length > peak_max ) treshold += 0.05;
     if ( treshold > 2 ) treshold = 2;
-    if ( treshold < 1 ) treshold = 1;
+    if ( treshold &lt; 1 ) treshold = 1;
 
     // calculate tempo by grouping peaks and calculate interval between them
     // see: http://joesul.li/van/beat-detection-using-web-audio/
@@ -301,11 +329,11 @@ function BPM( renderer ) {
       tempoCounts.reverse().forEach(function(v,i) {
         html += i + ", " + v.tempo + ", " + v.count + "\t ["
         var j = 0
-        while( j < v.count) {
+        while( j &lt; v.count) {
           html += '#'
           j++
         }
-        html += ']<br/>'
+        html += ']&lt;br/>'
       })
       $('#info').html(html)
     }
@@ -324,10 +352,10 @@ function BPM( renderer ) {
       }
 
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
-      if ( confidence_mod <= 2 ) {
+      if ( confidence_mod &lt;= 2 ) {
         confidence = "low"
         $('.blink').css('background-color','red')
-      }else if( confidence_mod > 2 && confidence_mod <= 7) {
+      }else if( confidence_mod > 2 &amp;&amp; confidence_mod &lt;= 7) {
         confidence = "average"
         $('.blink').css('background-color','yellow')
       }else if( confidence_mod > 7 ) {
@@ -363,7 +391,7 @@ function BPM( renderer ) {
     intervalCounts = [];
 
     _peaks.forEach(function(peak, index) {
-      for(var i = 0; i < 10; i++) {
+      for(var i = 0; i &lt; 10; i++) {
         if ( _peaks[index + i] !== undefined ) {
           var interval = _peaks[index + i][0] - peak[0];
           var foundInterval = intervalCounts.some( function(intervalCount) {
@@ -388,25 +416,25 @@ function BPM( renderer ) {
     intervalCounts.forEach(function(intervalCount, i) {
 
       // Convert an interval to tempo
-      if (intervalCount.interval != 0 && !isNaN(intervalCount.interval)) {
+      if (intervalCount.interval != 0 &amp;&amp; !isNaN(intervalCount.interval)) {
         var theoreticalTempo = 60 / (intervalCount.interval / 1000)
       }
 
       // Adjust the tempo to fit within the 90-180 BPM range
-      while (theoreticalTempo < 90) theoreticalTempo *= 2;
+      while (theoreticalTempo &lt; 90) theoreticalTempo *= 2;
       while (theoreticalTempo > 180) theoreticalTempo /= 2;
 
       // round to 2 beat
       theoreticalTempo = Math.round( theoreticalTempo/2 ) * 2
 
       var foundTempo = tempoCounts.some(function(tempoCount) {
-        if (tempoCount.tempo === theoreticalTempo && !noTempo )
+        if (tempoCount.tempo === theoreticalTempo &amp;&amp; !noTempo )
           return tempoCount.count += intervalCount.count;
       });
 
       // add it to the tempoCounts
       if (!foundTempo) {
-        if ( theoreticalTempo && !noTempo ) {
+        if ( theoreticalTempo &amp;&amp; !noTempo ) {
           tempoCounts.push({
             tempo: theoreticalTempo,
             count: intervalCount.count
@@ -419,3 +447,26 @@ function BPM( renderer ) {
   } // end groupNeighborsByTempo
 
 } // end BPM
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Aug 27 2018 03:00:50 GMT+0200 (DST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
