@@ -56,7 +56,7 @@ var GlRenderer = function() {
 \n}"
 
   // ---------------------------------------------------------------------------
-  /** @function GlRenderer#init */
+  /** @function GlRenderer.init */
   _self.init = function(  ) {
     console.log("init renderer")
     _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
@@ -94,7 +94,7 @@ var GlRenderer = function() {
 
   // ---------------------------------------------------------------------------
   var r = Math.round(Math.random()*100)
-  /** @function GlRenderer#render */
+  /** @function GlRenderer.render */
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
@@ -191,7 +191,20 @@ function AudioAnalysis( renderer ) {
   }
 }
 
-function BPM( renderer ) {
+/**
+ * @description
+ *   BPM (Audio analysis)
+ *
+ * @example
+ * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ * var bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ * bpm.add( mixer1.pod )
+ * @constructor Addon#BPM
+ * @implements Addon
+ * @param {GlRenderer} renderer
+ * @param {Object} options optional
+ */
+function BPM( renderer, options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -199,12 +212,47 @@ function BPM( renderer ) {
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   window["bpm_" + _self.uuid]
   _self.type = "Addon"
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  /**
+   * @description Beats Per Minute
+   * @member Addon#BPM#bpm
+   * @param {number} Beats per minute
+  */
   _self.bpm = 128              // beats per minute
+
+  /**
+   * @description Tapping beat control
+   * @member Addon#BPM#bps
+  */
   _self.bps = 2.133333         // beats per second
   _self.sec = 0                // second counter, from which the actual float is calculated
+
+  /**
+   * @description
+   *  BPM Float, current *position* of the BPM
+   *  If the BMP is a Sinus going up and down, the float shows up where it is on the curve
+   *  'up' is 1 and down is '0', oscillating.
+   * @member Addon#BPM#bpm_float
+  */
   _self.bpm_float = 0.46875    // 60 / 128, current float of bpm
+
+  /**
+   * @description Tapping beat control
+   * @member Addon#BPM#mod
+  */
   _self.mod = 1                // 0.25, 0.5, 1, 2, 4, etc.
 
+  /**
+   * @description Audio analysis
+   * @member Addon#BPM#useAutoBpm#
+   * @member Addon#BPM#autoBpmData#
+   * @member Addon#BPM#useMicrophone
+   * @member Addon#BPM#audio_src
+   */
   _self.useAutoBpm = true      // auto bpm
   _self.autoBpmData = {}       // info object for the auto bpm
   _self.useMicrophone = false  // use useMicrophone for autoBPM
@@ -260,11 +308,19 @@ function BPM( renderer ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2 // Math.sin( 128 / 60 )
   }
 
-  // half or double the bpm
+  /**
+   * @description double the bpm
+   * @function Addon#BPM#modUp
+  */
   _self.modUp = function() { _self.mod *= 2; }
+
+  /**
+   * @description half the bpm
+   * @function Addon#BPM#modDown
+  */
   _self.modDown = function() { _self.mod *= .5; }
 
-  // add nodes
+  // add nodes, implicit
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -281,6 +337,10 @@ function BPM( renderer ) {
   var time = 0;
   var avg = 0;
 
+  /**
+   * @description Tapping beat control
+   * @function BPM#tap
+   */
   _self.tap = function() {
     useAutoBPM = false
     time  = Number(new Date()) - last
@@ -297,6 +357,7 @@ function BPM( renderer ) {
   // ---------------------------------------------------------------------------
   // AUTO BPM
   // because of timing issues, autobpm runs seperate from the update call
+  // ---------------------------------------------------------------------------
 
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
@@ -326,6 +387,8 @@ function BPM( renderer ) {
   // audio.src =  'http://37.220.36.53:7904';
   //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   audio.src = '/audio/fulke_absurd.mp3'
+  if ( _options.audio ) audio.src = _options.audio
+
   //audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
@@ -577,6 +640,17 @@ function BPM( renderer ) {
 
 } // end BPM
 
+/**
+ * @description
+ *   FileManager
+ *
+ * @example
+ *  let filemanager1 = new FileManager( renderer, { audio: 'mymusic.mp3' } );
+ * @implements Addon
+ * @constructor Addon#FileManager
+ * @param {GlRenderer} renderer
+ * @param {VideoSource}  source
+ */
 function FileManager( _source ) {
 
   var _self = this
@@ -658,6 +732,19 @@ function FileManager( _source ) {
   }
 }
 
+/**
+ * @description
+ *   GiphyManager
+ *
+ * @example
+ * var gifmanager1 = new Gyphymanager( renderer );
+ * gifmanager1.search('vj');
+ * gifmanager1.change();
+ * @implements Addon
+ * @constructor Addon#Gyphymanager
+ * @param {GlRenderer} renderer
+ * @param {GifSource} source
+ */
 function GiphyManager( _source ) {
 
   var _self = this
@@ -669,8 +756,14 @@ function GiphyManager( _source ) {
   _self.program
   _self.renderer = renderer // do we even need this ?!!
 
+  // set in environment
   var key = "tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu"
 
+  /**
+   * @description same as [search]{@link Addon#Needle#Gyphymanager#search}
+   * @function Addon#Gyphymanager#needle
+   * @param {string} query - Search term
+   */
   _self.needle = function( _needle ) {
     $.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
@@ -678,31 +771,52 @@ function GiphyManager( _source ) {
     })
   }
 
-  // alternate
+   /**
+    * @description
+    *  loads a set of gif files from giphy based on
+    * @function Addon#Gyphymanager#search
+    * @param {string} query - Search term
+    */
   _self.search = function( _query ) {
     _self.needle( _query );
   }
 
+  // alternate
   _self.setSrc = function( file ) {
     console.log("set source: ", file)
     _self.source.src(file)
   }
 
   // load another source from the stack
+  /**
+   * @description
+   *  changes the gif file for another one in the collection
+   *  loaded by [search()]{@link Addon#Gyphymanager#search}
+   * @function Addon#Gyphymanager#change
+   */
   _self.change = function() {
     if ( _self.programs.length == 0 ) return "no programs"
     _self.program = _self.programs[ Math.floor( Math.random() * _self.programs.length ) ]
     _self.setSrc( _self.program.images.original.url );
   }
 
-  // for old times sake,
+  /**
+   * @description
+   *  same as [change()]{@link Addon#Gyphymanager#change}
+   * @function Addon#Gyphymanager#changez
+   */
   _self.changez = function(){
     _self.change()
   }
 
-  // load it up with defauilts
+  // load it up with defaults
   _self.needle("vj")
 }
+
+/**
+ * @constructor Addon
+ * @interface
+ */
 
 
 function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
@@ -1196,6 +1310,7 @@ function SourceControl( renderer, source ) {
 }
 
 
+
 // fragment
 // vec3 b_w = ( source.x + source.y + source.z) / 3
 // vec3 amount = source.xyz + ( b_w.xyx * _alpha )
@@ -1243,10 +1358,20 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
   }
 }
 
-function Chain(renderer, options) {
+/**
+ * @description
+ *   A Chain
+ *
+ * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
+ * @constructor Module#Chain
+ * @implements Module
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
 
-  // THIS IS DEPRICATED
-  // TODO: Rewrite
+
+function Chain(renderer, options) {
 
   // create and instance
   var _self = this;
@@ -1269,27 +1394,111 @@ function Chain(renderer, options) {
   _self.type = "Module"
   _self.sources = options.sources
 
+  // add source alpha to custom uniforms
+  _self.sources.forEach( function( source, index ) {
+    renderer.customUniforms[_self.uuid+'_source'+index+'_'+'alpha'] = { type: "f", value: 0.5 }
+  })
 
-  // Depricated, needs to exit with an output node like uuid_output
+  // add source uniforms to fragmentshader
+  _self.sources.forEach( function( source, index ) {
+    //renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_source'+index+'_'+'output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
+  })
+
+  // add chain output and chain alpha to shader
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_'+'alpha;\n/* custom_uniforms */')
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+
   _self.init = function() {
-    _self.sources.forEach( function( source ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = final_output + vec3( texture2D( '+source.uuid+', vUv ).xyz * '+source.uuid+'_alpha );\n  /* custom_main */')
-      //'vec3 '+_self.uuid+'_output =
+    // bould output module
+    var generatedOutput = "vec3(0.0,0.0,0.0)"
+    _self.sources.forEach( function( source, index ) {
+      generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
     });
+    generatedOutput += ";\n"
+
+    // put it in the shader
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
+
   }
 
   _self.update = function() {}
+
+  // ---------------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------------
+
+  var current = []
+  _self.toggle = function( _num ) {
+    console.log("TOGLLGGLLELEE!!!", _num)
+
+    if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
+    }else{
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
+      current = _num
+    }
+  }
+
+
+  _self.keyDown = function( _num, _event ) {
+    console.log("TOUCHFADE!!!", _num, _event)
+    //if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value > 0.99999 ) {
+    //  renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
+    //}
+
+    if (_event.repeat ) {
+      return
+      //renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 1.042
+      //console.log('pump', renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value)
+      //return
+    }
+
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
+    //console.log( renderer.customUniforms );
+  }
+
+  _self.keyUp = function( _num, _event ) {
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
+
+    /*
+    var touchFadeTimeout = setInterval( function() {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 0.90
+      if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value < 0.01 ) {
+        clearInterval(touchFadeTimeout);
+      }
+    });
+    */
+  }
+
+
 }
 
 /**
- * A mixer mixes two sources together. It can crossfade the sources with different MixModes and BlendModes
+ * @summary
+ *    A mixer mixes two sources together.
+ *
+ * @description
+ *   It can crossfade the sources with different _MixModes_ and _BlendModes_
+ *   requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
- * @constructor Mixer
+ * @constructor Module#Mixer
+ * @implements Module
  * @param renderer:GlRenderer
  * @param options:Object
- * requires source1 and source 2 in options param with a source
+ * @author Sense Studios
  */
+
+
+ // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
+ // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
+ // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
+ // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+
+ // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
+
 
 function Mixer( renderer, options ) {
 
@@ -1311,29 +1520,23 @@ function Mixer( renderer, options ) {
   if ( options != undefined ) _options = options
 
   // set type
-  _self.type = "Module"
+  _self.type = "Module";
 
   // add local variables
-  var alpha1 = 1
-  var alpha2 = 0
-  var pod = 0
-  var mixmode = 1
-  // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
-  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-  //var transmodes = [ 1, 2, 3 ]
-  //var transmodes = 1
+  var alpha1 = 1;
+  var alpha2 = 0;
+  var pod = 0;
 
+  var mixmode = 1;
+  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 
-  var blendmode = 1
-  // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
-  // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
-  // 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,
-  // 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
-  _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ]
+  var blendmode = 1;
+  _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
 
-  var source1, source2
-  source1 = options.source1
-  source2 = options.source2
+  var source1, source2;
+  source1 = options.source1;   // Mandatory
+  source2 = options.source2;   // Mandatory
+
 
   _self.init = function() {
 
@@ -1398,9 +1601,21 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   _self.alpha2 = function() { return alpha2 }
 
   /**
-   * @description total 8; 1: NORMAL (default), 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
-   * @function Mixer#mixMode
-   * @param {number} Number of the mixmode
+   * @description
+   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-8;
+   *  ```
+   *  1: NORMAL (default),
+   *  2: HARD,
+   *  3: NAM,
+   *  4: FAM,
+   *  5: LEFT,
+   *  6: RIGHT,
+   *  7: CENTER,
+   *  8: BOOM
+   *  ```
+   *
+   * @function Module#Mixer#mixMode
+   * @param {number} mixmode index of the Mixmode
    */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
@@ -1408,9 +1623,30 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   }
 
   /**
-   * @description total of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT,16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
-   * @function Mixer#blendMode
-   * @param {number} Number of the blendMode
+   * @description
+   *  gets or sets the _blendMode_, there are 18 Blendmodes available, numbered 1-18;
+   *  ```
+   *  1 ADD (default),
+   *  2 SUBSTRACT,
+   *  3 MULTIPLY,
+   *  4 DARKEN,
+   *  5 COLOUR BURN,
+   *  6 LINEAR_BURN,
+   *  7 LIGHTEN,
+   *  8 SCREEN,
+   *  9 COLOUR_DODGE,
+   *  10 LINEAR_DODGE,
+   *  11 OVERLAY,
+   *  12 SOFT_LIGHT,
+   *  13 HARD_LIGHT,
+   *  14 VIVID_LIGHT,
+   *  15 LINEAR_LIGHT,
+   *  16 PIN_LIGHT,
+   *  17 DIFFERENCE,
+   *  18 EXCLUSION
+   *  ```
+   * @function Module#Mixer#blendMode
+   * @param {number} blendmode index of the Blendmode
    */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
@@ -1422,8 +1658,8 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
 
   /**
    * @description the position of the handle, fader or pod. 0 is left, 1 is right
-   * @function Mixer#pod
-   * @param {float} position of the handle, between 0 and 1
+   * @function Module#Mixer#pod
+   * @param {float} position - position of the handle
    */
   _self.pod = function( _num ) {
     if ( _num != undefined ) {
@@ -1500,6 +1736,20 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
   }
 }
 
+/**
+ * @description
+ *   Output
+ *
+ * @example
+ *  let myChain = new output( renderer, source );
+ *  renderer.init()
+ *  renderer.render()
+ * @implements Module
+ * @constructor Module#Output
+ * @param renderer:GlRenderer
+ * @param source:Source
+ * @author Sense Studios
+ */
 function Output(renderer, _source ) {
 
   // create and instance
@@ -1508,7 +1758,7 @@ function Output(renderer, _source ) {
   // set or get uid
   _self.uuid = "Output_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Module"
-  
+
   // add to renderer
   renderer.add(_self)
 
@@ -1523,6 +1773,18 @@ function Output(renderer, _source ) {
   _self.update = function() {}
 }
 
+/**
+ * @description
+ *   Switcher
+ *
+ * @example
+ *  let mySwitcher = new Switcher( renderer, [ source1, source2 ]] );
+ * @constructor Module#Switcher
+ * @implements Module
+ * @param renderer:GlRenderer
+ * @param source:Source
+ * @author Sense Studios
+ */
 function Switcher(renderer, _sources ) {
 
   // create and instance
@@ -1592,6 +1854,11 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
     // TODO: add a foreach to allow infinite number of sources
   }
 }
+
+/**
+ * @constructor Module
+ * @interface
+ */
 
 
 
@@ -2046,6 +2313,8 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
 /**
+ * @description
+ *  The videosource allows for playback of video files in the Mixer project
  * @implements Source
  * @constructor Source#VideoSource
  * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
@@ -2127,7 +2396,6 @@ function VideoSource(renderer, options) {
     // videoElement.currentTime = Math.random() * 60   // use random in point
 
     // FOR FIREBASE
-
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
     // video2.currentTime = 20;
@@ -2159,6 +2427,10 @@ function VideoSource(renderer, options) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#VideoSource#video
+     */
     _self.video = videoElement
     _self.canvas = canvasElement
 
@@ -2183,6 +2455,15 @@ function VideoSource(renderer, options) {
   // HELPERS
   // ===========================================================================
 
+  /**
+   * @description
+   *  gets or sets source @file for the videosource
+   *  file has to be compatible with HTMLMediaElement Video ie. webm, mp4 etc.
+   *  We recommend **mp4**
+   *
+   * @function Source#VideoSource#src
+   * @param {file} Videofile - full path to file
+   */
   _self.src = function( file ) {
     videoElement.src = file
     var playInterval = setInterval( function() {
@@ -2194,10 +2475,29 @@ function VideoSource(renderer, options) {
     }, 400 )
   }
 
-  // Or use source.video[...]
+  /**
+   * @description start the current video
+   * @function Source#VideoSource#play
+   */
   _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#VideoSource#pause
+   */
   _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#VideoSource#paused
+   */
   _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#VideoSource#currentTime
+   * @param {float} time - time in seconds
+   */
   _self.currentTime = function( _num ) {
     if ( _num === undefined ) {
       return videoElement.currentTime;
@@ -2210,6 +2510,10 @@ function VideoSource(renderer, options) {
   }
 
   // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#VideoSource#duration
+   */
   _self.duration =     function() { return videoElement.duration }    // seconds
 
   // ===========================================================================
@@ -2233,6 +2537,7 @@ function VideoSource(renderer, options) {
 
 /**
  * @constructor Source
+ * @interface
  */
 
 function Source( renderer, options ) {
@@ -2262,11 +2567,1146 @@ function Source( renderer, options ) {
   _self.duration =     function() {}        // seconds
 }
 
-// hackity, jsdocs fails on _ at the beginning
-// so here is the source documentation
+/*
+	SuperGif
 
-// program interface
+	Example usage:
 
-/** Defines the interface for the Sources
- * @constructor Source
- */
+		<img src="./example1_preview.gif" rel:animated_src="./example1.gif" width="360" height="360" rel:auto_play="1" />
+
+		<script type="text/javascript">
+			$$('img').each(function (img_tag) {
+				if (/.*\.gif/.test(img_tag.src)) {
+					var rub = new SuperGif({ gif: img_tag } );
+					rub.load();
+				}
+			});
+		</script>
+
+	Image tag attributes:
+
+		rel:animated_src -	If this url is specified, it's loaded into the player instead of src.
+							This allows a preview frame to be shown until animated gif data is streamed into the canvas
+
+		rel:auto_play -		Defaults to 1 if not specified. If set to zero, a call to the play() method is needed
+
+	Constructor options args
+
+		gif 				Required. The DOM element of an img tag.
+		loop_mode			Optional. Setting this to false will force disable looping of the gif.
+		auto_play 			Optional. Same as the rel:auto_play attribute above, this arg overrides the img tag info.
+		max_width			Optional. Scale images over max_width down to max_width. Helpful with mobile.
+ 		on_end				Optional. Add a callback for when the gif reaches the end of a single loop (one iteration). The first argument passed will be the gif HTMLElement.
+		loop_delay			Optional. The amount of time to pause (in ms) after each single loop (iteration).
+		draw_while_loading	Optional. Determines whether the gif will be drawn to the canvas whilst it is loaded.
+		show_progress_bar	Optional. Only applies when draw_while_loading is set to true.
+
+	Instance methods
+
+		// loading
+		load( callback )		Loads the gif specified by the src or rel:animated_src sttributie of the img tag into a canvas element and then calls callback if one is passed
+		load_url( src, callback )	Loads the gif file specified in the src argument into a canvas element and then calls callback if one is passed
+
+		// play controls
+		play -				Start playing the gif
+		pause -				Stop playing the gif
+		move_to(i) -		Move to frame i of the gif
+		move_relative(i) -	Move i frames ahead (or behind if i < 0)
+
+		// getters
+		get_canvas			The canvas element that the gif is playing in. Handy for assigning event handlers to.
+		get_playing			Whether or not the gif is currently playing
+		get_loading			Whether or not the gif has finished loading/parsing
+		get_auto_play		Whether or not the gif is set to play automatically
+		get_length			The number of frames in the gif
+		get_current_frame	The index of the currently displayed frame of the gif
+
+		For additional customization (viewport inside iframe) these params may be passed:
+		c_w, c_h - width and height of canvas
+		vp_t, vp_l, vp_ w, vp_h - top, left, width and height of the viewport
+
+		A bonus: few articles to understand what is going on
+			http://enthusiasms.org/post/16976438906
+			http://www.matthewflickinger.com/lab/whatsinagif/bits_and_bytes.asp
+			http://humpy77.deviantart.com/journal/Frame-Delay-Times-for-Animated-GIFs-214150546
+
+*/
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory();
+    } else {
+        root.SuperGif = factory();
+    }
+}(this, function () {
+    // Generic functions
+    var bitsToNum = function (ba) {
+        return ba.reduce(function (s, n) {
+            return s * 2 + n;
+        }, 0);
+    };
+
+    var byteToBitArr = function (bite) {
+        var a = [];
+        for (var i = 7; i >= 0; i--) {
+            a.push( !! (bite & (1 << i)));
+        }
+        return a;
+    };
+
+    // Stream
+    /**
+     * @constructor
+     */
+    // Make compiler happy.
+    var Stream = function (data) {
+        this.data = data;
+        this.len = this.data.length;
+        this.pos = 0;
+
+        this.readByte = function () {
+            if (this.pos >= this.data.length) {
+                throw new Error('Attempted to read past end of stream.');
+            }
+            if (data instanceof Uint8Array)
+                return data[this.pos++];
+            else
+                return data.charCodeAt(this.pos++) & 0xFF;
+        };
+
+        this.readBytes = function (n) {
+            var bytes = [];
+            for (var i = 0; i < n; i++) {
+                bytes.push(this.readByte());
+            }
+            return bytes;
+        };
+
+        this.read = function (n) {
+            var s = '';
+            for (var i = 0; i < n; i++) {
+                s += String.fromCharCode(this.readByte());
+            }
+            return s;
+        };
+
+        this.readUnsigned = function () { // Little-endian.
+            var a = this.readBytes(2);
+            return (a[1] << 8) + a[0];
+        };
+    };
+
+    var lzwDecode = function (minCodeSize, data) {
+        // TODO: Now that the GIF parser is a bit different, maybe this should get an array of bytes instead of a String?
+        var pos = 0; // Maybe this streaming thing should be merged with the Stream?
+        var readCode = function (size) {
+            var code = 0;
+            for (var i = 0; i < size; i++) {
+                if (data.charCodeAt(pos >> 3) & (1 << (pos & 7))) {
+                    code |= 1 << i;
+                }
+                pos++;
+            }
+            return code;
+        };
+
+        var output = [];
+
+        var clearCode = 1 << minCodeSize;
+        var eoiCode = clearCode + 1;
+
+        var codeSize = minCodeSize + 1;
+
+        var dict = [];
+
+        var clear = function () {
+            dict = [];
+            codeSize = minCodeSize + 1;
+            for (var i = 0; i < clearCode; i++) {
+                dict[i] = [i];
+            }
+            dict[clearCode] = [];
+            dict[eoiCode] = null;
+
+        };
+
+        var code;
+        var last;
+
+        while (true) {
+            last = code;
+            code = readCode(codeSize);
+
+            if (code === clearCode) {
+                clear();
+                continue;
+            }
+            if (code === eoiCode) break;
+
+            if (code < dict.length) {
+                if (last !== clearCode) {
+                    dict.push(dict[last].concat(dict[code][0]));
+                }
+            }
+            else {
+                if (code !== dict.length) throw new Error('Invalid LZW code.');
+                dict.push(dict[last].concat(dict[last][0]));
+            }
+            output.push.apply(output, dict[code]);
+
+            if (dict.length === (1 << codeSize) && codeSize < 12) {
+                // If we're at the last code and codeSize is 12, the next code will be a clearCode, and it'll be 12 bits long.
+                codeSize++;
+            }
+        }
+
+        // I don't know if this is technically an error, but some GIFs do it.
+        //if (Math.ceil(pos / 8) !== data.length) throw new Error('Extraneous LZW bytes.');
+        return output;
+    };
+
+
+    // The actual parsing; returns an object with properties.
+    var parseGIF = function (st, handler) {
+        handler || (handler = {});
+
+        // LZW (GIF-specific)
+        var parseCT = function (entries) { // Each entry is 3 bytes, for RGB.
+            var ct = [];
+            for (var i = 0; i < entries; i++) {
+                ct.push(st.readBytes(3));
+            }
+            return ct;
+        };
+
+        var readSubBlocks = function () {
+            var size, data;
+            data = '';
+            do {
+                size = st.readByte();
+                data += st.read(size);
+            } while (size !== 0);
+            return data;
+        };
+
+        var parseHeader = function () {
+            var hdr = {};
+            hdr.sig = st.read(3);
+            hdr.ver = st.read(3);
+            if (hdr.sig !== 'GIF') throw new Error('Not a GIF file.'); // XXX: This should probably be handled more nicely.
+            hdr.width = st.readUnsigned();
+            hdr.height = st.readUnsigned();
+
+            var bits = byteToBitArr(st.readByte());
+            hdr.gctFlag = bits.shift();
+            hdr.colorRes = bitsToNum(bits.splice(0, 3));
+            hdr.sorted = bits.shift();
+            hdr.gctSize = bitsToNum(bits.splice(0, 3));
+
+            hdr.bgColor = st.readByte();
+            hdr.pixelAspectRatio = st.readByte(); // if not 0, aspectRatio = (pixelAspectRatio + 15) / 64
+            if (hdr.gctFlag) {
+                hdr.gct = parseCT(1 << (hdr.gctSize + 1));
+            }
+            handler.hdr && handler.hdr(hdr);
+        };
+
+        var parseExt = function (block) {
+            var parseGCExt = function (block) {
+                var blockSize = st.readByte(); // Always 4
+                var bits = byteToBitArr(st.readByte());
+                block.reserved = bits.splice(0, 3); // Reserved; should be 000.
+                block.disposalMethod = bitsToNum(bits.splice(0, 3));
+                block.userInput = bits.shift();
+                block.transparencyGiven = bits.shift();
+
+                block.delayTime = st.readUnsigned();
+
+                block.transparencyIndex = st.readByte();
+
+                block.terminator = st.readByte();
+
+                handler.gce && handler.gce(block);
+            };
+
+            var parseComExt = function (block) {
+                block.comment = readSubBlocks();
+                handler.com && handler.com(block);
+            };
+
+            var parsePTExt = function (block) {
+                // No one *ever* uses this. If you use it, deal with parsing it yourself.
+                var blockSize = st.readByte(); // Always 12
+                block.ptHeader = st.readBytes(12);
+                block.ptData = readSubBlocks();
+                handler.pte && handler.pte(block);
+            };
+
+            var parseAppExt = function (block) {
+                var parseNetscapeExt = function (block) {
+                    var blockSize = st.readByte(); // Always 3
+                    block.unknown = st.readByte(); // ??? Always 1? What is this?
+                    block.iterations = st.readUnsigned();
+                    block.terminator = st.readByte();
+                    handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
+                };
+
+                var parseUnknownAppExt = function (block) {
+                    block.appData = readSubBlocks();
+                    // FIXME: This won't work if a handler wants to match on any identifier.
+                    handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
+                };
+
+                var blockSize = st.readByte(); // Always 11
+                block.identifier = st.read(8);
+                block.authCode = st.read(3);
+                switch (block.identifier) {
+                    case 'NETSCAPE':
+                        parseNetscapeExt(block);
+                        break;
+                    default:
+                        parseUnknownAppExt(block);
+                        break;
+                }
+            };
+
+            var parseUnknownExt = function (block) {
+                block.data = readSubBlocks();
+                handler.unknown && handler.unknown(block);
+            };
+
+            block.label = st.readByte();
+            switch (block.label) {
+                case 0xF9:
+                    block.extType = 'gce';
+                    parseGCExt(block);
+                    break;
+                case 0xFE:
+                    block.extType = 'com';
+                    parseComExt(block);
+                    break;
+                case 0x01:
+                    block.extType = 'pte';
+                    parsePTExt(block);
+                    break;
+                case 0xFF:
+                    block.extType = 'app';
+                    parseAppExt(block);
+                    break;
+                default:
+                    block.extType = 'unknown';
+                    parseUnknownExt(block);
+                    break;
+            }
+        };
+
+        var parseImg = function (img) {
+            var deinterlace = function (pixels, width) {
+                // Of course this defeats the purpose of interlacing. And it's *probably*
+                // the least efficient way it's ever been implemented. But nevertheless...
+                var newPixels = new Array(pixels.length);
+                var rows = pixels.length / width;
+                var cpRow = function (toRow, fromRow) {
+                    var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
+                    newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
+                };
+
+                // See appendix E.
+                var offsets = [0, 4, 2, 1];
+                var steps = [8, 8, 4, 2];
+
+                var fromRow = 0;
+                for (var pass = 0; pass < 4; pass++) {
+                    for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
+                        cpRow(toRow, fromRow)
+                        fromRow++;
+                    }
+                }
+
+                return newPixels;
+            };
+
+            img.leftPos = st.readUnsigned();
+            img.topPos = st.readUnsigned();
+            img.width = st.readUnsigned();
+            img.height = st.readUnsigned();
+
+            var bits = byteToBitArr(st.readByte());
+            img.lctFlag = bits.shift();
+            img.interlaced = bits.shift();
+            img.sorted = bits.shift();
+            img.reserved = bits.splice(0, 2);
+            img.lctSize = bitsToNum(bits.splice(0, 3));
+
+            if (img.lctFlag) {
+                img.lct = parseCT(1 << (img.lctSize + 1));
+            }
+
+            img.lzwMinCodeSize = st.readByte();
+
+            var lzwData = readSubBlocks();
+
+            img.pixels = lzwDecode(img.lzwMinCodeSize, lzwData);
+
+            if (img.interlaced) { // Move
+                img.pixels = deinterlace(img.pixels, img.width);
+            }
+
+            handler.img && handler.img(img);
+        };
+
+        var parseBlock = function () {
+            var block = {};
+            block.sentinel = st.readByte();
+
+            switch (String.fromCharCode(block.sentinel)) { // For ease of matching
+                case '!':
+                    block.type = 'ext';
+                    parseExt(block);
+                    break;
+                case ',':
+                    block.type = 'img';
+                    parseImg(block);
+                    break;
+                case ';':
+                    block.type = 'eof';
+                    handler.eof && handler.eof(block);
+                    break;
+                default:
+                    throw new Error('Unknown block: 0x' + block.sentinel.toString(16)); // TODO: Pad this with a 0.
+            }
+
+            if (block.type !== 'eof') setTimeout(parseBlock, 0);
+        };
+
+        var parse = function () {
+            parseHeader();
+            setTimeout(parseBlock, 0);
+        };
+
+        parse();
+    };
+
+    var SuperGif = function ( opts ) {
+
+        var options = {
+            //viewport position
+            vp_l: 0,
+            vp_t: 0,
+            vp_w: null,
+            vp_h: null,
+            //canvas sizes
+            c_w: null,
+            c_h: null
+        };
+        for (var i in opts ) { options[i] = opts[i] }
+        if (options.vp_w && options.vp_h) options.is_vp = true;
+
+        //console.log(">>> >> ", options)
+
+        var stream;
+        var hdr;
+
+        var loadError = null;
+        var loading = false;
+
+        var transparency = null;
+        var delay = null;
+        var disposalMethod = null;
+        var disposalRestoreFromIdx = null;
+        var lastDisposalMethod = null;
+        var frame = null;
+        var lastImg = null;
+
+        var playing = true;
+        var forward = true;
+
+        var ctx_scaled = false;
+
+        var frames = [];
+        var frameOffsets = []; // elements have .x and .y properties
+
+        var gif = options.gif;
+        if (typeof options.auto_play == 'undefined')
+            options.auto_play = (!gif.getAttribute('rel:auto_play') || gif.getAttribute('rel:auto_play') == '1');
+
+        var onEndListener = (options.hasOwnProperty('on_end') ? options.on_end : null);
+        var loopDelay = (options.hasOwnProperty('loop_delay') ? options.loop_delay : 0);
+        var overrideLoopMode = (options.hasOwnProperty('loop_mode') ? options.loop_mode : 'auto');
+        var drawWhileLoading = (options.hasOwnProperty('draw_while_loading') ? options.draw_while_loading : false);
+        var showProgressBar = drawWhileLoading ? (options.hasOwnProperty('show_progress_bar') ? options.show_progress_bar : true) : false;
+        var progressBarHeight = (options.hasOwnProperty('progressbar_height') ? options.progressbar_height : 25);
+        var progressBarBackgroundColor = (options.hasOwnProperty('progressbar_background_color') ? options.progressbar_background_color : 'rgba(255,255,255,0.4)');
+        var progressBarForegroundColor = (options.hasOwnProperty('progressbar_foreground_color') ? options.progressbar_foreground_color : 'rgba(255,0,22,.8)');
+
+        var clear = function () {
+            transparency = null;
+            delay = null;
+            lastDisposalMethod = disposalMethod;
+            disposalMethod = null;
+            frame = null;
+        };
+
+        // XXX: There's probably a better way to handle catching exceptions when
+        // callbacks are involved.
+        var doParse = function () {
+            try {
+                parseGIF(stream, handler);
+            }
+            catch (err) {
+                doLoadError('parse');
+            }
+        };
+
+        var doText = function (text) {
+            toolbar.innerHTML = text; // innerText? Escaping? Whatever.
+            toolbar.style.visibility = 'visible';
+        };
+
+        var setSizes = function(w, h) {
+            canvas.width = w * get_canvas_scale();
+            canvas.height = h * get_canvas_scale();
+            toolbar.style.minWidth = ( w * get_canvas_scale() ) + 'px';
+
+            tmpCanvas.width = w;
+            tmpCanvas.height = h;
+            tmpCanvas.style.width = w + 'px';
+            tmpCanvas.style.height = h + 'px';
+            tmpCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
+        };
+
+        var setFrameOffset = function(frame, offset) {
+            if (!frameOffsets[frame]) {
+                frameOffsets[frame] = offset;
+                return;
+            }
+            if (typeof offset.x !== 'undefined') {
+                frameOffsets[frame].x = offset.x;
+            }
+            if (typeof offset.y !== 'undefined') {
+                frameOffsets[frame].y = offset.y;
+            }
+        };
+
+        var doShowProgress = function (pos, length, draw) {
+            if (draw && showProgressBar) {
+                var height = progressBarHeight;
+                var left, mid, top, width;
+                if (options.is_vp) {
+                    if (!ctx_scaled) {
+                        top = (options.vp_t + options.vp_h - height);
+                        height = height;
+                        left = options.vp_l;
+                        mid = left + (pos / length) * options.vp_w;
+                        width = canvas.width;
+                    } else {
+                        top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
+                        height = height / get_canvas_scale();
+                        left = (options.vp_l / get_canvas_scale() );
+                        mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
+                        width = canvas.width / get_canvas_scale();
+                    }
+                    //some debugging, draw rect around viewport
+                    if (false) {
+                        if (!ctx_scaled) {
+                            var l = options.vp_l, t = options.vp_t;
+                            var w = options.vp_w, h = options.vp_h;
+                        } else {
+                            var l = options.vp_l/get_canvas_scale(), t = options.vp_t/get_canvas_scale();
+                            var w = options.vp_w/get_canvas_scale(), h = options.vp_h/get_canvas_scale();
+                        }
+                        ctx.rect(l,t,w,h);
+                        ctx.stroke();
+                    }
+                }
+                else {
+                    top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
+                    mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
+                    width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1 );
+                    height /= ctx_scaled ? get_canvas_scale() : 1;
+                }
+
+                ctx.fillStyle = progressBarBackgroundColor;
+                ctx.fillRect(mid, top, width - mid, height);
+
+                ctx.fillStyle = progressBarForegroundColor;
+                ctx.fillRect(0, top, mid, height);
+            }
+        };
+
+        var doLoadError = function (originOfError) {
+            var drawError = function () {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.moveTo(0, 0);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
+                ctx.stroke();
+            };
+
+            loadError = originOfError;
+            hdr = {
+                width: gif.width,
+                height: gif.height
+            }; // Fake header.
+            frames = [];
+            drawError();
+        };
+
+        var doHdr = function (_hdr) {
+            hdr = _hdr;
+            setSizes(hdr.width, hdr.height)
+        };
+
+        var doGCE = function (gce) {
+            pushFrame();
+            clear();
+            transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
+            delay = gce.delayTime;
+            disposalMethod = gce.disposalMethod;
+            // We don't have much to do with the rest of GCE.
+        };
+
+        var pushFrame = function () {
+            if (!frame) return;
+            frames.push({
+                            data: frame.getImageData(0, 0, hdr.width, hdr.height),
+                            delay: delay
+                        });
+            frameOffsets.push({ x: 0, y: 0 });
+        };
+
+        var doImg = function (img) {
+            if (!frame) frame = tmpCanvas.getContext('2d');
+
+            var currIdx = frames.length;
+
+            //ct = color table, gct = global color table
+            var ct = img.lctFlag ? img.lct : hdr.gct; // TODO: What if neither exists?
+
+            /*
+            Disposal method indicates the way in which the graphic is to
+            be treated after being displayed.
+
+            Values :    0 - No disposal specified. The decoder is
+                            not required to take any action.
+                        1 - Do not dispose. The graphic is to be left
+                            in place.
+                        2 - Restore to background color. The area used by the
+                            graphic must be restored to the background color.
+                        3 - Restore to previous. The decoder is required to
+                            restore the area overwritten by the graphic with
+                            what was there prior to rendering the graphic.
+
+                            Importantly, "previous" means the frame state
+                            after the last disposal of method 0, 1, or 2.
+            */
+            if (currIdx > 0) {
+                if (lastDisposalMethod === 3) {
+                    // Restore to previous
+                    // If we disposed every frame including first frame up to this point, then we have
+                    // no composited frame to restore to. In this case, restore to background instead.
+                    if (disposalRestoreFromIdx !== null) {
+                    	frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
+                    } else {
+                    	frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                    }
+                } else {
+                    disposalRestoreFromIdx = currIdx - 1;
+                }
+
+                if (lastDisposalMethod === 2) {
+                    // Restore to background color
+                    // Browser implementations historically restore to transparent; we do the same.
+                    // http://www.wizards-toolkit.org/discourse-server/viewtopic.php?f=1&t=21172#p86079
+                    frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                }
+            }
+            // else, Undefined/Do not dispose.
+            // frame contains final pixel data from the last frame; do nothing
+
+            //Get existing pixels for img region after applying disposal method
+            var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
+
+            //apply color table colors
+            img.pixels.forEach(function (pixel, i) {
+                // imgData.data === [R,G,B,A,R,G,B,A,...]
+                if (pixel !== transparency) {
+                    imgData.data[i * 4 + 0] = ct[pixel][0];
+                    imgData.data[i * 4 + 1] = ct[pixel][1];
+                    imgData.data[i * 4 + 2] = ct[pixel][2];
+                    imgData.data[i * 4 + 3] = 255; // Opaque.
+                }
+            });
+
+            frame.putImageData(imgData, img.leftPos, img.topPos);
+
+            if (!ctx_scaled) {
+                ctx.scale(get_canvas_scale(),get_canvas_scale());
+                ctx_scaled = true;
+            }
+
+            // We could use the on-page canvas directly, except that we draw a progress
+            // bar for each image chunk (not just the final image).
+            if (drawWhileLoading) {
+                ctx.drawImage(tmpCanvas, 0, 0);
+                drawWhileLoading = options.auto_play;
+            }
+
+            lastImg = img;
+        };
+
+        var player = (function () {
+            var i = -1;
+            var iterationCount = 0;
+
+            var showingInfo = false;
+            var pinned = false;
+
+            /**
+             * Gets the index of the frame "up next".
+             * @returns {number}
+             */
+            var getNextFrameNo = function () {
+                var delta = (forward ? 1 : -1);
+                return (i + delta + frames.length) % frames.length;
+            };
+
+            var stepFrame = function (amount) { // XXX: Name is confusing.
+                i = i + amount;
+
+                putFrame();
+            };
+
+            var step = (function () {
+                var stepping = false;
+
+                var completeLoop = function () {
+                    if (onEndListener !== null)
+                        onEndListener(gif);
+                    iterationCount++;
+
+                    if (overrideLoopMode !== false || iterationCount < 0) {
+                        doStep();
+                    } else {
+                        stepping = false;
+                        playing = false;
+                    }
+                };
+
+                var doStep = function () {
+                    stepping = playing;
+                    if (!stepping) return;
+
+                    stepFrame(1);
+                    var delay = frames[i].delay * 10;
+                    if (!delay) delay = 100; // FIXME: Should this even default at all? What should it be?
+
+                    var nextFrameNo = getNextFrameNo();
+                    if (nextFrameNo === 0) {
+                        delay += loopDelay;
+                        setTimeout(completeLoop, delay);
+                    } else {
+                        setTimeout(doStep, delay);
+                    }
+                };
+
+                return function () {
+                    if (!stepping) setTimeout(doStep, 0);
+                };
+            }());
+
+            var putFrame = function () {
+                var offset;
+                i = parseInt(i, 10);
+
+                if (i > frames.length - 1){
+                    i = 0;
+                }
+
+                if (i < 0){
+                    i = 0;
+                }
+
+                offset = frameOffsets[i];
+
+                tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
+                ctx.globalCompositeOperation = "copy";
+                ctx.drawImage(tmpCanvas, 0, 0);
+            };
+
+            var play = function () {
+                playing = true;
+                step();
+            };
+
+            var pause = function () {
+                playing = false;
+            };
+
+
+            return {
+                init: function () {
+                    if (loadError) return;
+
+                    if ( ! (options.c_w && options.c_h) ) {
+                        ctx.scale(get_canvas_scale(),get_canvas_scale());
+                    }
+
+                    if (options.auto_play) {
+                        step();
+                    }
+                    else {
+                        i = 0;
+                        putFrame();
+                    }
+                },
+                step: step,
+                play: play,
+                pause: pause,
+                playing: playing,
+                move_relative: stepFrame,
+                current_frame: function() { return i; },
+                length: function() { return frames.length },
+                move_to: function ( frame_idx ) {
+                    i = frame_idx;
+                    putFrame();
+                }
+            }
+        }());
+
+        var doDecodeProgress = function (draw) {
+            doShowProgress(stream.pos, stream.data.length, draw);
+        };
+
+        var doNothing = function () {};
+        /**
+         * @param{boolean=} draw Whether to draw progress bar or not; this is not idempotent because of translucency.
+         *                       Note that this means that the text will be unsynchronized with the progress bar on non-frames;
+         *                       but those are typically so small (GCE etc.) that it doesn't really matter. TODO: Do this properly.
+         */
+        var withProgress = function (fn, draw) {
+            return function (block) {
+                fn(block);
+                doDecodeProgress(draw);
+            };
+        };
+
+
+        var handler = {
+            hdr: withProgress(doHdr),
+            gce: withProgress(doGCE),
+            com: withProgress(doNothing),
+            // I guess that's all for now.
+            app: {
+                // TODO: Is there much point in actually supporting iterations?
+                NETSCAPE: withProgress(doNothing)
+            },
+            img: withProgress(doImg, true),
+            eof: function (block) {
+                //toolbar.style.display = '';
+                pushFrame();
+                doDecodeProgress(false);
+                if ( ! (options.c_w && options.c_h) ) {
+                    canvas.width = hdr.width * get_canvas_scale();
+                    canvas.height = hdr.height * get_canvas_scale();
+                }
+                player.init();
+                loading = false;
+                if (load_callback) {
+                    load_callback(gif);
+                }
+
+            }
+        };
+
+        var init = function () {
+            var parent = gif.parentNode;
+
+            var div = document.createElement('div');
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext('2d');
+            toolbar = document.createElement('div');
+
+            tmpCanvas = document.createElement('canvas');
+
+            div.width = canvas.width = gif.width;
+            div.height = canvas.height = gif.height;
+            toolbar.style.minWidth = gif.width + 'px';
+
+            div.className = 'jsgif';
+            toolbar.className = 'jsgif_toolbar';
+            div.appendChild(canvas);
+            div.appendChild(toolbar);
+
+            //parent.insertBefore(div, gif);
+            //parent.removeChild(gif);
+
+            if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
+            initialized=true;
+        };
+
+        var get_canvas_scale = function() {
+            var scale;
+            if (options.max_width && hdr && hdr.width > options.max_width) {
+                scale = options.max_width / hdr.width;
+            }
+            else {
+                scale = 1;
+            }
+            return scale;
+        }
+
+        var canvas, ctx, toolbar, tmpCanvas;
+        var initialized = false;
+        var load_callback = false;
+
+        var load_setup = function(callback) {
+            if (loading) return false;
+            if (callback) load_callback = callback;
+            else load_callback = false;
+
+            loading = true;
+            frames = [];
+            clear();
+            disposalRestoreFromIdx = null;
+            lastDisposalMethod = null;
+            frame = null;
+            lastImg = null;
+
+            return true;
+        }
+
+        return {
+            // play controls
+            play: player.play,
+            pause: player.pause,
+            move_relative: player.move_relative,
+            move_to: player.move_to,
+
+            // getters for instance vars
+            get_playing      : function() { return playing },
+            get_canvas       : function() { return canvas },
+            get_canvas_scale : function() { return get_canvas_scale() },
+            get_loading      : function() { return loading },
+            get_auto_play    : function() { return options.auto_play },
+            get_length       : function() { return player.length() },
+            get_current_frame: function() { return player.current_frame() },
+            load_url: function(src,callback){
+                if (!load_setup(callback)) return;
+
+                var h = new XMLHttpRequest();
+                // new browsers (XMLHttpRequest2-compliant)
+                h.open('GET', src, true);
+
+                if ('overrideMimeType' in h) {
+                    h.overrideMimeType('text/plain; charset=x-user-defined');
+                }
+
+                // old browsers (XMLHttpRequest-compliant)
+                else if ('responseType' in h) {
+                    h.responseType = 'arraybuffer';
+                }
+
+                // IE9 (Microsoft.XMLHTTP-compliant)
+                else {
+                    h.setRequestHeader('Accept-Charset', 'x-user-defined');
+                }
+
+                h.onloadstart = function() {
+                    // Wait until connection is opened to replace the gif element with a canvas to avoid a blank img
+                    if (!initialized) init();
+                };
+                h.onload = function(e) {
+                    if (this.status != 200) {
+                        doLoadError('xhr - response');
+                    }
+                    // emulating response field for IE9
+                    if (!('response' in this)) {
+                        this.response = new VBArray(this.responseText).toArray().map(String.fromCharCode).join('');
+                    }
+                    var data = this.response;
+                    if (data.toString().indexOf("ArrayBuffer") > 0) {
+                        data = new Uint8Array(data);
+                    }
+
+                    stream = new Stream(data);
+                    setTimeout(doParse, 0);
+                };
+                h.onprogress = function (e) {
+                    if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
+                };
+                h.onerror = function() { doLoadError('xhr'); };
+                h.send();
+            },
+            load: function (callback) {
+                this.load_url(gif.getAttribute('rel:animated_src') || gif.src,callback);
+            },
+            load_raw: function(arr, callback) {
+                if (!load_setup(callback)) return;
+                if (!initialized) init();
+                stream = new Stream(arr);
+                setTimeout(doParse, 0);
+            },
+            set_frame_offset: setFrameOffset
+        };
+    };
+
+    return SuperGif;
+}));
+
+/*
+	RubbableGif
+
+	Example usage:
+
+		<img src="./example1_preview.gif" rel:animated_src="./example1.gif" width="360" height="360" rel:auto_play="1" />
+
+		<script type="text/javascript">
+			$$('img').each(function (img_tag) {
+				if (/.*\.gif/.test(img_tag.src)) {
+					var rub = new RubbableGif({ gif: img_tag } );
+					rub.load();
+				}
+			});
+		</script>
+
+	Image tag attributes:
+
+		rel:animated_src -	If this url is specified, it's loaded into the player instead of src.
+							This allows a preview frame to be shown until animated gif data is streamed into the canvas
+
+		rel:auto_play -		Defaults to 1 if not specified. If set to zero, the gif will be rubbable but will not
+							animate unless the user is rubbing it.
+
+	Constructor options args
+
+		gif 				Required. The DOM element of an img tag.
+		auto_play 			Optional. Same as the rel:auto_play attribute above, this arg overrides the img tag info.
+		max_width			Optional. Scale images over max_width down to max_width. Helpful with mobile.
+
+	Instance methods
+
+		// loading
+		load( callback )	Loads the gif into a canvas element and then calls callback if one is passed
+
+		// play controls
+		play -				Start playing the gif
+		pause -				Stop playing the gif
+		move_to(i) -		Move to frame i of the gif
+		move_relative(i) -	Move i frames ahead (or behind if i < 0)
+
+		// getters
+		get_canvas			The canvas element that the gif is playing in.
+		get_playing			Whether or not the gif is currently playing
+		get_loading			Whether or not the gif has finished loading/parsing
+		get_auto_play		Whether or not the gif is set to play automatically
+		get_length			The number of frames in the gif
+		get_current_frame	The index of the currently displayed frame of the gif
+
+		For additional customization (viewport inside iframe) these params may be passed:
+		c_w, c_h - width and height of canvas
+		vp_t, vp_l, vp_ w, vp_h - top, left, width and height of the viewport
+
+*/
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['./libgif'], factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory(require('./libgif'));
+    } else {
+        root.RubbableGif = factory(root.SuperGif);
+    }
+}(this, function (SuperGif) {
+    var RubbableGif = function( options ) {
+        var sup = new SuperGif( options );
+
+        var register_canvas_handers = function () {
+
+            var isvp = function(x) {
+                return (options.vp_l ? ( x - options.vp_l ) : x );
+            }
+
+            var canvas = sup.get_canvas();
+            var maxTime = 1000,
+            // allow movement if < 1000 ms (1 sec)
+                w = ( options.vp_w ? options.vp_w : canvas.width ),
+                maxDistance = Math.floor(w / (sup.get_length() * 2)),
+            // swipe movement of 50 pixels triggers the swipe
+                startX = 0,
+                startTime = 0;
+
+            var cantouch = "ontouchend" in document;
+
+            var aj = 0;
+            var last_played = 0;
+
+            canvas.addEventListener((cantouch) ? 'touchstart' : 'mousedown', function (e) {
+                // prevent image drag (Firefox)
+                e.preventDefault();
+                if (sup.get_auto_play()) sup.pause();
+
+                var pos = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
+
+                var x = (pos.layerX > 0) ? isvp(pos.layerX) : w / 2;
+                var progress = x / w;
+
+                sup.move_to( Math.floor(progress * (sup.get_length() - 1)) );
+
+                startTime = e.timeStamp;
+                startX = isvp(pos.pageX);
+            });
+
+            canvas.addEventListener((cantouch) ? 'touchend' : 'mouseup', function (e) {
+                startTime = 0;
+                startX = 0;
+                if (sup.get_auto_play()) sup.play();
+            });
+
+            canvas.addEventListener((cantouch) ? 'touchmove' : 'mousemove', function (e) {
+                e.preventDefault();
+                var pos = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
+
+                var currentX = isvp(pos.pageX);
+                currentDistance = (startX === 0) ? 0 : Math.abs(currentX - startX);
+                // allow if movement < 1 sec
+                currentTime = e.timeStamp;
+                if (startTime !== 0 && currentDistance > maxDistance) {
+                    if (currentX < startX && sup.get_current_frame() > 0) {
+                        sup.move_relative(-1);
+                    }
+                    if (currentX > startX && sup.get_current_frame() < sup.get_length() - 1) {
+                        sup.move_relative(1);
+                    }
+                    startTime = e.timeStamp;
+                    startX = isvp(pos.pageX);
+                }
+
+                var time_since_last_play = e.timeStamp - last_played;
+                {
+                    aj++;
+                    if (document.getElementById('tickles' + ((aj % 5) + 1))) document.getElementById('tickles' + ((aj % 5) + 1)).play();
+                    last_played = e.timeStamp;
+                }
+
+
+            });
+        };
+
+        sup.orig_load = sup.load;
+        sup.load = function(callback) {
+            sup.orig_load( function() {
+                if (callback) callback();
+                register_canvas_handers( sup );
+            } );
+        }
+
+        return sup;
+    }
+
+    return RubbableGif;
+}));

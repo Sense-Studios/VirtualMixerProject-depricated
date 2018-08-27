@@ -7,8 +7,7 @@
  * @implements Addon
  * @constructor Addon#FileManager
  * @param {GlRenderer} renderer
- * @param {Source}  source
- * @author Sense Studios
+ * @param {VideoSource}  source
  */
 function FileManager( _source ) {
 

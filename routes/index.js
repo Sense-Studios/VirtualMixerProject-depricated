@@ -1,29 +1,27 @@
 var express = require('express');
 var router = express.Router();
 
-// console.log("test test")
-// console.log(process.env.TEST)
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', {
-    title: 'Express',
-    giphy_key: process.env.GIPHYKEY,
-    marduq_key: process.env.MARDUQKEY
+    title: 'Express'
+    //giphy_key: process.env.GIPHYKEY,
+    //marduq_key: process.env.MARDUQKEY
   });
 });
 
+// for testing
+router.get('/test/*', function(req, res, next) {});
 router.get('/example1', function(req, res, next) {
-  res.render('compositions/example1', { title: 'Express' });
+  res.render('compositions/example1', { title: 'Example 1' });
 });
 
-router.get('/mixer5', function(req, res, next) {
-  res.render('compositions/mixer5', { title: 'Express' });
+// for composiions see /views
+router.get('/mixer/*', function(req, res, next) {
+  //console.log(req, res, next)
+  var repl_url = req.originalUrl.replace('/mixer', 'compositions')
+  var title = req.originalUrl.replace('/mixer/', '')
+  res.render(repl_url, { title: 'Composition: ' + title });
 });
-
-router.get('/notv', function(req, res, next) {
-  res.render('compositions/notv', { title: 'Express' });
-});
-
 
 module.exports = router;

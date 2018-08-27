@@ -1,16 +1,14 @@
 /**
  * @description
- *   A Chain
+ *   Chains together a string of sources, gives them an alpha channel, and allows for
+ *   switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
  * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
  * @constructor Module#Chain
  * @implements Module
  * @param renderer:GlRenderer
  * @param options:Object
- * @author Sense Studios
  */
-
-
 function Chain(renderer, options) {
 
   // create and instance
@@ -30,9 +28,8 @@ function Chain(renderer, options) {
   var _options;
   if ( options != undefined ) _options = options
 
-
   _self.type = "Module"
-  _self.sources = options.sources
+  _self.sources = _options.sources
 
   // add source alpha to custom uniforms
   _self.sources.forEach( function( source, index ) {

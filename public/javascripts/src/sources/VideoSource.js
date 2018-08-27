@@ -10,7 +10,7 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
 
 /**
  * @description
- *  The videosource allows for playback of video files in the Mixer project 
+ *  The videosource allows for playback of video files in the Mixer project
  * @implements Source
  * @constructor Source#VideoSource
  * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );

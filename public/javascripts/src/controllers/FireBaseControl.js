@@ -29,6 +29,9 @@ function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
     // window.addEventListener( 'keydown', keyHandler )
     // window.addEventListener("gamepadconnected", connecthandler )
 
+    // This is just another firebase, but it should be removed from the
+    // code and added in a tutorial on firebase.
+
     // Initialize Firebase
     var config = {
       apiKey: "AIzaSyDgrYfOUDN1QLRDcY4z45WwkcOjkXiImNQ",
