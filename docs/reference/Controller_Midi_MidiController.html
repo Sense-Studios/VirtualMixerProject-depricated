@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SolidSource</title>
+    <title>JSDoc: Class: MidiController</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: SolidSource</h1>
+    <h1 class="page-title">Class: MidiController</h1>
 
     
 
@@ -28,8 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="Source.html">Source</a>#</span>SolidSource<span class="signature">(renderer, options)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>MidiController<span class="signature">(renderer, Source, bpm)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -42,12 +41,16 @@
     
 
     
-    <h4 class="name" id="SolidSource"><span class="type-signature"></span>new SolidSource<span class="signature">(renderer, options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="MidiController"><span class="type-signature"></span>new MidiController<span class="signature">(renderer, Source, bpm)</span><span class="type-signature"></span></h4>
     
 
     
 
 
+
+<div class="description">
+    <p>Test en demo controller MidiController, implements controller and midicontroller</p>
+</div>
 
 
 
@@ -105,13 +108,13 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>Source</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type"><a href="Source.html">Source</a></span>
 
 
             
@@ -121,7 +124,30 @@
 
             
 
-            <td class="description last"><p>JSON Object</p></td>
+            <td class="description last"><p>a Source instance</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bpm</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Addon_BPM.html">Addon#BPM</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>a BPM instance</p></td>
         </tr>
 
     
@@ -149,7 +175,9 @@
     <dt class="implements">Implements:</dt>
     <dd class="implements"><ul>
         
-            <li><a href="Source.html">Source</a></li>
+            <li><a href="Controller.html">Controller</a></li>
+        
+            <li><a href="Midi.html">Midi</a></li>
         
     </ul></dd>
     
@@ -169,7 +197,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sources_SolidSource.js.html">sources/SolidSource.js</a>, <a href="sources_SolidSource.js.html#line7">line 7</a>
+        <a href="controllers_MidiController.js.html">controllers/MidiController.js</a>, <a href="controllers_MidiController.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -198,7 +226,7 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );</code></pre>
+    <pre class="prettyprint"><code>var myMidicontroller = new MidiController( renderer, { sources: [ source1, source2, ... ], bpm: bpm1 } );</code></pre>
 
 
 
@@ -219,209 +247,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="color"><span class="type-signature"></span>color<span class="signature">(r, g, b)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>r</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">float</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>red value</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>g</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">float</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>green value</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>b</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">float</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>blue value</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="implements">Implements:</dt>
-    <dd class="implements"><ul>
-        
-            <li><a href="Source.html">Source</a></li>
-        
-    </ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sources_SolidSource.js.html">sources/SolidSource.js</a>, <a href="sources_SolidSource.js.html#line57">line 57</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>color</p>
-</div>
-
-
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>red.color( { r: 0.0, g: 0.0, b: 1.0 } );</code></pre>
-
-
-
-        
     
 
     
