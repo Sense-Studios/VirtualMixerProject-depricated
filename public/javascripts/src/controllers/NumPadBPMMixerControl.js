@@ -1,5 +1,5 @@
-NumpadBpmMixerControl.prototype = new Source(); // assign prototype to marqer
-NumpadBpmMixerControl.constructor = GifSource;  // re-assign constructor
+NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
 
 /**
 * @description
