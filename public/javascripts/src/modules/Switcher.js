@@ -24,14 +24,18 @@ function Switcher(renderer, options ) {
   renderer.add(_self)
 
   // set options
-  var _options;
-  if ( options != undefined ) _options = options
+  //_self.options = {};
+  //if ( options != undefined ) self.options = options
 
   // add source
-  if (_options.source1 && _options.source2) {
-    _self.sources = [ _options.source1, _options.source2 ]; // array
-    _self.active_source = 0
-  }
+  _self.sources = []
+  //if (_self.options.source1 && _self.options.source2) {
+  //  _self.sources = [ _self.options.source1, _self.options.source2 ]; // array
+  //  _self.active_source = 0
+  // }
+
+  _self.sources = [ options.source1, options.source2 ]; // array
+  _self.active_source = 0
 
   _self.init = function() {
 
@@ -52,7 +56,7 @@ function Switcher(renderer, options ) {
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_sources[0].uuid +'_output, '+_sources[1].uuid +'_output );\n  /* custom_main */')
+vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
 
     // TODO: add a foreach to allow infinite number of sources
 

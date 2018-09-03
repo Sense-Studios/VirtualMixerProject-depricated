@@ -21,9 +21,8 @@ function BPM( renderer, options ) {
   _self.type = "Addon"
 
   // set options
-  var _options;
-  if ( options != undefined ) _options = options;
-
+  _self.options = {}
+  if ( options != undefined ) _self.options = options
   /**
    * @description Beats Per Minute
    * @member Addon#BPM#bpm
@@ -194,7 +193,7 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   audio.src = '/audio/fulke_absurd.mp3'
-  if ( _options.audio ) audio.src = _options.audio
+  if ( _self.options.audio ) audio.src = _self.options.audio
 
   //audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
