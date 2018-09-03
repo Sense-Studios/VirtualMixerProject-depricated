@@ -60,7 +60,7 @@ var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 }
 var mixer5 = new Mixer( renderer, { source1: mixer1, source2: clutter } );
 mixer5.mixMode(9)
 
-var switcher1 = new Switcher( renderer, [ mixer5, mixer3  ] );
+var switcher1 = new Switcher( renderer, { source1: mixer5, source2: mixer3 } );
 
 // ## ADDONS ##################################################################
 
@@ -71,7 +71,7 @@ var filemanager3 = new FileManager( testSource3 )
 var filemanager4 = new FileManager( testSource4 )
 
 // create a bpm addon
-var bpm = new BPM( renderer )
+var bpm = new BPM( renderer, { audio: '/audio/fear_is_the_mind_killer_audio.mp3' } )
 
 // add the bpm to the mixer (-pod)
 bpm.add( mixer4.pod )
