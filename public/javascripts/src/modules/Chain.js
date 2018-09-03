@@ -38,7 +38,6 @@ function Chain(renderer, options) {
 
   // add source uniforms to fragmentshader
   _self.sources.forEach( function( source, index ) {
-    //renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_source'+index+'_'+'output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
   })
 
@@ -65,10 +64,19 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
+  _self.setChainLink = function( _num, _alpha ) {
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
+  }
 
-  var current = []
-  _self.toggle = function( _num ) {
-    console.log("TOGLLGGLLELEE!!!", _num)
+  _self.getChainLink = function( _num ) {
+    return _self.sources( _num )
+  }
+
+  _self.toggle = function( _num, _state ) {
+    if ( _state !== undefined ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
+      return;
+    }
 
     if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
       renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
@@ -77,37 +85,4 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
       current = _num
     }
   }
-
-
-  _self.keyDown = function( _num, _event ) {
-    console.log("TOUCHFADE!!!", _num, _event)
-    //if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value > 0.99999 ) {
-    //  renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-    //}
-
-    if (_event.repeat ) {
-      return
-      //renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 1.042
-      //console.log('pump', renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value)
-      //return
-    }
-
-    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-    //console.log( renderer.customUniforms );
-  }
-
-  _self.keyUp = function( _num, _event ) {
-    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
-
-    /*
-    var touchFadeTimeout = setInterval( function() {
-      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 0.90
-      if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value < 0.01 ) {
-        clearInterval(touchFadeTimeout);
-      }
-    });
-    */
-  }
-
-
 }
