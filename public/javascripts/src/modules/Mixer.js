@@ -125,16 +125,17 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
 
   /**
    * @description
-   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-8;
+   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
    *  1: NORMAL (default),
    *  2: HARD,
    *  3: NAM,
    *  4: FAM,
-   *  5: LEFT,
-   *  6: RIGHT,
-   *  7: CENTER,
-   *  8: BOOM
+   *  5: NON-DARK,
+   *  6: LEFT,
+   *  7: RIGHT,
+   *  8: CENTER,
+   *  9: BOOM
    *  ```
    *
    * @function Module#Mixer#mixMode
