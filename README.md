@@ -129,10 +129,11 @@ In a regular crossfade, source 1 would fade out while source 2 fades in. At the 
 * 2: **HARD**,               switches with a hard cut at 50%
 * 3: **NAM**,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
 * 4: **FAM**,                fades with a downward curve, forcing a 'overlay' period
-* 5: **LEFT**,               forces the pod on 0 (locks pod)
-* 6: **RIGHT**,              forces the pod on 1 (locks pod)
-* 7: **CENTER**,             forces both sources at ~66% (locks pod)
-* 8: **BOOM**                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+* 5: **NON DARK**,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+* 6: **LEFT**,               forces the pod on 0 (locks pod)
+* 7: **RIGHT**,              forces the pod on 1 (locks pod)
+* 8: **CENTER**,             forces both sources at ~66% (locks pod)
+* 9: **BOOM**                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
 
 ### Blendmode
 Mixers also support a [`Blendmode`](Mixer.html#blendMode).
