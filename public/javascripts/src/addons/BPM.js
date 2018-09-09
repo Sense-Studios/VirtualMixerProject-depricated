@@ -215,7 +215,8 @@ function BPM( renderer, options ) {
   bufferLength = analyser.frequencyBinCount;
 
   // firstload for mobile
-  $("body").click(function() {
+  // $("body").click(function() {
+  document.body.addEventListener('click', function() {
     console.log("Auto BPM is initialized!", audio.src);
     audio.play();
     document.body.webkitRequestFullScreen()
@@ -286,9 +287,13 @@ function BPM( renderer, options ) {
   // blink on the beat
   var doBlink = function() {
     if ( audio.paused ) {
-      $('.blink').hide()
+      document.getElementsByClassName('blink')[0].style.opacity = 0
     }else{
-      $('.blink').toggle()
+      if (document.getElementsByClassName('blink')[0].style.opacity == 1) {
+        document.getElementsByClassName('blink')[0].style.opacity = 0
+      }else{
+        document.getElementsByClassName('blink')[0].style.opacity = 1
+      }
     }
     setTimeout( doBlink, (60/window.bpm_test)*1000 )
   }
@@ -333,14 +338,17 @@ function BPM( renderer, options ) {
         }
         html += ']<br/>'
       })
-      $('#info').html(html)
+      if (document.getElementById('info') != null) {
+        document.getElementById('info').html = html
+      }
     }
 
     var confidence = "calibrating"
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      $('.blink').css('background-color','rgba(150,150,150,0.5) !important')
+      //$('.blink').css('background-color','rgba(150,150,150,0.5) !important')
+      document.getElementsByClassName('blink')[0].background = '#999999';
     }else{
       calibrating = false
 
@@ -352,13 +360,17 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod <= 2 ) {
         confidence = "low"
-        $('.blink').css('background-color','red')
+        //$('.blink').css('background-color','red')
+        document.getElementsByClassName('blink')[0].background = '#990000';
       }else if( confidence_mod > 2 && confidence_mod <= 7) {
         confidence = "average"
-        $('.blink').css('background-color','yellow')
+        //$('.blink').css('background-color','yellow')
+        document.getElementsByClassName('blink')[0].background = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        $('.blink').css('background-color','white')
+        //$('.blink').css('background-color','yellow')
+        document.getElementsByClassName('blink')[0].background = '#CCCCCC';
+        //$('.blink').css('background-color','white')
       }
     }
 

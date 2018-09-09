@@ -121,7 +121,7 @@ function TextSource(renderer, options) {
   }
 
   // this should be set externally, of course
-  var text = null; $.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d })
+  var text = null; utils.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d; console.log("get text", d) })
 
   // textbehaviour should be loaded externally too
   var text_c = 0
@@ -133,7 +133,7 @@ function TextSource(renderer, options) {
   var title_text_font_size = 64
   var small_text_x = 512
   _self.update = function() {
-
+    
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return

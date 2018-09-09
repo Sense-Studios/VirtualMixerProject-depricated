@@ -56,7 +56,8 @@ function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
   var mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
   var _to;
 
-  $('body').click( function() { _bpms.forEach( function( b ) { b.tap() } ) } );
+  //$('body').click( function() { _bpms.forEach( function( b ) { b.tap() } ) } );
+  document.body.addEventListener('click', function() { _bpms.forEach( function( b ) { b.tap() } ) } );
 
   var keyDownHandler = function( _event ) {
     // should be some way to check focus of this BPM instance

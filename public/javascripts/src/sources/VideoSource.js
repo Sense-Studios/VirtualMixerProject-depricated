@@ -82,7 +82,7 @@ function VideoSource(renderer, options) {
     }, 400 )
 
     // firstload handler for mobile; neest at least 1 user click
-    $("body").click(function() {
+    document.body.addEventListener('click', function() {
       videoElement.play();
       _self.firstplay = true
     });
