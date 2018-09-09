@@ -23,21 +23,13 @@ function Switcher(renderer, options ) {
   // add to renderer
   renderer.add(_self)
 
-  // set options
-  //_self.options = {};
-  //if ( options != undefined ) self.options = options
-
-  // add source
-  _self.sources = []
-  //if (_self.options.source1 && _self.options.source2) {
-  //  _self.sources = [ _self.options.source1, _self.options.source2 ]; // array
-  //  _self.active_source = 0
-  // }
-
+  // add sources, only 2 allowed, build mixers or use a chain
   _self.sources = [ options.source1, options.source2 ]; // array
   _self.active_source = 0
 
   _self.init = function() {
+
+    console.log("Switcher", _self.uuid, _self.sources)
 
     renderer.customUniforms[_self.uuid+'_active_source'] = { type: "i", value: 1 }
 
@@ -52,17 +44,10 @@ function Switcher(renderer, options ) {
 \n}'
 );
 
-    // TODO: add a foreach to allow infinite number of sources
-
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
 vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
-
-    // TODO: add a foreach to allow infinite number of sources
-
   }
-
-
 
   _self.update = function() {}
   _self.render = function() {
@@ -85,7 +70,5 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
     }
     renderer.customUniforms[_self.uuid+'_active_source'] = { type: "i", value: _self.active_source }
     return _self.active_source
-
-    // TODO: add a foreach to allow infinite number of sources
   }
 }

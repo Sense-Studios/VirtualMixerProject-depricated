@@ -214,9 +214,8 @@ function BPM( renderer, options ) {
   _self.type = "Addon"
 
   // set options
-  var _options;
-  if ( options != undefined ) _options = options;
-
+  _self.options = {}
+  if ( options != undefined ) _self.options = options
   /**
    * @description Beats Per Minute
    * @member Addon#BPM#bpm
@@ -387,7 +386,7 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   audio.src = '/audio/fulke_absurd.mp3'
-  if ( _options.audio ) audio.src = _options.audio
+  if ( _self.options.audio ) audio.src = _self.options.audio
 
   //audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
@@ -409,7 +408,8 @@ function BPM( renderer, options ) {
   bufferLength = analyser.frequencyBinCount;
 
   // firstload for mobile
-  $("body").click(function() {
+  // $("body").click(function() {
+  document.body.addEventListener('click', function() {
     console.log("Auto BPM is initialized!", audio.src);
     audio.play();
     document.body.webkitRequestFullScreen()
@@ -480,9 +480,13 @@ function BPM( renderer, options ) {
   // blink on the beat
   var doBlink = function() {
     if ( audio.paused ) {
-      $('.blink').hide()
+      document.getElementsByClassName('blink')[0].style.opacity = 0
     }else{
-      $('.blink').toggle()
+      if (document.getElementsByClassName('blink')[0].style.opacity == 1) {
+        document.getElementsByClassName('blink')[0].style.opacity = 0
+      }else{
+        document.getElementsByClassName('blink')[0].style.opacity = 1
+      }
     }
     setTimeout( doBlink, (60/window.bpm_test)*1000 )
   }
@@ -527,14 +531,17 @@ function BPM( renderer, options ) {
         }
         html += ']<br/>'
       })
-      $('#info').html(html)
+      if (document.getElementById('info') != null) {
+        document.getElementById('info').html = html
+      }
     }
 
     var confidence = "calibrating"
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      $('.blink').css('background-color','rgba(150,150,150,0.5) !important')
+      //$('.blink').css('background-color','rgba(150,150,150,0.5) !important')
+      document.getElementsByClassName('blink')[0].background = '#999999';
     }else{
       calibrating = false
 
@@ -546,13 +553,17 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod <= 2 ) {
         confidence = "low"
-        $('.blink').css('background-color','red')
+        //$('.blink').css('background-color','red')
+        document.getElementsByClassName('blink')[0].background = '#990000';
       }else if( confidence_mod > 2 && confidence_mod <= 7) {
         confidence = "average"
-        $('.blink').css('background-color','yellow')
+        //$('.blink').css('background-color','yellow')
+        document.getElementsByClassName('blink')[0].background = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        $('.blink').css('background-color','white')
+        //$('.blink').css('background-color','yellow')
+        document.getElementsByClassName('blink')[0].background = '#CCCCCC';
+        //$('.blink').css('background-color','white')
       }
     }
 
@@ -765,7 +776,7 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    $.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    utils.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })
@@ -849,6 +860,9 @@ function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
     console.log("init FireBase contoller.")
     // window.addEventListener( 'keydown', keyHandler )
     // window.addEventListener("gamepadconnected", connecthandler )
+
+    // This is just another firebase, but it should be removed from the
+    // code and added in a tutorial on firebase.
 
     // Initialize Firebase
     var config = {
@@ -1113,11 +1127,30 @@ function GamePadVerticalControl( renderer ) {
 
 }
 
+// -------------------------------------------------------------------------- //
 
 // refers to ...
 // https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+MidiController.prototype = new Midi();  // assign prototype to marqer
+MidiController.constructor = MidiController;  // re-assign constructor
 
-function MidiController( renderer, _mixer1, _mixer2, _mixer3 ) {
+//MidiController.prototype = new Controller();  // assign prototype to marqer
+//MidiController.constructor = MidiController;  // re-assign constructor
+
+// based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+// ONLY WORKS PARTIALLY WITHOUT HTTPS://
+/**
+* @description
+*  Demo controller MidiController, implements controller and midicontroller
+* @implements Controller#Midi
+* @constructor Controller#Midi#MidiController
+* @example var myMidicontroller = new MidiController( renderer, { sources: [ source1, source2, ... ], bpm: bpm1 } );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Source} Source - a Source instance
+* @param {Addon#BPM} bpm - a BPM instance
+*/
+
+function MidiController( renderer, options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -1135,6 +1168,210 @@ function MidiController( renderer, _mixer1, _mixer2, _mixer3 ) {
 
   // add to renderer
   renderer.add(_self)
+
+  // Check this image, with all the buttons etc.
+  // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
+
+  // these are the available colors
+  var OFF = 0;
+  var GREEN = 1;
+  var GREEN_BLINK = 2;
+  var RED = 3;
+  var RED_BLINK = 4;
+  var YELLOW = 5;
+  var YELLOW_BLINK = 6;
+
+  // needed for the program
+  var midi, input, output
+
+  // this is the main keypad
+  var midimap = [
+  	[ 56, 57, 58, 59, 60, 61, 62, 63 ],
+  	[ 48, 49, 50, 51, 52, 53, 54, 55 ],
+  	[ 40, 41, 42, 43, 44, 45, 46, 47 ],
+  	[ 32, 33, 34, 35, 36, 37, 38, 39 ],
+  	[ 24, 25, 26, 27, 28, 29, 30, 31 ],
+  	[ 16, 17, 18, 19, 20, 21, 22, 23 ],
+  	[  8,  9, 10, 11, 12, 13, 14, 15 ],
+  	[  0,  1,  2,  3,  4,  5,  6,  7 ]
+  ]
+
+  // these are the rest of the buttons
+  var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
+  var faders        = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
+  var faders_opaque = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+
+  // request MIDI access
+  if (navigator.requestMIDIAccess) {
+  	navigator.requestMIDIAccess()
+  		.then(success, failure);
+  }
+
+  // we have success!
+  function success (_midi) {
+    console.log("We have midi!09po ")
+  	midi = _midi
+  	var inputs = midi.inputs.values();
+  	var outputs = midi.outputs.values();
+
+  	for (i = inputs.next(); i && !i.done; i = inputs.next()) {
+  		input = i.value;
+      input.onmidimessage = onMIDIMessage;
+  	}
+
+  	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
+  		output = o.value;
+      initMidi()
+  	}
+  }
+
+  // everything went wrong.
+  function failure () {
+  	console.error('No access to your midi devices.');
+  }
+
+  function initMidi() {
+    // make everything red!
+    var commands = []
+    midimap.forEach( function( row, i ) {
+      row.forEach( function( value, j ) {
+        commands.push( 0x90, value, RED_BLINK )
+      });
+    });
+
+    // switch the rest off, if there is still some led on
+    rest.forEach( function( r, i ) {
+      commands.push( 0x90, r, OFF )
+    });
+
+    // send the comand
+    output.send( commands );
+
+    // start the bpm sync
+    var bpmonoff = true
+    bpm.blinkCallBack = function(_on) {
+      if (bpmonoff) {
+        output.send( [ 0x90, 82, OFF ] )
+        bpmonoff = false
+      }else{
+        output.send( [ 0x90, 82, GREEN ] )
+        bpmonoff = true
+      }
+    }
+  }
+
+  // some examples, this is the 'onpress' (and on slider) function
+  var doubleclickbuffer = [ 0, 0, 0, 0 ]
+  var doubleclickPattern = [ 128, 144, 128, 144 ]
+  var doubleclick = false
+  function onMIDIMessage(e) {
+    //console.log(e.data)
+
+    // Uint8Array(3) [176, 48, 117]
+    // [ state, key, value]
+    // state
+    // 144 = down
+    // 112 = up
+    // 176 = sliding
+
+    var opaque = false
+    if (doubleclick) return
+    doubleclickbuffer.unshift([ e.data[0], e.data[1] ])
+    doubleclickbuffer.pop()
+    if ( doubleclickbuffer.map(function(m) { return m[0] } ).join(",") == doubleclickPattern.join(",") ) {
+      console.log("blink1")
+      if ( doubleclickbuffer.map( function(m) { return m[1] } ).every( (val, i, arr) => val === arr[0] ) ) {
+        doubleclickbuffer = [ 0, 0, 0, 0 ]
+
+        // DO STUFF ON DOUBLECLICK
+        output.send( [ 0x90, e.data[1], GREEN_BLINK ] );
+
+
+        console.log("blink2")
+        doubleclick = true
+        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        faders_opaque[e.data[1]] = 1
+        var source = chain1.getChainLink( e.data[1] )
+        if (source.video) source.video.currentTime = Math.random() * source.video.duration
+
+        console.log("toggle chain")
+        setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false}, 350)
+        return
+      }
+    }
+    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
+    //console.log( doubleclickbuffer )
+
+
+
+    if (e.data[1] == 48) {
+      //console.log( e.data[2] / 126 )
+      //testSource2.video.playbackRate  = e.data[2] / 56
+      //console.log(e.data[2])
+      if ( faders_opaque[0] ) chain1.setChainLink (0, e.data[2]/126 )
+      faders[0] = e.data[2]
+    }
+
+    if (e.data[1] == 49) {
+      //testSource3.video.playbackRate  = e.data[2] / 56
+      if ( faders_opaque[1] ) chain1.setChainLink (1, e.data[2]/126 )
+      faders[1] = e.data[2]
+    }
+
+    if (e.data[1] == 50) {
+      //testSource4.video.playbackRate  = e.data[2] / 56.0
+      if ( faders_opaque[2] ) chain1.setChainLink (2, e.data[2]/126 )
+      faders[2] = e.data[2]
+    }
+
+    if (e.data[1] == 51) {
+      //testSource4.video.playbackRate  = e.data[2] / 56.0
+      if ( faders_opaque[3] ) chain1.setChainLink (3, e.data[2]/126 )
+      faders[3] = e.data[2]
+    }
+
+  	if (e.data[1] == 64) {
+  		// switch everything off
+  		var commands = []
+  		midimap.forEach( function( row, i ) {
+  			row.forEach( function( value, j ) {
+  				commands.push(0x90, value, OFF)
+  			})
+  		})
+
+  		rest.forEach( function( r, i ) {
+  			commands.push( 0x90, r, OFF )
+  		})
+  		output.send(commands)
+
+  	}else if (e.data[1] == 65) {
+  		// switch the main pads yellow
+  		var commands = []
+  		midimap.forEach( function( row, i ) {
+  			row.forEach( function( value, j ) {
+  				commands.push( 0x90, value, YELLOW )
+  			})
+  		})
+      output.send( commands )
+
+  	}else{
+  		// press a button, make it green
+      if (e.data[0] == 128 ) {
+        output.send( [ 0x90, e.data[1], OFF ] );
+        chain1.setChainLink(e.data[1], 0)
+        //console.log("toggle chain")
+        doubleclick = false
+      }
+
+      if (e.data[0] == 144  ) {
+        output.send( [ 0x90, e.data[1], GREEN ] );
+        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        //console.log("toggle chain", faders[e.data[1]], e.data[1] )
+        faders_opaque[e.data[1]] = 0
+        doubleclick = false
+      }
+  	}
+  }
 
   // init with a tap contoller
   _self.init = function() {
@@ -1159,6 +1396,20 @@ function MidiController( renderer, _mixer1, _mixer2, _mixer3 ) {
     return scheme
   }
 }
+
+NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
+
+/**
+* @description
+*  Test en demo controller NumpadBpmMixerControl
+* @implements Controller
+* @constructor Controller#NumpadBpmMixerControl
+* @example var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Module#Mixer} mixer - a Mixer instance
+* @param {Addon#BPM} bpm - a BPM instance
+*/
 
 function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
 
@@ -1204,7 +1455,8 @@ function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
   var mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
   var _to;
 
-  $('body').click( function() { _bpms.forEach( function( b ) { b.tap() } ) } );
+  //$('body').click( function() { _bpms.forEach( function( b ) { b.tap() } ) } );
+  document.body.addEventListener('click', function() { _bpms.forEach( function( b ) { b.tap() } ) } );
 
   var keyDownHandler = function( _event ) {
     // should be some way to check focus of this BPM instance
@@ -1309,6 +1561,132 @@ function SourceControl( renderer, source ) {
 
 }
 
+/**
+ * @constructor Controller
+ * @interface
+ */
+
+function Controller( renderer, options ) {
+  var _self = this
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  _self.type = "Controller"
+  _self.myLittleControllerVar = "Wakkawakka"
+
+  // program interface
+  _self.init =         function() {}
+  _self.update =       function() {}
+  _self.render =       function() {}
+  _self.add =          function() {}
+  //_self.start =        function() {}
+
+}
+
+
+
+Midi.prototype = new Controller();  // assign prototype to marqer
+Midi.constructor = Midi;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#Midi
+ * @interface
+ */
+
+function Midi() {
+  // base
+
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "Midi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "MidiControl"
+  //_self.controllers = {};
+  //_self.bypass = true
+  _self.mylittlevar = "boejaka"
+  /*
+
+  // Check this image, with all the buttons etc.
+  // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
+
+  // these are the available colors
+  var OFF = 0;
+  var GREEN = 1;
+  var GREEN_BLINK = 2;
+  var RED = 3;
+  var RED_BLINK = 4;
+  var YELLOW = 5;
+  var YELLOW_BLINK = 6;
+
+  // needed for the program
+  var midi, input, output
+
+  // this is the main keypad
+  var midimap = [
+  	[ 56, 57, 58, 59, 60, 61, 62, 63 ],
+  	[ 48, 49, 50, 51, 52, 53, 54, 55 ],
+  	[ 40, 41, 42, 43, 44, 45, 46, 47 ],
+  	[ 32, 33, 34, 35, 36, 37, 38, 39 ],
+  	[ 24, 25, 26, 27, 28, 29, 30, 31 ],
+  	[ 16, 17, 18, 19, 20, 21, 22, 23 ],
+  	[  8,  9, 10, 11, 12, 13, 14, 15 ],
+  	[  0,  1,  2,  3,  4,  5,  6,  7 ]
+  ]
+
+  // these are the rest of the buttons
+  var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
+  var faders        = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
+  var faders_opaque = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+
+  // request MIDI access
+  if (navigator.requestMIDIAccess) {
+  	navigator.requestMIDIAccess()
+  		.then(success, failure);
+  }
+
+  // we have success!
+  function success (_midi) {
+    console.log("We have midi!09po ")
+  	midi = _midi
+  	var inputs = midi.inputs.values();
+  	var outputs = midi.outputs.values();
+
+  	for (i = inputs.next(); i && !i.done; i = inputs.next()) {
+  		input = i.value;
+      input.onmidimessage = onMIDIMessage;
+  	}
+
+  	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
+  		output = o.value;
+      initMidi()
+  	}
+  }
+
+  // everything went wrong.
+  function failure () {
+  	console.error('No access to your midi devices.');
+  }
+
+  function initMidi() {
+    // make everything red!
+    var commands = []
+    midimap.forEach( function( row, i ) {
+      row.forEach( function( value, j ) {
+        commands.push( 0x90, value, RED_BLINK )
+      });
+    });
+  }
+
+  function onMIDIMessage(e) {
+    commands.push( 0x90, value, YELLOW )
+    output.send( commands )
+  }
+  */
+}
 
 
 // fragment
@@ -1360,17 +1738,15 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
 
 /**
  * @description
- *   A Chain
+ *   Chains together a string of sources, gives them an alpha channel, and allows for
+ *   switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
  * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
  * @constructor Module#Chain
  * @implements Module
  * @param renderer:GlRenderer
  * @param options:Object
- * @author Sense Studios
  */
-
-
 function Chain(renderer, options) {
 
   // create and instance
@@ -1390,9 +1766,8 @@ function Chain(renderer, options) {
   var _options;
   if ( options != undefined ) _options = options
 
-
   _self.type = "Module"
-  _self.sources = options.sources
+  _self.sources = _options.sources
 
   // add source alpha to custom uniforms
   _self.sources.forEach( function( source, index ) {
@@ -1401,7 +1776,6 @@ function Chain(renderer, options) {
 
   // add source uniforms to fragmentshader
   _self.sources.forEach( function( source, index ) {
-    //renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_source'+index+'_'+'output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
   })
 
@@ -1428,10 +1802,19 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
+  _self.setChainLink = function( _num, _alpha ) {
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
+  }
 
-  var current = []
-  _self.toggle = function( _num ) {
-    console.log("TOGLLGGLLELEE!!!", _num)
+  _self.getChainLink = function( _num ) {
+    return _self.sources( _num )
+  }
+
+  _self.toggle = function( _num, _state ) {
+    if ( _state !== undefined ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
+      return;
+    }
 
     if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
       renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
@@ -1440,39 +1823,6 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
       current = _num
     }
   }
-
-
-  _self.keyDown = function( _num, _event ) {
-    console.log("TOUCHFADE!!!", _num, _event)
-    //if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value > 0.99999 ) {
-    //  renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-    //}
-
-    if (_event.repeat ) {
-      return
-      //renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 1.042
-      //console.log('pump', renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value)
-      //return
-    }
-
-    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-    //console.log( renderer.customUniforms );
-  }
-
-  _self.keyUp = function( _num, _event ) {
-    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
-
-    /*
-    var touchFadeTimeout = setInterval( function() {
-      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value *= 0.90
-      if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value < 0.01 ) {
-        clearInterval(touchFadeTimeout);
-      }
-    });
-    */
-  }
-
-
 }
 
 /**
@@ -1602,16 +1952,17 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
 
   /**
    * @description
-   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-8;
+   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
    *  1: NORMAL (default),
    *  2: HARD,
    *  3: NAM,
    *  4: FAM,
-   *  5: LEFT,
-   *  6: RIGHT,
-   *  7: CENTER,
-   *  8: BOOM
+   *  5: NON-DARK,
+   *  6: LEFT,
+   *  7: RIGHT,
+   *  8: CENTER,
+   *  9: BOOM
    *  ```
    *
    * @function Module#Mixer#mixMode
@@ -1785,11 +2136,11 @@ function Output(renderer, _source ) {
  * @param source:Source
  * @author Sense Studios
  */
-function Switcher(renderer, _sources ) {
+
+function Switcher(renderer, options ) {
 
   // create and instance
   var _self = this;
-  _self.sources = _sources // array
 
   // set or get uid
   _self.uuid = "Switcher_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -1798,11 +2149,23 @@ function Switcher(renderer, _sources ) {
   // add to renderer
   renderer.add(_self)
 
-  // add source
+  // set options
+  //_self.options = {};
+  //if ( options != undefined ) self.options = options
 
+  // add source
+  _self.sources = []
+  //if (_self.options.source1 && _self.options.source2) {
+  //  _self.sources = [ _self.options.source1, _self.options.source2 ]; // array
+  //  _self.active_source = 0
+  // }
+
+  _self.sources = [ options.source1, options.source2 ]; // array
   _self.active_source = 0
 
   _self.init = function() {
+
+    console.log("Switcher", _self.uuid, _self.sources)
 
     renderer.customUniforms[_self.uuid+'_active_source'] = { type: "i", value: 1 }
 
@@ -1821,7 +2184,7 @@ function Switcher(renderer, _sources ) {
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_sources[0].uuid +'_output, '+_sources[1].uuid +'_output );\n  /* custom_main */')
+vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
 
     // TODO: add a foreach to allow infinite number of sources
 
@@ -2192,7 +2555,7 @@ function TextSource(renderer, options) {
   }
 
   // this should be set externally, of course
-  var text = null; $.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d })
+  var text = null; utils.get('/texts/fear_is_the_mind_killer.txt', function(d) { text = d; console.log("get text", d) })
 
   // textbehaviour should be loaded externally too
   var text_c = 0
@@ -2204,7 +2567,7 @@ function TextSource(renderer, options) {
   var title_text_font_size = 64
   var small_text_x = 512
   _self.update = function() {
-
+    
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
@@ -2386,7 +2749,7 @@ function VideoSource(renderer, options) {
     }, 400 )
 
     // firstload handler for mobile; neest at least 1 user click
-    $("body").click(function() {
+    document.body.addEventListener('click', function() {
       videoElement.play();
       _self.firstplay = true
     });

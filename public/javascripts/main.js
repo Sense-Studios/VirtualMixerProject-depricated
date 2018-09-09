@@ -76,7 +76,7 @@ var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 } );
 var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
 
 
-var switcher1 = new Switcher( renderer, [ mixer3, mixer4 ] );
+var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 
 // create the filemanager addon for the sources
