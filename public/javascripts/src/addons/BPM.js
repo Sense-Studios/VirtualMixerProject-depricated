@@ -347,8 +347,7 @@ function BPM( renderer, options ) {
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      //$('.blink').css('background-color','rgba(150,150,150,0.5) !important')
-      document.getElementsByClassName('blink')[0].background = '#999999';
+      document.getElementsByClassName('blink')[0].style.backgroundColor = '#999999';
     }else{
       calibrating = false
 
@@ -360,30 +359,28 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod <= 2 ) {
         confidence = "low"
-        //$('.blink').css('background-color','red')
-        document.getElementsByClassName('blink')[0].background = '#990000';
+        document.getElementsByClassName('blink')[0].style.backgroundColor = '#990000';
       }else if( confidence_mod > 2 && confidence_mod <= 7) {
         confidence = "average"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#999900';
+        document.getElementsByClassName('blink')[0].style.backgroundColor = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#CCCCCC';
-        //$('.blink').css('background-color','white')
+        document.getElementsByClassName('blink')[0].style.backgroundColor = '#CCCCCC';
       }
     }
 
     // return an object with all the necc. data.
     var tempoData = {
       bpm: tempoCounts[0].tempo,     // suggested bpm
-      confidence: confidence,
-      calibrating: calibrating,
+      confidence: confidence,        // String
+      calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
       foundpeaks:  foundpeaks,       // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
+
+    //console.log(tempoData.bpm, tempoData.confidence)
 
     return tempoData;
   }
