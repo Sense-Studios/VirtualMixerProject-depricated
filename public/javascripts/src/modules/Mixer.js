@@ -192,19 +192,19 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
       pod = _num
 
       // evaluate current mix style
-      // normal mix
+      // 1 normal mix
       if (mixmode == 1) {
         alpha1 = pod
         alpha2 = 1 - pod
       }
 
-      // hard mix
+      // 2 hard mix
       if (mixmode == 2) {
         alpha1 = Math.round( pod )
         alpha2 = Math.round( 1-pod )
       }
 
-      // NAM mix
+      // 3 NAM mix
       if (mixmode == 3) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -212,13 +212,13 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         if ( alpha2 > 1 ) alpha2 = 1;
       }
 
-      // FAM mix
+      // 4 FAM mix
       if (mixmode == 4) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
       }
 
-      // Non Dark mix
+      // 5 Non Dark mix
       if (mixmode == 5) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -228,25 +228,25 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         alpha2 += 0.36;
       }
 
-      // left
+      // 6 left
       if (mixmode == 6) {
         alpha1 = 1;
         alpha2 = 0;
       }
 
-      // right
+      // 7 right
       if (mixmode == 7) {
         alpha1 = 0;
         alpha2 = 1;
       }
 
-      // center
+      // 8 center
       if (mixmode == 8) {
         alpha1 = 0.5;
         alpha2 = 0.5;
       }
 
-      // BOOM
+      // 9 BOOM
       if (mixmode == 9) {
         alpha1 = 1;
         alpha2 = 1;

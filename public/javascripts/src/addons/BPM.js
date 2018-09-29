@@ -106,12 +106,12 @@ function BPM( renderer, options ) {
   var starttime = (new Date()).getTime()
   _self.update = function() {
     nodes.forEach( function( node ) {
-      node( _self.render() );
+      if ( _self.useAutoBpm ) node( _self.render() );
     });
 
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * _self.bpm / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2 // Math.sin( 128 / 60 )
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
   /**
@@ -148,7 +148,7 @@ function BPM( renderer, options ) {
    * @function BPM#tap
    */
   _self.tap = function() {
-    useAutoBPM = false
+    _self.useAutoBPM = false
     time  = Number(new Date()) - last
     last = Number(new Date());
     if ( time < 10000 && time > 10 ) {
@@ -191,11 +191,13 @@ function BPM( renderer, options ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  audio.src = '/audio/fulke_absurd.mp3'
+  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  // audio.src = '/audio/fulke_absurd.mp3'
+  audio.src = '/proxy/1' // NSB RADIO --> 'http://37.220.36.53:7904';
+
   if ( _self.options.audio ) audio.src = _self.options.audio
 
-  //audio.src = '/audio/rage_hard.mp3'
+  // audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
@@ -205,17 +207,16 @@ function BPM( renderer, options ) {
   audio.loop = true;
   audio.autoplay = true;
 
-  bandpassFilter.type = "lowpass";
-
   // or as argument(settings.passFreq ? settings.passFreq : 350);
+  bandpassFilter.type = "lowpass";
   bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
 
   analyser.fftSize = 128;
+
   bufferLength = analyser.frequencyBinCount;
 
-  // firstload for mobile
-  // $("body").click(function() {
+  // firstload for mobile, forces all control to the site on click
   document.body.addEventListener('click', function() {
     console.log("Auto BPM is initialized!", audio.src);
     audio.play();
@@ -227,7 +228,7 @@ function BPM( renderer, options ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS OUT FOR NOW SOUND
+    // COMMENT THIS LINE OUT FOR NOW SOUND
     source.connect(context.destination);
 
     resolve(audio);
@@ -238,12 +239,14 @@ function BPM( renderer, options ) {
     initializeAudio.then( function(r) {
       console.log("Auto BPM is initialized!", audio.src);
       audio.play();
-      setInterval( sampler, 1);                 // as fast as we can, we need those samples
+      setInterval( sampler, 1); // as fast as we can, we need those samples !!
 
     }).catch( function(err){
       console.log("Error: Auto BPM ERROR ", err);
     });
   }
+
+  // ANYLISIS STARTS HERE ------------------------------------------------------
 
   var sampler = function() {
     if ( !_self.useAutoBpm ) return;
@@ -255,12 +258,13 @@ function BPM( renderer, options ) {
     var dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray)
 
-    // precalc
+    // precalculculations, push only the highest value of the frequency range
     var now = Date.now()
     var high = 0
-    dataArray.forEach( (d,i)=> { if ( d > high ) high = d })
+    dataArray.forEach( (d) => { if ( d > high ) high = d })
     dataSet.push( [ now, high ] )
 
+    // keep the set on sampleLength
     if (dataSet.length > sampleLength) dataSet.splice(0, dataSet.length - sampleLength)
     d++
 
@@ -269,16 +273,25 @@ function BPM( renderer, options ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-      //var tempoCounts = tempoData.tempoCounts
-      // getBlackout // TODO
-      // getAmbience // TODO
-      // drawData(dataSet) // DEPRICATED
-      //if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
 
+      // Here are some ideas for a more complete analisis range
+
+      // var tempoCounts = tempoData.tempoCounts
+      // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
+      // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
+
+      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+
+      // depricated failsafe
+      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
+
+      // depricated debug window
       // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + window.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
       // console.log(" ### AUTOBPM: ",  window.calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
+
+      // write the test data globally (needs uiid?)
       window.bpm_test = tempoData.bpm
-      _self.sec = c * Math.PI * tempoData.bpm / 60
+      if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
     }
@@ -286,6 +299,7 @@ function BPM( renderer, options ) {
 
   // blink on the beat
   var doBlink = function() {
+    if ( document.getElementsByClassName('blink').length == 0 ) return
     if ( audio.paused ) {
       document.getElementsByClassName('blink')[0].style.opacity = 0
     }else{
@@ -347,7 +361,7 @@ function BPM( renderer, options ) {
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      document.getElementsByClassName('blink')[0].style.backgroundColor = '#999999';
+      if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999999';
     }else{
       calibrating = false
 
@@ -359,13 +373,13 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod <= 2 ) {
         confidence = "low"
-        document.getElementsByClassName('blink')[0].style.backgroundColor = '#990000';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#990000';
       }else if( confidence_mod > 2 && confidence_mod <= 7) {
         confidence = "average"
-        document.getElementsByClassName('blink')[0].style.backgroundColor = '#999900';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        document.getElementsByClassName('blink')[0].style.backgroundColor = '#CCCCCC';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#CCCCCC';
       }
     }
 

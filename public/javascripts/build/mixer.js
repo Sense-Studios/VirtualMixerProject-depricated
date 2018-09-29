@@ -299,12 +299,12 @@ function BPM( renderer, options ) {
   var starttime = (new Date()).getTime()
   _self.update = function() {
     nodes.forEach( function( node ) {
-      node( _self.render() );
+      if ( _self.useAutoBpm ) node( _self.render() );
     });
 
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * _self.bpm / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2 // Math.sin( 128 / 60 )
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
   /**
@@ -341,7 +341,7 @@ function BPM( renderer, options ) {
    * @function BPM#tap
    */
   _self.tap = function() {
-    useAutoBPM = false
+    _self.useAutoBPM = false
     time  = Number(new Date()) - last
     last = Number(new Date());
     if ( time < 10000 && time > 10 ) {
@@ -384,11 +384,13 @@ function BPM( renderer, options ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  audio.src = '/audio/fulke_absurd.mp3'
+  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  // audio.src = '/audio/fulke_absurd.mp3'
+  audio.src = '/proxy/1' // NSB RADIO --> 'http://37.220.36.53:7904';
+
   if ( _self.options.audio ) audio.src = _self.options.audio
 
-  //audio.src = '/audio/rage_hard.mp3'
+  // audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
@@ -398,17 +400,16 @@ function BPM( renderer, options ) {
   audio.loop = true;
   audio.autoplay = true;
 
-  bandpassFilter.type = "lowpass";
-
   // or as argument(settings.passFreq ? settings.passFreq : 350);
+  bandpassFilter.type = "lowpass";
   bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
 
   analyser.fftSize = 128;
+
   bufferLength = analyser.frequencyBinCount;
 
-  // firstload for mobile
-  // $("body").click(function() {
+  // firstload for mobile, forces all control to the site on click
   document.body.addEventListener('click', function() {
     console.log("Auto BPM is initialized!", audio.src);
     audio.play();
@@ -420,7 +421,7 @@ function BPM( renderer, options ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS OUT FOR NOW SOUND
+    // COMMENT THIS LINE OUT FOR NOW SOUND
     source.connect(context.destination);
 
     resolve(audio);
@@ -431,12 +432,14 @@ function BPM( renderer, options ) {
     initializeAudio.then( function(r) {
       console.log("Auto BPM is initialized!", audio.src);
       audio.play();
-      setInterval( sampler, 1);                 // as fast as we can, we need those samples
+      setInterval( sampler, 1); // as fast as we can, we need those samples !!
 
     }).catch( function(err){
       console.log("Error: Auto BPM ERROR ", err);
     });
   }
+
+  // ANYLISIS STARTS HERE ------------------------------------------------------
 
   var sampler = function() {
     if ( !_self.useAutoBpm ) return;
@@ -448,12 +451,13 @@ function BPM( renderer, options ) {
     var dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray)
 
-    // precalc
+    // precalculculations, push only the highest value of the frequency range
     var now = Date.now()
     var high = 0
-    dataArray.forEach( (d,i)=> { if ( d > high ) high = d })
+    dataArray.forEach( (d) => { if ( d > high ) high = d })
     dataSet.push( [ now, high ] )
 
+    // keep the set on sampleLength
     if (dataSet.length > sampleLength) dataSet.splice(0, dataSet.length - sampleLength)
     d++
 
@@ -462,16 +466,25 @@ function BPM( renderer, options ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-      //var tempoCounts = tempoData.tempoCounts
-      // getBlackout // TODO
-      // getAmbience // TODO
-      // drawData(dataSet) // DEPRICATED
-      //if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
 
+      // Here are some ideas for a more complete analisis range
+
+      // var tempoCounts = tempoData.tempoCounts
+      // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
+      // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
+
+      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+
+      // depricated failsafe
+      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
+
+      // depricated debug window
       // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + window.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
       // console.log(" ### AUTOBPM: ",  window.calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
+
+      // write the test data globally (needs uiid?)
       window.bpm_test = tempoData.bpm
-      _self.sec = c * Math.PI * tempoData.bpm / 60
+      if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
     }
@@ -479,6 +492,7 @@ function BPM( renderer, options ) {
 
   // blink on the beat
   var doBlink = function() {
+    if ( document.getElementsByClassName('blink').length == 0 ) return
     if ( audio.paused ) {
       document.getElementsByClassName('blink')[0].style.opacity = 0
     }else{
@@ -540,8 +554,7 @@ function BPM( renderer, options ) {
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      //$('.blink').css('background-color','rgba(150,150,150,0.5) !important')
-      document.getElementsByClassName('blink')[0].background = '#999999';
+      if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999999';
     }else{
       calibrating = false
 
@@ -553,30 +566,28 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod <= 2 ) {
         confidence = "low"
-        //$('.blink').css('background-color','red')
-        document.getElementsByClassName('blink')[0].background = '#990000';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#990000';
       }else if( confidence_mod > 2 && confidence_mod <= 7) {
         confidence = "average"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#999900';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#CCCCCC';
-        //$('.blink').css('background-color','white')
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#CCCCCC';
       }
     }
 
     // return an object with all the necc. data.
     var tempoData = {
       bpm: tempoCounts[0].tempo,     // suggested bpm
-      confidence: confidence,
-      calibrating: calibrating,
+      confidence: confidence,        // String
+      calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
       foundpeaks:  foundpeaks,       // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
+
+    //console.log(tempoData.bpm, tempoData.confidence)
 
     return tempoData;
   }
@@ -725,6 +736,10 @@ function FileManager( _source ) {
       return
     }
     _self.setSrc( _self.getSrcByQuality( program ) );
+
+
+
+    
   }
 
   // for old times sake,
@@ -734,7 +749,10 @@ function FileManager( _source ) {
 
   // get the version by it's quality ( marduq asset library )
   _self.getSrcByQuality = function( _program, _quality ) {
+    //console.log("le program", _program)
     if ( _quality == undefined ) _quality = "720p_h264"
+    //if ( _quality == undefined ) _quality = "720p_5000kbps_h264"
+    //if ( _quality == undefined ) _quality = "320p_h264_mobile"
     var match = null
     _program.assets.versions.forEach( function(version) {
       if ( version.label == _quality ) match = version
@@ -828,6 +846,283 @@ function GiphyManager( _source ) {
  * @constructor Addon
  * @interface
  */
+
+/*
+
+1 ______________________________________________________________________________
+2 ______________________________________________________________________________
+3 ______________________________________________________________________________
+4 ______________________________________________________________________________
+5 ______________________________________________________________________________
+6 ______________________________________________________________________________
+7 ______________________________________________________________________________
+8 ______________________________________________________________________________
+9 ______________________________________________________________________________
+0 ______________________________________________________________________________
+
+
+
+
+
+*/
+
+
+function Behaviour( renderer, options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  _self.uuid = "Behaviour" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Behaviour"
+
+  _self.beats = 0
+  _self.time = (new Date()).getTime()
+  _self.script = {}
+  _self.sheets = []
+
+  renderer.add(_self)
+
+  function addTrigger( _obj ) {
+    if ( _obj.mod.type == "seconds" ) {
+      triggers.push( [_obj, _self.time + _obj.mod.value, null ] )
+    }else if ( _obj.mod.type == "beats" ) {
+      triggers.push( [_obj, _self.beats + _obj.mod.value ] )
+    }else if ( _obj.mod.type == "random-seconds" ) {
+      triggers.push( [_obj, _self.time + ( Math.random() * _obj.mod.value), null ] )
+    }else if ( _obj.mod.type == "random-beats" ) {
+      triggers.push( [_obj, _self.beats + ( Math.random() * _obj.mod.value ) ] )
+    }else{
+
+    }
+  }
+
+  //function fireTrigger( _obj ) {
+  //  obj[trigger.action.method], trigger.action.args, trigger.mod
+    // should repeat?
+  //}
+
+  triggers = []
+  _self.tr = triggers
+  old_bpm = 1
+
+  _self.init = function (){}
+  _self.update = function(){
+
+    // updat time
+    _self.time = (new Date()).getTime()
+    // _self.beats = +1 if
+    // bps
+
+    // updat beats
+    var bpsr = Math.round( bpm.render() * 4 )
+
+
+
+    if ( bpsr != old_bpm ) {
+      _self.beats += 1
+      old_bpm = bpsr
+    }
+    //if ( bpsr == 0 ) old_bpm = 1
+
+    // checkTriggers()
+    checkSheets()
+  }
+
+  // ---------------------------------------------------------------------------
+  _self.load = function( _behaviour ) {
+    _self.script = _behaviour
+    _self.sheets = _behaviour.sheets
+    console.log("loaded A BEHAVIOUR", _behaviour.title )
+
+    _behaviour.triggers.forEach( function( trigger, i) {
+      addTrigger(trigger)
+    });
+
+
+      //if ( trigger.action.on !== undefined) {
+      //  trigger.action.on.forEach( function( obj, i ) {
+      //    console.log(" ====> ", obj)
+      //    addTrigger( obj )
+      //    // filemanager1.changez()
+      //  })
+      //}
+
+      //if ( trigger.action.with !== undefined ) {
+      //  trigger.action.width.forEach( function( _src, i ) {
+      //    // init.filemanager1 [trigger.action.method]()
+          // mixer.pod = -1 ?
+
+      //    _self.jump( _src )
+
+
+      //  })
+    //  }
+    //});
+  }
+
+  _self.jump = function( _src ) {
+    console.log("how high?", _src )
+    _src.video.currentTime = Math.random() * _src.video.duration
+  }
+
+  // ---------------------------------------------------------------------------
+  var sheet_pointer = 0
+  var old_sheet_pointer = 0
+  var checkSheets = function() {
+    sheet_pointer = _self.beats%_self.sheets[0].length
+
+    if ( old_sheet_pointer != sheet_pointer ) {
+      console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer] )
+      old_sheet_pointer = sheet_pointer
+      _self.sheets[0][sheet_pointer].forEach( function( trigger_pointer ) {
+
+        if ( trigger_pointer != 0 ) {
+           fireTrigger( triggers[ trigger_pointer ] )
+        }
+
+      })
+    }
+  }
+
+  var fireTrigger = function(trigger) {
+    if ( trigger[0].action.method !== undefined ) {
+      trigger[0].action.on.forEach( function( _obj ) {
+        console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
+        _obj[trigger[0].action.method]( trigger[0].action.args  )
+      })
+      return true
+    }
+
+    if ( trigger[0].action.set !== undefined ) {
+      trigger[0].action.on.forEach( function( _obj ) {
+        console.log("SET", trigger[0].action.args, "on", trigger[0].action.set, "at", _obj.uuid )
+        _obj[trigger[0].action.set] = trigger[0].action.args
+      })
+      return true
+    }
+
+    if ( trigger[0].action.internal !== undefined ) {
+      trigger[0].action.on.forEach( function( _obj ) {
+        _self[ trigger[0].action.internal ](_obj)
+        console.log("INTERNAL",  trigger[0].action.args, "on", _obj.uuid )
+      })
+      return true
+    }
+  }
+
+  var checkTriggers = function()  {
+
+    var kill = []
+
+    triggers.forEach( function( trigger, i) {
+
+      var had_update = false
+      if ( trigger[0].mod.type == "seconds" || trigger[0].mod.type == "random-seconds" ) {
+        if ( _self.time > trigger[1] ) {
+          console.log("TRAEDASDASASDADSDAS SECONDS", trigger[0].mod.type  )
+          had_update = fireTrigger( trigger )
+        }
+
+      }else if ( trigger[0].mod.type == "beats" || trigger[0].mod.type == "random-beats" ) {
+        //console.log("-->", trigger, trigger[0].mod.type, trigger[1], _self.beats, ">", trigger[1])
+        if (  _self.beats > trigger[1] ) {
+          had_update = fireTrigger( trigger )
+        }
+      }
+
+      if (had_update) {
+         if ( trigger[0].mod.repeat == true ) addTrigger( trigger[0] )
+         if ( trigger[0].mod.after !== null ) addTrigger( _self.script.triggers[ trigger[0].mod.after ] )
+         triggers.splice(i, 1)
+      }
+    })
+  } //
+
+  setTimeout( function() {
+    // filemanager1.change()
+    // filemanager2.change()
+    // filemanager3.change()
+    // filemanager4.change()
+
+  }, 12000)
+
+
+  var changez_mod = 8000
+  var jump_mod = 7200
+  var scratch_mod = 12000
+
+  //setTimeout(function(){
+  //  filemanager1.changez()
+  //  filemanager2.changez()
+  //  filemanager3.changez()
+  //  filemanager4.changez()
+  //}, 16000 )
+
+  // this is a hokey pokey controller
+  // call this a behaviour?
+
+  /*
+  function changez() {
+    if (Math.random() > 0.25 ) {
+      filemanager1.change();
+    }else if (Math.random() > 0.50 ) {
+      filemanager2.change();
+    }else if (Math.random() > 0.75 ) {
+      filemanager3.change();
+    }else{
+      filemanager4.change();
+    }
+    var r = Math.floor( Math.random() * changez_mod )
+    setTimeout( function() {
+      changez()
+    }, r )
+  };
+  */
+  //changez()
+
+
+  /*
+  function jumps() {
+    var r = Math.floor( Math.random() * jump_mod )
+    setTimeout( function() {
+      jumps()
+    }, r )
+
+    try {
+      if (Math.random() > 0.5 ) {
+        testSource1.video.currentTime = Math.random() * testSource1.video.duration
+        console.log("src 1 jumps")
+      }else{
+        testSource2.video.currentTime = Math.random() * testSource2.video.duration
+        console.log("src 2 jumps")
+      }
+    }catch(err) {}
+  };
+  jumps()
+
+
+  function scratch() {
+    var r = Math.floor( Math.random() * scratch_mod )
+    setTimeout( function() {
+      scratch()
+    }, r )
+
+    try {
+      var rq = ( Math.random() * 0.6 ) + 0.7
+      //var rq = Math.pow( (Math.random() * 0.5), 0.3 )
+      if ( Math.random() > 0.5 ) {
+        testSource1.video.playbackRate = rq //+ 0.7
+        console.log("src 1 scxratches", rq)
+      }else{
+        testSource2.video.playbackRate = rq //+ 0.7
+        console.log("src 1 scxratches", rq)
+      }
+    }catch(err) { console.log("err:", err)}
+  };
+  scratch()
+  */
+}
 
 
 function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
@@ -2019,19 +2314,19 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
       pod = _num
 
       // evaluate current mix style
-      // normal mix
+      // 1 normal mix
       if (mixmode == 1) {
         alpha1 = pod
         alpha2 = 1 - pod
       }
 
-      // hard mix
+      // 2 hard mix
       if (mixmode == 2) {
         alpha1 = Math.round( pod )
         alpha2 = Math.round( 1-pod )
       }
 
-      // NAM mix
+      // 3 NAM mix
       if (mixmode == 3) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -2039,13 +2334,13 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         if ( alpha2 > 1 ) alpha2 = 1;
       }
 
-      // FAM mix
+      // 4 FAM mix
       if (mixmode == 4) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
       }
 
-      // Non Dark mix
+      // 5 Non Dark mix
       if (mixmode == 5) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -2055,25 +2350,25 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         alpha2 += 0.36;
       }
 
-      // left
+      // 6 left
       if (mixmode == 6) {
         alpha1 = 1;
         alpha2 = 0;
       }
 
-      // right
+      // 7 right
       if (mixmode == 7) {
         alpha1 = 0;
         alpha2 = 1;
       }
 
-      // center
+      // 8 center
       if (mixmode == 8) {
         alpha1 = 0.5;
         alpha2 = 0.5;
       }
 
-      // BOOM
+      // 9 BOOM
       if (mixmode == 9) {
         alpha1 = 1;
         alpha2 = 1;
@@ -2149,17 +2444,7 @@ function Switcher(renderer, options ) {
   // add to renderer
   renderer.add(_self)
 
-  // set options
-  //_self.options = {};
-  //if ( options != undefined ) self.options = options
-
-  // add source
-  _self.sources = []
-  //if (_self.options.source1 && _self.options.source2) {
-  //  _self.sources = [ _self.options.source1, _self.options.source2 ]; // array
-  //  _self.active_source = 0
-  // }
-
+  // add sources, only 2 allowed, build mixers or use a chain
   _self.sources = [ options.source1, options.source2 ]; // array
   _self.active_source = 0
 
@@ -2180,17 +2465,10 @@ function Switcher(renderer, options ) {
 \n}'
 );
 
-    // TODO: add a foreach to allow infinite number of sources
-
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
 vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
-
-    // TODO: add a foreach to allow infinite number of sources
-
   }
-
-
 
   _self.update = function() {}
   _self.render = function() {
@@ -2213,8 +2491,6 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
     }
     renderer.customUniforms[_self.uuid+'_active_source'] = { type: "i", value: _self.active_source }
     return _self.active_source
-
-    // TODO: add a foreach to allow infinite number of sources
   }
 }
 

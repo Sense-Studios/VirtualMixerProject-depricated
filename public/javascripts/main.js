@@ -33,7 +33,8 @@ bpm.add( mixer4.pod )
 
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
-var output = new Output( renderer, switcher1 )
+//var output = new Output( renderer, switcher1 )
+var output = new Output( renderer, mixer4 )
 
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
@@ -86,14 +87,17 @@ renderer.init();         // init
 renderer.render();       // start update & animation
 */
 
-
+mixer4.pod(0.5)
+filemanager1.change()
+filemanager2.change()
+bpm.mod = 0.5
 
 // -----------------------------------------------------------------------------
 // Testscripts ("Behaviours?")
-var myBehaviour = new Behaviour()
+var myBehaviour = new Behaviour( renderer )
 
 var behaviour  = {
-  "title": "",
+  "title": "My First Behaviour",
   "author": "",
 
   changez_mod: "r8000ms",
@@ -101,23 +105,231 @@ var behaviour  = {
   scratch_mod: "r12000ms",
 
   // action: { "method": "changez", "arg":{}, "on": { filemanager1, filemanager2, filemanager3, filemanager4 } },     on.method( arg )
-  // action: { "method": "pod", "witdh": { mixer1, mixer2, filemanager3, filemanager4 } },                  with.method = arg
+  // action: { "method": "pod", "witdh": { mixer1, mixer2, filemanager3, filemanager4 } },                            method(  width )
   // changez
   // jump  "on"
   //
 
+  sheets: [
+    [
+      [  3,  5,  0,  0, 10, 13  ],
+      [  1,  0,  0,  0,  9,  0  ],
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  9,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  7, 10, 14  ],   //
+      [  0,  0,  0,  0,  0 , 0  ],
+      [  0,  6,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0  ],
+      [  0,  5,  0,  0,  0,  0  ],   //
+      [  3,  6,  0,  0,  0,  0  ],
+      [  1,  0,  0,  8,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  9, 10, 13  ],   ////
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],
+      [  3,  0,  0,  0,  0 , 0  ],
+      [  1,  6,  0,  0,  0 , 0  ],   //
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0, 10, 14  ],
+      [  1,  6,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  9,  0  ],  //
+      [  3,  5,  0,  0, 10,  0  ],
+      [  1,  6,  0,  0,  9,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0  ]   //
+
+      [  3,  5,  0,  0, 10, 0  ],
+      [  1,  0,  0,  0,  9,  0  ],
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  9,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  7, 10,  0  ],   //
+      [  0,  0,  0,  0,  0 , 0  ],
+      [  0,  6,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0  ],
+      [  0,  5,  0,  0,  0,  0  ],   //
+      [  3,  6,  0,  0,  0,  0  ],
+      [  1,  0,  0,  8,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  9, 10,  0  ],   ////
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],
+      [  3,  0,  0,  0,  0 , 0  ],
+      [  1,  6,  0,  0,  0 , 0  ],   //
+      [  3,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0, 10,  0  ],
+      [  1,  6,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  9,  0  ],  //
+      [  3,  5,  0,  0, 10,  0  ],
+      [  1,  6,  0,  0,  9,  0  ],
+      [  3,  5,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  4,  0  ]   //
+    ]
+  ],
+
+  // mixer4.pod(0)
+  // testsource1.scratch
   triggers: [
+
+    //{
+    //  action: { "method": "pod", "on": [ mixer4 ], "args": 0.3 },
+    //  mod: { code: "4b", value: 1, type: 'beats', repeat: false, after: 1 }
+    //},
+    //{
+    //  action: { "method": "pod", "on": [ mixer4 ], "args": 0.7 },
+    //  mod: { code: "4b", value: 1, type: 'beats', repeat: false, after: 0 }
+    //},
     {
-      action: { "method": "changez", "on": [ filemanager1, filemanager2, filemanager3, filemanager4 ] },
-      mod: { value: 64, type: 'beats', repeat: false, after: 'trigger' }
-    },{
-      action: { "method": "changez", "on": [ filemanager1, filemanager2, filemanager3, filemanager4 ] },
-      mod: { value: 8000, type: 'random', repeat: false, after: 'trigger' }
-    },{
-      action: { "method": "jump", "on": [ testSource1, testSource2, testSource3, testSource4 ] },
-      mod: { value: 8000, type: 'random', repeat: false, after: 'trigger' }
+      action: { "method": "blendMode", "on": [ mixer4 ], "args": 7 },              // 0 (NOT USED)
+      mod: { code: "4b", value: 500, type: 'beats', repeat: false, after: 1 }
+    },
+
+
+
+
+    {
+      action: { "method": "blendMode", "on": [ mixer4 ], "args": 7 },              // 1
+      mod: { code: "4b", value: 5, type: 'beats', repeat: false, after: 1 }
+    },
+    {
+      action: { "method": "blendMode", "on": [ mixer4 ], "args": 17 },             // 2
+      mod: { code: "4b", value: 7, type: 'beats', repeat: false, after: 2 }
+    },
+    {
+      action: { "method": "blendMode", "on": [ mixer4 ], "args": 8 },              // 3
+      mod: { code: "4b", value: 9, type: 'beats', repeat: false, after: 0 }
+    },
+
+    {
+      action: { "method": "changez", "on": [ filemanager1, filemanager2 ] },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }
+    },
+
+    {
+      action: { "method": "pod", "on": [ mixer4 ], "args": 0 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 5
+    },
+    {
+      action: { "method": "pod", "on": [ mixer4 ], "args": 1 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 6
+    },
+
+
+    {
+      action: { "internal": "jump", "on": [ testSource1 ] },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 7
+    },
+
+    {
+      action: { "internal": "jump", "on": [ testSource2 ] },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 8
+    },
+    //{
+    //  action: { "method": "mixMode", "with": [ mixer4 ], "args": 3 },
+    //  mod: { code: "4b", value: 2, type: 'beats', repeat: false, after: 2 }
+    //},
+    //{
+    //  action: { "method": "pod", "on": [ mixer4 ], "args": 1 },
+    //  mod: { code: "4b", value: 4, type: 'beats', repeat: true, after: null }
+    //},
+
+
+    {
+      action: { "method": "pod", "on": [ mixer4 ], "args": 0.5 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 9
+    },
+    {
+      action: { "method": "pod", "on": [ mixer4 ], "args": 0.25 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 10
+    },
+
+    {
+      action: { "method": "changez", "on": [ filemanager1 ] },                     // 11
+      mod: { code: "4b", value: 6, type: 'beats', repeat: true, after: null }
+    },
+    {
+      action: { "method": "changez", "on": [ filemanager2 ] },                     // 12
+      mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
+    },
+
+    {
+      action: { "set": "useAutoBpm", "on": [ bpm ], "args":true },              // 13
+      mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
+    },
+    {
+      action: { "set": "useAutoBpm", "on": [ bpm ], "args":false },               // 14
+      mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
     }
+    //{
+    //  action: { "set": "mixMode", "on": [ mixer4 ], "args": mixer4.blendmodes[  Math.floor( Math.random() * mixer4.blendmodes.length ) ] },
+    //  mod: { code: "4b", value: 2, type: 'beats', repeat: true, after: null }
+    //},
+
+
+    /*
+    ,{
+      action: { "method": "changez", "on": [ filemanager1, filemanager2, filemanager3, filemanager4 ] },
+      mod: {  code: "8000rs", value: 8000, type: 'random-seconds', repeat: false, after: '' }
+    },{
+      action: { "method": "changez", "on": [ filemanager1, filemanager2, filemanager3, filemanager4 ] },
+      mod: {  code: "8rb", value: 8, type: 'random-beats', repeat: false, after: '' }
+    },{
+      action: { "method": "jump", "with": [ testSource1, testSource2, testSource3, testSource4 ] },
+      mod: {  code: "8000s", value: 8000, type: 'seconds', repeat: false, after: '' }
+    }
+    */
   ]
 }
 
+
 myBehaviour.load(behaviour)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// scroll
