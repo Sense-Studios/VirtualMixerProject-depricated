@@ -12377,7 +12377,8 @@ var programs = [
     "title": "Evangelion vs the PRodigy",
     "description": "",
     "tags": [
-      "awesome"
+      "awesome",
+      "manga"
     ],
     "created_at": "2016-09-14T00:10:18.499Z",
     "assets": {
@@ -12386,7 +12387,8 @@ var programs = [
       "description": "",
       "meta": null,
       "tags": [
-        "awesome"
+        "awesome",
+        "manga"
       ],
       "client_id": null,
       "_type": "Video",
@@ -12703,7 +12705,8 @@ var programs = [
     "description": "",
     "tags": [
       "awesome",
-      "home_awesome"
+      "home_awesome",
+      "manga"
     ],
     "created_at": "2016-09-14T22:49:32.204Z",
     "assets": {
@@ -12712,7 +12715,8 @@ var programs = [
       "description": "",
       "meta": null,
       "tags": [
-        "awesome"
+        "awesome",
+        "manga"
       ],
       "client_id": null,
       "_type": "Video",
@@ -12812,7 +12816,8 @@ var programs = [
     "description": "Serial experiments",
     "tags": [
       "awesome",
-      "home_awesome"
+      "home_awesome",
+      "manga"
     ],
     "created_at": "2016-09-14T22:55:29.926Z",
     "assets": {
@@ -12821,7 +12826,8 @@ var programs = [
       "description": "Serial experiments",
       "meta": null,
       "tags": [
-        "awesome"
+        "awesome",
+        "manga"
       ],
       "client_id": null,
       "_type": "Video",
@@ -13024,7 +13030,9 @@ var programs = [
     "title": "NERVE",
     "description": "Your in it, now play while we watch",
     "tags": [
-      "nerve"
+      "nerve",
+      "awesome",
+      "manga"
     ],
     "created_at": "2016-09-14T23:04:16.217Z",
     "assets": {
@@ -13933,7 +13941,8 @@ var programs = [
       "gits",
       "shelling",
       "2017",
-      "ghost"
+      "ghost",
+      "manga"
     ],
     "created_at": "2016-11-16T00:12:46.830Z",
     "assets": {
@@ -13945,7 +13954,8 @@ var programs = [
         "ghost in the shell",
         "gits",
         "shelling",
-        "2017"
+        "2017",
+        "manga"
       ],
       "client_id": null,
       "_type": "Video",
@@ -15014,7 +15024,8 @@ var programs = [
     "title": "Anime Girls",
     "description": "no comment",
     "tags": [
-      "awesome"
+      "awesome",
+      "manga"
     ],
     "created_at": "2017-11-04T00:09:57.219Z",
     "assets": {
@@ -15023,7 +15034,8 @@ var programs = [
       "description": "no comment",
       "meta": null,
       "tags": [
-        "awesome"
+        "awesome",
+        "manga"
       ],
       "client_id": null,
       "_type": "Video",

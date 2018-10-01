@@ -193,7 +193,8 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
-  audio.src = '/proxy/1' // NSB RADIO --> 'http://37.220.36.53:7904';
+  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  //audio.src = '/proxy/dunklenacht' // dunklenacht
 
   if ( _self.options.audio ) audio.src = _self.options.audio
 

@@ -136,9 +136,14 @@ function VideoSource(renderer, options) {
 
   _self.update = function() {
     if (_self.bypass = false) return
-    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA ) {
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
       if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
     }
   }
 

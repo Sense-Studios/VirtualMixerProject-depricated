@@ -14,14 +14,22 @@ var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 }
 var mixer2 = new Mixer( renderer, { source1: testSource3, source2: testSource4 } );
 var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 } );
 var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
+var mixer5 = new Mixer( renderer, { source1: mixer4, source2: testSource3 } );
 var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // create the filemanager addon to manage the sources
 var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager1 = new FileManager( testSource1 )
+filemanager1.load('/sets/occupy_chaos.json')
+
 var filemanager2 = new FileManager( testSource2 )
+filemanager2.load('/sets/notv.json')
+
 var filemanager3 = new FileManager( testSource3 )
+filemanager3.load('/sets/occupy_chaos.json')
+
 var filemanager4 = new FileManager( testSource4 )
+filemanager4.load('/sets/occupy_chaos.json')
 
 
 // -----------------------------------------------------------------------------
@@ -30,20 +38,22 @@ var bpm = new BPM( renderer )
 
 // add the bpm to some of the mixer(-pod)
 bpm.add( mixer4.pod )
+bpm.add( mixer5.pod )
+
 
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
-var output = new Output( renderer, mixer4 )
+var output = new Output( renderer, mixer5 )
 
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
-var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
-numpad1.addBpm(bpm)
-numpad1.addMixer( mixer1 )
-numpad1.addMixer( mixer2 )
-numpad1.addMixer( mixer3 )
-numpad1.addMixer( mixer4 )
+// var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
+// numpad1.addBpm(bpm)
+// numpad1.addMixer( mixer1 )
+// numpad1.addMixer( mixer2 )
+// numpad1.addMixer( mixer3 )
+// numpad1.addMixer( mixer4 )
 // nupad1.addFileManager
 
 //var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
@@ -51,7 +61,7 @@ numpad1.addMixer( mixer4 )
 // var gamepad = new GamePad( renderer, mixer1, mixer2, mixer3 )
 // var gamepad1 = new GamePadDiagonalControl( renderer, mixer1, mixer2, mixer3 )
 // var gamepad2 = new GamePadVerticalControl( renderer, mixer1, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7 )
-var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
+// var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
 // firebase1.addMixer( mixer1 ) ?
 // firebase1.addMixer( mixer2 ) ?
 // firebase1.addMixer( mixer3 ) ?
@@ -112,71 +122,78 @@ var behaviour  = {
 
   sheets: [
     [
-      [  3,  5,  0,  0, 10, 13  ],
-      [  1,  0,  0,  0,  9,  0  ],
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  9,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  7, 10, 14  ],   //
-      [  0,  0,  0,  0,  0 , 0  ],
-      [  0,  6,  0,  0,  0,  0  ],
-      [  0,  0,  0,  0,  0,  0  ],
-      [  0,  5,  0,  0,  0,  0  ],   //
-      [  3,  6,  0,  0,  0,  0  ],
-      [  1,  0,  0,  8,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  9, 10, 13  ],   ////
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],
-      [  3,  0,  0,  0,  0 , 0  ],
-      [  1,  6,  0,  0,  0 , 0  ],   //
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0, 10, 14  ],
-      [  1,  6,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  9,  0  ],  //
-      [  3,  5,  0,  0, 10,  0  ],
-      [  1,  6,  0,  0,  9,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0,  0  ]   //
+      [  3,  5,  0,  0, 10, 13, 15  ],
+      [  1,  0,  0,  0,  9,  0,  0  ],
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  9,  0, 16  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  7, 10, 14,  0 ],   //
+      [  0,  0,  0,  0,  0 , 0,  0  ],
+      [  0,  6,  0,  0,  0,  0,  17  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  5,  0,  0,  0,  0 , 15 ],   //
+      [  3,  6,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  8,  0,  0,  0  ],
+      [  1,  6,  0,  9, 10, 13,  0  ],   ////
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0 ,  0 ],
+      [  1,  0,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0 , 0,  0  ],   //
+      [  3,  0,  0,  0,  0 , 0,  0  ],
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0,  0  ],   //
+      [  3,  0,  0,  0, 10, 14,  16  ],
+      [  1,  6,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  9,  0,  0  ],  //
+      [  3,  5,  0,  0, 10,  0,  0  ],
+      [  1,  6,  0,  0,  9,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0,  0  ],   //
 
-      [  3,  5,  0,  0, 10, 0  ],
-      [  1,  0,  0,  0,  9,  0  ],
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  9,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  7, 10,  0  ],   //
-      [  0,  0,  0,  0,  0 , 0  ],
-      [  0,  6,  0,  0,  0,  0  ],
-      [  0,  0,  0,  0,  0,  0  ],
-      [  0,  5,  0,  0,  0,  0  ],   //
-      [  3,  6,  0,  0,  0,  0  ],
-      [  1,  0,  0,  8,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  9, 10,  0  ],   ////
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],
-      [  3,  0,  0,  0,  0 , 0  ],
-      [  1,  6,  0,  0,  0 , 0  ],   //
-      [  3,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0, 10,  0  ],
-      [  1,  6,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  9,  0  ],  //
-      [  3,  5,  0,  0, 10,  0  ],
-      [  1,  6,  0,  0,  9,  0  ],
-      [  3,  5,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  4,  0  ]   //
+      [  3,  5,  0,  0, 10,  0,  0  ],
+      [  1,  0,  0,  0,  9,  0,  0  ],
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  0,  0,  17  ],   //
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  9,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  7, 10,  0,  15  ],   //
+      [  0,  0,  0,  0,  0 , 0,  0  ],
+      [  0,  6,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  5,  0,  0,  0,  0,  0  ],   //
+      [  3,  6,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  8,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  9, 10,  0,  0  ],   ////
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0,  0  ],
+      [  3,  0,  0,  0,  0 , 0,  0  ],
+      [  1,  6,  0,  0,  0 , 0,  0  ],   //
+      [  3,  0,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  3,  0,  0,  0, 10,  0,  16  ],
+      [  1,  0,  0,  0,  0,  0,  0 ],   //
+      [  1,  6,  0,  0,  0,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  9,  0,  0  ],  //
+      [  3,  5,  0,  0, 10,  0,  15  ],
+      [  1,  6,  0,  0,  9,  0,  0  ],
+      [  3,  5,  0,  0,  0,  0,  0  ],
+      [  1,  6,  0,  0,  4,  0,  0  ]   //
     ]
   ],
 
@@ -272,7 +289,21 @@ var behaviour  = {
     {
       action: { "set": "useAutoBpm", "on": [ bpm ], "args":false },               // 14
       mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
+    },
+
+    {
+      action: { "method": "pod", "on": [ mixer5 ], "args": 0 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 15
+    },
+    {
+      action: { "method": "pod", "on": [ mixer5 ], "args": 1 },       // 4
+      mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 16
+    },
+    {
+      action: { "method": "getSrcByTags", "on": [ filemanager3], "args": ["runner"] },                     // 17
+      mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
     }
+
     //{
     //  action: { "set": "mixMode", "on": [ mixer4 ], "args": mixer4.blendmodes[  Math.floor( Math.random() * mixer4.blendmodes.length ) ] },
     //  mod: { code: "4b", value: 2, type: 'beats', repeat: true, after: null }
