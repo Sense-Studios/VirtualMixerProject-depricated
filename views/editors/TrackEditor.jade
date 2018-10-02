@@ -1,1 +1,17 @@
-I am the track editor
+extends ../layout
+
+block content
+  
+  content
+    header This is the header
+    #trackgrid
+
+  // YOUR CODE
+  script(src='/javascripts/editors/TrackEditor.js')  
+
+  script.
+    var socket = io();
+
+  // YOUR STYLE
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(rel='stylesheet', href='/stylesheets/editors/trackeditor.css')

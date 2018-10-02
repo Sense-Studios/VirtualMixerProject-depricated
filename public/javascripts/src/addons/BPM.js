@@ -27,15 +27,30 @@ function BPM( renderer, options ) {
    * @description Beats Per Minute
    * @member Addon#BPM#bpm
    * @param {number} Beats per minute
+   *
+   *  actual Beats Per Minute
+   *
   */
-  _self.bpm = 128              // beats per minute
+  _self.bpm = 128
 
   /**
    * @description Tapping beat control
    * @member Addon#BPM#bps
+   *
+   *  beats per second
+   *
   */
-  _self.bps = 2.133333         // beats per second
-  _self.sec = 0                // second counter, from which the actual float is calculated
+  _self.bps = 2.133333         //
+
+
+  /**
+   * @description Second counter
+   * @member Addon#BPM#sec
+   *
+   *  second counter, from which the actual float is calculated
+   *
+  */
+  _self.sec = 0                //
 
   /**
    * @description
@@ -75,6 +90,7 @@ function BPM( renderer, options ) {
   renderer.add(_self)
 
   // define scheme for this Addon
+  /*
   _self.scheme = function() {
     var scheme = {
       description: {
@@ -93,6 +109,7 @@ function BPM( renderer, options ) {
     }
     return scheme;
   }
+  */
 
   // init with a tap contoller
   _self.init = function() {
@@ -193,8 +210,9 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
-  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  //audio.src = '/proxy/dunklenacht' // dunklenacht
+
+  // audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  audio.src = '/proxy/dunklenacht' // dunklenacht
 
   if ( _self.options.audio ) audio.src = _self.options.audio
 
@@ -229,7 +247,7 @@ function BPM( renderer, options ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS LINE OUT FOR NOW SOUND
+    // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
 
     resolve(audio);

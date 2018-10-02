@@ -55,15 +55,30 @@ function BPM( renderer, options ) {
    * @description Beats Per Minute
    * @member Addon#BPM#bpm
    * @param {number} Beats per minute
+   *
+   *  actual Beats Per Minute
+   *
   */
-  _self.bpm = 128              // beats per minute
+  _self.bpm = 128
 
   /**
    * @description Tapping beat control
    * @member Addon#BPM#bps
+   *
+   *  beats per second
+   *
   */
-  _self.bps = 2.133333         // beats per second
-  _self.sec = 0                // second counter, from which the actual float is calculated
+  _self.bps = 2.133333         //
+
+
+  /**
+   * @description Second counter
+   * @member Addon#BPM#sec
+   *
+   *  second counter, from which the actual float is calculated
+   *
+  */
+  _self.sec = 0                //
 
   /**
    * @description
@@ -103,6 +118,7 @@ function BPM( renderer, options ) {
   renderer.add(_self)
 
   // define scheme for this Addon
+  /*
   _self.scheme = function() {
     var scheme = {
       description: {
@@ -121,6 +137,7 @@ function BPM( renderer, options ) {
     }
     return scheme;
   }
+  */
 
   // init with a tap contoller
   _self.init = function() {
@@ -134,12 +151,12 @@ function BPM( renderer, options ) {
   var starttime = (new Date()).getTime()
   _self.update = function() {
     nodes.forEach( function( node ) {
-      node( _self.render() );
+      if ( _self.useAutoBpm ) node( _self.render() );
     });
 
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * _self.bpm / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2 // Math.sin( 128 / 60 )
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
   /**
@@ -176,7 +193,7 @@ function BPM( renderer, options ) {
    * @function BPM#tap
    */
   _self.tap = function() {
-    useAutoBPM = false
+    _self.useAutoBPM = false
     time  = Number(new Date()) - last
     last = Number(new Date());
     if ( time &lt; 10000 &amp;&amp; time > 10 ) {
@@ -219,11 +236,15 @@ function BPM( renderer, options ) {
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
-  //audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  audio.src = '/audio/fulke_absurd.mp3'
+  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
+  // audio.src = '/audio/fulke_absurd.mp3'
+
+  // audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  audio.src = '/proxy/dunklenacht' // dunklenacht
+
   if ( _self.options.audio ) audio.src = _self.options.audio
 
-  //audio.src = '/audio/rage_hard.mp3'
+  // audio.src = '/audio/rage_hard.mp3'
   // audio.src = '/audio/i_own_it.mp3'
   // audio.src = '/audio/100_metronome.mp3'
   // audio.src = '/audio/120_metronome.mp3'
@@ -233,17 +254,16 @@ function BPM( renderer, options ) {
   audio.loop = true;
   audio.autoplay = true;
 
-  bandpassFilter.type = "lowpass";
-
   // or as argument(settings.passFreq ? settings.passFreq : 350);
+  bandpassFilter.type = "lowpass";
   bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
 
   analyser.fftSize = 128;
+
   bufferLength = analyser.frequencyBinCount;
 
-  // firstload for mobile
-  // $("body").click(function() {
+  // firstload for mobile, forces all control to the site on click
   document.body.addEventListener('click', function() {
     console.log("Auto BPM is initialized!", audio.src);
     audio.play();
@@ -255,7 +275,7 @@ function BPM( renderer, options ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS OUT FOR NOW SOUND
+    // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
 
     resolve(audio);
@@ -266,12 +286,14 @@ function BPM( renderer, options ) {
     initializeAudio.then( function(r) {
       console.log("Auto BPM is initialized!", audio.src);
       audio.play();
-      setInterval( sampler, 1);                 // as fast as we can, we need those samples
+      setInterval( sampler, 1); // as fast as we can, we need those samples !!
 
     }).catch( function(err){
       console.log("Error: Auto BPM ERROR ", err);
     });
   }
+
+  // ANYLISIS STARTS HERE ------------------------------------------------------
 
   var sampler = function() {
     if ( !_self.useAutoBpm ) return;
@@ -283,12 +305,13 @@ function BPM( renderer, options ) {
     var dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray)
 
-    // precalc
+    // precalculculations, push only the highest value of the frequency range
     var now = Date.now()
     var high = 0
-    dataArray.forEach( (d,i)=> { if ( d > high ) high = d })
+    dataArray.forEach( (d) => { if ( d > high ) high = d })
     dataSet.push( [ now, high ] )
 
+    // keep the set on sampleLength
     if (dataSet.length > sampleLength) dataSet.splice(0, dataSet.length - sampleLength)
     d++
 
@@ -297,16 +320,25 @@ function BPM( renderer, options ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-      //var tempoCounts = tempoData.tempoCounts
-      // getBlackout // TODO
-      // getAmbience // TODO
-      // drawData(dataSet) // DEPRICATED
-      //if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
 
+      // Here are some ideas for a more complete analisis range
+
+      // var tempoCounts = tempoData.tempoCounts
+      // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
+      // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
+
+      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+
+      // depricated failsafe
+      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
+
+      // depricated debug window
       // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: &lt;strong>"+ Math.round(window.bpm) + " &lt;/strong> ("+Math.round(window.bpm2)+") \t\tconfidence: &lt;em>" + window.confidence + " &lt;strong>" + window.calibrating + "&lt;/strong>&lt;/em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
       // console.log(" ### AUTOBPM: ",  window.calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
+
+      // write the test data globally (needs uiid?)
       window.bpm_test = tempoData.bpm
-      _self.sec = c * Math.PI * tempoData.bpm / 60
+      if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
     }
@@ -314,6 +346,7 @@ function BPM( renderer, options ) {
 
   // blink on the beat
   var doBlink = function() {
+    if ( document.getElementsByClassName('blink').length == 0 ) return
     if ( audio.paused ) {
       document.getElementsByClassName('blink')[0].style.opacity = 0
     }else{
@@ -375,8 +408,7 @@ function BPM( renderer, options ) {
     var calibrating = false
     if ( _data[0] === undefined ) {
       calibrating = true
-      //$('.blink').css('background-color','rgba(150,150,150,0.5) !important')
-      document.getElementsByClassName('blink')[0].background = '#999999';
+      if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999999';
     }else{
       calibrating = false
 
@@ -388,30 +420,28 @@ function BPM( renderer, options ) {
       var confidence_mod = tempoCounts[0].count - tempoCounts[1].count
       if ( confidence_mod &lt;= 2 ) {
         confidence = "low"
-        //$('.blink').css('background-color','red')
-        document.getElementsByClassName('blink')[0].background = '#990000';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#990000';
       }else if( confidence_mod > 2 &amp;&amp; confidence_mod &lt;= 7) {
         confidence = "average"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#999900';
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#999900';
       }else if( confidence_mod > 7 ) {
         confidence = "high"
-        //$('.blink').css('background-color','yellow')
-        document.getElementsByClassName('blink')[0].background = '#CCCCCC';
-        //$('.blink').css('background-color','white')
+        if ( document.getElementsByClassName('blink').length > 0 ) document.getElementsByClassName('blink')[0].style.backgroundColor = '#CCCCCC';
       }
     }
 
     // return an object with all the necc. data.
     var tempoData = {
       bpm: tempoCounts[0].tempo,     // suggested bpm
-      confidence: confidence,
-      calibrating: calibrating,
+      confidence: confidence,        // String
+      calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
       foundpeaks:  foundpeaks,       // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
+
+    //console.log(tempoData.bpm, tempoData.confidence)
 
     return tempoData;
   }
@@ -495,13 +525,13 @@ function BPM( renderer, options ) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li><li><a href="Yes,.html">Yes,</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 10 2018 01:16:17 GMT+0200 (DST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 02 2018 16:08:16 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -386,7 +386,8 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
-  audio.src = '/proxy/1' // NSB RADIO --> 'http://37.220.36.53:7904';
+  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  //audio.src = '/proxy/dunklenacht' // dunklenacht
 
   if ( _self.options.audio ) audio.src = _self.options.audio
 
@@ -662,17 +663,6 @@ function BPM( renderer, options ) {
 
 } // end BPM
 
-/**
- * @description
- *   FileManager
- *
- * @example
- *  let filemanager1 = new FileManager( renderer, { audio: 'mymusic.mp3' } );
- * @implements Addon
- * @constructor Addon#FileManager
- * @param {GlRenderer} renderer
- * @param {VideoSource}  source
- */
 function FileManager( _source ) {
 
   var _self = this
@@ -680,7 +670,8 @@ function FileManager( _source ) {
   _self.type = "AddOn"
   _self.defaultQuality = ""
   _self.source = _source
-  _self.programs = []
+  _self.set = []
+  //_self.programs = []
   _self.file
   _self.renderer = renderer // do we even need this ?!!
 
@@ -703,8 +694,8 @@ function FileManager( _source ) {
       //console.log(i, p)
       _tags.forEach( function( t, j) {
         //console.log( j, t)
-        if ( p.tags.includes(t) ) {
-          matches.push(p)
+        if ( p.tags.includes(t) && p.assets != undefined ) {
+          if ( p.assets._type == "Video" ) matches.push(p)
         }
       })
     })
@@ -718,6 +709,13 @@ function FileManager( _source ) {
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
+
+  _self.load = function( _file ) {
+    utils.get( _file, function(d) {
+      console.log('got:', JSON.parse(d) )
+      _self.set = JSON.parse(d)
+    } )
+  }
 
   // load another source from the stack
   _self.change = function( _tag ) {
@@ -735,11 +733,29 @@ function FileManager( _source ) {
       _self.change()
       return
     }
-    _self.setSrc( _self.getSrcByQuality( program ) );
+
+    //var notv = null
+    //$.get('/set/notv', function(d) { notv = JSON.parse(d) })
+
+    console.log("SOURCE")
+    //var source = notv[ Math.floor( Math.random() * notv.length) ];
+    //var source = occupy_chaos[ Math.floor( Math.random() * occupy_chaos.length) ];
+
+    if (_self.set.length > 0) {
+      var source = _self.set[ Math.floor( Math.random() * _self.set.length) ];
+
+      //var source = _self.getSrcByQuality( program )
+      _self.setSrc( source );
+    }
 
 
-
-    
+    /*
+    if (Math.random() > 0.5 ) {
+      _self.getSrcByTags(["awesome"])
+    }else{
+      _self.getSrcByTags(["runner"])
+    }
+    */
   }
 
   // for old times sake,
@@ -749,10 +765,7 @@ function FileManager( _source ) {
 
   // get the version by it's quality ( marduq asset library )
   _self.getSrcByQuality = function( _program, _quality ) {
-    //console.log("le program", _program)
     if ( _quality == undefined ) _quality = "720p_h264"
-    //if ( _quality == undefined ) _quality = "720p_5000kbps_h264"
-    //if ( _quality == undefined ) _quality = "320p_h264_mobile"
     var match = null
     _program.assets.versions.forEach( function(version) {
       if ( version.label == _quality ) match = version
@@ -1983,6 +1996,34 @@ function Midi() {
   */
 }
 
+Vidi.prototype = new Controller();  // assign prototype to marqer
+Vidi.constructor = Vidi;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#Vidi
+ * @interface
+ *
+ * Yes, The Visual Instrument Digital Interface is here.
+ */
+
+function Vidi() {
+  // base
+
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "Vidi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "VidiControl"
+  //_self.controllers = {};
+  //_self.bypass = true
+  _self.mylittlevar = "boejaka"
+
+}
+
+//Node editor js
+
 
 // fragment
 // vec3 b_w = ( source.x + source.y + source.z) / 3
@@ -3079,9 +3120,14 @@ function VideoSource(renderer, options) {
 
   _self.update = function() {
     if (_self.bypass = false) return
-    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA ) {
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
       if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
     }
   }
 
