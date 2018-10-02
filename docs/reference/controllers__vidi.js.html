@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: modules/_module.js</title>
+    <title>JSDoc: Source: controllers/_vidi.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: modules/_module.js</h1>
+    <h1 class="page-title">Source: controllers/_vidi.js</h1>
 
     
 
@@ -26,10 +26,31 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @constructor Module
+            <pre class="prettyprint source linenums"><code>Vidi.prototype = new Controller();  // assign prototype to marqer
+Vidi.constructor = Vidi;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#Vidi
  * @interface
+ *
+ * Yes, The Visual Instrument Digital Interface is here.
  */
+
+function Vidi() {
+  // base
+
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "Vidi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "VidiControl"
+  //_self.controllers = {};
+  //_self.bypass = true
+  _self.mylittlevar = "boejaka"
+
+}
 </code></pre>
         </article>
     </section>

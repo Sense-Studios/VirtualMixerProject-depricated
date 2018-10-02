@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('virtualmixerproject:server');
 var http = require('http');
+// var io = require('socket.io')(http);
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io').listen(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -87,4 +89,20 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log('Listening on ' + bind)
 }
+
+
+/**
+ * Maybe move this somewhere else, but io functions (for now)
+ */
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+  });
+});

@@ -2,9 +2,6 @@ var express = require('express');
 var request = require('request');
 var router = express.Router();
 
-
-
-
 /* GET proxy listing. */
 router.get('/1', function(req, res, next) {
 

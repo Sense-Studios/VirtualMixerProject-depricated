@@ -1,0 +1,12 @@
+.table {
+  width: 100%; }
+
+.tracktest {
+  background-color: red; }
+
+tr {
+  background-color: grey; }
+  tr.alternate {
+    background-color: blue; }
+
+/*# sourceMappingURL=trackeditor.css.map */
