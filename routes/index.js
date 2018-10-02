@@ -16,6 +16,18 @@ router.get('/example1', function(req, res, next) {
   res.render('compositions/example1', { title: 'Example 1' });
 });
 
+// FIXME: routing scheme should be nicer 
+// editors and controllers
+router.get('/editors/*', function(req, res, next) {
+  var repl_url = req.originalUrl.replace('/editors', 'editors')
+  res.render(repl_url, { title: 'Editors: ' });
+});
+
+router.get('/controllers/*', function(req, res, next) {
+  var repl_url = req.originalUrl.replace('/controllers', 'controllers')
+  res.render(repl_url, { title: 'Controllers: ' });
+});
+
 // for composiions see /views
 router.get('/mixer/*', function(req, res, next) {
   //console.log(req, res, next)
