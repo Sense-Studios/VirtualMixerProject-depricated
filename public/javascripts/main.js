@@ -49,24 +49,6 @@ bpm.add( mixer5.pod )
 var output = new Output( renderer, mixer5 )
 
 
-var socket = io();
-socket.on('beats', function(msg){
-  console.log(msg)
-  //$('#messages').append($('<li>').text(msg));
-});
-
-
-var _beats = 0
-// move this to the bpm
-var checkBeats = function() {
-  _beats += 1
-  socket.emit('command', {"command":"beats", "payload":_beats});
-  setTimeout( function() { checkBeats() }, 6000/(bpm.bpm/8) )
-};
-
-checkBeats()
-
-
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
 // var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
@@ -118,14 +100,38 @@ renderer.init();         // init
 renderer.render();       // start update & animation
 */
 
-mixer4.pod(0.5)
-filemanager1.change()
-filemanager2.change()
-bpm.mod = 0.5
+mixer5.pod(0)
+mixer5.pod(0.5)
+setTimeout( function() {
+  filemanager1.change()
+  filemanager2.change()
+  filemanager3.change()
+}, 500 )
+
+bpm.mod = 0.125
+bpm.useAutoBpm = false
 
 // -----------------------------------------------------------------------------
 // Testscripts ("Behaviours?")
 var myBehaviour = new Behaviour( renderer )
+
+var socket = io();
+socket.on('beats', function(msg){
+  console.log(msg)
+  //$('#messages').append($('<li>').text(msg));
+});
+
+
+var _beats = 0
+// move this to the bpm
+var checkBeats = function(_num) {
+  _beats += 1
+  //console.log(_beats)
+  socket.emit('command', {"command":"beats", "payload": _num});
+  //setTimeout( checkBeats, ((60/window.bpm_test)*1000) )
+};
+
+//checkBeats()
 
 var behaviour  = {
   "title": "My First Behaviour",
@@ -143,78 +149,47 @@ var behaviour  = {
 
   sheets: [
     [
-      [  3,  5,  0,  0, 10, 13, 15  ],
-      [  1,  0,  0,  0,  9,  0,  0  ],
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0,  0,  0  ],   // 4
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  9,  0, 16  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  7, 10, 14,  0  ],   // 8
-      [  0,  0,  0,  0,  0 , 0,  0  ],
-      [  0,  6,  0,  0,  0,  0, 17  ],
+      [  1, 15,  0,  0,  0,  0,  0  ],
       [  0,  0,  0,  0,  0,  0,  0  ],
-      [  0,  5,  0,  0,  0,  0, 15  ],   // 12
-      [  3,  6,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  8,  0,  0,  0  ],
-      [  1,  6,  0,  9, 10, 13,  0  ],   //// 16
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0 , 0,  0  ],   // 20
-      [  3,  0,  0,  0,  0 , 0,  0  ],
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],   // 24
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0, 10, 14, 16  ],
-      [  1,  6,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],  //  28
-      [  1,  6,  0,  0,  9,  0,  0  ],  //
-      [  3,  5,  0,  0, 10,  0,  0  ],
-      [  1,  6,  0,  0,  9,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],  // 32
-      [  1,  6,  0,  0,  0,  0,  0  ],   //
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
 
-      [  3,  5,  0,  0, 10,  0,  0  ],
-      [  1,  0,  0,  0,  9,  0,  0  ],
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  0,  0, 17  ],   // 36
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  9,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  7, 10,  0, 15  ],   // 40
-      [  0,  0,  0,  0,  0 , 0,  0  ],
-      [  0,  6,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
       [  0,  0,  0,  0,  0,  0,  0  ],
-      [  0,  5,  0,  0,  0,  0,  0  ],   // 44
-      [  3,  6,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  8,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  9, 10,  0,  0  ],   //// 52
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],
-      [  3,  0,  0,  0,  0 , 0,  0  ],
-      [  1,  6,  0,  0,  0 , 0,  0  ],   // 56
-      [  3,  0,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],   // 60
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  1,  0,  0,  0,  0,  0,  0  ],   // 64
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  1,  0,  0,  0,  0,  0,  0  ],   //
-      [  3,  0,  0,  0, 10,  0, 16  ],
-      [  1,  0,  0,  0,  0,  0,  0  ],   // 68
-      [  1,  6,  0,  0,  0,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  9,  0,  0  ],  //
-      [  3,  5,  0,  0, 10,  0, 15  ],  //  72
-      [  1,  6,  0,  0,  9,  0,  0  ],
-      [  3,  5,  0,  0,  0,  0,  0  ],
-      [  1,  6,  0,  0,  4,  0,  0  ]   //
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+
+      [  2, 15,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+
+      [  0, 15,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+      [  0, 15,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+
+      // ----------------------------
+
+      [  1, 15,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+
+      [  2, 15,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+
+      [  0, 15,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ],
+      [  0, 16,  0,  0,  0,  0,  0  ],
+      [  0,  0,  0,  0,  0,  0,  0  ]
     ]
   ],
 
@@ -231,23 +206,20 @@ var behaviour  = {
     //  mod: { code: "4b", value: 1, type: 'beats', repeat: false, after: 0 }
     //},
     {
-      action: { "method": "blendMode", "on": [ mixer4 ], "args": 7 },              // 0 (NOT USED)
+      action: { "method": "blendMode", "on": [ mixer5 ], "args": 7 },              // 0 (NOT USED)
       mod: { code: "4b", value: 500, type: 'beats', repeat: false, after: 1 }
     },
 
-
-
-
     {
-      action: { "method": "blendMode", "on": [ mixer4 ], "args": 7 },              // 1
+      action: { "method": "blendMode", "on": [ mixer5 ], "args": 7 },              // 1
       mod: { code: "4b", value: 5, type: 'beats', repeat: false, after: 1 }
     },
     {
-      action: { "method": "blendMode", "on": [ mixer4 ], "args": 17 },             // 2
+      action: { "method": "blendMode", "on": [ mixer5 ], "args": 17 },             // 2
       mod: { code: "4b", value: 7, type: 'beats', repeat: false, after: 2 }
     },
     {
-      action: { "method": "blendMode", "on": [ mixer4 ], "args": 8 },              // 3
+      action: { "method": "blendMode", "on": [ mixer5 ], "args": 8 },              // 3
       mod: { code: "4b", value: 9, type: 'beats', repeat: false, after: 0 }
     },
 
@@ -257,11 +229,11 @@ var behaviour  = {
     },
 
     {
-      action: { "method": "pod", "on": [ mixer4 ], "args": 0 },       // 4
+      action: { "method": "pod", "on": [ mixer5 ], "args": 0 },       // 4
       mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 5
     },
     {
-      action: { "method": "pod", "on": [ mixer4 ], "args": 1 },       // 4
+      action: { "method": "pod", "on": [ mixer5 ], "args": 1 },       // 4
       mod: { code: "4b", value: 11, type: 'beats', repeat: false, after: null }    // 6
     },
 
@@ -348,6 +320,7 @@ var behaviour  = {
 
 
 myBehaviour.load(behaviour)
+myBehaviour.checkSheets()
 
 
 

@@ -1,4 +1,4 @@
-body 
+body
   overflow: auto;
 
 .table
@@ -12,7 +12,28 @@ tr
   height: 12px
 
   &.alternate
-    background-color: blue
+    background-color: white
 
   &.active
     background-color: purple
+
+  td
+    // blendmode
+    &._1, &._2, &._3
+      background-color: orange
+
+    // file loading
+    &._4, &._11, &._12, &._17
+      background-color: green
+
+    // pods
+    &._5, &._6, &._9, &._10, &._15, &._16
+      background-color: #885555
+
+    // jumps
+    &._7, &._8
+      background-color: #886633
+
+    // useAutoBpm
+    &._13, &._14
+      background-color: #442211
