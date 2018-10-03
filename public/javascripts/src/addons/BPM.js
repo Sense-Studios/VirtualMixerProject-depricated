@@ -213,8 +213,8 @@ function BPM( renderer, options ) {
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
 
-  // audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  audio.src = '/proxy/dunklenacht' // dunklenacht
+  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  // audio.src = '/proxy/dunklenacht' // dunklenacht
 
   if ( _self.options.audio ) audio.src = _self.options.audio
 
@@ -270,7 +270,8 @@ function BPM( renderer, options ) {
   // ANYLISIS STARTS HERE ------------------------------------------------------
 
   var sampler = function() {
-    if ( !_self.useAutoBpm ) return;
+    //if ( !_self.useAutoBpm ) return;
+    if ( _self.audio.muted ) return;
     if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return

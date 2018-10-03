@@ -11,8 +11,18 @@ tr {
   background-color: grey;
   height: 12px; }
   tr.alternate {
-    background-color: blue; }
+    background-color: white; }
   tr.active {
     background-color: purple; }
+  tr td._1, tr td._2, tr td._3 {
+    background-color: orange; }
+  tr td._4, tr td._11, tr td._12, tr td._17 {
+    background-color: green; }
+  tr td._5, tr td._6, tr td._9, tr td._10, tr td._15, tr td._16 {
+    background-color: #885555; }
+  tr td._7, tr td._8 {
+    background-color: #886633; }
+  tr td._13, tr td._14 {
+    background-color: #442211; }
 
 /*# sourceMappingURL=trackeditor.css.map */

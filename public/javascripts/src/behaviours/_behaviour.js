@@ -77,7 +77,7 @@ function Behaviour( renderer, options ) {
     //if ( bpsr == 0 ) old_bpm = 1
 
     // checkTriggers()
-    checkSheets()
+    //checkSheets()
   }
 
   // ---------------------------------------------------------------------------
@@ -120,26 +120,30 @@ function Behaviour( renderer, options ) {
   // ---------------------------------------------------------------------------
   var sheet_pointer = 0
   var old_sheet_pointer = 0
-  var checkSheets = function() {
-    sheet_pointer = _self.beats%_self.sheets[0].length
+  _self.checkSheets = function() {
+     // _self.beats%_self.sheets[0].length
 
-    if ( old_sheet_pointer != sheet_pointer ) {
-      console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer] )
+    //console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
+    //if ( old_sheet_pointer != sheet_pointer ) {
+      // console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+      checkBeats(sheet_pointer%_self.sheets[0].length)
       old_sheet_pointer = sheet_pointer
-      _self.sheets[0][sheet_pointer].forEach( function( trigger_pointer ) {
+      _self.sheets[0][sheet_pointer%_self.sheets[0].length].forEach( function( trigger_pointer ) {
 
         if ( trigger_pointer != 0 ) {
            fireTrigger( triggers[ trigger_pointer ] )
         }
 
       })
-    }
+    //}
+    sheet_pointer += 1
+    setTimeout( _self.checkSheets, ((60/window.bpm_test)*1000)/4 )
   }
 
   var fireTrigger = function(trigger) {
     if ( trigger[0].action.method !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
-        console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
+        //console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
         _obj[trigger[0].action.method]( trigger[0].action.args  )
       })
       return true
@@ -147,7 +151,7 @@ function Behaviour( renderer, options ) {
 
     if ( trigger[0].action.set !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
-        console.log("SET", trigger[0].action.args, "on", trigger[0].action.set, "at", _obj.uuid )
+        //console.log("SET", trigger[0].action.args, "on", trigger[0].action.set, "at", _obj.uuid )
         _obj[trigger[0].action.set] = trigger[0].action.args
       })
       return true
@@ -156,7 +160,7 @@ function Behaviour( renderer, options ) {
     if ( trigger[0].action.internal !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
         _self[ trigger[0].action.internal ](_obj)
-        console.log("INTERNAL",  trigger[0].action.args, "on", _obj.uuid )
+        //console.log("INTERNAL",  trigger[0].action.args, "on", _obj.uuid )
       })
       return true
     }
@@ -171,7 +175,7 @@ function Behaviour( renderer, options ) {
       var had_update = false
       if ( trigger[0].mod.type == "seconds" || trigger[0].mod.type == "random-seconds" ) {
         if ( _self.time > trigger[1] ) {
-          console.log("TRAEDASDASASDADSDAS SECONDS", trigger[0].mod.type  )
+          //console.log("TRAEDASDASASDADSDAS SECONDS", trigger[0].mod.type  )
           had_update = fireTrigger( trigger )
         }
 
