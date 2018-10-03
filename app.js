@@ -8,6 +8,7 @@ var sassMiddleware = require('node-sass-middleware');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var proxyRouter = require('./routes/proxy');
+var ioRouter = require('./routes/io');
 
 var app = express();
 
@@ -29,8 +30,8 @@ app.use(sassMiddleware({
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/proxy', proxyRouter);
+app.use('/io', ioRouter);
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -47,5 +48,29 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// -----------------------------------------------------------------------------
+// For Sockets
+// -----------------------------------------------------------------------------
+var io = null
+app.setIo = function( _io ) {
+  io = _io
+
+  io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+      console.log('user disconnected');
+    });
+
+    socket.on('chat message', function(msg){
+      console.log('message: ' + msg);
+    });
+
+    socket.on('command', function(msg){
+      console.log('command: ' + msg);
+      io.emit('command', msg);      
+    });
+  });
+}
 
 module.exports = app;

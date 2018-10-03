@@ -120,7 +120,7 @@ function MidiController( renderer, options ) {
 
     // start the bpm sync
     var bpmonoff = true
-    bpm.blinkCallBack = function(_on) {
+    _self.blinkCallBack = function(_on) {
       if (bpmonoff) {
         output.send( [ 0x90, 82, OFF ] )
         bpmonoff = false
@@ -160,10 +160,10 @@ function MidiController( renderer, options ) {
 
         console.log("blink2")
         doubleclick = true
-        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         faders_opaque[e.data[1]] = 1
-        var source = chain1.getChainLink( e.data[1] )
-        if (source.video) source.video.currentTime = Math.random() * source.video.duration
+        // var source = chain1.getChainLink( e.data[1] )
+        // if (source.video) source.video.currentTime = Math.random() * source.video.duration
 
         console.log("toggle chain")
         setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false}, 350)
@@ -179,25 +179,25 @@ function MidiController( renderer, options ) {
       //console.log( e.data[2] / 126 )
       //testSource2.video.playbackRate  = e.data[2] / 56
       //console.log(e.data[2])
-      if ( faders_opaque[0] ) chain1.setChainLink (0, e.data[2]/126 )
+      //if ( faders_opaque[0] ) chain1.setChainLink (0, e.data[2]/126 )
       faders[0] = e.data[2]
     }
 
     if (e.data[1] == 49) {
       //testSource3.video.playbackRate  = e.data[2] / 56
-      if ( faders_opaque[1] ) chain1.setChainLink (1, e.data[2]/126 )
+      //if ( faders_opaque[1] ) chain1.setChainLink (1, e.data[2]/126 )
       faders[1] = e.data[2]
     }
 
     if (e.data[1] == 50) {
       //testSource4.video.playbackRate  = e.data[2] / 56.0
-      if ( faders_opaque[2] ) chain1.setChainLink (2, e.data[2]/126 )
+      //if ( faders_opaque[2] ) chain1.setChainLink (2, e.data[2]/126 )
       faders[2] = e.data[2]
     }
 
     if (e.data[1] == 51) {
       //testSource4.video.playbackRate  = e.data[2] / 56.0
-      if ( faders_opaque[3] ) chain1.setChainLink (3, e.data[2]/126 )
+      //if ( faders_opaque[3] ) chain1.setChainLink (3, e.data[2]/126 )
       faders[3] = e.data[2]
     }
 
@@ -229,14 +229,14 @@ function MidiController( renderer, options ) {
   		// press a button, make it green
       if (e.data[0] == 128 ) {
         output.send( [ 0x90, e.data[1], OFF ] );
-        chain1.setChainLink(e.data[1], 0)
+        //chain1.setChainLink(e.data[1], 0)
         //console.log("toggle chain")
         doubleclick = false
       }
 
       if (e.data[0] == 144  ) {
         output.send( [ 0x90, e.data[1], GREEN ] );
-        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        //chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         //console.log("toggle chain", faders[e.data[1]], e.data[1] )
         faders_opaque[e.data[1]] = 0
         doubleclick = false

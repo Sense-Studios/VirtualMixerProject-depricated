@@ -1,32 +1,34 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'start' ]
+1 verbose cli [ '/home/xangadix/.nvm/versions/node/v6.11.1/bin/node',
+1 verbose cli   '/home/xangadix/.nvm/versions/node/v6.11.1/bin/npm',
+1 verbose cli   'start' ]
 2 info using npm@3.10.10
-3 info using node@v6.11.3
+3 info using node@v6.11.1
 4 verbose run-script [ 'prestart', 'start', 'poststart' ]
 5 info lifecycle virtualmixerproject@1.0.0~prestart: virtualmixerproject@1.0.0
 6 silly lifecycle virtualmixerproject@1.0.0~prestart: no script for prestart, continuing
 7 info lifecycle virtualmixerproject@1.0.0~start: virtualmixerproject@1.0.0
 8 verbose lifecycle virtualmixerproject@1.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle virtualmixerproject@1.0.0~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/DaanNolen/Documents/VirtualMixerProject/node_modules/.bin:/Users/DaanNolen/.rvm/gems/ruby-2.3.0/bin:/Users/DaanNolen/.rvm/gems/ruby-2.3.0@global/bin:/Users/DaanNolen/.rvm/rubies/ruby-2.3.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Wireshark.app/Contents/MacOS:/Users/DaanNolen/.rvm/bin
-10 verbose lifecycle virtualmixerproject@1.0.0~start: CWD: /Users/DaanNolen/Documents/VirtualMixerProject
+9 verbose lifecycle virtualmixerproject@1.0.0~start: PATH: /home/xangadix/.nvm/versions/node/v6.11.1/lib/node_modules/npm/bin/node-gyp-bin:/mnt/d/_work/VirtualMixerProject/node_modules/.bin:/home/xangadix/bin:/home/xangadix/.local/bin:/home/xangadix/.nvm/versions/node/v6.11.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/Oculus/Support/oculus-runtime:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64_win/compiler:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/ia32_win/compiler:/mnt/c/Ruby23-x64/bin:/mnt/c/ProgramData/Oracle/Java/javapath:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Program Files (x86)/Common Files/Adobe/AGL:/mnt/c/Program Files/nodejs:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files (x86)/QuickTime Alternative/QTSystem:/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit:/mnt/c/Program Files/Microsoft SQL Server/120/Tools/Binn:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Program Files/Geth:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Windows/System32/OpenSSH:/mnt/c/Program Files (x86)/Skype/Phone:/mnt/c/Users/Daan/AppData/Local/atom/bin:/mnt/c/Users/Daan/AppData/Roaming/npm:/mnt/c/Users/Daan/AppData/Local/Microsoft/WindowsApps:/mnt/c/msys64/usr/bin:/mnt/c/msys64/mingw32/bin:/mnt/c/Users/Daan/AppData/Local/GitHubDesktop/bin:/snap/bin
+10 verbose lifecycle virtualmixerproject@1.0.0~start: CWD: /mnt/d/_work/VirtualMixerProject
 11 silly lifecycle virtualmixerproject@1.0.0~start: Args: [ '-c', 'node ./bin/www' ]
 12 silly lifecycle virtualmixerproject@1.0.0~start: Returned: code: 1  signal: null
 13 info lifecycle virtualmixerproject@1.0.0~start: Failed to exec start script
 14 verbose stack Error: virtualmixerproject@1.0.0 start: `node ./bin/www`
 14 verbose stack Exit status 1
-14 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
+14 verbose stack     at EventEmitter.<anonymous> (/home/xangadix/.nvm/versions/node/v6.11.1/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
 14 verbose stack     at emitTwo (events.js:106:13)
 14 verbose stack     at EventEmitter.emit (events.js:191:7)
-14 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:40:14)
+14 verbose stack     at ChildProcess.<anonymous> (/home/xangadix/.nvm/versions/node/v6.11.1/lib/node_modules/npm/lib/utils/spawn.js:40:14)
 14 verbose stack     at emitTwo (events.js:106:13)
 14 verbose stack     at ChildProcess.emit (events.js:191:7)
-14 verbose stack     at maybeClose (internal/child_process.js:920:16)
-14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:230:5)
+14 verbose stack     at maybeClose (internal/child_process.js:891:16)
+14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
 15 verbose pkgid virtualmixerproject@1.0.0
-16 verbose cwd /Users/DaanNolen/Documents/VirtualMixerProject
-17 error Darwin 17.7.0
-18 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
-19 error node v6.11.3
+16 verbose cwd /mnt/d/_work/VirtualMixerProject
+17 error Linux 4.4.0-17134-Microsoft
+18 error argv "/home/xangadix/.nvm/versions/node/v6.11.1/bin/node" "/home/xangadix/.nvm/versions/node/v6.11.1/bin/npm" "start"
+19 error node v6.11.1
 20 error npm  v3.10.10
 21 error code ELIFECYCLE
 22 error virtualmixerproject@1.0.0 start: `node ./bin/www`

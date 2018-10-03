@@ -41,10 +41,31 @@ bpm.add( mixer4.pod )
 bpm.add( mixer5.pod )
 
 
+
+
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
 var output = new Output( renderer, mixer5 )
+
+
+var socket = io();
+socket.on('beats', function(msg){
+  console.log(msg)
+  //$('#messages').append($('<li>').text(msg));
+});
+
+
+var _beats = 0
+// move this to the bpm
+var checkBeats = function() {
+  _beats += 1
+  socket.emit('command', {"command":"beats", "payload":_beats});
+  setTimeout( function() { checkBeats() }, 6000/(bpm.bpm/8) )
+};
+
+checkBeats()
+
 
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
