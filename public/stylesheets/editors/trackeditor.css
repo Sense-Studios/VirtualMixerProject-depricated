@@ -1,3 +1,6 @@
+body {
+  overflow: auto; }
+
 .table {
   width: 100%; }
 
@@ -5,8 +8,11 @@
   background-color: red; }
 
 tr {
-  background-color: grey; }
+  background-color: grey;
+  height: 12px; }
   tr.alternate {
     background-color: blue; }
+  tr.active {
+    background-color: purple; }
 
 /*# sourceMappingURL=trackeditor.css.map */

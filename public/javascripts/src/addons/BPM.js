@@ -75,6 +75,7 @@ function BPM( renderer, options ) {
    * @member Addon#BPM#audio_src
    */
   _self.useAutoBpm = true      // auto bpm
+  _self.mute = false
   _self.autoBpmData = {}       // info object for the auto bpm
   _self.useMicrophone = false  // use useMicrophone for autoBPM
   _self.audio_src = ""         // audio file or stream (useMicrophone = false)
@@ -184,6 +185,7 @@ function BPM( renderer, options ) {
 
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
+  _self.audio = audio
   var context = new AudioContext(); // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();

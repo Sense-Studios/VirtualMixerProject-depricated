@@ -3,6 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
+  console.log('this is index')
+  console.log( express.io )
+
   res.render('index', {
     title: 'Express'
     //giphy_key: process.env.GIPHYKEY,
@@ -16,7 +20,7 @@ router.get('/example1', function(req, res, next) {
   res.render('compositions/example1', { title: 'Example 1' });
 });
 
-// FIXME: routing scheme should be nicer 
+// FIXME: routing scheme should be nicer
 // editors and controllers
 router.get('/editors/*', function(req, res, next) {
   var repl_url = req.originalUrl.replace('/editors', 'editors')
