@@ -1,46 +1,6 @@
-var sheets = [
-[  1, 15,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
 
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-
-[  2, 15,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-
-[  0, 15,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0, 15,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-
-// ----------------------------
-
-[  1, 15,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-
-[  2, 15,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-
-[  0, 15,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ],
-[  0, 16,  0,  0,  0,  0,  0  ],
-[  0,  0,  0,  0,  0,  0,  0  ]
-]
+var sheets = [[]]
+var track
 
 var TrackEditor = function( _options ) {
   var _self = this
@@ -52,7 +12,9 @@ var TrackEditor = function( _options ) {
       y%4 == 0 ? html += "<tr class='tablerow alternate'>" : html += "<tr class='tablerow'>"
 
       for ( var x = 0; x < _cols; x++ ) {
-        html += "<td class='_"+ sheets[y-1][x] + "'>" + sheets[y-1][x] + "</td>"
+        html += "<td class='_"+ sheets[0][y-1][x] + "'>"
+        html +=  sheets[0][y-1][x] + "\t..... ... ..."
+        html +=  "</td>"
       }
 
       html += "</tr>"
@@ -64,8 +26,18 @@ var TrackEditor = function( _options ) {
   }
 }
 
-var track = new TrackEditor()
-track.generateTrack(sheets.length,sheets[0].length)
+// INIT
+var u = new Utils()
+u.get('/io', function(d) {
+  console.log(d)
+  sheets = JSON.parse(d)
+  track = new TrackEditor()
+  track.generateTrack(sheets[0].length,sheets[0][0].length)
+})
+
+u.post('/io', { sheets: sheets }, function(d) {
+  console.log("posted sheets, ", d)
+})
 
 var _beats = 0
 var socket = io();
@@ -83,6 +55,7 @@ socket.on('command', function(msg){
   if (msg == "test") { console.log("msg", msg)}
   if (msg.command == "test") { console.log("test:", msg.payload)}
   if (msg.command == "beats") { setBeats( msg.payload ) }
+  if (msg.command == "updatesheets") { updateSheets( JSON.parse(msg.payload.sheets) ) }
 
 });
 
@@ -97,11 +70,17 @@ var setBeats = function( _num ) {
       rows[i].classList.remove('active');
   }
 
-  rows[_beats%sheets.length].classList.add('active');
-
-
+  rows[_beats%sheets[0].length].classList.add('active');
 
 }
+
+var updateSheets = function( _sheets ) {
+  sheets = _sheets
+  console.log(sheets)
+  document.getElementById('trackgrid').innerHTML = ""
+  track.generateTrack(sheets[0].length,sheets[0][0].length)
+}
+
 // ping?
 // hasmaster? (end)
 // (getmaster)

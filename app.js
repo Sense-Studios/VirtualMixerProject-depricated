@@ -55,6 +55,7 @@ app.use(function(err, req, res, next) {
 var io = null
 app.setIo = function( _io ) {
   io = _io
+  ioRouter.setIo(_io)
 
   io.on('connection', function(socket){
     console.log('a user connected');
@@ -68,7 +69,7 @@ app.setIo = function( _io ) {
 
     socket.on('command', function(msg){
       console.log('command: ' + msg);
-      io.emit('command', msg);      
+      io.emit('command', msg);
     });
   });
 }
