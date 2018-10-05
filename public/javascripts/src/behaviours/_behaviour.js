@@ -125,7 +125,7 @@ function Behaviour( renderer, options ) {
 
     //console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
     //if ( old_sheet_pointer != sheet_pointer ) {
-      // console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+      console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
       checkBeats(sheet_pointer%_self.sheets[0].length)
       old_sheet_pointer = sheet_pointer
       _self.sheets[0][sheet_pointer%_self.sheets[0].length].forEach( function( trigger_pointer ) {
