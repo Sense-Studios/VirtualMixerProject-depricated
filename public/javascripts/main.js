@@ -117,21 +117,42 @@ var myBehaviour = new Behaviour( renderer )
 
 var socket = io();
 socket.on('beats', function(msg){
-  console.log(msg)
-  //$('#messages').append($('<li>').text(msg));
+  // console.log(msg)
+  // $('#messages').append($('<li>').text(msg));
 });
 
+socket.on('dips', function(msg){
+  console.log(msg)
+  //$('#messages').append($('<li>').text(msg));
+  // if msg == yes setdips
+});
+
+socket.emit('dibs')
+
+dips = false
+
+socket.on('command', function(msg) {
+  console.log("command!", msg, msg.command == "updatesheets" )
+  if ( msg.command == "updatesheets" ) {
+    console.log(msg.payload.sheets)
+    sheets = JSON.parse(msg.payload.sheets)
+    myBehaviour.sheets = JSON.parse(msg.payload.sheets)
+    // myBehaviour.load(behaviour)
+  }
+})
 
 var _beats = 0
 // move this to the bpm
 var checkBeats = function(_num) {
   _beats += 1
   //console.log(_beats)
-  socket.emit('command', {"command":"beats", "payload": _num});
+  if (dips) socket.emit('command', {"command":"beats", "payload": _num});
   //setTimeout( checkBeats, ((60/window.bpm_test)*1000) )
 };
 
 //checkBeats()
+
+
 
 var behaviour  = {
   "title": "My First Behaviour",
@@ -146,6 +167,30 @@ var behaviour  = {
   // changez
   // jump  "on"
   //
+
+  composition: {
+    sources: [
+      ["VID01", testSource1],
+      ["VID02", testSource2],
+      ["VID03", testSource3],
+      ["VID04", testSource4]
+    ],
+    modules: [
+      ["MIX01", mixer1 ],
+      ["MIX02", mixer2 ],
+      ["MIX03", mixer3 ],
+      ["MIX04", mixer4 ],     // VID01 in, VID03 out
+      ["MIX05", mixer5 ],     // mixer4 in, VID03 in, --> out
+      ["SWC01", switcher1 ]
+    ],
+    addons: [
+      ["FIL01", filemanager1],
+      ["FIL02", filemanager2],
+      ["FIL03", filemanager3],
+      ["FIL04", filemanager4],
+      ["BPM", bpm]
+    ]
+  },
 
   sheets: [],
 
@@ -163,7 +208,9 @@ var behaviour  = {
     //},
     {
       action: { "method": "blendMode", "on": [ mixer5 ], "args": 7 },              // 0 (NOT USED)
-      mod: { code: "4b", value: 500, type: 'beats', repeat: false, after: 1 }
+      mod: { code: "4b", value: 5, type: 'beats', repeat: false, after: 1 }
+
+
     },
 
     {
@@ -251,7 +298,12 @@ var behaviour  = {
     {
       action: { "method": "getSrcByTags", "on": [ filemanager3], "args": ["runner"] },                     // 17
       mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
-    }
+    },
+    {
+      action: { "method": "changez", "on": [ filemanager3 ] },                     // 18
+      mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
+    },
+
 
     //{
     //  action: { "set": "mixMode", "on": [ mixer4 ], "args": mixer4.blendmodes[  Math.floor( Math.random() * mixer4.blendmodes.length ) ] },

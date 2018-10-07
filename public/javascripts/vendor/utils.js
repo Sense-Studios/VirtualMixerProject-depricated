@@ -39,10 +39,10 @@ var Utils = function() {
       _callback(data)
     }
 
-    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     httpRequest.open('POST', _url)
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     //httpRequest.send('username=' + encodeURIComponent(username))
-    httpRequest.send(encodeURIComponent(_options))
+    httpRequest.send(_options)
   }
 }
 

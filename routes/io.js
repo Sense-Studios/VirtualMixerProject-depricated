@@ -14,6 +14,8 @@ var sheets = [
     [  0,  0,  0,  0,  0,  0,  0  ],    // 3 | ..... ... .. | ..... ... .. | MIX04 BLN 01 | ..... ... .. |
     [  0,  0,  0,  0,  0,  0,  0  ],    // 4 | ..... ... .. | ..... ... .. | ..... ... .. | ..... ... .. |
 
+    
+
     [  0, 16,  0,  0,  0,  0,  0  ],    //     SWI01 TGL   0
     [  0,  0,  0,  0,  0,  0,  0  ],    //     BPM00 SET 128
     [  0,  0,  0,  0,  0,  0,  0  ],    //     FIL02 CHG
@@ -66,7 +68,9 @@ app.post('/login',function(req,res){
 router.post('/', function (req, res) {
   // uipdate sheetsres.send('POST request to the homepage')
   // something something res
-  console.log("got post,", req)
+  console.log("got post,", req.body)
+
+  sheets = JSON.parse( req.body.sheets )
   //sheets = req.body.sheets
   router.io.emit('command', {'command': 'updatesheets', "payload": req.body })
   res.send("ok")
