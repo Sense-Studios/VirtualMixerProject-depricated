@@ -1,37 +1,52 @@
 
 .html
 
-
 @font-face
 	font-family: 'MINI7'
 	src:  url('/fonts/MINI 7.ttf') format('truetype')
 
-
 body
-  overflow: auto
   font-family: MINI7
-  font-size: 14px
+  font-size: 10px
+  background-color: #333
+  color: #d5d4d4
 
 .table
   width: 100%
+  position: absolute
 
 .tracktest
   background-color: red
 
+input, select
+  font-family: MINI7
+  font-size: 7px
+  background-color: rgba(0,0,0,0)
+  color: #d5d4d4
+  border: none
+  padding: 2px 4px
+  width: 30%
+  display: inline-block
+
 tr
-  background-color: grey
-  height: 10px
 
   &.alternate
-    background-color: white
+    background-color: #666
+    color: #fff
 
   &.active
-    background-color: purple
+    background-color: #45c
 
   td
+    // set in javascript 100/cols
+    // width: 14.28% (7 cols)
+    border-bottom: solid 1px #222
+    border-right: solid 1px #222
+
     // blendmode
     &._1, &._2, &._3
       background-color: orange
+      color: black
 
     // file loading
     &._4, &._11, &._12, &._17
@@ -48,3 +63,7 @@ tr
     // useAutoBpm
     &._13, &._14
       background-color: #442211
+
+@media only screen and (max-width: 768px)
+    input, select
+      width: 100% !important
