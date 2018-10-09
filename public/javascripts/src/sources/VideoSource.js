@@ -229,6 +229,20 @@ function VideoSource(renderer, options) {
     }
   }
 
+  _self.jump = function( _num) {
+    if ( _num == undefined || isNaN(_num) ) {
+      try {
+        videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
+      }catch(e){
+        console.log("prevented a race error")
+      }
+    } else {
+      videoElement.currentTime = _num
+    }
+
+    return videoElement.currentTime
+  }
+
   // ===========================================================================
   // Rerturn a reference to self
   // ===========================================================================

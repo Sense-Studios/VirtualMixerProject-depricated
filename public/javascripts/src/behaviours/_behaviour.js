@@ -146,7 +146,7 @@ function Behaviour( renderer, options ) {
               console.log("TRIGGERED", _function = _func[2])
               var _args = trigger_pointer[2]  // BLEND //isnan?
               if ( !isNaN(trigger_pointer[2]) ) {
-                  _args = parseInt(trigger_pointer[2])
+                  _args = parseFloat(trigger_pointer[2])
               }else{
                   _args = trigger_pointer[2]  // BLEND //isnan?
               }
