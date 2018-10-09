@@ -172,7 +172,7 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
    * @function Module#Mixer#blendMode
    * @param {number} blendmode index of the Blendmode
    */
-  _self.blendMode = function( _num ) {
+  _self.blendMode = function( _num ) {    
     if ( _num != undefined ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode

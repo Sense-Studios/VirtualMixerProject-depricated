@@ -16,9 +16,9 @@ var options = [
   [ "MIX03", mixer_functions ],
   [ "MIX04", mixer_functions ],
   [ "MIX05", mixer_functions ],
-  [ "SRC01", source_functions ],
-  [ "SRC02", source_functions ],
-  [ "SRC03", source_functions ],
+  [ "VID01", source_functions ],
+  [ "VID02", source_functions ],
+  [ "VID03", source_functions ],
   [ "FIL01", filemanager_functions ],
   [ "FIL02", filemanager_functions ],
   [ "FIL03", filemanager_functions ],
@@ -35,16 +35,32 @@ var TrackEditor = function( _options ) {
       y%4 == 0 ? html += "<tr class='tablerow alternate'>" : html += "<tr class='tablerow'>"
 
       for ( var x = 0; x < _cols; x++ ) {
-        html += "<td width='"+(99/_cols)+"%' class='_"+ sheets[0][y-1][x] + " tablecell'>"
+        html += "<td width='"
+        html += (99/_cols)+"%' class='_"
+        html +=  sheets[0][y-1][x][2]
+        html +=  " " + sheets[0][y-1][x][0]
+        html += " tablecell' data-index='0' data-x='"+x+"' data-y='"+y+"'>"
+
         //html +=  sheets[0][y-1][x]   // index
         //html += "\t..... ... ..."
-        html += "<select class='target'>"
-        options.forEach(function(opt, i) {
-          html += "<option>" + opt[0] + "</option>"
-        })
+        html += "<select class='target' data-index='0'>"
+        html += " <option selected>" + sheets[0][y-1][x][0] + "</option>"
+        options.forEach(function(opt, i) { html += "<option>" + opt[0] + "</option>" });
+        html += " </select>"
+        html += "<select class='action' data-index='0'>"
+        html += "<option selected>"+sheets[0][y-1][x][1]+"</option>"
+        // load
+        // from
+        options.forEach( function( opt, i ) {
+          if ( opt[0] == sheets[0][y-1][x][0] ) {
+            opt[1].forEach( function( func, i ) {
+              html += "<option>" + func[0] + "</option>"
+            })
+          }
+        });
+
         html += "</select>"
-        html += "<select class='action'><option>.....</option></select>"
-        html += "<input class='pattern_input' data-index='0' data-x='"+x+"' data-y='"+y+"' value='" + sheets[0][y-1][x] + "'>"
+        html += "<input class='pattern_input' value='" + sheets[0][y-1][x][2] + "'>"
         html +=  "</td>"
       }
 
@@ -96,23 +112,40 @@ var TrackEditor = function( _options ) {
 
       /* ------------ */
 
-      var pattern_input = tc[i].getElementsByClassName('pattern_input')[0]
-      pattern_input.tableindex = i
-      holder = pattern_input
-      pattern_input.addEventListener('change', function(evt) {
-        console.log("elm change", evt.srcElement.getAttribute("data-index"), evt.srcElement.value, i)
-        var index = evt.srcElement.getAttribute("data-index")
-        var pointer_x = evt.srcElement.getAttribute("data-x")
-        var pointer_y = evt.srcElement.getAttribute("data-y")
-        sheets[index][pointer_y-1][pointer_x] =  evt.srcElement.value
+      // var tablecells = tc[i].getElementsByClassName('tablecell') //[0]
+      // var targets = tc[i].getElementsByClassName('target')[0]
+      // var actions = tc[i].getElementsByClassName('action')[0]
+      var tablecell = tc[i]
 
-        setTimeout(function() { document.getElementsByClassName('pattern_input')[evt.srcElement.tableindex].focus() },  200)
+      // console.log(pattern_input)
+      tablecell.tableindex = i
+      //holder = pattern_input
+      console.log("add listener", tablecell)
 
+      tablecell.children[0].addEventListener('change', update)
+      tablecell.children[1].addEventListener('change', update)
+      tablecell.children[2].addEventListener('change', update)
+
+      var update = function(evt) {
+        var tablecell = evt.srcElement.parentElement
+        console.log("elm change", evt.srcElement.getAttribute("data-index"), tablecell, evt.srcElement.value, i)
+
+        var index = tablecell.getAttribute("data-index")
+        var pointer_x = tablecell.getAttribute("data-x")
+        var pointer_y = tablecell.getAttribute("data-y")
+
+        sheets[index][pointer_y-1][pointer_x][0] =  tablecell.children[0].value
+        sheets[index][pointer_y-1][pointer_x][1] =  tablecell.children[1].value
+        sheets[index][pointer_y-1][pointer_x][2] =  tablecell.children[2].value
+
+        //setTimeout(function() { document.getElementsByClassName('pattern_input')[evt.srcElement.tableindex].focus() },  200)
         updateSheets(sheets)
-        postSheets()
 
+        console.log("now start posting sheets")
+        postSheets()
         return true
-      })
+      }
+
     }
   }
 }
@@ -143,7 +176,7 @@ socket.on('chat message', function(msg){
 });
 
 socket.on('command', function(msg){
-  console.log(msg)
+  if (msg.command != "beats") console.log(msg)
   //$('#messages').append($('<li>').text(msg));
 
   // setUID
@@ -157,7 +190,7 @@ socket.on('command', function(msg){
 
 
 var setBeats = function( _num ) {
-  console.log("beats!", _num )
+  //console.log("beats!", _num )
   //console.log( document.querySelector(".table") )
   _beats = _num
   var rows = document.getElementsByClassName('tablerow')
