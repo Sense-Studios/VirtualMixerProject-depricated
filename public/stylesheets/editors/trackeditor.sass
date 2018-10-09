@@ -27,6 +27,9 @@ input, select
   padding: 2px 4px
   width: 30%
   display: inline-block
+  color: #CCC
+  option
+    color: #333
 
 tr
 
@@ -43,26 +46,46 @@ tr
     border-bottom: solid 1px #222
     border-right: solid 1px #222
 
-    // blendmode
-    &._1, &._2, &._3
-      background-color: orange
+    &[class*="MIX"]
+      background-color: purple
       color: black
 
+    &[class*="SRC"]
+      background-color: violet
+      select, input
+        color: black
+
+    &[class*="FIL"]
+      background-color: pink
+      color: black
+      select, input
+        color: black
+
+    &[class*="BPM"]
+      background-color: darkred
+      color: black
+
+
+    // blendmode
+    //&._1, &._2, &._3
+    //  background-color: orange
+    //  color: black
+
     // file loading
-    &._4, &._11, &._12, &._17
-      background-color: green
+    //&._4, &._11, &._12, &._17
+    //  background-color: green
 
     // pods
-    &._5, &._6, &._9, &._10, &._15, &._16
-      background-color: #885555
+    //&._5, &._6, &._9, &._10, &._15, &._16
+    //  background-color: #885555
 
     // jumps
-    &._7, &._8
-      background-color: #886633
+    //&._7, &._8
+    //  background-color: #886633
 
     // useAutoBpm
-    &._13, &._14
-      background-color: #442211
+    //&._13, &._14
+    //  background-color: #442211
 
 @media only screen and (max-width: 768px)
     input, select

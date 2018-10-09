@@ -125,13 +125,39 @@ function Behaviour( renderer, options ) {
      var __beats = sheet_pointer%_self.sheets[0].length
     //console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
     //if ( old_sheet_pointer != sheet_pointer ) {
-      console.log( "Boem:", __beats, sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+      //console.log( "Boem:", __beats, sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
       checkBeats(sheet_pointer%_self.sheets[0].length)
       old_sheet_pointer = sheet_pointer
+
       _self.sheets[0][sheet_pointer%_self.sheets[0].length].forEach( function( trigger_pointer ) {
 
-        if ( trigger_pointer != 0 ) {
-           fireTrigger( triggers[ trigger_pointer ] )
+
+        if (trigger_pointer[0] != "....." && trigger_pointer[0] != "START") {
+          console.log(trigger_pointer)
+          //console.log( _self.script.composition[ trigger_pointer[0] ] )
+
+          var target = _self.script.composition[ trigger_pointer[0] ].target
+          var _functions = _self.script.composition[ trigger_pointer[0] ].functions // BLEND
+
+          var _function = null
+          _functions.forEach( function( _func, i ) {
+            // var _function = _self.script.composition[ trigger_pointer[0] ].functions // BLEND
+            if ( trigger_pointer[1] == _func[0] ) {
+              console.log("TRIGGERED", _function = _func[2])
+              var _args = trigger_pointer[2]  // BLEND //isnan?
+              if ( !isNaN(trigger_pointer[2]) ) {
+                  _args = parseInt(trigger_pointer[2])
+              }else{
+                  _args = trigger_pointer[2]  // BLEND //isnan?
+              }
+
+
+              target[ _func[2] ](_args);
+
+              console.log(target, _function, _args)
+
+            }
+          })
         }
 
       })
@@ -143,8 +169,8 @@ function Behaviour( renderer, options ) {
   var fireTrigger = function(trigger) {
     if ( trigger[0].action.method !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
-        //console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
-        _obj[trigger[0].action.method]( trigger[0].action.args  )
+        console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
+        //_obj[trigger[0].action.method]( trigger[0].action.args  )
       })
       return true
     }

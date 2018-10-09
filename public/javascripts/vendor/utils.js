@@ -36,7 +36,10 @@ var Utils = function() {
     var httpRequest = new XMLHttpRequest()
     httpRequest.onreadystatechange = function (data) {
       // code
-      _callback(data)
+      if(httpRequest.readyState === 4 && httpRequest.status === 200) {
+        //console.log(httpRequest.responseText);
+        _callback(data)
+      }
     }
 
     httpRequest.open('POST', _url)

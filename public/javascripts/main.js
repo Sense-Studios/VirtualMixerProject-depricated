@@ -13,8 +13,10 @@ var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 }
 var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
 var mixer2 = new Mixer( renderer, { source1: testSource3, source2: testSource4 } );
 var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 } );
+
 var mixer4 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
 var mixer5 = new Mixer( renderer, { source1: mixer4, source2: testSource3 } );
+
 var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // create the filemanager addon to manage the sources
@@ -26,7 +28,7 @@ var filemanager2 = new FileManager( testSource2 )
 filemanager2.load('/sets/notv.json')
 
 var filemanager3 = new FileManager( testSource3 )
-filemanager3.load('/sets/occupy_chaos.json')
+filemanager3.load('/sets/notv.json')
 
 var filemanager4 = new FileManager( testSource4 )
 filemanager4.load('/sets/occupy_chaos.json')
@@ -132,7 +134,7 @@ socket.emit('dibs')
 dips = false
 
 socket.on('command', function(msg) {
-  console.log("command!", msg, msg.command == "updatesheets" )
+  // console.log("command!", msg, msg.command == "updatesheets" )
   if ( msg.command == "updatesheets" ) {
     console.log(msg.payload.sheets)
     sheets = JSON.parse(msg.payload.sheets)
@@ -146,13 +148,18 @@ var _beats = 0
 var checkBeats = function(_num) {
   _beats += 1
   //console.log(_beats)
-  if (dips) socket.emit('command', {"command":"beats", "payload": _num});
+  socket.emit('command', {"command":"beats", "payload": _num});
   //setTimeout( checkBeats, ((60/window.bpm_test)*1000) )
 };
 
 //checkBeats()
 
-
+// SHOULD BE HANDLED THROUGH THE INTERFACE
+var blank_functions = [[".....", "",""]]
+var mixer_functions = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
+var filemanager_functions = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+var source_functions = [["JUMP","internal","jump"]]
+var bpm_functions = [ ["SET", "set", "useAutoBpm"] ]
 
 var behaviour  = {
   "title": "My First Behaviour",
@@ -169,28 +176,23 @@ var behaviour  = {
   //
 
   composition: {
-    sources: [
-      ["VID01", testSource1],
-      ["VID02", testSource2],
-      ["VID03", testSource3],
-      ["VID04", testSource4]
-    ],
-    modules: [
-      ["MIX01", mixer1 ],
-      ["MIX02", mixer2 ],
-      ["MIX03", mixer3 ],
-      ["MIX04", mixer4 ],     // VID01 in, VID03 out
-      ["MIX05", mixer5 ],     // mixer4 in, VID03 in, --> out
-      ["SWC01", switcher1 ]
-    ],
-    addons: [
-      ["FIL01", filemanager1],
-      ["FIL02", filemanager2],
-      ["FIL03", filemanager3],
-      ["FIL04", filemanager4],
-      ["BPM", bpm]
-    ]
+      "VID01": { target: testSource1, functions: source_functions },
+      "VID02": { target: testSource2, functions: source_functions },
+      "VID03": { target: testSource3, functions: source_functions },
+      "VID04": { target: testSource4, functions: source_functions },
+      "MIX01": { target: mixer1, functions: mixer_functions },
+      "MIX02": { target: mixer2, functions: mixer_functions },
+      "MIX03": { target:  mixer3, functions: mixer_functions },
+      "MIX04": { target:  mixer4, functions: mixer_functions },    // VID01 in, VID03 out
+      "MIX05": { target:  mixer5, functions: mixer_functions },   // mixer4 in, VID03 in, --> out
+      "SWC01": { target:  switcher1 , functions: mixer_functions },
+      "FIL01": { target:  filemanager1, functions: filemanager_functions },
+      "FIL02": { target:  filemanager2, functions: filemanager_functions },
+      "FIL03": { target:  filemanager3, functions: filemanager_functions },
+      "FIL04": { target:  filemanager4, functions: filemanager_functions },
+      "BPM":  { target: bpm, functions: bpm_functions }
   },
+
 
   sheets: [],
 
