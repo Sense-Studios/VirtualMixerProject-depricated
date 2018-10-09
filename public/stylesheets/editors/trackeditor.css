@@ -21,12 +21,17 @@ input, select {
   background-color: rgba(0, 0, 0, 0);
   color: #d5d4d4;
   border: none;
-  padding: 2px 4px;
-  width: 30%;
+  padding: 2px 1px;
   display: inline-block;
   color: #CCC; }
   input option, select option {
     color: #333; }
+
+input {
+  width: 14%; }
+
+select {
+  width: 40%; }
 
 tr.alternate {
   background-color: #666;
@@ -41,9 +46,9 @@ tr td {
   tr td[class*="MIX"] {
     background-color: purple;
     color: black; }
-  tr td[class*="SRC"] {
+  tr td[class*="SRC"], tr td[class*="VID"] {
     background-color: violet; }
-    tr td[class*="SRC"] select, tr td[class*="SRC"] input {
+    tr td[class*="SRC"] select, tr td[class*="SRC"] input, tr td[class*="VID"] select, tr td[class*="VID"] input {
       color: black; }
   tr td[class*="FIL"] {
     background-color: pink;

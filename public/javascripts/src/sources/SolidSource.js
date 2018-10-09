@@ -70,6 +70,10 @@ function SolidSource(renderer, options) {
     }
     return color
   }
+
+  _self.jump = function( _num ) {
+    console.log("no")
+  }
 }
 
 

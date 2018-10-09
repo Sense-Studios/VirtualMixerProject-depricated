@@ -24,12 +24,17 @@ input, select
   background-color: rgba(0,0,0,0)
   color: #d5d4d4
   border: none
-  padding: 2px 4px
-  width: 30%
+  padding: 2px 1px
   display: inline-block
   color: #CCC
   option
     color: #333
+
+input
+  width: 14%
+
+select
+  width: 40%
 
 tr
 
@@ -50,7 +55,7 @@ tr
       background-color: purple
       color: black
 
-    &[class*="SRC"]
+    &[class*="SRC"], &[class*="VID"]
       background-color: violet
       select, input
         color: black

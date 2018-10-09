@@ -6,6 +6,12 @@ var testSource2 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com
 var testSource3 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
 var testSource4 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_h264.mp4' } );
 
+// var testSource1 = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+// var testSource2 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.0 } } );
+// var testSource3 = new SolidSource( renderer, { color: { r: 0.1, g: 0.0, b: 1.0 } } );
+// var testSource4 = new SolidSource( renderer, { color: { r: 1.1, g: 1.0, b: 0.5 } } );
+
+
 // solid
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
 
@@ -22,13 +28,13 @@ var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 // create the filemanager addon to manage the sources
 var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager1 = new FileManager( testSource1 )
-filemanager1.load('/sets/occupy_chaos.json')
+filemanager1.load('/sets/example.json')
 
 var filemanager2 = new FileManager( testSource2 )
-filemanager2.load('/sets/notv.json')
+filemanager2.load('/sets/occupy_chaos.json')
 
 var filemanager3 = new FileManager( testSource3 )
-filemanager3.load('/sets/notv.json')
+filemanager3.load('/sets/occupy_chaos.json')
 
 var filemanager4 = new FileManager( testSource4 )
 filemanager4.load('/sets/occupy_chaos.json')
