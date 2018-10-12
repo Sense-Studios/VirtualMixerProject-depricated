@@ -6,10 +6,24 @@ body {
   font-family: MINI7;
   font-size: 10px;
   background-color: #333;
-  color: #d5d4d4; }
+  color: #d5d4d4;
+  overflow-y: scroll; }
+
+.sheet_button {
+  background-color: #752;
+  width: 4%;
+  height: 4%;
+  position: fixed;
+  top: 10px;
+  left: 0.5%;
+  display: inline-block; }
+
+#button_sheet_2 {
+  top: calc( 4% + 20px); }
 
 .table {
-  width: 100%;
+  width: 94%;
+  left: 5%;
   position: absolute; }
 
 .tracktest {

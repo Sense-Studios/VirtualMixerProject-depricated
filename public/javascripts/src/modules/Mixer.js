@@ -186,7 +186,7 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
    * @param {float} position - position of the handle
    */
   _self.pod = function( _num ) {
-    console.log("---> POD:", _num)
+    //console.log("---> POD:", _num)
     if ( _num != undefined ) {
 
       // set pod position

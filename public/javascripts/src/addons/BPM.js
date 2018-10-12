@@ -137,13 +137,25 @@ function BPM( renderer, options ) {
    * @function Addon#BPM#modUp
   */
   _self.modUp = function() { _self.mod *= 2; }
-
   /**
    * @description half the bpm
    * @function Addon#BPM#modDown
   */
   _self.modDown = function() { _self.mod *= .5; }
 
+
+  _self.modNum = function(_num) {
+    console.log("MOD ", _num)
+    var oldState = _self.useAutoBpm
+    _self.mod = _num;
+    _self.useAutoBpm = oldState
+  }
+
+  _self.toggleAutoBpm = function( _num ) {
+    _self.useAutoBpm  = !_self.useAutoBpm
+    console.log("--->", _self.useAutoBpm  )
+
+  }
   // add nodes, implicit
   _self.add = function( _func ) {
     nodes.push( _func )
