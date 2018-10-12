@@ -28,7 +28,7 @@ var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 // create the filemanager addon to manage the sources
 var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager1 = new FileManager( testSource1 )
-filemanager1.load('/sets/example.json')
+filemanager1.load('/sets/notv.json')
 
 var filemanager2 = new FileManager( testSource2 )
 filemanager2.load('/sets/occupy_chaos.json')
@@ -142,9 +142,12 @@ dips = false
 socket.on('command', function(msg) {
   // console.log("command!", msg, msg.command == "updatesheets" )
   if ( msg.command == "updatesheets" ) {
+    console.log("updatesheets", msg)
     console.log(msg.payload.sheets)
+
     sheets = JSON.parse(msg.payload.sheets)
     myBehaviour.sheets = JSON.parse(msg.payload.sheets)
+    myBehaviour.sheet_index = parseInt(JSON.parse(msg.payload.sheetindex))
     // myBehaviour.load(behaviour)
   }
 })
@@ -164,8 +167,8 @@ var checkBeats = function(_num) {
 var blank_functions = [[".....", "",""]]
 var mixer_functions = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
 var filemanager_functions = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
-var source_functions = [["JUMP","internal","jump"]]
-var bpm_functions = [ ["SET", "set", "useAutoBpm"] ]
+var source_functions = [["JUMP","method","jump"]]
+var bpm_functions = [ ["AUTO", "method", "toggleAutoBpm"],["MODDOWN", "method", "modDown"],["MODUP", "method", "modUp"],["MOD", "method", "modNum"]]
 
 var behaviour  = {
   "title": "My First Behaviour",
@@ -196,7 +199,7 @@ var behaviour  = {
       "FIL02": { target:  filemanager2, functions: filemanager_functions },
       "FIL03": { target:  filemanager3, functions: filemanager_functions },
       "FIL04": { target:  filemanager4, functions: filemanager_functions },
-      "BPM":  { target: bpm, functions: bpm_functions }
+      "BPM01":  { target: bpm, functions: bpm_functions }
   },
 
 
