@@ -5,16 +5,25 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
 
+var app = express();
+var io = require('socket.io')(app.listen(3000))
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var proxyRouter = require('./routes/proxy');
 var ioRouter = require('./routes/io');
+ioRouter.setIo(io);
 
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+// app.set('io', io)
+
+//app.use(function(req, res, next) {
+//    req.io = io;
+//    next();
+//});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -52,6 +61,10 @@ app.use(function(err, req, res, next) {
 // -----------------------------------------------------------------------------
 // For Sockets
 // -----------------------------------------------------------------------------
+
+
+
+/*
 var io = null
 app.setIo = function( _io ) {
   io = _io
@@ -61,6 +74,8 @@ app.setIo = function( _io ) {
     console.log('a user connected');
     socket.on('disconnect', function(){
       console.log('user disconnected');
+      // remove user
+
     });
 
     socket.on('chat message', function(msg){
@@ -73,5 +88,6 @@ app.setIo = function( _io ) {
     });
   });
 }
+*/
 
 module.exports = app;
