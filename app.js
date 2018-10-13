@@ -4,26 +4,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
+var io = null
 
 var app = express();
-var io = require('socket.io')(app.listen(3000))
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var proxyRouter = require('./routes/proxy');
 var ioRouter = require('./routes/io');
-ioRouter.setIo(io);
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-// app.set('io', io)
 
-//app.use(function(req, res, next) {
-//    req.io = io;
-//    next();
-//});
+// when we have io,pass it to the requests
+app.use(function(req, res, next) {
+	req.io = io;
+	next();
+});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -61,7 +59,11 @@ app.use(function(err, req, res, next) {
 // -----------------------------------------------------------------------------
 // For Sockets
 // -----------------------------------------------------------------------------
-
+// get sockets.io and pass it to the router
+app.setIo = function( _io ) {
+  io = _io
+  ioRouter.setIo(_io)
+}
 
 
 /*

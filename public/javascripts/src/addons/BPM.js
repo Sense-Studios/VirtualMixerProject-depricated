@@ -11,6 +11,7 @@
  * @param {GlRenderer} renderer
  * @param {Object} options optional
  */
+
 function BPM( renderer, options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this

@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('virtualmixerproject:server');
 var http = require('http');
-// var io = require('socket.io')(http);
+var io = require('socket.io')(http);
 
 /**
  * Get port from environment and store in Express.
@@ -19,16 +19,21 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
 var server = http.createServer(app);
+
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+/** 
+ * pass the server to socekts.io and pass sockets.io
+ * to the app 
+*/
+var io = require('socket.io')(server);
+app.setIo(io)
 
 /**
  * Maybe move this somewhere else, but io functions (for now)
