@@ -1,12 +1,15 @@
 var express = require('express');
 var router = express.Router();
 
-router.setIo = function(_io ) {
-  router.io = _io
-}
+var io_controller = require('../controllers/ioController');
+//var io = null
 
+// test
 var myObj = {"foo":"bar"}
+var clients = {}
+var io
 
+// load from somewhere?
 var sheets = [
   [
     [ [ ".....", ".....", 8], [ ".....", ".....", 0], [ ".....", ".....", 0], [ ".....", ".....", 0], [ ".....", ".....", 0] ],
@@ -142,14 +145,19 @@ var sheets = [
 
 ]
 
-/*
-app.post('/login',function(req,res){
-  var user_name=req.body.user;
-  var password=req.body.password;
-  console.log("User name = "+user_name+", password is "+password);
-  res.end("yes");
-});
-*/
+// passes io to the controllers
+router.setIo = function( _io ) {
+  console.log("router set io")
+  io = _io
+  io_controller.setIo(_io)
+}
+
+// test delegates to controller
+router.get('/test', function(req, res, next) {
+  io_controller.test(req, res, next)
+})
+
+
 
 /* Return data for io. */
 router.post('/', function (req, res) {
@@ -166,14 +174,12 @@ router.post('/', function (req, res) {
 })
 
 router.get('/', function(req, res, next) {
-
   //  console.log(msg)
     //$('#messages').append($('<li>').text(msg));
-  router.io.emit('command', 'ping')
-  console.log('this is io')
+  console.log('this is io', io)
+  //console.log('this is app', app )
+  io.emit('command', 'ping')
   //console.log( express )
-
-
 
   res.send(sheets)
   /*
@@ -185,5 +191,26 @@ router.get('/', function(req, res, next) {
   */
 });
 
+/*
+var init_io = function() {
+  io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+      console.log('user disconnected');
+      // remove user
+
+    });
+
+    socket.on('chat message', function(msg){
+      console.log('message: ' + msg);
+    });
+
+    socket.on('command', function(msg){
+      console.log('command: ' + msg);
+      io.emit('command', msg);
+    });
+  });
+}
+*/
 
 module.exports = router;

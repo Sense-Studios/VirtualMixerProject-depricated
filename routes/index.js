@@ -1,4 +1,5 @@
 var express = require('express');
+var io = require('socket.io');
 var router = express.Router();
 
 /* GET home page. */
@@ -39,5 +40,9 @@ router.get('/mixer/*', function(req, res, next) {
   var title = req.originalUrl.replace('/mixer/', '')
   res.render(repl_url, { title: 'Composition: ' + title });
 });
+
+var socketConnection = function socketConnection(socket){
+  socket.emit('message', {message: 'Hey!'});
+};
 
 module.exports = router;

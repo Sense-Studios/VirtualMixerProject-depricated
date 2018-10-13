@@ -33,8 +33,6 @@ server.on('listening', onListening);
 /**
  * Maybe move this somewhere else, but io functions (for now)
  */
-var io = require('socket.io').listen(server);
-app.setIo(io)
 
 /**
  * Normalize a port into a number, string, or false.
