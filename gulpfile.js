@@ -18,8 +18,8 @@ gulp.task('mixer-js', function () {
 	return gulp.src( mixer_min )
 		.pipe(concat('mixer.js'))
     .pipe(gulp.dest('public/javascripts/build/'))
-    //.pipe(minify())
-		//.pipe(gulp.dest('public/javascripts/build/'));
+    .pipe(minify())
+		.pipe(gulp.dest('public/javascripts/build/'));
 });
 
 gulp.task('default', ['vendor-js', 'mixer-js']);
