@@ -204,6 +204,7 @@ function AudioAnalysis( renderer ) {
  * @param {GlRenderer} renderer
  * @param {Object} options optional
  */
+
 function BPM( renderer, options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -220,15 +221,30 @@ function BPM( renderer, options ) {
    * @description Beats Per Minute
    * @member Addon#BPM#bpm
    * @param {number} Beats per minute
+   *
+   *  actual Beats Per Minute
+   *
   */
-  _self.bpm = 128              // beats per minute
+  _self.bpm = 128
 
   /**
    * @description Tapping beat control
    * @member Addon#BPM#bps
+   *
+   *  beats per second
+   *
   */
-  _self.bps = 2.133333         // beats per second
-  _self.sec = 0                // second counter, from which the actual float is calculated
+  _self.bps = 2.133333         //
+
+
+  /**
+   * @description Second counter
+   * @member Addon#BPM#sec
+   *
+   *  second counter, from which the actual float is calculated
+   *
+  */
+  _self.sec = 0                //
 
   /**
    * @description
@@ -253,6 +269,7 @@ function BPM( renderer, options ) {
    * @member Addon#BPM#audio_src
    */
   _self.useAutoBpm = true      // auto bpm
+  _self.mute = false
   _self.autoBpmData = {}       // info object for the auto bpm
   _self.useMicrophone = false  // use useMicrophone for autoBPM
   _self.audio_src = ""         // audio file or stream (useMicrophone = false)
@@ -268,6 +285,7 @@ function BPM( renderer, options ) {
   renderer.add(_self)
 
   // define scheme for this Addon
+  /*
   _self.scheme = function() {
     var scheme = {
       description: {
@@ -286,6 +304,7 @@ function BPM( renderer, options ) {
     }
     return scheme;
   }
+  */
 
   // init with a tap contoller
   _self.init = function() {
@@ -312,13 +331,25 @@ function BPM( renderer, options ) {
    * @function Addon#BPM#modUp
   */
   _self.modUp = function() { _self.mod *= 2; }
-
   /**
    * @description half the bpm
    * @function Addon#BPM#modDown
   */
   _self.modDown = function() { _self.mod *= .5; }
 
+
+  _self.modNum = function(_num) {
+    console.log("MOD ", _num)
+    var oldState = _self.useAutoBpm
+    _self.mod = _num;
+    _self.useAutoBpm = oldState
+  }
+
+  _self.toggleAutoBpm = function( _num ) {
+    _self.useAutoBpm  = !_self.useAutoBpm
+    console.log("--->", _self.useAutoBpm  )
+
+  }
   // add nodes, implicit
   _self.add = function( _func ) {
     nodes.push( _func )
@@ -360,6 +391,7 @@ function BPM( renderer, options ) {
 
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
+  _self.audio = audio
   var context = new AudioContext(); // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -386,8 +418,9 @@ function BPM( renderer, options ) {
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
+
   audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  //audio.src = '/proxy/dunklenacht' // dunklenacht
+  // audio.src = '/proxy/dunklenacht' // dunklenacht
 
   if ( _self.options.audio ) audio.src = _self.options.audio
 
@@ -422,7 +455,7 @@ function BPM( renderer, options ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS LINE OUT FOR NOW SOUND
+    // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
 
     resolve(audio);
@@ -443,7 +476,8 @@ function BPM( renderer, options ) {
   // ANYLISIS STARTS HERE ------------------------------------------------------
 
   var sampler = function() {
-    if ( !_self.useAutoBpm ) return;
+    //if ( !_self.useAutoBpm ) return;
+    if ( _self.audio.muted ) return;
     if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
@@ -893,6 +927,7 @@ function Behaviour( renderer, options ) {
   _self.time = (new Date()).getTime()
   _self.script = {}
   _self.sheets = []
+  _self.sheet_index = 0
 
   renderer.add(_self)
 
@@ -939,7 +974,7 @@ function Behaviour( renderer, options ) {
     //if ( bpsr == 0 ) old_bpm = 1
 
     // checkTriggers()
-    checkSheets()
+    //checkSheets()
   }
 
   // ---------------------------------------------------------------------------
@@ -982,34 +1017,65 @@ function Behaviour( renderer, options ) {
   // ---------------------------------------------------------------------------
   var sheet_pointer = 0
   var old_sheet_pointer = 0
-  var checkSheets = function() {
-    sheet_pointer = _self.beats%_self.sheets[0].length
+  var sheet_index = 0
 
-    if ( old_sheet_pointer != sheet_pointer ) {
-      console.log( "Boem:", sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer] )
+  _self.checkSheets = function() {
+     // _self.beats%_self.sheets[0].length
+     var __beats = sheet_pointer%_self.sheets[ sheet_index ].length
+    //console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
+    //if ( old_sheet_pointer != sheet_pointer ) {
+      //console.log( "Boem:", __beats, sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+      checkBeats(sheet_pointer%_self.sheets[ _self.sheet_index ].length)
       old_sheet_pointer = sheet_pointer
-      _self.sheets[0][sheet_pointer].forEach( function( trigger_pointer ) {
 
-        if ( trigger_pointer != 0 ) {
-           fireTrigger( triggers[ trigger_pointer ] )
+      _self.sheets[ _self.sheet_index ][sheet_pointer%_self.sheets[ _self.sheet_index ].length].forEach( function( trigger_pointer ) {
+
+
+        if ( trigger_pointer[0] != "....." ) {
+          console.log(trigger_pointer)
+          //console.log( _self.script.composition[ trigger_pointer[0] ] )
+
+          var target = _self.script.composition[ trigger_pointer[0] ].target
+          var _functions = _self.script.composition[ trigger_pointer[0] ].functions // BLEND
+
+          var _function = null
+          _functions.forEach( function( _func, i ) {
+            // var _function = _self.script.composition[ trigger_pointer[0] ].functions // BLEND
+            if ( trigger_pointer[1] == _func[0] ) {
+              console.log("TRIGGERED", _function = _func[2])
+              var _args = trigger_pointer[2]  // BLEND //isnan?
+              if ( !isNaN(trigger_pointer[2]) ) {
+                  _args = parseFloat(trigger_pointer[2])
+              }else{
+                  _args = trigger_pointer[2]  // BLEND //isnan?
+              }
+              
+              target[ _func[2] ](_args);
+
+              console.log(target, _function, _args)
+
+            }
+          })
         }
 
       })
-    }
+    //}
+    sheet_pointer += 1
+    setTimeout( _self.checkSheets, ((60/window.bpm_test)*1000)/4 )
   }
 
   var fireTrigger = function(trigger) {
     if ( trigger[0].action.method !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
         console.log("DO", trigger[0].action.method, "on", _obj.uuid, "args",  trigger[0].action.args )
-        _obj[trigger[0].action.method]( trigger[0].action.args  )
+        //_obj[trigger[0].action.method]( trigger[0].action.args  )
       })
       return true
     }
 
     if ( trigger[0].action.set !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
-        console.log("SET", trigger[0].action.args, "on", trigger[0].action.set, "at", _obj.uuid )
+        //console.log("SET", trigger[0].action.args, "on", trigger[0].action.set, "at", _obj.uuid )
         _obj[trigger[0].action.set] = trigger[0].action.args
       })
       return true
@@ -1018,7 +1084,7 @@ function Behaviour( renderer, options ) {
     if ( trigger[0].action.internal !== undefined ) {
       trigger[0].action.on.forEach( function( _obj ) {
         _self[ trigger[0].action.internal ](_obj)
-        console.log("INTERNAL",  trigger[0].action.args, "on", _obj.uuid )
+        //console.log("INTERNAL",  trigger[0].action.args, "on", _obj.uuid )
       })
       return true
     }
@@ -1033,7 +1099,7 @@ function Behaviour( renderer, options ) {
       var had_update = false
       if ( trigger[0].mod.type == "seconds" || trigger[0].mod.type == "random-seconds" ) {
         if ( _self.time > trigger[1] ) {
-          console.log("TRAEDASDASASDADSDAS SECONDS", trigger[0].mod.type  )
+          //console.log("TRAEDASDASASDADSDAS SECONDS", trigger[0].mod.type  )
           had_update = fireTrigger( trigger )
         }
 
@@ -1557,7 +1623,7 @@ function MidiController( renderer, options ) {
 
     // start the bpm sync
     var bpmonoff = true
-    bpm.blinkCallBack = function(_on) {
+    _self.blinkCallBack = function(_on) {
       if (bpmonoff) {
         output.send( [ 0x90, 82, OFF ] )
         bpmonoff = false
@@ -1597,10 +1663,10 @@ function MidiController( renderer, options ) {
 
         console.log("blink2")
         doubleclick = true
-        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         faders_opaque[e.data[1]] = 1
-        var source = chain1.getChainLink( e.data[1] )
-        if (source.video) source.video.currentTime = Math.random() * source.video.duration
+        // var source = chain1.getChainLink( e.data[1] )
+        // if (source.video) source.video.currentTime = Math.random() * source.video.duration
 
         console.log("toggle chain")
         setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false}, 350)
@@ -1616,25 +1682,25 @@ function MidiController( renderer, options ) {
       //console.log( e.data[2] / 126 )
       //testSource2.video.playbackRate  = e.data[2] / 56
       //console.log(e.data[2])
-      if ( faders_opaque[0] ) chain1.setChainLink (0, e.data[2]/126 )
+      //if ( faders_opaque[0] ) chain1.setChainLink (0, e.data[2]/126 )
       faders[0] = e.data[2]
     }
 
     if (e.data[1] == 49) {
       //testSource3.video.playbackRate  = e.data[2] / 56
-      if ( faders_opaque[1] ) chain1.setChainLink (1, e.data[2]/126 )
+      //if ( faders_opaque[1] ) chain1.setChainLink (1, e.data[2]/126 )
       faders[1] = e.data[2]
     }
 
     if (e.data[1] == 50) {
       //testSource4.video.playbackRate  = e.data[2] / 56.0
-      if ( faders_opaque[2] ) chain1.setChainLink (2, e.data[2]/126 )
+      //if ( faders_opaque[2] ) chain1.setChainLink (2, e.data[2]/126 )
       faders[2] = e.data[2]
     }
 
     if (e.data[1] == 51) {
       //testSource4.video.playbackRate  = e.data[2] / 56.0
-      if ( faders_opaque[3] ) chain1.setChainLink (3, e.data[2]/126 )
+      //if ( faders_opaque[3] ) chain1.setChainLink (3, e.data[2]/126 )
       faders[3] = e.data[2]
     }
 
@@ -1666,14 +1732,14 @@ function MidiController( renderer, options ) {
   		// press a button, make it green
       if (e.data[0] == 128 ) {
         output.send( [ 0x90, e.data[1], OFF ] );
-        chain1.setChainLink(e.data[1], 0)
+        //chain1.setChainLink(e.data[1], 0)
         //console.log("toggle chain")
         doubleclick = false
       }
 
       if (e.data[0] == 144  ) {
         output.send( [ 0x90, e.data[1], GREEN ] );
-        chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
+        //chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         //console.log("toggle chain", faders[e.data[1]], e.data[1] )
         faders_opaque[e.data[1]] = 0
         doubleclick = false
@@ -2022,9 +2088,6 @@ function Vidi() {
 
 }
 
-//Node editor js
-
-
 // fragment
 // vec3 b_w = ( source.x + source.y + source.z) / 3
 // vec3 amount = source.xyz + ( b_w.xyx * _alpha )
@@ -2349,6 +2412,7 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
    * @param {float} position - position of the handle
    */
   _self.pod = function( _num ) {
+    //console.log("---> POD:", _num)
     if ( _num != undefined ) {
 
       // set pod position
@@ -2743,6 +2807,10 @@ function SolidSource(renderer, options) {
       renderer.customUniforms[_self.uuid + "_color"] = { type: "v3", value: new THREE.Vector3( color.r, color.g, color.b ) }
     }
     return color
+  }
+
+  _self.jump = function( _num ) {
+    console.log("no")
   }
 }
 
@@ -3211,6 +3279,20 @@ function VideoSource(renderer, options) {
     }else{
       renderer.customUniforms[_self.uuid+'_alpha'].value = a
     }
+  }
+
+  _self.jump = function( _num) {
+    if ( _num == undefined || isNaN(_num) ) {
+      try {
+        videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
+      }catch(e){
+        console.log("prevented a race error")
+      }
+    } else {
+      videoElement.currentTime = _num
+    }
+
+    return videoElement.currentTime
   }
 
   // ===========================================================================
