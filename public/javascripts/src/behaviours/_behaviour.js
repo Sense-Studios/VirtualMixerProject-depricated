@@ -33,6 +33,9 @@ function Behaviour( renderer, options ) {
   _self.sheets = []
   _self.sheet_index = 0
 
+  // requires a bpm
+  _self.bpm = options.bpm
+
   renderer.add(_self)
 
   function addTrigger( _obj ) {
@@ -126,11 +129,12 @@ function Behaviour( renderer, options ) {
   _self.checkSheets = function() {
      // _self.beats%_self.sheets[0].length
      var __beats = sheet_pointer%_self.sheets[ sheet_index ].length
-    //console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
-    //if ( old_sheet_pointer != sheet_pointer ) {
-      //console.log( "Boem:", __beats, sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+    // console.log("check", sheet_pointer,  sheet_pointer%_self.sheets[0].length)
+    // if ( old_sheet_pointer != sheet_pointer ) {
+      // console.log( "Boem:", __beats, sheet_pointer, "sheets:", _self.sheets[0][sheet_pointer%_self.sheets[0].length] )
+
       checkBeats(sheet_pointer%_self.sheets[ _self.sheet_index ].length)
-      old_sheet_pointer = sheet_pointer
+
 
       _self.sheets[ _self.sheet_index ][sheet_pointer%_self.sheets[ _self.sheet_index ].length].forEach( function( trigger_pointer ) {
 
@@ -153,7 +157,7 @@ function Behaviour( renderer, options ) {
               }else{
                   _args = trigger_pointer[2]  // BLEND //isnan?
               }
-              
+
               target[ _func[2] ](_args);
 
               console.log(target, _function, _args)
@@ -165,7 +169,7 @@ function Behaviour( renderer, options ) {
       })
     //}
     sheet_pointer += 1
-    setTimeout( _self.checkSheets, ((60/window.bpm_test)*1000)/4 )
+    setTimeout( _self.checkSheets, ((60/bpm.bpm)*1000)/4 )
   }
 
   var fireTrigger = function(trigger) {

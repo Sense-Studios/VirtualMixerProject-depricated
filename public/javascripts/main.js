@@ -48,9 +48,6 @@ var bpm = new BPM( renderer )
 bpm.add( mixer4.pod )
 bpm.add( mixer5.pod )
 
-
-
-
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
@@ -108,12 +105,15 @@ renderer.init();         // init
 renderer.render();       // start update & animation
 */
 
-mixer5.pod(0)
-mixer5.pod(0.5)
+//mixer5.pod(0)
+//mixer5.pod(0.5)
 setTimeout( function() {
   filemanager1.change()
   filemanager2.change()
   filemanager3.change()
+  bpm.audio.muted = true
+  bpm.useAutoBpm = false
+
 }, 500 )
 
 bpm.mod = 0.125
@@ -121,54 +121,18 @@ bpm.useAutoBpm = false
 
 // -----------------------------------------------------------------------------
 // Testscripts ("Behaviours?")
-var myBehaviour = new Behaviour( renderer )
-
-var socket = io();
-socket.on('beats', function(msg){
-  // console.log(msg)
-  // $('#messages').append($('<li>').text(msg));
-});
-
-socket.on('dips', function(msg){
-  console.log(msg)
-  //$('#messages').append($('<li>').text(msg));
-  // if msg == yes setdips
-});
-
-socket.emit('dibs')
-
-dips = false
-
-socket.on('command', function(msg) {
-  // console.log("command!", msg, msg.command == "updatesheets" )
-  if ( msg.command == "updatesheets" ) {
-    console.log("updatesheets", msg)
-    console.log(msg.payload.sheets)
-
-    sheets = JSON.parse(msg.payload.sheets)
-    myBehaviour.sheets = JSON.parse(msg.payload.sheets)
-    myBehaviour.sheet_index = parseInt(JSON.parse(msg.payload.sheetindex))
-    // myBehaviour.load(behaviour)
-  }
-})
-
-var _beats = 0
-// move this to the bpm
-var checkBeats = function(_num) {
-  _beats += 1
-  //console.log(_beats)
-  socket.emit('command', {"command":"beats", "payload": _num});
-  //setTimeout( checkBeats, ((60/window.bpm_test)*1000) )
-};
+var myBehaviour = new Behaviour( renderer, {"bpm": bpm} )
 
 //checkBeats()
 
 // SHOULD BE HANDLED THROUGH THE INTERFACE
+/*
 var blank_functions = [[".....", "",""]]
 var mixer_functions = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
 var filemanager_functions = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
 var source_functions = [["JUMP","method","jump"]]
 var bpm_functions = [ ["AUTO", "method", "toggleAutoBpm"],["MODDOWN", "method", "modDown"],["MODUP", "method", "modUp"],["MOD", "method", "modNum"]]
+*/
 
 var behaviour  = {
   "title": "My First Behaviour",
@@ -185,21 +149,21 @@ var behaviour  = {
   //
 
   composition: {
-      "VID01": { target: testSource1, functions: source_functions },
-      "VID02": { target: testSource2, functions: source_functions },
-      "VID03": { target: testSource3, functions: source_functions },
-      "VID04": { target: testSource4, functions: source_functions },
-      "MIX01": { target: mixer1, functions: mixer_functions },
-      "MIX02": { target: mixer2, functions: mixer_functions },
-      "MIX03": { target:  mixer3, functions: mixer_functions },
-      "MIX04": { target:  mixer4, functions: mixer_functions },    // VID01 in, VID03 out
-      "MIX05": { target:  mixer5, functions: mixer_functions },   // mixer4 in, VID03 in, --> out
-      "SWC01": { target:  switcher1 , functions: mixer_functions },
-      "FIL01": { target:  filemanager1, functions: filemanager_functions },
-      "FIL02": { target:  filemanager2, functions: filemanager_functions },
-      "FIL03": { target:  filemanager3, functions: filemanager_functions },
-      "FIL04": { target:  filemanager4, functions: filemanager_functions },
-      "BPM01":  { target: bpm, functions: bpm_functions }
+      "VID01": { target: testSource1, functions: testSource1.function_list },
+      "VID02": { target: testSource2, functions: testSource2.function_list },
+      "VID03": { target: testSource3, functions: testSource3.function_list },
+      "VID04": { target: testSource4, functions: testSource4.function_list },
+      "MIX01": { target: mixer1, functions: mixer1.function_list },
+      "MIX02": { target: mixer2, functions: mixer2.function_list },
+      "MIX03": { target:  mixer3, functions: mixer3.function_list },
+      "MIX04": { target:  mixer4, functions: mixer4.function_list },    // VID01 in, VID03 out
+      "MIX05": { target:  mixer5, functions: mixer5.function_list },   // mixer4 in, VID03 in, --> out
+      "SWC01": { target:  switcher1 , functions: switcher1.function_list },
+      "FIL01": { target:  filemanager1, functions: filemanager1.function_list },
+      "FIL02": { target:  filemanager2, functions: filemanager2.function_list },
+      "FIL03": { target:  filemanager3, functions: filemanager3.function_list },
+      "FIL04": { target:  filemanager4, functions: filemanager4.function_list },
+      "BPM01":  { target: bpm, functions: bpm.function_list }
   },
 
 
@@ -313,7 +277,7 @@ var behaviour  = {
     {
       action: { "method": "changez", "on": [ filemanager3 ] },                     // 18
       mod: { code: "4b", value: 9, type: 'beats', repeat: true, after: null }
-    },
+    }
 
 
     //{
@@ -336,6 +300,7 @@ var behaviour  = {
     */
   ]
 }
+
 var u = new Utils()
 u.get('/io', function(d) {
   console.log(d)
@@ -343,6 +308,63 @@ u.get('/io', function(d) {
   myBehaviour.load(behaviour)
   myBehaviour.checkSheets()
 })
+
+
+// -----------------------------------------------------------------------------
+var socket = io();
+dips = false
+
+// used in behaviour
+var _beats = 0
+
+// move this to the bpm
+var checkBeats = function(_num) {
+  _beats += 1
+  //console.log(_beats)
+  socket.emit('command', {"command":"beats", "payload": _num});
+  //setTimeout( checkBeats, ((60/window.bpm_test)*1000) )
+  //console.log(" IO chackbeats callee", _num, window.bpm_test )
+};
+
+//socket.emit('command', { "command":"identify", "payload": "viewer" });
+
+socket.on('ping', function(msg) {
+  // send pong, uuid
+  socket.emit('pong');
+})
+
+socket.on('command', function(msg) {
+  if ( msg.command != "beats" ) console.log(" IO command:", msg)
+
+  socket.on('beats', function(msg){
+    // if !dibs
+    // beats = beats
+    // console.log(" IO beats!")
+  });
+
+  if ( msg.command == "welcome" ) {
+    console.log(" IO you are: ", msg.payload )
+    socket.emit('command', {"command":"dibs", "payload": msg.payload } );
+  }
+
+  if ( msg.command == "dibs" ) {
+    console.log(" IO send command dibs", msg)
+    //if (msg.payload == uuid ) {
+    //  dibs = true
+    //  console.log(" IO Has dibs!")
+    //}
+  }
+
+  if ( msg.command == "updatesheets" ) {
+    console.log(" IO updatesheets", msg)
+    console.log(msg.payload.sheets)
+    sheets = JSON.parse(msg.payload.sheets)
+    myBehaviour.sheets = JSON.parse(msg.payload.sheets)
+    myBehaviour.sheet_index = parseInt(JSON.parse(msg.payload.sheetindex))
+    // myBehaviour.load(behaviour)
+  }
+})
+
 
 
 

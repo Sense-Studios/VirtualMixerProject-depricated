@@ -1,6 +1,14 @@
 function FileManager( _source ) {
 
   var _self = this
+
+  try {
+    renderer
+  } catch {
+    _self.function_list = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+    return
+  }
+
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""

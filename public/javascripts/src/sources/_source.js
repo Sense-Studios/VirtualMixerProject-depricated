@@ -12,7 +12,7 @@ function Source( renderer, options ) {
 
 
   _self.type = "Source"
-
+  _self.function_list = [["JUMP","method","jump"]]
   // override these
 
   // program interface

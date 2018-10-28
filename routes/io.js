@@ -174,7 +174,7 @@ router.post('/', function (req, res) {
 router.get('/', function(req, res, next) {
   //  console.log(msg)
     //$('#messages').append($('<li>').text(msg));
-  console.log('this is io', io)
+  console.log('got /io root, ping') //, io)
   //console.log('this is app', app )
   io.emit('command', 'ping')
   //console.log( express )
