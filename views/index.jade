@@ -1,10 +1,11 @@
 extends layout
 
-block content
+block content  
+  
   // h1= title
   // p Wikommen to #{title}
   // a(href='http://www.xangadix.net') with a link
-
+  
   canvas#glcanvas
   .blink
   pre#info
@@ -18,3 +19,6 @@ block content
 
   // YOUR STYLE
   link(rel='stylesheet', href='/stylesheets/style.css')
+
+  
+  include editors/hud
