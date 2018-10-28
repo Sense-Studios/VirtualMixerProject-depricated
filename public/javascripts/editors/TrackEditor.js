@@ -3,27 +3,21 @@ var sheets = [[]]
 var sheet_index = 0
 var track
 
-var blank_functions = [[".....", "",""]]
-var mixer_functions = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
-var filemanager_functions = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
-var source_functions = [["JUMP","internal","jump"]]
-var bpm_functions = [ ["AUTO", "method", "toggleAutoBpm"],["MODDOWN", "method", "modDown"],["MODUP", "method", "modUp"],["MOD", "method", "modNum"]]
-
 // instruments ?
 var options = [
-  [ ".....", blank_functions ],
-  [ "MIX01", mixer_functions ],
-  [ "MIX02", mixer_functions ],
-  [ "MIX03", mixer_functions ],
-  [ "MIX04", mixer_functions ],
-  [ "MIX05", mixer_functions ],
-  [ "VID01", source_functions ],
-  [ "VID02", source_functions ],
-  [ "VID03", source_functions ],
-  [ "FIL01", filemanager_functions ],
-  [ "FIL02", filemanager_functions ],
-  [ "FIL03", filemanager_functions ],
-  [ "BPM01", bpm_functions ]
+  [ ".....", (new Mixer()).function_list ],
+  [ "MIX01", (new Mixer()).function_list ],
+  [ "MIX02", (new Mixer()).function_list ],
+  [ "MIX03", (new Mixer()).function_list ],
+  [ "MIX04", (new Mixer()).function_list ],
+  [ "MIX05", (new Mixer()).function_list ],
+  [ "VID01", (new Source()).function_list ],
+  [ "VID02", (new Source()).function_list ],
+  [ "VID03", (new Source()).function_list ],
+  [ "FIL01", (new FileManager()).function_list ],
+  [ "FIL02", (new FileManager()).function_list ],
+  [ "FIL03", (new FileManager()).function_list ],
+  [ "BPM01", (new BPM()).function_list ]
 ]
 
 var TrackEditor = function( _options ) {
@@ -193,7 +187,9 @@ socket.on('chat message', function(msg){
 });
 
 socket.on('command', function(msg){
-  if (msg.command != "beats") console.log(msg)
+  console.log(msg)
+  // console.log(msg)
+
   //$('#messages').append($('<li>').text(msg));
 
   // setUID
