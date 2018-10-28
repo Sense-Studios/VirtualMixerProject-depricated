@@ -27,6 +27,8 @@ function Mixer( renderer, options ) {
 
   // create and instance
   var _self = this;
+  _self.function_list = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
+  if (renderer == undefined) return
 
   // set or get uid
   if ( options.uuid == undefined ) {

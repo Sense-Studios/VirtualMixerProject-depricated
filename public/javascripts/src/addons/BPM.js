@@ -13,8 +13,42 @@
  */
 
 function BPM( renderer, options ) {
-  // returns a floating point between 1 and 0, in sync with a bpm
+
   var _self = this
+
+  _self.function_list = [
+    ["AUTO", "method", "toggleAutoBpm"],
+    ["MODDOWN", "method", "modDown"],
+    ["MODUP", "method", "modUp"],
+    ["MOD", "method", "modNum"]
+  ]
+
+  // define scheme for this Addon?
+  /*
+  _self.scheme = function() {
+    var scheme = {
+      description: {
+        "name": "BPM",
+        "type": "Addon"
+      },
+      inputs: {
+        "bypass": "Boolean",
+        "audio": "Addon",
+        "mod": "number"
+      },
+      outputs: {
+        "bpm": "number",
+        "bpm_float": "float"
+      }
+    }
+    return scheme;
+  }
+  */
+
+  if ( renderer == undefined ) return
+  // returns a floating point between 1 and 0, in sync with a bpm
+
+
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -72,15 +106,23 @@ function BPM( renderer, options ) {
    * @description Audio analysis
    * @member Addon#BPM#useAutoBpm#
    * @member Addon#BPM#autoBpmData#
-   * @member Addon#BPM#useMicrophone
+   * @member Addon#BPM#tempodata_bpm#
    * @member Addon#BPM#audio_src
+   * @member Addon#BPM#useMicrophone
    */
-  _self.useAutoBpm = true      // auto bpm
+  _self.useAutoBpm = false      // auto bpm
+  _self.tempodata_bpm = 128     // from music
   _self.mute = false
   _self.autoBpmData = {}       // info object for the auto bpm
-  _self.useMicrophone = false  // use useMicrophone for autoBPM
+
   _self.audio_src = ""         // audio file or stream (useMicrophone = false)
+
+  // TODO
+  _self.useMicrophone = false  // use useMicrophone for autoBPM
+
+  // DEPRICATED
   _self.bypass = false
+
 
   // source.renderer ?
   var nodes = []
@@ -91,27 +133,7 @@ function BPM( renderer, options ) {
   // add to renderer
   renderer.add(_self)
 
-  // define scheme for this Addon
-  /*
-  _self.scheme = function() {
-    var scheme = {
-      description: {
-        "name": "BPM",
-        "type": "Addon"
-      },
-      inputs: {
-        "bypass": "Boolean",
-        "audio": "Addon",
-        "mod": "number"
-      },
-      outputs: {
-        "bpm": "number",
-        "bpm_float": "float"
-      }
-    }
-    return scheme;
-  }
-  */
+
 
   // init with a tap contoller
   _self.init = function() {
@@ -124,9 +146,17 @@ function BPM( renderer, options ) {
   // UPDATE
   var starttime = (new Date()).getTime()
   _self.update = function() {
-    nodes.forEach( function( node ) {
-      if ( _self.useAutoBpm ) node( _self.render() );
-    });
+
+    // rename useAnalyser?
+    if ( _self.useAutoBpm ) {
+      _self.bpm = _self.tempodata_bpm
+    }
+
+    if ( !_self.disabled ) {
+      nodes.forEach( function( node ) {
+        node( _self.render() );
+      });
+    }
 
     c = ((new Date()).getTime() - starttime) / 1000;
     _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
@@ -155,8 +185,13 @@ function BPM( renderer, options ) {
   _self.toggleAutoBpm = function( _num ) {
     _self.useAutoBpm  = !_self.useAutoBpm
     console.log("--->", _self.useAutoBpm  )
-
   }
+
+  _self.turnOff = function() {
+    bpm.audio.muted = false
+    bpm.useAutoBpm = false
+  }
+
   // add nodes, implicit
   _self.add = function( _func ) {
     nodes.push( _func )
@@ -325,14 +360,14 @@ function BPM( renderer, options ) {
       // console.log(" ### AUTOBPM: ",  window.calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
 
       // write the test data globally (needs uiid?)
-      window.bpm_test = tempoData.bpm
+      _self.tempodata_bpm = tempoData.bpm
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
     }
   }
 
-  // blink on the beat
+  // blink on the beat with element with class .blink
   var doBlink = function() {
     if ( document.getElementsByClassName('blink').length == 0 ) return
     if ( audio.paused ) {
@@ -344,11 +379,11 @@ function BPM( renderer, options ) {
         document.getElementsByClassName('blink')[0].style.opacity = 1
       }
     }
-    setTimeout( doBlink, (60/window.bpm_test)*1000 )
+    setTimeout( doBlink, (60/ (_self.bpm) )*1000 / _self.mod    )
   }
   doBlink()
 
-  // rewrite of getTempo without display and local vars
+  // get bpm tempo by analyising audio stream
   var getTempo = function( _data ) {
     foundpeaks = []                    // reset foundpeaks
     peaks = new Array( _data.length )  // reset peaks
@@ -376,7 +411,9 @@ function BPM( renderer, options ) {
     if ( tempoCounts.length == 0 ) {
       tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
     }else{
-      // DISPLAY
+
+
+      // DISPLAY, for debugging, requires element with an .info class
       var html = ""
       tempoCounts.reverse().forEach(function(v,i) {
         html += i + ", " + v.tempo + ", " + v.count + "\t ["
@@ -390,8 +427,10 @@ function BPM( renderer, options ) {
       if (document.getElementById('info') != null) {
         document.getElementById('info').html = html
       }
+
     }
 
+    // Callibration feedback (~24 seconids)
     var confidence = "calibrating"
     var calibrating = false
     if ( _data[0] === undefined ) {
@@ -400,6 +439,7 @@ function BPM( renderer, options ) {
     }else{
       calibrating = false
 
+      // race condition
       if (tempoCounts[0] === undefined  || tempoCounts[1] === undefined ) {
         console.log("holdit")
         return
