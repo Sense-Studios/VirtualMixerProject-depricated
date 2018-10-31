@@ -9,7 +9,8 @@ var source2 = new VideoSource(renderer, {src:""})
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
 var bpm = new BPM( renderer, { audio: "" })
-var filemanager = new FileManager( renderer, { set: "/sets/notv.json"} )
+var filemanager = new FileManager( source1 )
+filemanager.load_set("/sets/notv.json")
 
 // finally asign that mixer to the output
 var output = new Output( renderer, mixer1 )

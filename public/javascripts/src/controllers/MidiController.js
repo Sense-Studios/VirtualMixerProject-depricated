@@ -69,8 +69,9 @@ function MidiController( renderer, options ) {
 
   // these are the rest of the buttons
   var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
-  var faders        = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
-  var faders_opaque = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+  var faders        = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
+  var faders_opaque = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+  var listeners = []
 
   // request MIDI access
   if (navigator.requestMIDIAccess) {
@@ -155,17 +156,14 @@ function MidiController( renderer, options ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
         // DO STUFF ON DOUBLECLICK
-        output.send( [ 0x90, e.data[1], GREEN_BLINK ] );
-
-
-        console.log("blink2")
+        output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
         doubleclick = true
+
         // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         faders_opaque[e.data[1]] = 1
         // var source = chain1.getChainLink( e.data[1] )
         // if (source.video) source.video.currentTime = Math.random() * source.video.duration
 
-        console.log("toggle chain")
         setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false}, 350)
         return
       }
@@ -173,7 +171,11 @@ function MidiController( renderer, options ) {
     setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
     //console.log( doubleclickbuffer )
 
-
+    listeners.forEach( function( val, i ) {
+      if ( val.btn == e.data[1] ) {
+        val.cb( e.data )
+      }
+    })
 
     if (e.data[1] == 48) {
       //console.log( e.data[2] / 126 )
@@ -250,20 +252,11 @@ function MidiController( renderer, options ) {
     //window.addEventListener( 'keydown', keyHandler )
   }
 
-  _self.update = function() {
+  _self.update = function() {}
+
+  _self.addEventListener = function( _num, _callback ) {
+    listeners.push({ btn: _num, cb: _callback })
   }
 
-  _self.scheme = function() {
-    var scheme = {
-      inputs: {
-      },
-      outputs: {
-        tones: [],
-        floats: [],
-        visual: [],
-        audio: []
-      }
-    }
-    return scheme
-  }
+  _self.scheme = function() {}
 }

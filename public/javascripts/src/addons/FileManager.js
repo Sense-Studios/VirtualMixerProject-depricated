@@ -4,7 +4,7 @@ function FileManager( _source ) {
 
   try {
     renderer
-  } catch {
+  } catch(e) {
     _self.function_list = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
     return
   }
@@ -18,6 +18,13 @@ function FileManager( _source ) {
   _self.file
   _self.renderer = renderer // do we even need this ?!!
 
+  _self.load_set = function( _set ) {
+    var u = new Utils()
+    u.get( _set, function(d) {
+      console.log("-->", d)
+      _self.set = JSON.parse(d)
+    })
+  }
 
   _self.setSrc = function( file ) {
     console.log("set source: ", file)
@@ -62,6 +69,13 @@ function FileManager( _source ) {
 
   // load another source from the stack
   _self.change = function( _tag ) {
+
+    if ( _self.set.length != 0 ) {
+      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
+      console.log("from set:", r )
+      _self.setSrc( r )
+    }
+    return
 
     if ( programs.length == 0 ) return "no programs"
     if ( _tag ) {
