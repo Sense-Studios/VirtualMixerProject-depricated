@@ -43,10 +43,13 @@ filemanager4.load('/sets/occupy_chaos.json')
 // -----------------------------------------------------------------------------
 // create a bpm addon
 var bpm = new BPM( renderer )
+var audioanalysis1 = new AudioAnalysis(renderer)
 
 // add the bpm to some of the mixer(-pod)
 bpm.add( mixer4.pod )
-bpm.add( mixer5.pod )
+audioanalysis1.add( mixer5.pod )
+
+//audioanalysis1.audio.muted = true
 
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
@@ -111,12 +114,13 @@ setTimeout( function() {
   filemanager1.change()
   filemanager2.change()
   filemanager3.change()
-  bpm.audio.muted = true
-  bpm.useAutoBpm = false
+
+  //bpm.audio.muted = true
+  //bpm.useAutoBpm = false
 
 }, 500 )
 
-bpm.mod = 0.125
+bpm.mod = 0.5
 bpm.useAutoBpm = false
 
 // -----------------------------------------------------------------------------
