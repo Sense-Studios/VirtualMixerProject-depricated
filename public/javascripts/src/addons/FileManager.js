@@ -1,11 +1,14 @@
+
+
+
 function FileManager( _source ) {
 
   var _self = this
 
   try {
     renderer
-  } catch {
-    _self.function_list = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+  } catch(e) {
+    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
     return
   }
 
