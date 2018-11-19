@@ -126,11 +126,23 @@ function AudioAnalysis( renderer ) {
   bufferLength = analyser.frequencyBinCount;
 
   // firstload for mobile, forces all control to the site on click
-  document.body.addEventListener('click', function() {
-    console.log("AudioAnalysis is initialized!", audio.src);
+  var forceFullscreen = function() {
+    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     audio.play();
     document.body.webkitRequestFullScreen()
-  });
+    document.body.removeEventListener('click', forceFullscreen);
+  }
+
+  document.body.addEventListener('click', forceFullscreen)
+
+  _self.disconnectOutput = function() {
+    source.disconnect(context.destination);
+  }
+
+  _self.connectOutput = function() {
+    source.connect(context.destination);
+  }
+
 
   // initialize Audio, used in the first run
   var initializeAudio = new Promise( function( resolve, reject ) {
@@ -139,6 +151,7 @@ function AudioAnalysis( renderer ) {
 
     // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
+    audioanalysis1
 
     resolve(audio);
     reject(err);
