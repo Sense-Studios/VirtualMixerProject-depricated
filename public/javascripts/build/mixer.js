@@ -780,6 +780,9 @@ function BPM( renderer, options ) {
 
 } // end BPM
 
+
+
+
 function FileManager( _source ) {
 
   var _self = this
@@ -787,7 +790,7 @@ function FileManager( _source ) {
   try {
     renderer
   } catch(e) {
-    _self.function_list = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
     return
   }
 
@@ -802,8 +805,9 @@ function FileManager( _source ) {
 
   _self.load_set = function( _set ) {
     var u = new Utils()
-    u.get('', function(d) {
+    u.get( _set, function(d) {
       console.log("-->", d)
+      _self.set = JSON.parse(d)
     })
   }
 
@@ -850,6 +854,13 @@ function FileManager( _source ) {
 
   // load another source from the stack
   _self.change = function( _tag ) {
+
+    if ( _self.set.length != 0 ) {
+      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
+      console.log("from set:", r )
+      _self.setSrc( r )
+    }
+    return
 
     if ( programs.length == 0 ) return "no programs"
     if ( _tag ) {
@@ -1673,8 +1684,9 @@ function MidiController( renderer, options ) {
 
   // these are the rest of the buttons
   var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
-  var faders        = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
-  var faders_opaque = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+  var faders        = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
+  var faders_opaque = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
+  var listeners = []
 
   // request MIDI access
   if (navigator.requestMIDIAccess) {
@@ -1759,17 +1771,14 @@ function MidiController( renderer, options ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
         // DO STUFF ON DOUBLECLICK
-        output.send( [ 0x90, e.data[1], GREEN_BLINK ] );
-
-
-        console.log("blink2")
+        output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
         doubleclick = true
+
         // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         faders_opaque[e.data[1]] = 1
         // var source = chain1.getChainLink( e.data[1] )
         // if (source.video) source.video.currentTime = Math.random() * source.video.duration
 
-        console.log("toggle chain")
         setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false}, 350)
         return
       }
@@ -1777,7 +1786,11 @@ function MidiController( renderer, options ) {
     setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
     //console.log( doubleclickbuffer )
 
-
+    listeners.forEach( function( val, i ) {
+      if ( val.btn == e.data[1] ) {
+        val.cb( e.data )
+      }
+    })
 
     if (e.data[1] == 48) {
       //console.log( e.data[2] / 126 )
@@ -1854,22 +1867,13 @@ function MidiController( renderer, options ) {
     //window.addEventListener( 'keydown', keyHandler )
   }
 
-  _self.update = function() {
+  _self.update = function() {}
+
+  _self.addEventListener = function( _num, _callback ) {
+    listeners.push({ btn: _num, cb: _callback })
   }
 
-  _self.scheme = function() {
-    var scheme = {
-      inputs: {
-      },
-      outputs: {
-        tones: [],
-        floats: [],
-        visual: [],
-        audio: []
-      }
-    }
-    return scheme
-  }
+  _self.scheme = function() {}
 }
 
 NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
