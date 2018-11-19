@@ -6,7 +6,8 @@ Vidi.constructor = Vidi;  // re-assign constructor
  * @constructor Controller#Vidi
  * @interface
  *
- * Yes, The Visual Instrument Digital Interface is here.
+ * @description
+ *  Yes, The Visual Instrument Digital Interface is here. We're not sure what it does though.
  */
 
 function Vidi() {

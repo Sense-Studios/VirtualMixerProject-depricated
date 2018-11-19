@@ -1,3 +1,18 @@
+/**
+ * @description
+ *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
+ *   the BPM is calculated based on an input music stream (mp3 file)
+ *
+ * @example
+ * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ * var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
+ * analysis.add( mixer1.pod )
+ * @constructor Addon#AudioAnalysis
+ * @implements Addon
+ * @param {GlRenderer} renderer
+ * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
+ */
+
 function AudioAnalysis( renderer ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -8,71 +23,35 @@ function AudioAnalysis( renderer ) {
   _self.audio = ""
   _self.bypass = false
 
-  // keep an internal of this
+  // main bpm numbers
   _self.bpm = 128
   _self.bpm_float = 128
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
 
+  // private
   var calibrating = true
-
-    // source.renderer ?
   var nodes = []
-
-  // counter
   var c = 0
-
-  // not implemented
-  // _self.scheme = function() {}
+  var starttime = (new Date()).getTime()
 
   // add to renderer
   renderer.add(_self)
 
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init AudioAnalysis Addon.")
-    //window.addEventListener( 'keydown', keyHandler )
-    initializeAutoBpm()
-  }
-
-  var starttime = (new Date()).getTime()
-  _self.update = function() {
-    // var tempoData = getTempo(dataSet)
-    // getBlackout // TODO
-    // getAmbience // TODO
-    //
-    if ( _self.bypass ) return
-
-    // update nodes
-    if ( !_self.disabled ) {
-      nodes.forEach( function( node ) {
-        node( _self.render() );
-      });
-    }
-
-    // get new numbers
-    _self.bpm = _self.tempodata_bpm
-    c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
-  }
-
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
-  }
-
-  // add nodes, implicit
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
-  // ---------------------------------------------------------------------------
-
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
+
+  /**
+   * @description Audio element
+   * @member Addon#BPM#audio_src
+   * @param {HTMLMediaElement} reference to the virtual media element
+   *
+   *  HTMLMediaElement AUDIO reference
+   *
+  */
   _self.audio = audio
+
   var context = new AudioContext(); // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -132,6 +111,44 @@ function AudioAnalysis( renderer ) {
     document.body.webkitRequestFullScreen()
   });
 
+  // main ----------------------------------------------------------------------
+  _self.init = function() {
+    console.log("init AudioAnalysis Addon.")
+    initializeAutoBpm()
+  }
+
+  _self.update = function() {
+    if ( _self.bypass ) return
+
+    // var tempoData = getTempo(dataSet)
+    // getBlackout // TODO
+    // getAmbience // TODO
+
+    // update nodes
+    if ( !_self.disabled ) {
+      nodes.forEach( function( node ) {
+        node( _self.render() );
+      });
+    }
+
+    // set new numbers
+    _self.bpm = _self.tempodata_bpm
+    c = ((new Date()).getTime() - starttime) / 1000;
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  // actual --------------------------------------------------------------------
   // initialize Audio, used in the first run
   var initializeAudio = new Promise( function( resolve, reject ) {
     source.connect(bandpassFilter);

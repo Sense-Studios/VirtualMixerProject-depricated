@@ -1,10 +1,11 @@
 /**
  * @description
- *   BPM (Audio analysis)
+ *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- * var bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ * var bpm = new BPM( renderer );
+ * bpm.bpm = 100
  * bpm.add( mixer1.pod )
  * @constructor Addon#BPM
  * @implements Addon
@@ -23,32 +24,8 @@ function BPM( renderer, options ) {
     ["MOD", "method", "modNum"]
   ]
 
-  // define scheme for this Addon?
-  /*
-  _self.scheme = function() {
-    var scheme = {
-      description: {
-        "name": "BPM",
-        "type": "Addon"
-      },
-      inputs: {
-        "bypass": "Boolean",
-        "audio": "Addon",
-        "mod": "number"
-      },
-      outputs: {
-        "bpm": "number",
-        "bpm_float": "float"
-      }
-    }
-    return scheme;
-  }
-  */
-
+  // only return the functionlist
   if ( renderer == undefined ) return
-  // returns a floating point between 1 and 0, in sync with a bpm
-
-
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -134,7 +111,7 @@ function BPM( renderer, options ) {
   renderer.add( _self )
 
 
-
+  // main ----------------------------------------------------------------------
   // init with a tap contoller
   _self.init = function() {
     console.log("init BPM contoller.")
@@ -164,6 +141,18 @@ function BPM( renderer, options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+
+  // actual --------------------------------------------------------------------
   /**
    * @description double the bpm
    * @function Addon#BPM#modUp
@@ -191,16 +180,6 @@ function BPM( renderer, options ) {
   _self.turnOff = function() {
     bpm.audio.muted = false
     bpm.useAutoBpm = false
-  }
-
-  // add nodes, implicit
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
   }
 
   // ---------------------------------------------------------------------------
