@@ -150,8 +150,18 @@ function MidiController( renderer, options ) {
     if (doubleclick) return
     doubleclickbuffer.unshift([ e.data[0], e.data[1] ])
     doubleclickbuffer.pop()
+
     if ( doubleclickbuffer.map(function(m) { return m[0] } ).join(",") == doubleclickPattern.join(",") ) {
+
       console.log("blink1")
+      // update event listeners
+      listeners.forEach( function( val, i ) {
+        // doubleclick
+        if ( val.btn == e.data[1] ) {
+          val.cb( e.data, true )
+        }
+      })
+
       if ( doubleclickbuffer.map( function(m) { return m[1] } ).every( (val, i, arr) => val === arr[0] ) ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
@@ -168,14 +178,17 @@ function MidiController( renderer, options ) {
         return
       }
     }
-    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
-    //console.log( doubleclickbuffer )
 
+    // update event listeners
     listeners.forEach( function( val, i ) {
+      // doubleclick
       if ( val.btn == e.data[1] ) {
-        val.cb( e.data )
+        val.cb( e.data, false )
       }
     })
+
+    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
+    //console.log( doubleclickbuffer )
 
     if (e.data[1] == 48) {
       //console.log( e.data[2] / 126 )

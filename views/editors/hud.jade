@@ -1,22 +1,23 @@
 block hud
   
-  // YOUR CODE
-  script(src='/javascripts/editors/hud.js')  
-
   // YOUR STYLE  
   link(rel='stylesheet', href='/stylesheets/editors/hud.css')
   hud
     board
       button ne
       button na
-      button na
-      button na
-      button analyser on
-      button audio on
+      button#changez changez
+      button#reload reolad
+      button#audio_analyser analyser on
+      button#audio_toggle audio on
       
       display beats
-      display 128
+      display#beats_display 128
 
     bash
       textarea#bash_window
       // input(type='text')
+
+
+  // YOUR CODE
+  script(src='/javascripts/editors/hud.js')  
