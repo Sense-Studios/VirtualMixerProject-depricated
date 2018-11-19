@@ -1,6 +1,9 @@
 /**
+ * @summary
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the @GlRenderer
+ *
  * @description
- *   Output
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the {@link GlRenderer}
  *
  * @example
  *  let myChain = new output( renderer, source );
@@ -8,8 +11,8 @@
  *  renderer.render()
  * @implements Module
  * @constructor Module#Output
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer} a reference to the GLrenderer
+ * @param source{Source} any valid source node
  * @author Sense Studios
  */
 function Output(renderer, _source ) {
