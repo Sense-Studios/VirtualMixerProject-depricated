@@ -1,3 +1,6 @@
+
+
+
 function FileManager( _source ) {
 
   var _self = this
@@ -5,7 +8,7 @@ function FileManager( _source ) {
   try {
     renderer
   } catch(e) {
-    _self.function_list = [["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
     return
   }
 
