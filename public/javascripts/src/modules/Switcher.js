@@ -1,4 +1,7 @@
 /**
+ * @summary
+ *   A switcher selects either one of two sources
+ *
  * @description
  *   Switcher
  *
@@ -6,8 +9,8 @@
  *  let mySwitcher = new Switcher( renderer, [ source1, source2 ]] );
  * @constructor Module#Switcher
  * @implements Module
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer}
+ * @param source{Source}
  * @author Sense Studios
  */
 

@@ -1,7 +1,9 @@
 /**
+ * @summary
+ *    A Chain is string of sources, stacked on top of each other
+ *
  * @description
- *   Chains together a string of sources, gives them an alpha channel, and allows for
- *   switching them on and off with fade effects. Ideal for a piano board or a midicontroller
+ *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
  * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
  * @constructor Module#Chain
