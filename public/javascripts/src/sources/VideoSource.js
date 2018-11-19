@@ -1,16 +1,10 @@
 VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
-  // TODO: implement these as arrays ?
-  // This is new, but better?
-  // Or let file manager handle it?
-  // var videos =        [];   // video1, video2, video3, ...
-  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
-  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
-
 /**
  * @description
  *  The videosource allows for playback of video files in the Mixer project
+ *
  * @implements Source
  * @constructor Source#VideoSource
  * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
@@ -46,6 +40,8 @@ function VideoSource(renderer, options) {
 
   // initialize
   _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
 
     console.log("init video source", _self.uuid)
 
@@ -153,7 +149,7 @@ function VideoSource(renderer, options) {
   }
 
   // ===========================================================================
-  // HELPERS
+  // Actual HELPERS
   // ===========================================================================
 
   /**

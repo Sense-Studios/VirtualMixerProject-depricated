@@ -28,4 +28,7 @@ function Source( renderer, options ) {
   _self.paused =       function() {}
   _self.currentFrame = function( _num ) {}  // seconds
   _self.duration =     function() {}        // seconds
+
+  _self.jump =         function() {}
+  //_self.cue =          function() {}
 }

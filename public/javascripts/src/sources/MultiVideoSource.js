@@ -1,69 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: sources/VideoSource.js</title>
+MultiVideoSource.prototype = new Source(); // assign prototype to marqer
+MultiVideoSource.constructor = MultiVideoSource;  // re-assign constructor
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: sources/VideoSource.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>VideoSource.prototype = new Source(); // assign prototype to marqer
-VideoSource.constructor = VideoSource;  // re-assign constructor
+  // TODO: implement these as arrays !
+  // This is new, but better?
+  // Or let file manager handle it?
+  // var videos =        [];   // video1, video2, video3, ...
+  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
+  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
 /**
  * @description
- *  The videosource allows for playback of video files in the Mixer project
+ *  The MultiVideoSource allows for playback of video files in the Mixer project.
+ *  It is very similar to the regular videosource, however it used multiple references to the videofile.
+ *  In doing so it allows for very fast jumping through the video even when it is loading from a remote server.
+ *  The main features are random jumping and a cue list, allowing for smart referincing in video files.
  *
  * @implements Source
- * @constructor Source#VideoSource
- * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+ * @constructor Source#MultiVideoSource
+ * @example let myMultiVideoSource = new MultiVideoSource( renderer, { src: 'myfile.mp4', cues: [ 0, 10, 20, 30 ] } );
  * @param {GlRenderer} renderer - GlRenderer object
- * @param {Object} options - JSON Object
+ * @param {Object} options - JSON Object, with src (file path) and cues, cuepoints in seconds
  */
-function VideoSource(renderer, options) {
+
+function MultiVideoSource(renderer, options) {
 
   // create and instance
   var _self = this;
 
   if ( options.uuid == undefined ) {
-    _self.uuid = "VideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+    _self.uuid = "MultiVideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   } else {
     _self.uuid = options.uuid
   }
 
-  _self.type = "VideoSource"
-
-  // allow bypass
+  _self.type = "MultiVideoSource"
   _self.bypass = true;
-
-  // add to renderer
   renderer.add(_self)
-
-  // set options
   var _options;
   if ( options != undefined ) _options = options;
+  var canvasElement, canvasElementContext, videoTexture;
+  var videoElements = []; // maybe as array?
 
-  // create elements (private)
-  var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
 
   // initialize
@@ -149,7 +126,7 @@ function VideoSource(renderer, options) {
     // expose video and canvas
     /**
      * @description exposes the HTMLMediaElement Video for listeners and control
-     * @member Source#VideoSource#video
+     * @member Source#MultiVideoSource#video
      */
     _self.video = videoElement
     _self.canvas = canvasElement
@@ -160,7 +137,7 @@ function VideoSource(renderer, options) {
 
   _self.update = function() {
     if (_self.bypass = false) return
-    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA &amp;&amp; !videoElement.seeking) {
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
@@ -182,11 +159,11 @@ function VideoSource(renderer, options) {
 
   /**
    * @description
-   *  gets or sets source @file for the videosource
+   *  gets or sets source @file for the MultiVideoSource
    *  file has to be compatible with HTMLMediaElement Video ie. webm, mp4 etc.
    *  We recommend **mp4**
    *
-   * @function Source#VideoSource#src
+   * @function Source#MultiVideoSource#src
    * @param {file} Videofile - full path to file
    */
   _self.src = function( file ) {
@@ -202,25 +179,25 @@ function VideoSource(renderer, options) {
 
   /**
    * @description start the current video
-   * @function Source#VideoSource#play
+   * @function Source#MultiVideoSource#play
    */
   _self.play =         function() { return videoElement.play() }
 
   /**
    * @description pauses the video
-   * @function Source#VideoSource#pause
+   * @function Source#MultiVideoSource#pause
    */
   _self.pause =        function() { return videoElement.pause() }
 
   /**
    * @description returns true then the video is paused. False otherwise
-   * @function Source#VideoSource#paused
+   * @function Source#MultiVideoSource#paused
    */
   _self.paused =       function() { return videoElement.paused }
 
   /**
    * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
-   * @function Source#VideoSource#currentTime
+   * @function Source#MultiVideoSource#currentTime
    * @param {float} time - time in seconds
    */
   _self.currentTime = function( _num ) {
@@ -237,7 +214,7 @@ function VideoSource(renderer, options) {
   // seconds
   /**
    * @description give the duration of the video in seconds (cannot be changed)
-   * @function Source#VideoSource#duration
+   * @function Source#MultiVideoSource#duration
    */
   _self.duration =     function() { return videoElement.duration }    // seconds
 
@@ -273,26 +250,3 @@ function VideoSource(renderer, options) {
 
   // _self.init()
 }
-</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 17 2018 14:46:22 GMT+0100 (CET)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>

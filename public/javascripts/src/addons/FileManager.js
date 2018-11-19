@@ -1,4 +1,18 @@
-
+/**
+ * @summary
+ *   Allows for fast switching between a prefefined list of files (or 'sets' )
+ *
+ * @description
+ *   Allows for fast switching between a prefefined list of files (or 'sets' )
+ *
+ * @example
+ * var myFilemanager = new FileManager( VideoSource )
+ * myFilemanager.load_set( "myset.json")
+ * myFilemanager.change()
+ * @constructor Addon#FileManager
+ * @implements Addon
+ * @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
+ */
 
 
 function FileManager( _source ) {
