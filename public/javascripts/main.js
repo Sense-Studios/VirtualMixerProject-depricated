@@ -1,8 +1,8 @@
 var renderer = new GlRenderer();
 
 // create sources
-var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_5000kbps_h264.mp4' } );
-//var testSource1 = new WebcamSource(renderer, {});
+//var testSource1 = new VideoSource( renderer, { src: '//nabu-dev.s3.amazonaws.com/uploads/video/556ce4f36465764bdf590000/720p_5000kbps_h264.mp4' } );
+var testSource1 = new WebcamSource(renderer, {});
 var gifSource1 = new GifSource(renderer, { src: '/gif/gifshow/5b4cccdec8c97546ca88f2efc589ba58.gif' });
 var gifSource2 = new GifSource(renderer, { src: '/gif/gifshow/5b4cccdec8c97546ca88f2efc589ba58.gif' });
 
