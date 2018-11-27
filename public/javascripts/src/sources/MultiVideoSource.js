@@ -36,10 +36,12 @@ function MultiVideoSource(renderer, options) {
   _self.type = "MultiVideoSource"
   _self.bypass = true;
   renderer.add(_self)
+
   var _options;
   if ( options != undefined ) _options = options;
   var canvasElement, canvasElementContext, videoTexture;
   var videoElements = []; // maybe as array?
+  var currentVideo = null // the curret video
 
   var alpha = 1;
 
@@ -71,6 +73,7 @@ function MultiVideoSource(renderer, options) {
     _self.firstplay = false
 
     // Here we wait for a user to click and take over
+    // especially for mobile
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         var r = Math.random() * videoElement.duration
