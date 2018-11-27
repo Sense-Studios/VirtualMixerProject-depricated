@@ -34,6 +34,8 @@ function VideoSource(renderer, options) {
   var _options;
   if ( options != undefined ) _options = options;
 
+  _self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
+
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
@@ -52,7 +54,7 @@ function VideoSource(renderer, options) {
 
     // set the source
     if ( options.src == undefined ) {
-      videoElement.src = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4";
+      videoElement.src = _self.currentSrc;
     } else {
       videoElement.src = options.src
     }
@@ -161,8 +163,9 @@ function VideoSource(renderer, options) {
    * @function Source#VideoSource#src
    * @param {file} Videofile - full path to file
    */
-  _self.src = function( file ) {
-    videoElement.src = file
+  _self.src = function( _file ) {
+    _self.currentSrc = _file
+    videoElement.src = _file
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();

@@ -32,6 +32,14 @@ function GifSource( renderer, options ) {
   var _options;
   if ( options != undefined ) _options = options;
 
+  // set the source
+  if ( options.src == undefined ) {
+     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+  } else {
+    _self.currentSrc = options.src
+  }
+
+
   // create elements (private)
   var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
 
@@ -72,9 +80,10 @@ function GifSource( renderer, options ) {
     gifElement.setAttribute('rel:auto_play', '1')
     supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
     // sup1.load();
-    console.log(_self.uuid, " Load...")
-    supergifelement.load_url("http://nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif")
-    _self.bypass = false
+    console.log(_self.uuid, " Load", _self.currentSrc, "..." )
+    supergifelement.load_url( _self.currentSrc )
+    console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
+     _self.bypass = false
   }
 
   _self.update = function() {
@@ -99,6 +108,7 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
+    _self.currentSrc = _file
     gifElement = document.createElement('div')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')

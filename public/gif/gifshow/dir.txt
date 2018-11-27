@@ -1,0 +1,18 @@
+ Volume in drive D is Work
+ Volume Serial Number is 901D-F85D
+
+ Directory of D:\_work\VirtualMixerProject\public\gif\gifshow
+
+26-Nov-18  23:35    <DIR>          .
+26-Nov-18  23:35    <DIR>          ..
+17-Sep-18  23:37           484,746 2d09f2844398497960c8a39c0693b16c.gif
+13-Nov-18  01:07         2,437,215 39c7ce68ca5edd7c2caff6038d529c2a.gif
+26-Nov-18  23:27         2,569,125 5b4cccdec8c97546ca88f2efc589ba58.gif
+13-Nov-18  00:58         2,346,088 6378418073e3c0ae0d6bb6aab85e4fd8.gif
+13-Nov-18  01:26         1,221,287 6f0c35642bfb102dfbc8f7876bf95a02 (1).gif
+13-Nov-18  01:23         2,695,963 b4752f118e07ab5f3153712b3636704d.gif
+13-Nov-18  01:07         8,009,290 c4341013ac4d1db413a3ae85f63f832e.gif
+13-Nov-18  01:25           194,136 d5a7cb46e2f15a8fed10aaf1dd00965c.gif
+26-Nov-18  23:35                 0 dir.txt
+               9 File(s)     19,957,850 bytes
+               2 Dir(s)  42,843,975,680 bytes free
