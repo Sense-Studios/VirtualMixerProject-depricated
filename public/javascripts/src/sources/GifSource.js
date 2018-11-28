@@ -75,13 +75,16 @@ function GifSource( renderer, options ) {
     window.image_source = new Image()
 
     //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
-    gifElement = document.createElement('div')
+    gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
     supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
+    supergifelement.draw_while_loading = true
+
     // sup1.load();
     console.log(_self.uuid, " Load", _self.currentSrc, "..." )
-    supergifelement.load_url( _self.currentSrc )
+    //supergifelement.load_url( _self.currentSrc )
+    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
     console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
      _self.bypass = false
   }
@@ -109,11 +112,8 @@ function GifSource( renderer, options ) {
   // Helpers
   _self.src = function( _file ) {
     _self.currentSrc = _file
-    gifElement = document.createElement('div')
-    gifElement.setAttribute('id', 'gif_'+_self.uuid)
-    gifElement.setAttribute('rel:auto_play', '1')
-    supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
-    supergifelement.load_url(_file)
+    supergifelement.pause()
+    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
   }
 
   _self.play =         function() { return supergifelement.play() }

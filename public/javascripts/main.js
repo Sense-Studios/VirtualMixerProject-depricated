@@ -14,20 +14,25 @@ mixer1.mixMode(5)
 var output = new Output( renderer, mixer2 )
 
 // create a bpm addon
-var bpm = new BPM( renderer )
+// var bpm = new BPM( renderer )
 var audioanalysis1 = new AudioAnalysis(renderer)
-var audioanalysis2 = new AudioAnalysis(renderer)
-audioanalysis2.mod = 0.6
-audioanalysis2.disconnectOutput()
+//var audioanalysis2 = new AudioAnalysis(renderer)
+//audioanalysis2.mod = 0.6
+//audioanalysis2.disconnectOutput()
 
 renderer.init();         // init
 renderer.render();       // start update & animation
 
 //mixer1.pod(bpm)
 //bpm.add( mixer1.pod )
+audioanalysis1.add( mixer2.pod )
 //audioanalysis1.add( mixer1.pod )
-audioanalysis1.add( mixer1.pod )
-audioanalysis2.add( mixer2.pod )
+//audioanalysis1.add( mixer2.pod )
+//mixer1/
+//setInterval( function() {
+//  mixer1.pod( audioanalysis1.render()*audioanalysis1.render()  )
+  //console.log( mixer1.pod(), audioanalysis1.render() )
+//}, 10 )
 
 
 

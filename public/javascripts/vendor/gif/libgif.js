@@ -17,7 +17,7 @@
 	Image tag attributes:
 
 		rel:animated_src -	If this url is specified, it's loaded into the player instead of src.
-							This allows a preview frame to be shown until animated gif data is streamed into the canvas
+							         This allows a preview frame to be shown until animated gif data is streamed into the canvas
 
 		rel:auto_play -		Defaults to 1 if not specified. If set to zero, a call to the play() method is needed
 
@@ -765,7 +765,7 @@
 
                 offset = frameOffsets[i];
 
-                tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
+                tmpCanvas.getContext("2d").putImageData (frames[i].data, offset.x, offset.y);
                 ctx.globalCompositeOperation = "copy";
                 ctx.drawImage(tmpCanvas, 0, 0);
             };
