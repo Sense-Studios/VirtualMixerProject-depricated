@@ -1,4 +1,5 @@
 
+
 /**
  * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
  * @constructor GlRenderer
@@ -3382,7 +3383,7 @@ function TextSource(renderer, options) {
   var title_text_font_size = 64
   var small_text_x = 512
   _self.update = function() {
-    
+
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
