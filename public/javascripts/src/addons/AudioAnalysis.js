@@ -72,16 +72,15 @@ function AudioAnalysis( renderer ) {
   var intervalCounts = [];
 
   // this should be set externally (at createion)
-  // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
 
-  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/proxy/nsb'
-  // audio.src = '/proxy/dunklenacht' // dunklenacht
+  audio.src = '/radio/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  _self.audio_src = '/radio/nsb'
+  // audio.src = '/radio/dunklenacht' // dunklenacht
 
   // if ( _self.options.audio ) audio.src = _self.options.audio
 
