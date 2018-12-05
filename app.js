@@ -10,7 +10,7 @@ var app = express();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var proxyRouter = require('./routes/proxy');
+var radioRouter = require('./routes/radio');
 var ioRouter = require('./routes/io');
 
 // view engine setup
@@ -37,7 +37,7 @@ app.use(sassMiddleware({
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/proxy', proxyRouter);
+app.use('/radio', radioRouter);
 app.use('/io', ioRouter);
 app.use(express.static(path.join(__dirname, 'public')));
 
