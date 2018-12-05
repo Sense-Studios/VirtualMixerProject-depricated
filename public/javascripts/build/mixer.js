@@ -154,6 +154,21 @@ var GlRenderer = function() {
   }
 }
 
+/**
+ * @description
+ *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
+ *   the BPM is calculated based on an input music stream (mp3 file)
+ *
+ * @example
+ * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ * var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
+ * analysis.add( mixer1.pod )
+ * @constructor Addon#AudioAnalysis
+ * @implements Addon
+ * @param {GlRenderer} renderer
+ * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
+ */
+
 function AudioAnalysis( renderer ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -164,71 +179,35 @@ function AudioAnalysis( renderer ) {
   _self.audio = ""
   _self.bypass = false
 
-  // keep an internal of this
+  // main bpm numbers
   _self.bpm = 128
   _self.bpm_float = 128
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
 
+  // private
   var calibrating = true
-
-    // source.renderer ?
   var nodes = []
-
-  // counter
   var c = 0
-
-  // not implemented
-  // _self.scheme = function() {}
+  var starttime = (new Date()).getTime()
 
   // add to renderer
   renderer.add(_self)
 
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init AudioAnalysis Addon.")
-    //window.addEventListener( 'keydown', keyHandler )
-    initializeAutoBpm()
-  }
-
-  var starttime = (new Date()).getTime()
-  _self.update = function() {
-    // var tempoData = getTempo(dataSet)
-    // getBlackout // TODO
-    // getAmbience // TODO
-    //
-    if ( _self.bypass ) return
-
-    // update nodes
-    if ( !_self.disabled ) {
-      nodes.forEach( function( node ) {
-        node( _self.render() );
-      });
-    }
-
-    // get new numbers
-    _self.bpm = _self.tempodata_bpm
-    c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
-  }
-
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
-  }
-
-  // add nodes, implicit
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
-  // ---------------------------------------------------------------------------
-
   // setup ---------------------------------------------------------------------
   var audio = new Audio()
+
+  /**
+   * @description Audio element
+   * @member Addon#BPM#audio_src
+   * @param {HTMLMediaElement} reference to the virtual media element
+   *
+   *  HTMLMediaElement AUDIO reference
+   *
+  */
   _self.audio = audio
+
   var context = new AudioContext(); // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -249,16 +228,15 @@ function AudioAnalysis( renderer ) {
   var intervalCounts = [];
 
   // this should be set externally (at createion)
-  // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
   console.log("SET AUDIO SRC")
   //audio.setAttribute('crossorigin', 'anonymous');
   // audio.src =  'http://37.220.36.53:7904';
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
 
-  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/proxy/nsb'
-  // audio.src = '/proxy/dunklenacht' // dunklenacht
+  audio.src = '/radio/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
+  _self.audio_src = '/radio/nsb'
+  // audio.src = '/radio/dunklenacht' // dunklenacht
 
   // if ( _self.options.audio ) audio.src = _self.options.audio
 
@@ -282,12 +260,62 @@ function AudioAnalysis( renderer ) {
   bufferLength = analyser.frequencyBinCount;
 
   // firstload for mobile, forces all control to the site on click
-  document.body.addEventListener('click', function() {
-    console.log("AudioAnalysis is initialized!", audio.src);
+  var forceFullscreen = function() {
+    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     audio.play();
     document.body.webkitRequestFullScreen()
-  });
+    document.body.removeEventListener('click', forceFullscreen);
+  }
 
+  document.body.addEventListener('click', forceFullscreen)
+
+  _self.disconnectOutput = function() {
+    source.disconnect(context.destination);
+  }
+
+  _self.connectOutput = function() {
+    source.connect(context.destination);
+  }
+
+
+  // main ----------------------------------------------------------------------
+  _self.init = function() {
+    console.log("init AudioAnalysis Addon.")
+    initializeAutoBpm()
+  }
+
+  _self.update = function() {
+    if ( _self.bypass ) return
+
+    // var tempoData = getTempo(dataSet)
+    // getBlackout // TODO
+    // getAmbience // TODO
+
+    // update nodes
+    if ( !_self.disabled ) {
+      nodes.forEach( function( node ) {
+        node( _self.render() );
+      });
+    }
+
+    // set new numbers
+    _self.bpm = _self.tempodata_bpm
+    c = ((new Date()).getTime() - starttime) / 1000;
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  // actual --------------------------------------------------------------------
   // initialize Audio, used in the first run
   var initializeAudio = new Promise( function( resolve, reject ) {
     source.connect(bandpassFilter);
@@ -295,6 +323,7 @@ function AudioAnalysis( renderer ) {
 
     // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
+    audioanalysis1
 
     resolve(audio);
     reject(err);
@@ -542,11 +571,12 @@ function AudioAnalysis( renderer ) {
 
 /**
  * @description
- *   BPM (Audio analysis)
+ *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- * var bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ * var bpm = new BPM( renderer );
+ * bpm.bpm = 100
  * bpm.add( mixer1.pod )
  * @constructor Addon#BPM
  * @implements Addon
@@ -565,32 +595,8 @@ function BPM( renderer, options ) {
     ["MOD", "method", "modNum"]
   ]
 
-  // define scheme for this Addon?
-  /*
-  _self.scheme = function() {
-    var scheme = {
-      description: {
-        "name": "BPM",
-        "type": "Addon"
-      },
-      inputs: {
-        "bypass": "Boolean",
-        "audio": "Addon",
-        "mod": "number"
-      },
-      outputs: {
-        "bpm": "number",
-        "bpm_float": "float"
-      }
-    }
-    return scheme;
-  }
-  */
-
+  // only return the functionlist
   if ( renderer == undefined ) return
-  // returns a floating point between 1 and 0, in sync with a bpm
-
-
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -676,7 +682,7 @@ function BPM( renderer, options ) {
   renderer.add( _self )
 
 
-
+  // main ----------------------------------------------------------------------
   // init with a tap contoller
   _self.init = function() {
     console.log("init BPM contoller.")
@@ -706,6 +712,18 @@ function BPM( renderer, options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+
+  // actual --------------------------------------------------------------------
   /**
    * @description double the bpm
    * @function Addon#BPM#modUp
@@ -733,16 +751,6 @@ function BPM( renderer, options ) {
   _self.turnOff = function() {
     bpm.audio.muted = false
     bpm.useAutoBpm = false
-  }
-
-  // add nodes, implicit
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
   }
 
   // ---------------------------------------------------------------------------
@@ -780,7 +788,21 @@ function BPM( renderer, options ) {
 
 } // end BPM
 
-
+/**
+ * @summary
+ *   Allows for fast switching between a prefefined list of files (or 'sets' )
+ *
+ * @description
+ *   Allows for fast switching between a prefefined list of files (or 'sets' )
+ *
+ * @example
+ * var myFilemanager = new FileManager( VideoSource )
+ * myFilemanager.load_set( "myset.json")
+ * myFilemanager.change()
+ * @constructor Addon#FileManager
+ * @implements Addon
+ * @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
+ */
 
 
 function FileManager( _source ) {
@@ -1765,8 +1787,18 @@ function MidiController( renderer, options ) {
     if (doubleclick) return
     doubleclickbuffer.unshift([ e.data[0], e.data[1] ])
     doubleclickbuffer.pop()
+
     if ( doubleclickbuffer.map(function(m) { return m[0] } ).join(",") == doubleclickPattern.join(",") ) {
+
       console.log("blink1")
+      // update event listeners
+      listeners.forEach( function( val, i ) {
+        // doubleclick
+        if ( val.btn == e.data[1] ) {
+          val.cb( e.data, true )
+        }
+      })
+
       if ( doubleclickbuffer.map( function(m) { return m[1] } ).every( (val, i, arr) => val === arr[0] ) ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
@@ -1783,14 +1815,17 @@ function MidiController( renderer, options ) {
         return
       }
     }
-    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
-    //console.log( doubleclickbuffer )
 
+    // update event listeners
     listeners.forEach( function( val, i ) {
+      // doubleclick
       if ( val.btn == e.data[1] ) {
-        val.cb( e.data )
+        val.cb( e.data, false )
       }
     })
+
+    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
+    //console.log( doubleclickbuffer )
 
     if (e.data[1] == 48) {
       //console.log( e.data[2] / 126 )
@@ -2175,7 +2210,8 @@ Vidi.constructor = Vidi;  // re-assign constructor
  * @constructor Controller#Vidi
  * @interface
  *
- * Yes, The Visual Instrument Digital Interface is here.
+ * @description
+ *  Yes, The Visual Instrument Digital Interface is here. We're not sure what it does though.
  */
 
 function Vidi() {
@@ -2241,9 +2277,11 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
 }
 
 /**
+ * @summary
+ *    A Chain is string of sources, stacked on top of each other
+ *
  * @description
- *   Chains together a string of sources, gives them an alpha channel, and allows for
- *   switching them on and off with fade effects. Ideal for a piano board or a midicontroller
+ *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
  * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
  * @constructor Module#Chain
@@ -2334,8 +2372,7 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
  *    A mixer mixes two sources together.
  *
  * @description
- *   It can crossfade the sources with different _MixModes_ and _BlendModes_
- *   requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
+ *   It can crossfade the sources with different _MixModes_ and _BlendModes_ requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
  * @constructor Module#Mixer
@@ -2344,7 +2381,6 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
  * @param options:Object
  * @author Sense Studios
  */
-
 
  // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
  // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
@@ -2595,8 +2631,11 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
 }
 
 /**
+ * @summary
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the @GlRenderer
+ *
  * @description
- *   Output
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the {@link GlRenderer}
  *
  * @example
  *  let myChain = new output( renderer, source );
@@ -2604,8 +2643,8 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
  *  renderer.render()
  * @implements Module
  * @constructor Module#Output
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer} a reference to the GLrenderer
+ * @param source{Source} any valid source node
  * @author Sense Studios
  */
 function Output(renderer, _source ) {
@@ -2632,6 +2671,9 @@ function Output(renderer, _source ) {
 }
 
 /**
+ * @summary
+ *   A switcher selects either one of two sources
+ *
  * @description
  *   Switcher
  *
@@ -2639,8 +2681,8 @@ function Output(renderer, _source ) {
  *  let mySwitcher = new Switcher( renderer, [ source1, source2 ]] );
  * @constructor Module#Switcher
  * @implements Module
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer}
+ * @param source{Source}
  * @author Sense Studios
  */
 
@@ -2711,6 +2753,21 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
  * @interface
  */
 
+ function Module( renderer, options ) {
+   var _self = this
+
+   /*
+     renderer
+   */
+
+   _self.type = "Module"
+
+   // program interface
+   _self.init =         function() {}
+   _self.update =       function() {}
+   _self.render =       function() {}
+ }
+
 
 
 GifSource.prototype = new Source(); // assign prototype to marqer
@@ -2744,6 +2801,14 @@ function GifSource( renderer, options ) {
   // set options
   var _options;
   if ( options != undefined ) _options = options;
+
+  // set the source
+  if ( options.src == undefined ) {
+     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+  } else {
+    _self.currentSrc = options.src
+  }
+
 
   // create elements (private)
   var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
@@ -2780,14 +2845,18 @@ function GifSource( renderer, options ) {
     window.image_source = new Image()
 
     //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
-    gifElement = document.createElement('div')
+    gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
     supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
+    supergifelement.draw_while_loading = true
+
     // sup1.load();
-    console.log(_self.uuid, " Load...")
-    supergifelement.load_url("http://nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif")
-    _self.bypass = false
+    console.log(_self.uuid, " Load", _self.currentSrc, "..." )
+    //supergifelement.load_url( _self.currentSrc )
+    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
+    console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
+     _self.bypass = false
   }
 
   _self.update = function() {
@@ -2812,11 +2881,9 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
-    gifElement = document.createElement('div')
-    gifElement.setAttribute('id', 'gif_'+_self.uuid)
-    gifElement.setAttribute('rel:auto_play', '1')
-    supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
-    supergifelement.load_url(_file)
+    _self.currentSrc = _file
+    supergifelement.pause()
+    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
   }
 
   _self.play =         function() { return supergifelement.play() }
@@ -2833,6 +2900,262 @@ function GifSource( renderer, options ) {
   }  // seconds
   _self.duration =     function() { return supergifelement.get_length() }        // seconds
 };
+
+MultiVideoSource.prototype = new Source(); // assign prototype to marqer
+MultiVideoSource.constructor = MultiVideoSource;  // re-assign constructor
+
+  // TODO: implement these as arrays !
+  // This is new, but better?
+  // Or let file manager handle it?
+  // var videos =        [];   // video1, video2, video3, ...
+  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
+  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
+
+/**
+ * @description
+ *  The MultiVideoSource allows for playback of video files in the Mixer project.
+ *  It is very similar to the regular videosource, however it used multiple references to the videofile.
+ *  In doing so it allows for very fast jumping through the video even when it is loading from a remote server.
+ *  The main features are random jumping and a cue list, allowing for smart referincing in video files.
+ *
+ * @implements Source
+ * @constructor Source#MultiVideoSource
+ * @example let myMultiVideoSource = new MultiVideoSource( renderer, { src: 'myfile.mp4', cues: [ 0, 10, 20, 30 ] } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object, with src (file path) and cues, cuepoints in seconds
+ */
+
+function MultiVideoSource(renderer, options) {
+
+  // create and instance
+  var _self = this;
+
+  if ( options.uuid == undefined ) {
+    _self.uuid = "MultiVideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  _self.type = "MultiVideoSource"
+  _self.bypass = true;
+  renderer.add(_self)
+
+  var _options;
+  if ( options != undefined ) _options = options;
+  var canvasElement, canvasElementContext, videoTexture;
+  var videoElements = []; // maybe as array?
+  var currentVideo = null // the curret video
+
+  var alpha = 1;
+
+  // initialize
+  _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
+
+    console.log("init video source", _self.uuid)
+
+    // create video element
+    videoElement = document.createElement('video');
+    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.muted= true
+
+    // set the source
+    if ( options.src == undefined ) {
+      videoElement.src = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4";
+    } else {
+      videoElement.src = options.src
+    }
+    console.log('loaded source: ', videoElement.src )
+
+    // set properties
+    videoElement.height = 1024
+    videoElement.width = 1024
+    videoElement.loop = true          // must call after setting/changing source
+    videoElement.load();              // must call after setting/changing source
+    _self.firstplay = false
+
+    // Here we wait for a user to click and take over
+    // especially for mobile
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        var r = Math.random() * videoElement.duration
+        videoElement.currentTime = r
+        videoElement.play();
+        _self.firstplay = true
+        console.log(_self.uuid, "First Play; ", r)
+        clearInterval(playInterval)
+      }
+    }, 400 )
+
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', function() {
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    videoElement.volume = 0;
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
+    // listen for a timer update (as it is playing)
+    // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
+    // video2.currentTime = 20;
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    // create the videoTexture
+    videoTexture = new THREE.Texture( canvasElement );
+    // videoTexture.minFilter = THREE.LinearFilter;
+
+    // -------------------------------------------------------------------------
+    // Set shader params
+    // -------------------------------------------------------------------------
+
+    // set the uniforms
+    renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+
+    // add uniform
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+
+    // add main
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#MultiVideoSource#video
+     */
+    _self.video = videoElement
+    _self.canvas = canvasElement
+
+    // remove the bypass
+    _self.bypass = false
+  }
+
+  _self.update = function() {
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
+    }
+  }
+
+  // return the video texture, for direct customUniforms injection (or something)
+  _self.render = function() {
+    return videoTexture
+  }
+
+  // ===========================================================================
+  // Actual HELPERS
+  // ===========================================================================
+
+  /**
+   * @description
+   *  gets or sets source @file for the MultiVideoSource
+   *  file has to be compatible with HTMLMediaElement Video ie. webm, mp4 etc.
+   *  We recommend **mp4**
+   *
+   * @function Source#MultiVideoSource#src
+   * @param {file} Videofile - full path to file
+   */
+  _self.src = function( file ) {
+    videoElement.src = file
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        videoElement.play();
+        console.log(_self.uuid, "First Play.")
+        clearInterval(playInterval)
+      }
+    }, 400 )
+  }
+
+  /**
+   * @description start the current video
+   * @function Source#MultiVideoSource#play
+   */
+  _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#MultiVideoSource#pause
+   */
+  _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#MultiVideoSource#paused
+   */
+  _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#MultiVideoSource#currentTime
+   * @param {float} time - time in seconds
+   */
+  _self.currentTime = function( _num ) {
+    if ( _num === undefined ) {
+      return videoElement.currentTime;
+    } else {
+      console.log("set time", _num)
+      videoElement.currentTime = _num;
+      return _num;
+    }
+
+  }
+
+  // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#MultiVideoSource#duration
+   */
+  _self.duration =     function() { return videoElement.duration }    // seconds
+
+  // ===========================================================================
+  // For now only here, move to _source?
+  // ===========================================================================
+
+  _self.alpha = function(a) {
+    if (a == undefined) {
+      return renderer.customUniforms[_self.uuid+'_alpha'].value
+    }else{
+      renderer.customUniforms[_self.uuid+'_alpha'].value = a
+    }
+  }
+
+  _self.jump = function( _num) {
+    if ( _num == undefined || isNaN(_num) ) {
+      try {
+        videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
+      }catch(e){
+        console.log("prevented a race error")
+      }
+    } else {
+      videoElement.currentTime = _num
+    }
+
+    return videoElement.currentTime
+  }
+
+  // ===========================================================================
+  // Rerturn a reference to self
+  // ===========================================================================
+
+  // _self.init()
+}
 
 
 SVGSource.prototype = new Source(); // assign prototype to marqer
@@ -3160,16 +3483,10 @@ function TextSource(renderer, options) {
 VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
-  // TODO: implement these as arrays ?
-  // This is new, but better?
-  // Or let file manager handle it?
-  // var videos =        [];   // video1, video2, video3, ...
-  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
-  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
-
 /**
  * @description
  *  The videosource allows for playback of video files in the Mixer project
+ *
  * @implements Source
  * @constructor Source#VideoSource
  * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
@@ -3199,12 +3516,16 @@ function VideoSource(renderer, options) {
   var _options;
   if ( options != undefined ) _options = options;
 
+  _self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
+
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
 
   // initialize
   _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
 
     console.log("init video source", _self.uuid)
 
@@ -3215,7 +3536,7 @@ function VideoSource(renderer, options) {
 
     // set the source
     if ( options.src == undefined ) {
-      videoElement.src = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4";
+      videoElement.src = _self.currentSrc;
     } else {
       videoElement.src = options.src
     }
@@ -3312,7 +3633,7 @@ function VideoSource(renderer, options) {
   }
 
   // ===========================================================================
-  // HELPERS
+  // Actual HELPERS
   // ===========================================================================
 
   /**
@@ -3324,8 +3645,9 @@ function VideoSource(renderer, options) {
    * @function Source#VideoSource#src
    * @param {file} Videofile - full path to file
    */
-  _self.src = function( file ) {
-    videoElement.src = file
+  _self.src = function( _file ) {
+    _self.currentSrc = _file
+    videoElement.src = _file
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
@@ -3409,6 +3731,235 @@ function VideoSource(renderer, options) {
   // _self.init()
 }
 
+WebcamSource.prototype = new Source(); // assign prototype to marqer
+WebcamSource.constructor = WebcamSource;  // re-assign constructor
+
+/**
+ * @description
+ *  The WebcamSource allows for playback of video files in the Mixer project
+ *
+ * @implements Source
+ * @constructor Source#WebcamSource
+ * @example let myWebcamSource = new WebcamSource( renderer, { src: 'myfile.mp4' } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
+function WebcamSource(renderer, options) {
+
+  // create and instance
+  var _self = this;
+
+  if ( options.uuid == undefined ) {
+    _self.uuid = "WebcamSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  _self.type = "WebcamSource"
+
+  // allow bypass
+  _self.bypass = true;
+
+  // add to renderer
+  renderer.add(_self)
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  // create elements (private)
+  var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
+  var alpha = 1;
+
+  // initialize
+  _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
+    console.log("init video source", _self.uuid)
+
+    // create video element
+    videoElement = document.createElement('video');
+    videoElement.setAttribute("crossorigin","anonymous")
+    //videoElement.muted = true
+
+    // set properties
+    videoElement.height = 1024
+    videoElement.width = 1024
+    videoElement.loop = true          // must call after setting/changing source
+    videoElement.load();              // must call after setting/changing source
+    _self.firstplay = false
+
+    // here is the getUserMediaMagic, note that it only works in HTTPS
+    // Prefer camera resolution nearest to 1280x720.
+    var constraints = { audio: false, video: { width: 1024, height: 1024 } };
+
+    //
+    // Call the webcam, NOTE: you MUST run on HTTPS for this.
+    // or make an exception
+    //
+
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(mediaStream) {
+      //var video = document.querySelector('video');
+      videoElement.srcObject = mediaStream;
+      videoElement.onloadedmetadata = function(e) {
+        videoElement.play();
+      };
+    })
+    .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+    //ocument.body.appendChild(newChild)
+
+    // Here we wait for a user to click and take over
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        var r = Math.random() * videoElement.duration
+        //videoElement.currentTime = r
+        videoElement.play();
+        _self.firstplay = true
+        console.log(_self.uuid, "First Play; ", r)
+        clearInterval(playInterval)
+      }
+    }, 400 )
+
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', function() {
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    videoElement.volume = 0;
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
+    // listen for a timer update (as it is playing)
+    // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
+    // video2.currentTime = 20;
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    // create the videoTexture
+    videoTexture = new THREE.Texture( canvasElement );
+    // videoTexture.minFilter = THREE.LinearFilter;
+
+    // -------------------------------------------------------------------------
+    // Set shader params
+    // -------------------------------------------------------------------------
+
+    // set the uniforms
+    renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+
+    // add uniform
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+
+    // add main
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#WebcamSource#video
+     */
+    _self.video = videoElement
+    _self.canvas = canvasElement
+
+    // remove the bypass
+    _self.bypass = false
+  }
+
+  _self.update = function() {
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
+    }
+  }
+
+  // return the video texture, for direct customUniforms injection (or something)
+  _self.render = function() {
+    return videoTexture
+  }
+
+  // ===========================================================================
+  // Actual HELPERS
+  // ===========================================================================
+
+  /**
+   * @description start the current video
+   * @function Source#WebcamSource#play
+   */
+  _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#WebcamSource#pause
+   */
+  _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#WebcamSource#paused
+   */
+  _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#WebcamSource#currentTime
+   * @param {float} time - time in seconds
+   */
+   /*
+  _self.currentTime = function( _num ) {
+    returns false
+    if ( _num === undefined ) {
+      return videoElement.currentTime;
+    } else {
+      console.log("set time", _num)
+      videoElement.currentTime = _num;
+      return _num;
+    }
+
+  }
+  */
+
+  // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#WebcamSource#duration
+   */
+  _self.duration =     function() { return videoElement.duration }    // seconds
+
+  // ===========================================================================
+  // For now only here, move to _source?
+  // ===========================================================================
+
+  _self.alpha = function(a) {
+    if (a == undefined) {
+      return renderer.customUniforms[_self.uuid+'_alpha'].value
+    }else{
+      renderer.customUniforms[_self.uuid+'_alpha'].value = a
+    }
+  }
+
+  // ===========================================================================
+  // Rerturn a reference to self
+  // ===========================================================================
+
+  // _self.init()
+}
+
 /**
  * @constructor Source
  * @interface
@@ -3439,6 +3990,9 @@ function Source( renderer, options ) {
   _self.paused =       function() {}
   _self.currentFrame = function( _num ) {}  // seconds
   _self.duration =     function() {}        // seconds
+
+  _self.jump =         function() {}
+  //_self.cue =          function() {}
 }
 
 /*
