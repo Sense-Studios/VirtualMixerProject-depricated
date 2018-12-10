@@ -18,6 +18,11 @@
  *    </script>
  */
 
+ /*
+    We might try and change threejs and move to regl;
+    https://github.com/regl-project, http://regl.party/examples => video
+ */
+
 var GlRenderer = function() {
 
   console.log("created renderer")
@@ -37,23 +42,25 @@ var GlRenderer = function() {
   _self.customDefines = {}
 
   // base vertexShader
-  _self.vertexShader = "\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-\n  vUv = uv;\
-\n}"
+  _self.vertexShader = `
+    varying vec2 vUv;\
+    void main() {\
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+      vUv = uv;\
+    }
+  `
 
   // base fragment shader
-  _self.fragmentShader = "\
-\nuniform sampler2D textureTest;\
-\nuniform float wave;\
-\n/* custom_uniforms */\n\
-\n/* custom_helpers */\n\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  /* custom_main */\n\
-\n}"
+  _self.fragmentShader = `
+    uniform sampler2D textureTest;
+    uniform float wave;
+    /* custom_uniforms */\
+    /* custom_helpers */\
+    varying vec2 vUv;\
+    void main() {\
+      /* custom_main */\
+    }
+  `
 
   // ---------------------------------------------------------------------------
   /** @function GlRenderer.init */
@@ -129,27 +136,30 @@ var GlRenderer = function() {
      * The vertex shader
      * @member GlRenderer#vertexShader
      */
-    _self.vertexShader = "\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-  \n  vUv = uv;\
-  \n}"
+    _self.vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vUv = uv;
+      }
+    `
 
   /**
    * The fragment shader
    * @member GlRenderer#fragmentShader
    */
     // base fragment shader
-    _self.fragmentShader = "\
-  \nuniform sampler2D textureTest;\
-  \nuniform float wave;\
-  \n/* custom_uniforms */\n\
-  \n/* custom_helpers */\n\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  /* custom_main */\n\
-  \n}"
+    _self.fragmentShader = `
+      uniform sampler2D textureTest;
+      ununiform float wave;
+      /* custom_uniforms */
+      /* custom_helpers */
+      varying vec2 vUv;
+      void main() {
+        /* custom_main */
+      }
+    `
+
     _self.nodes = []
   }
 }

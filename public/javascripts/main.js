@@ -11,7 +11,9 @@ mixer1.mixMode(2)
 var mixer2 = new Mixer(renderer, { source1: gifSource2, source2: mixer1 })
 mixer1.mixMode(5)
 
-var output = new Output( renderer, mixer2 )
+var switcher1 = new Switcher( renderer, { source1: mixer1, source2: mixer2 } )
+
+var output = new Output( renderer, switcher1 )
 
 // create a bpm addon
 // var bpm = new BPM( renderer )

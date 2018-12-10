@@ -40,12 +40,12 @@ function Switcher(renderer, options ) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // we actually need this for each instance itt. the Mixer
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 get_source_'+_self.uuid+' ( int active_source, vec3 src1, vec3 src2 ) {\
-\n  if ( active_source ==  0 ) return src1;\
-\n  if ( active_source ==  1 ) return src2;\
-\n}'
-);
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',`
+vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
+  if ( active_source ==  0 ) return src1;\
+  if ( active_source ==  1 ) return src2;\
+}`
+    );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
