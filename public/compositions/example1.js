@@ -11,16 +11,23 @@ var mixer1 = new Mixer( renderer, { source1: red, source2: green });
 
 // finally asign that mixer to the output
 var output = new Output( renderer, mixer1 )
+var analysis = new AudioAnalysis( renderer, { audio: '/audio/rage_hard.mp3' } );
+analysis.mod = 0.5
+analysis.bpm = 24
 
 // initialize the renderer and start the renderer
 renderer.init();         // init
 renderer.render();       // start update & animation
 
-var bpm = new BPM( renderer, { audio: '/audio/rage_hard.mp3' } )
+var bpm = analysis;
 
 // add a function that moves the mixer handle from left to right.
+/*
 var c = 0;
 setInterval( function() {
   c += 0.01
   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })
+*/
+
+analysis.add( mixer1.pod )

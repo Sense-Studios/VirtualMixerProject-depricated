@@ -46,6 +46,12 @@
  *    &lt;/script>
  */
 
+ /*
+    We might try and change THREEJS and move to regl;
+    https://github.com/regl-project, http://regl.party/examples => video
+    133.6 => ~26kb
+ */
+
 var GlRenderer = function() {
 
   console.log("created renderer")
@@ -65,23 +71,25 @@ var GlRenderer = function() {
   _self.customDefines = {}
 
   // base vertexShader
-  _self.vertexShader = "\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-\n  vUv = uv;\
-\n}"
+  _self.vertexShader = `
+    varying vec2 vUv;\
+    void main() {\
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+      vUv = uv;\
+    }
+  `
 
   // base fragment shader
-  _self.fragmentShader = "\
-\nuniform sampler2D textureTest;\
-\nuniform float wave;\
-\n/* custom_uniforms */\n\
-\n/* custom_helpers */\n\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  /* custom_main */\n\
-\n}"
+  _self.fragmentShader = `
+    uniform sampler2D textureTest;
+    uniform float wave;
+    /* custom_uniforms */\
+    /* custom_helpers */\
+    varying vec2 vUv;\
+    void main() {\
+      /* custom_main */\
+    }
+  `
 
   // ---------------------------------------------------------------------------
   /** @function GlRenderer.init */
@@ -157,27 +165,30 @@ var GlRenderer = function() {
      * The vertex shader
      * @member GlRenderer#vertexShader
      */
-    _self.vertexShader = "\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-  \n  vUv = uv;\
-  \n}"
+    _self.vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vUv = uv;
+      }
+    `
 
   /**
    * The fragment shader
    * @member GlRenderer#fragmentShader
    */
     // base fragment shader
-    _self.fragmentShader = "\
-  \nuniform sampler2D textureTest;\
-  \nuniform float wave;\
-  \n/* custom_uniforms */\n\
-  \n/* custom_helpers */\n\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  /* custom_main */\n\
-  \n}"
+    _self.fragmentShader = `
+      uniform sampler2D textureTest;
+      ununiform float wave;
+      /* custom_uniforms */
+      /* custom_helpers */
+      varying vec2 vUv;
+      void main() {
+        /* custom_main */
+      }
+    `
+
     _self.nodes = []
   }
 }
@@ -191,13 +202,13 @@ var GlRenderer = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 17 2018 14:46:22 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Dec 15 2018 11:54:35 GMT+0100 (STD)
 </footer>
 
 <script> prettyPrint(); </script>

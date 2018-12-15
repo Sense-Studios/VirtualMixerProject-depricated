@@ -19,8 +19,9 @@
  */
 
  /*
-    We might try and change threejs and move to regl;
+    We might try and change THREEJS and move to regl;
     https://github.com/regl-project, http://regl.party/examples => video
+    133.6 => ~26kb
  */
 
 var GlRenderer = function() {

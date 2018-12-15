@@ -1,5 +1,4 @@
 
-
 /**
  * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
  * @constructor GlRenderer
@@ -17,6 +16,12 @@
  *      renderer.init();
  *      renderer.render();
  *    </script>
+ */
+
+ /*
+    We might try and change THREEJS and move to regl;
+    https://github.com/regl-project, http://regl.party/examples => video
+    133.6 => ~26kb
  */
 
 var GlRenderer = function() {
@@ -38,23 +43,25 @@ var GlRenderer = function() {
   _self.customDefines = {}
 
   // base vertexShader
-  _self.vertexShader = "\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-\n  vUv = uv;\
-\n}"
+  _self.vertexShader = `
+    varying vec2 vUv;\
+    void main() {\
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+      vUv = uv;\
+    }
+  `
 
   // base fragment shader
-  _self.fragmentShader = "\
-\nuniform sampler2D textureTest;\
-\nuniform float wave;\
-\n/* custom_uniforms */\n\
-\n/* custom_helpers */\n\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  /* custom_main */\n\
-\n}"
+  _self.fragmentShader = `
+    uniform sampler2D textureTest;
+    uniform float wave;
+    /* custom_uniforms */\
+    /* custom_helpers */\
+    varying vec2 vUv;\
+    void main() {\
+      /* custom_main */\
+    }
+  `
 
   // ---------------------------------------------------------------------------
   /** @function GlRenderer.init */
@@ -130,27 +137,30 @@ var GlRenderer = function() {
      * The vertex shader
      * @member GlRenderer#vertexShader
      */
-    _self.vertexShader = "\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-  \n  vUv = uv;\
-  \n}"
+    _self.vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vUv = uv;
+      }
+    `
 
   /**
    * The fragment shader
    * @member GlRenderer#fragmentShader
    */
     // base fragment shader
-    _self.fragmentShader = "\
-  \nuniform sampler2D textureTest;\
-  \nuniform float wave;\
-  \n/* custom_uniforms */\n\
-  \n/* custom_helpers */\n\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  /* custom_main */\n\
-  \n}"
+    _self.fragmentShader = `
+      uniform sampler2D textureTest;
+      ununiform float wave;
+      /* custom_uniforms */
+      /* custom_helpers */
+      varying vec2 vUv;
+      void main() {
+        /* custom_main */
+      }
+    `
+
     _self.nodes = []
   }
 }
@@ -170,7 +180,7 @@ var GlRenderer = function() {
  * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
  */
 
-function AudioAnalysis( renderer ) {
+function AudioAnalysis( renderer, _options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -186,6 +196,17 @@ function AudioAnalysis( renderer ) {
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
+
+
+  _self.options = {
+    audio: '/radio/nsb'
+  }
+
+  if ( _options != undefined ) {
+    _self.options = _options
+  }
+
+  // TODO: needs an option override
 
   // private
   var calibrating = true
@@ -235,8 +256,9 @@ function AudioAnalysis( renderer ) {
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
 
-  audio.src = '/radio/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/radio/nsb'
+  audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+  _self.audio_src = _self.options.audio
+
   // audio.src = '/radio/dunklenacht' // dunklenacht
 
   // if ( _self.options.audio ) audio.src = _self.options.audio
@@ -324,7 +346,6 @@ function AudioAnalysis( renderer ) {
 
     // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
-    audioanalysis1
 
     resolve(audio);
     reject(err);
@@ -2451,32 +2472,36 @@ function Mixer( renderer, options ) {
 
     // add blendmodes helper, we only need it once
     if ( renderer.fragmentShader.indexOf('vec3 blend ( vec3 src, vec3 dst, int blendmode )') == -1 ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 blend ( vec3 src, vec3 dst, int blendmode ) {\
-\n  if ( blendmode ==  1 ) return src + dst;\
-\n  if ( blendmode ==  2 ) return src - dst;\
-\n  if ( blendmode ==  3 ) return src * dst;\
-\n  if ( blendmode ==  4 ) return min(src, dst);\
-\n  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));\
-\n  if ( blendmode ==  6 ) return (src + dst) - 1.0;\
-\n  if ( blendmode ==  7 ) return max(src, dst);\
-\n  if ( blendmode ==  8 ) return (src + dst) - (src * dst);\
-\n  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));\
-\n  if ( blendmode == 10 ) return src + dst;\
-\n  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));\
-\n  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));\
-\n  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));\
-\n  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));\
-\n  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;\
-\n  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));\
-\n  if ( blendmode == 17 ) return abs(dst - src);\
-\n  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;\
-\n  return src + dst;\
-\n}\n/* custom_helpers */');
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
+  if ( blendmode ==  1 ) return src + dst;
+  if ( blendmode ==  2 ) return src - dst;
+  if ( blendmode ==  3 ) return src * dst;
+  if ( blendmode ==  4 ) return min(src, dst);
+  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));
+  if ( blendmode ==  6 ) return (src + dst) - 1.0;
+  if ( blendmode ==  7 ) return max(src, dst);
+  if ( blendmode ==  8 ) return (src + dst) - (src * dst);
+  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));
+  if ( blendmode == 10 ) return src + dst;
+  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));
+  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));
+  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));
+  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));
+  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
+  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));
+  if ( blendmode == 17 ) return abs(dst - src);
+  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
+  return src + dst;
+}
+/* custom_helpers */
+`
+      );
     }
 
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */')
+vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */' )
   }
 
   _self.update = function() {
@@ -2713,12 +2738,12 @@ function Switcher(renderer, options ) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // we actually need this for each instance itt. the Mixer
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 get_source_'+_self.uuid+' ( int active_source, vec3 src1, vec3 src2 ) {\
-\n  if ( active_source ==  0 ) return src1;\
-\n  if ( active_source ==  1 ) return src2;\
-\n}'
-);
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',`
+vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
+  if ( active_source ==  0 ) return src1;\
+  if ( active_source ==  1 ) return src2;\
+}`
+    );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
@@ -3383,7 +3408,7 @@ function TextSource(renderer, options) {
   var title_text_font_size = 64
   var small_text_x = 512
   _self.update = function() {
-
+    
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
