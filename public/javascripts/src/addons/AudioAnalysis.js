@@ -13,7 +13,7 @@
  * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
  */
 
-function AudioAnalysis( renderer ) {
+function AudioAnalysis( renderer, _options ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -29,6 +29,17 @@ function AudioAnalysis( renderer ) {
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
+
+
+  _self.options = {
+    audio: '/radio/nsb'
+  }
+
+  if ( _options != undefined ) {
+    _self.options = _options
+  }
+
+  // TODO: needs an option override
 
   // private
   var calibrating = true
@@ -78,8 +89,9 @@ function AudioAnalysis( renderer ) {
   // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
   // audio.src = '/audio/fulke_absurd.mp3'
 
-  audio.src = '/radio/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/radio/nsb'
+  audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+  _self.audio_src = _self.options.audio
+
   // audio.src = '/radio/dunklenacht' // dunklenacht
 
   // if ( _self.options.audio ) audio.src = _self.options.audio
@@ -167,7 +179,6 @@ function AudioAnalysis( renderer ) {
 
     // COMMENT THIS LINE OUT FOR NO SOUND
     source.connect(context.destination);
-    audioanalysis1
 
     resolve(audio);
     reject(err);
