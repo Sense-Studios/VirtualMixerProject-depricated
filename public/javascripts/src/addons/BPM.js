@@ -1,4 +1,7 @@
 /**
+ * @summary
+ *   BPM calculates beat per minutes based on a 'tap' function
+ *
  * @description
  *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
@@ -16,7 +19,6 @@
 function BPM( renderer, options ) {
 
   var _self = this
-
   _self.function_list = [
     ["AUTO", "method", "toggleAutoBpm"],
     ["MODDOWN", "method", "modDown"],
