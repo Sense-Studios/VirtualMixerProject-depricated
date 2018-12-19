@@ -41,18 +41,18 @@ function BlackAndWhite( _renderer, _source, _options ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
 vec3 effect ( vec3 src ) {
-  // return vec3( src.r + src.g + src.b ) / 3.;                                                           // black and white
-  // return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                         // negtive 1
-  // return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                             // negtive 2
-  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                             // negtive 3
-  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                             // negtive 3
-  // return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) /1.7 ) / 3.; // mopnocolor red
-  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.; // mopnocolor blue
-  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) *3   ) / 3.; // mopnocolor green
-  // return vec3( (src.r+src.g+src.b) *2.   , (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b) /1.2 ) / 3.; // mopnocolor yellow
-  // return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.; // mopnocolor turqoise
-  // return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.; // mopnocolor purple
-  // return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                   // sepia
+  // return vec3( src.r + src.g + src.b ) / 3.;                                                             // black and white
+  // return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                           // negtive 1
+  // return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                               // negtive 2
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor red
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor blue
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) *3   ) / 3.;   // mopnocolor green
+  // return vec3( (src.r+src.g+src.b) *2.   , (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;   // mopnocolor yellow
+  // return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor turqoise
+  // return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor purple
+  // return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                     // sepia
 }
 
 /* custom_helpers */
