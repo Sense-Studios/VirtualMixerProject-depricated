@@ -1,11 +1,21 @@
-NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.prototype = new ComputerKeyboard(); // assign prototype to marqer
 NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
 
 /**
 * @description
 *  Test en demo controller NumpadBpmMixerControl
+*  It's basically a wrapper around a single mixer with the numpad
+*
+*  ```
+*  L / * -
+*  7 8 9 +
+*  4 5 6 +
+*  1 2 3 e
+*   0  . e
+*  ```
+*
 * @implements Controller
-* @constructor Controller#NumpadBpmMixerControl
+* @constructor Controller#Keyboard#NumpadBpmMixerControl
 * @example var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );
 * @param {GlRenderer} renderer - GlRenderer object
 * @param {Module#Mixer} mixer - a Mixer instance

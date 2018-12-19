@@ -44,7 +44,9 @@ function Switcher(renderer, options ) {
 vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
   if ( active_source ==  0 ) return src1;\
   if ( active_source ==  1 ) return src2;\
-}`
+}
+/* custom_helpers */
+`
     );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
