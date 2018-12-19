@@ -3,11 +3,14 @@
  *   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
  *
  * @description
+ *   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
  *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
  *   the BPM is calculated based on an input music stream (mp3 file)
- *   options values;
+ *   ```
  *     options.audio (String) is a source, like /path/to/mymusic.mp3
  *     options.microphone (Boolean) use microphone (true) or audiosource (false)
+ *   ```
+ *
  *
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
@@ -216,7 +219,8 @@ function AudioAnalysis( renderer, _options ) {
 
   /**
    * @description
-   *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio} start the {@link Addon#AudioAnalysis.sampler}
+   *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
+   *  start the {@link Addon#AudioAnalysis~sampler}
    *
    * @member Addon#AudioAnalysis.initializeAutoBpm
    *
@@ -235,7 +239,12 @@ function AudioAnalysis( renderer, _options ) {
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
   /**
-   * @description actual sampler for audio analisis
+   * @description
+   *   gets the analyser.getByteTimeDomainData
+   *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
+   *   returns the most occuring bpm
+   *
+   *
    * @member Addon#AudioAnalysis~sampler
    *
   */

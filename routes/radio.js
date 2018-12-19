@@ -11,6 +11,8 @@ router.get('/1', function(req, res, next) {
 
   /*
 
+  https://directory.shoutcast.com/Search
+
   var request = require('request');
   app.get('/', function(req,res) {
     //modify the url in any way you want
@@ -19,7 +21,6 @@ router.get('/1', function(req, res, next) {
   });
 
   */
-
 
 });
 
