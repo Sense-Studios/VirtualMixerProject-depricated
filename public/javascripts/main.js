@@ -26,7 +26,7 @@ var mixer5 = new Mixer( renderer, { source1: mixer4, source2: testSource3 } );
 var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // mixer5
-var effect1 = new BlackAndWhite( renderer, mixer5, {} )
+var effect1 = new ColorEffect( renderer, { source: mixer5 } )
 
 // create the filemanager addon to manage the sources
 var giphymanager1 = new GiphyManager( testSource1 )
