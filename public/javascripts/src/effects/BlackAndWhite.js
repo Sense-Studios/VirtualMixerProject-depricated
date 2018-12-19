@@ -38,8 +38,6 @@ function BlackAndWhite( _renderer, _source, _options ) {
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
 
-
-
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
 vec3 effect ( vec3 src ) {
