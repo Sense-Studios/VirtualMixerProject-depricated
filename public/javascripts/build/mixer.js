@@ -166,9 +166,18 @@ var GlRenderer = function() {
 }
 
 /**
+ * @summary
+ *   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+ *
  * @description
+ *   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
  *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
  *   the BPM is calculated based on an input music stream (mp3 file)
+ *   ```
+ *     options.audio (String) is a source, like /path/to/mymusic.mp3
+ *     options.microphone (Boolean) use microphone (true) or audiosource (false)
+ *   ```
+ *
  *
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
@@ -176,8 +185,8 @@ var GlRenderer = function() {
  * analysis.add( mixer1.pod )
  * @constructor Addon#AudioAnalysis
  * @implements Addon
- * @param {GlRenderer} renderer
- * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
+ * @param {GlRenderer} renderer - current {@link GlRenderer}
+ * @param {Object} options - object with several settings
  */
 
 function AudioAnalysis( renderer, _options ) {
@@ -191,19 +200,32 @@ function AudioAnalysis( renderer, _options ) {
   _self.bypass = false
 
   // main bpm numbers
+
+  /**
+   * @description (calculated)bpm
+   * @member Addon#AudioAnalysis#bpm
+  */
   _self.bpm = 128
   _self.bpm_float = 128
+
+  /**
+   * @description bpm mod, multiplyer for bpm output, usuall 0.125, 0.25, 0.5, 2, 4 etc.
+   * @member Addon#AudioAnalysis#mod
+  */
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
 
-
+  // default options
   _self.options = {
-    audio: '/radio/nsb'
+    audio: '/radio/nsb',
+    microphone: false
   }
 
   if ( _options != undefined ) {
-    _self.options = _options
+    _options.forEach( function( _option, _value ) {
+      _self[_option] = _value
+    })
   }
 
   // TODO: needs an option override
@@ -222,14 +244,15 @@ function AudioAnalysis( renderer, _options ) {
 
   /**
    * @description Audio element
-   * @member Addon#BPM#audio_src
-   * @param {HTMLMediaElement} reference to the virtual media element
+   * @member Addon#AudioAnalysis#audio
+   * @param {HTMLMediaElement} - reference to the virtual media element
    *
    *  HTMLMediaElement AUDIO reference
    *
   */
   _self.audio = audio
 
+  // create all necc. contexts
   var context = new AudioContext(); // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -238,7 +261,7 @@ function AudioAnalysis( renderer, _options ) {
   var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
-  // with ~ 200 samples/s it takes ~ 20 seconds to adjust
+  // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
   var sampleLength = 4000;
   var dataSet = new Array(sampleLength);
   var peaks = new Array(sampleLength);
@@ -249,25 +272,15 @@ function AudioAnalysis( renderer, _options ) {
   var treshold = 1;
   var intervalCounts = [];
 
-  // this should be set externally (at createion)
-  console.log("SET AUDIO SRC")
-  //audio.setAttribute('crossorigin', 'anonymous');
-  // audio.src =  'http://37.220.36.53:7904';
-  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/fulke_absurd.mp3'
-
+  // set audio src to optioned value
   audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+
+  /**
+   * @description Audio element
+   * @member Addon#AudioAnalysis#audio_src
+   * @param {string} - reference to audiofile
+  */
   _self.audio_src = _self.options.audio
-
-  // audio.src = '/radio/dunklenacht' // dunklenacht
-
-  // if ( _self.options.audio ) audio.src = _self.options.audio
-
-  // audio.src = '/audio/rage_hard.mp3'
-  // audio.src = '/audio/i_own_it.mp3'
-  // audio.src = '/audio/100_metronome.mp3'
-  // audio.src = '/audio/120_metronome.mp3'
-  // audio.src = '/audio/140_metronome.mp3'
 
   audio.controls = true;
   audio.loop = true;
@@ -277,12 +290,15 @@ function AudioAnalysis( renderer, _options ) {
   bandpassFilter.type = "lowpass";
   bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
-
   analyser.fftSize = 128;
-
   bufferLength = analyser.frequencyBinCount;
 
-  // firstload for mobile, forces all control to the site on click
+  /**
+   * @description
+   *  firstload for mobile, forces all control to the site on click
+   * @member Addon#AudioAnalysis~disconnectOutput
+   *
+  */
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     audio.play();
@@ -292,10 +308,22 @@ function AudioAnalysis( renderer, _options ) {
 
   document.body.addEventListener('click', forceFullscreen)
 
+  /**
+   * @description
+   *  disconnects audio to output, this will mute the analalyser, but won't stop analysing
+   * @member Addon#AudioAnalysis#disconnectOutput
+   *
+  */
   _self.disconnectOutput = function() {
     source.disconnect(context.destination);
   }
 
+  /**
+   * @description
+   *   connects the audio source to output, making it audible
+   * @member Addon#AudioAnalysis#connectOutput
+   *
+  */
   _self.connectOutput = function() {
     source.connect(context.destination);
   }
@@ -340,6 +368,11 @@ function AudioAnalysis( renderer, _options ) {
 
   // actual --------------------------------------------------------------------
   // initialize Audio, used in the first run
+  /**
+   * @description initialize audio element and connect filters and source
+   * @member Addon#AudioAnalysis.initializeAudio
+   *
+  */
   var initializeAudio = new Promise( function( resolve, reject ) {
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
@@ -351,6 +384,14 @@ function AudioAnalysis( renderer, _options ) {
     reject(err);
   })
 
+  /**
+   * @description
+   *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
+   *  start the {@link Addon#AudioAnalysis~sampler}
+   *
+   * @member Addon#AudioAnalysis.initializeAutoBpm
+   *
+  */
   var initializeAutoBpm = function() {
     initializeAudio.then( function(r) {
       console.log("AudioAnalysis is initialized!", audio.src);
@@ -364,7 +405,16 @@ function AudioAnalysis( renderer, _options ) {
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
-
+  /**
+   * @description
+   *   gets the analyser.getByteTimeDomainData
+   *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
+   *   returns the most occuring bpm
+   *
+   *
+   * @member Addon#AudioAnalysis~sampler
+   *
+  */
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -431,7 +481,14 @@ function AudioAnalysis( renderer, _options ) {
   }
   doBlink()
 
-  // get bpm tempo by analyising audio stream
+  /**
+   * @description
+   *  returns 'tempodata', a list of found BPMs sorted on occurrence
+   *  object includes: bpm (ie. 128), confidence (0-1), calibrating (true/false),
+   *  treshold, tempocounts, foundpeaks and peaks
+   * @member Addon#AudioAnalysis~getTempo
+   *
+  */
   var getTempo = function( _data ) {
     foundpeaks = []                    // reset foundpeaks
     peaks = new Array( _data.length )  // reset peaks
@@ -455,7 +512,7 @@ function AudioAnalysis( renderer, _options ) {
     // see: http://joesul.li/van/beat-detection-using-web-audio/
     // for more information on this method and the sources of the algroritm
     var tempoCounts = groupNeighborsByTempo( countIntervalsBetweenNearbyPeaks( foundpeaks ) );
-    tempoCounts.sort( mycomparator );                             // sort tempo's by 'score', or most neighbours
+    tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
       tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
     }else{
@@ -513,7 +570,7 @@ function AudioAnalysis( renderer, _options ) {
       calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
-      foundpeaks:  foundpeaks,       // current found peaks
+      foundpeaks: foundpeaks,        // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
 
@@ -524,11 +581,15 @@ function AudioAnalysis( renderer, _options ) {
 
   // HELPERS
   // sort helper
-  var mycomparator = function ( a,b ) {
+  var sortHelper = function ( a,b ) {
     return parseInt( a.count, 10 ) - parseInt( b.count, 10 );
   }
 
-  // generate interval counter
+  /**
+   * @description Finds peaks in the audiodata and groups them together
+   * @member Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
+   *
+  */
   var countIntervalsBetweenNearbyPeaks = function( _peaks ) {
 
     // reset
@@ -550,6 +611,13 @@ function AudioAnalysis( renderer, _options ) {
   }
 
   // group intervalcounts by temp
+  /**
+   * @description
+   *  map found intervals together and returns 'tempocounts', a list of found
+   *  tempos and their occurences
+   * @member Addon#AudioAnalysis~groupNeighborsByTempo
+   *
+  */
   var groupNeighborsByTempo = function( intervalCounts ) {
 
     // reset
@@ -592,6 +660,9 @@ function AudioAnalysis( renderer, _options ) {
 }
 
 /**
+ * @summary
+ *   BPM calculates beat per minutes based on a 'tap' function
+ *
  * @description
  *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
@@ -609,7 +680,6 @@ function AudioAnalysis( renderer, _options ) {
 function BPM( renderer, options ) {
 
   var _self = this
-
   _self.function_list = [
     ["AUTO", "method", "toggleAutoBpm"],
     ["MODDOWN", "method", "modDown"],
@@ -961,8 +1031,11 @@ function FileManager( _source ) {
 }
 
 /**
+ * @summary
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *
  * @description
- *   GiphyManager
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
  *
  * @example
  * var gifmanager1 = new Gyphymanager( renderer );
@@ -973,6 +1046,7 @@ function FileManager( _source ) {
  * @param {GlRenderer} renderer
  * @param {GifSource} source
  */
+ 
 function GiphyManager( _source ) {
 
   var _self = this
@@ -985,6 +1059,7 @@ function GiphyManager( _source ) {
   _self.renderer = renderer // do we even need this ?!!
 
   // set in environment
+  // this key is for demo purposes only
   var key = "tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu"
 
   /**
@@ -993,7 +1068,7 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    utils.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    utils.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })
@@ -1042,8 +1117,16 @@ function GiphyManager( _source ) {
 }
 
 /**
+ * @summary
+ *   Helper classes that add on other classes in the mixer.
+ *
+ * @description
+ *   Helper classes that add on other classes in the mixer.
+ *   ```
+ *
  * @constructor Addon
  * @interface
+ * @author Sense Studios
  */
 
 /*
@@ -1933,14 +2016,24 @@ function MidiController( renderer, options ) {
   _self.scheme = function() {}
 }
 
-NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.prototype = new ComputerKeyboard(); // assign prototype to marqer
 NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
 
 /**
 * @description
 *  Test en demo controller NumpadBpmMixerControl
+*  It's basically a wrapper around a single mixer with the numpad
+*
+*  ```
+*  L / * -
+*  7 8 9 +
+*  4 5 6 +
+*  1 2 3 e
+*   0  . e
+*  ```
+*
 * @implements Controller
-* @constructor Controller#NumpadBpmMixerControl
+* @constructor Controller#Keyboard#NumpadBpmMixerControl
 * @example var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );
 * @param {GlRenderer} renderer - GlRenderer object
 * @param {Module#Mixer} mixer - a Mixer instance
@@ -2097,6 +2190,18 @@ function SourceControl( renderer, source ) {
 
 }
 
+ComputerKeyboard.prototype = new Controller();  // assign prototype to marqer
+ComputerKeyboard.constructor = ComputerKeyboard;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#ComputerKeyboard
+ * @interface
+ */
+
+function ComputerKeyboard() {
+}
+
 /**
  * @constructor Controller
  * @interface
@@ -2121,7 +2226,17 @@ function Controller( renderer, options ) {
 
 }
 
+Gamepad.prototype = new Controller();  // assign prototype to marqer
+Gamepad.constructor = Gamepad;  // re-assign constructor
 
+/**
+ * @implements Controller
+ * @constructor Controller#Gamepad
+ * @interface
+ */
+
+function Gamepad() {
+}
 
 Midi.prototype = new Controller();  // assign prototype to marqer
 Midi.constructor = Midi;  // re-assign constructor
@@ -2251,24 +2366,501 @@ function Vidi() {
 
 }
 
+ColorEffect.prototype = new Effect(); // assign prototype to marqer
+ColorEffect.constructor = ColorEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#ColorEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
 // fragment
 // vec3 b_w = ( source.x + source.y + source.z) / 3
 // vec3 amount = source.xyz + ( b_w.xyx * _alpha )
 // col = vec3(col.r+col.g+col.b)/3.0;
 // col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
 
-function BlackAndWhite( renderer, _source ) {
+function ColorEffect( _renderer, _options ) {
 
   // create and instance
   var _self = this;
 
   // set or get uid
-  if ( options.uuid == undefined ) {
-    _self.uuid = "Effect_BlackAndWhite_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "ColorEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   } else {
-    _self.uuid = options.uuid
+    _self.uuid = _options.uuid
   }
 
+  // add to renderer
+  _renderer.add(_self)
+
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 12
+
+  var dpr = window.devicePixelRatio;
+  var textureSize = 128 * dpr;
+  var data = new Uint8Array( textureSize * textureSize * 3 );
+  //var dataTexture = new THREE.DataTexture( canvasElement );
+  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+  //dataTexture.minFilter = THREE.NearestFilter;
+	//dataTexture.magFilter = THREE.NearestFilter;
+	//dataTexture.needsUpdate = true;
+
+  var canvasElement, canvasContext, tempTexture
+
+
+  _self.init = function() {
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+    canvasElementContext.fillStyle = "#FF0000";
+    canvasElementContext.fillRect( 0, 0, 500,500)
+
+    console.log("ColorEffect inits, with", _renderer)
+    // add uniforms to renderer
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 100 }
+    //_renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "t", value: null }
+    // _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: tempTexture }
+    //_renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
+
+    // add uniforms to fragmentshader
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
+
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_noisesampler;\n/* custom_uniforms */')
+
+    // uniform float noiseScale;
+    // uniform float time;
+    // uniform float baseSpeed;
+
+
+    //_renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_output;\n/* custom_uniforms */')
+
+    // _output * uuid_alpha_1
+    // uuid_alpha_1 * -pod
+    // uuid_alpha_2 * +pod
+    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv ) {
+  if ( currentcoloreffect == 1  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
+  if ( currentcoloreffect == 2  ) return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                          // negtive 1
+  if ( currentcoloreffect == 3  ) return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                              // negtive 2
+  if ( currentcoloreffect == 4  ) return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                              // negtive 3
+  if ( currentcoloreffect == 5  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
+  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
+  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
+  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
+  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
+  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
+  if ( currentcoloreffect == 11 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
+
+  // color swapping
+  if ( currentcoloreffect == 12 ) return vec3( src.rrr );
+  if ( currentcoloreffect == 13 ) return vec3( src.rrg );
+  if ( currentcoloreffect == 14 ) return vec3( src.rrb );
+  if ( currentcoloreffect == 15 ) return vec3( src.rgr );
+  if ( currentcoloreffect == 16 ) return vec3( src.rgg );
+  if ( currentcoloreffect == 17 ) return vec3( src.rgb ); // normal
+  if ( currentcoloreffect == 18 ) return vec3( src.rbr );
+  if ( currentcoloreffect == 19 ) return vec3( src.rbg );
+  if ( currentcoloreffect == 20 ) return vec3( src.rbb );
+  if ( currentcoloreffect == 21 ) return vec3( src.grr );
+  if ( currentcoloreffect == 22 ) return vec3( src.grg );
+  if ( currentcoloreffect == 23 ) return vec3( src.grb );
+  if ( currentcoloreffect == 24 ) return vec3( src.ggr );
+  if ( currentcoloreffect == 25 ) return vec3( src.ggg );
+  if ( currentcoloreffect == 26 ) return vec3( src.ggb );
+  if ( currentcoloreffect == 27 ) return vec3( src.gbr );
+  if ( currentcoloreffect == 28 ) return vec3( src.gbg );
+  if ( currentcoloreffect == 29 ) return vec3( src.gbb );
+  if ( currentcoloreffect == 30 ) return vec3( src.brr );
+  if ( currentcoloreffect == 31 ) return vec3( src.brg );
+  if ( currentcoloreffect == 32 ) return vec3( src.brb );
+  if ( currentcoloreffect == 33 ) return vec3( src.bgr );
+  if ( currentcoloreffect == 34 ) return vec3( src.bgg );
+  if ( currentcoloreffect == 35 ) return vec3( src.bgb );
+  if ( currentcoloreffect == 36 ) return vec3( src.bbr );
+  if ( currentcoloreffect == 37 ) return vec3( src.bbg );
+  if ( currentcoloreffect == 38 ) return vec3( src.bbb );
+  return src.rgb;
+}
+
+/* custom_helpers */
+`
+    );
+  }
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', vUv );\n  /* custom_main */')
+  } // init
+
+
+  var vector = new THREE.Vector2();
+  //var glcanvas = document.getElementById('glcanvas');
+  //var glcanvas = _renderer.glrenderer.context.canvas
+  var i = 0
+  _self.update = function() {
+    i++
+    // mixmode
+    // blendmode
+    // pod
+    //console.log( "--", glcanvas.width, glcanvas.height )
+
+    //glcanvas = _renderer.glrenderer.context.canvas
+    //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
+
+    //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+  	//vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+
+    //_renderer.copyFramebufferToTexture( vector, dataTexture );
+
+    glcanvas = document.getElementById('glcanvas');
+    canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
+    if ( tempTexture ) tempTexture.needsUpdate = true;
+  }
+
+  /* ------------------------------------------------------------------------ */
+
+  /**
+   * @description
+   *  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
+   *  ```
+   *  1. BlackAndWhite (default),
+   *  2. Negative 1,
+   *  3. Negative 2,
+   *  4. Negative 3,
+   *  5. Monocolor red,
+   *  6. Monocolor blue,
+   *  7. Monocolor green,
+   *  8. Monocolor yellow,
+   *  9. Monocolor turqoise,
+   *  10. Monocolor purple,
+   *  11. Sepia,
+   *  ```
+   * @function Module#Mixer#effect
+   * @param {number} effect index of the effect
+   */
+
+
+  _self.effect = function( _num ){
+    if ( _num != undefined ) {
+      currentEffect = _num
+      renderer.customUniforms[_self.uuid+'_currentcoloreffect'].value = currentEffect
+      // update uniform ?
+    }
+    return currentEffect
+  }
+}
+
+DistortionEffect.prototype = new Effect(); // assign prototype to marqer
+DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new DistortionEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#DistortionEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+// TO THINK ON: Seems we need to connect this to SOURCES somehow
+
+function DistortionEffect( _renderer, _options ) {
+
+  _self.update = function() {
+    i += 0.001
+    //renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
+
+    // ONLY WORKS ON VIDEO SOURCE, IF IT WORKS
+    renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }
+    renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
+  }
+
+  _self.effect = function( _num ){
+    if ( _num != undefined ) {
+      currentEffect = _num
+      renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
+      // update uniform ?
+    }
+    return currentEffect
+    }
+}
+
+FeedbackEffect.prototype = new Effect(); // assign prototype to marqer
+FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new FeedbackEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#FeedbackEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+function FeedbackEffect( _renderer, _options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "FeedbackEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 12
+
+  var dpr = window.devicePixelRatio;
+  var textureSize = 128 * dpr;
+  var data = new Uint8Array( textureSize * textureSize * 3 );
+  //var dataTexture = new THREE.DataTexture( canvasElement );
+  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+  //dataTexture.minFilter = THREE.NearestFilter;
+	//dataTexture.magFilter = THREE.NearestFilter;
+	//dataTexture.needsUpdate = true;
+
+  var canvasElement, canvasContext, effectsTexture
+
+
+  _self.init = function() {
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+    canvasElementContext.fillStyle = "#FF0000";
+    canvasElementContext.fillRect( 0, 0, 500,500)
+
+    console.log("FeedbackEffect inits, with", _renderer)
+
+    effectsTexture = new THREE.Texture( canvasElement );
+    effectsTexture.wrapS = THREE.RepeatWrapping;
+    effectsTexture.wrapT = THREE.RepeatWrapping;
+    effectsTexture.repeat.set( 4, 4 );
+
+    _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: effectsTexture }
+    _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: 100 }
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int  '+_self.uuid+'_currentfeedbackeffect;\n/* custom_uniforms */')
+
+
+    if ( renderer.fragmentShader.indexOf('vec3 feedbackeffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+
+      _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+  vec3 feedbackeffect ( vec3 src, int currentfeedbackeffect, vec2 vUv ) {
+    if ( currentfeedbackeffect == 100 ) {
+      //vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
+      //gl_Position = vec4( vec2(0.,0.), 0., 0.);
+      //return inbetween.rrr;
+      // return src;
+      return ( texture2D( `+_self.uuid+`_effectsampler, vUv + vec2( 1., 0.99999999) ).rgb ) + src * 0.3;
+      // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb * 1.4 + src * .8) * 0.5; //* vec3(.5, .5, .5
+      // return ( texture2D( src, vUv ).rgb );
+      // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb ) * src + src;
+
+      vec4 tex = texture2D( `+_self.uuid+`_effectsampler, vUv * 2. ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
+
+      // return src.rrr;
+      // tex.rgb = vec3(src.r, src.g, src.b);
+      // tex.xy = vec2(1.0,1.0);
+      // tex = tex + vec4( src.r, src.g, src.b, vUv * 2. );
+
+
+      // * 0.52 + vec4( src * 0.52, vUv ) *
+      // vec4 tex = vec4( src, vUv * .5 );
+      // return mix( tex, `+_self.uuid+`_effectsampler, 0.).rgb;
+      //return mix(tex.rgb, src.rgb, 1.);
+    }
+
+    // uniform float noiseScale;
+    // uniform float time;
+    // uniform float baseSpeed;
+    // uniform sampler2D noiseTexture;
+
+    if ( currentfeedbackeffect == 101 ) {
+      // vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+      // vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
+      // vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.a );
+
+      // _effectsampler
+      // return  vec4 texture2D( baseTexture1, uvNoiseTimeShift )
+
+      // https://stackoverflow.com/questions/19872524/threejs-fragment-shader-using-recycled-frame-buffers
+      // http://labs.sense-studios.com/webgl/index4.html?r=sdad
+
+      // return _effectsampler.rgb
+      return src;
+    }
+
+    return src;
+  }
+`
+  );
+}
+
+_renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
+} // init
+
+
+var vector = new THREE.Vector2();
+//var glcanvas = document.getElementById('glcanvas');
+//var glcanvas = _renderer.glrenderer.context.canvas
+var i = 0
+_self.update = function() {
+  i++
+  // mixmode
+  // blendmode
+  // pod
+  //console.log( "--", glcanvas.width, glcanvas.height )
+
+  //glcanvas = _renderer.glrenderer.context.canvas
+  //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
+
+  //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+  //vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+
+  //_renderer.copyFramebufferToTexture( vector, dataTexture );
+
+  glcanvas = document.getElementById('glcanvas');
+  canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
+  if ( effectsTexture ) effectsTexture.needsUpdate = true;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/**
+* @description
+*  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
+*  ```
+*  1. BlackAndWhite (default),
+*  2. Negative 1,
+*  3. Negative 2,
+*  4. Negative 3,
+*  5. Monocolor red,
+*  6. Monocolor blue,
+*  7. Monocolor green,
+*  8. Monocolor yellow,
+*  9. Monocolor turqoise,
+*  10. Monocolor purple,
+*  11. Sepia,
+*  ```
+* @function Module#Mixer#effect
+* @param {number} effect index of the effect
+*/
+
+
+_self.effect = function( _num ){
+  if ( _num != undefined ) {
+    currentEffect = _num
+    renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'].value = currentEffect
+    // update uniform ?
+  }
+  return currentEffect
+  }
+}
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+function BlackAndWhite( _renderer, _source, _options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "Effect_BlackAndWhite_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
 
   _self.type = "Effect"
 
@@ -2276,19 +2868,43 @@ function BlackAndWhite( renderer, _source ) {
 
   _self.init = function() {
 
+    console.log("Effect inits, with", _renderer)
     // add uniforms to renderer
     // renderer.customUniforms[_self.uuid+'_mixmode'] = { type: "i", value: 1 }
 
     // add uniforms to fragmentshader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // _output * uuid_alpha_1
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_output, '+_self.uuid+'_blendmode );\n  /* custom_main */')
-  }
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 effect ( vec3 src ) {
+  // return vec3( src.r + src.g + src.b ) / 3.;                                                             // black and white
+  // return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                           // negtive 1
+  // return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                               // negtive 2
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor red
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor blue
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) *3   ) / 3.;   // mopnocolor green
+  // return vec3( (src.r+src.g+src.b) *2.   , (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;   // mopnocolor yellow
+  // return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor turqoise
+  // return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor purple
+  // return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                     // sepia
+}
+
+/* custom_helpers */
+`
+    );
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = effect( '+_source.uuid+'_output );\n  /* custom_main */')
+  } // init
 
   _self.update = function() {
 
@@ -2297,6 +2913,26 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
     // pod
   }
 }
+
+/**
+ * @constructor Effect
+ * @interface
+ */
+
+ function Effect( renderer, options ) {
+   var _self = this
+
+   /*
+     renderer
+   */
+
+   _self.type = "Effect"
+
+   // program interface
+   _self.init =         function() {}
+   _self.update =       function() {}
+   _self.render =       function() {}
+ }
 
 /**
  * @summary
@@ -2742,7 +3378,9 @@ function Switcher(renderer, options ) {
 vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
   if ( active_source ==  0 ) return src1;\
   if ( active_source ==  1 ) return src2;\
-}`
+}
+/* custom_helpers */
+`
     );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
@@ -3542,7 +4180,8 @@ function VideoSource(renderer, options) {
   var _options;
   if ( options != undefined ) _options = options;
 
-  _self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
+  //_self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
+  _self.currentSrc = "/video/placeholder.mp4"
 
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
@@ -3557,7 +4196,7 @@ function VideoSource(renderer, options) {
 
     // create video element
     videoElement = document.createElement('video');
-    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("crossorigin", "anonymous")
     videoElement.muted= true
 
     // set the source
@@ -3610,6 +4249,10 @@ function VideoSource(renderer, options) {
 
     // create the videoTexture
     videoTexture = new THREE.Texture( canvasElement );
+    videoTexture.wrapS = THREE.RepeatWrapping;
+    videoTexture.wrapT = THREE.RepeatWrapping;
+
+
     // videoTexture.minFilter = THREE.LinearFilter;
 
     // -------------------------------------------------------------------------
@@ -3619,14 +4262,20 @@ function VideoSource(renderer, options) {
     // set the uniforms
     renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+    renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
+
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
 
     // expose video and canvas
     /**
@@ -3640,10 +4289,12 @@ function VideoSource(renderer, options) {
     _self.bypass = false
   }
 
+  var i = 0
   _self.update = function() {
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
       // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
