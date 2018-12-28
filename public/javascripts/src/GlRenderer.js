@@ -1,6 +1,11 @@
 
 /**
- * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ * @summery
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ *
+ * @description
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ *
  * @constructor GlRenderer
  * @example
  *    <!-- a Canvas element with id: glcanvas is required! -->
@@ -24,13 +29,19 @@
     133.6 => ~26kb
  */
 
-var GlRenderer = function() {
-
-  console.log("created renderer")
+var GlRenderer = function( _options ) {
 
   var _self = this
+
+  /** Set uop options */
+  _self.options = { element: 'glcanvas' }
+  if ( _options != undefined ) {
+    _self.options = _options
+  }
+
   /** This is a description of the foo function. */
   // set up threejs scene
+  _self.element = _self.options.element
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20

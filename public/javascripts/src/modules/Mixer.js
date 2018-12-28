@@ -50,6 +50,13 @@ function Mixer( renderer, options ) {
   var alpha2 = 0;
   var pod = 0;
 
+  // hoist an own bpm here
+  var currentBPM = 128
+  var currentMOD = 1
+  var currentBpmFunc = function() { return currentBPM; }
+  _self.autoFade = false
+
+
   var mixmode = 1;
   _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 
@@ -113,7 +120,15 @@ vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
 vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */' )
   }
 
+  var starttime = (new Date()).getTime()
+  var c = 0
   _self.update = function() {
+    if ( _self.autoFade ) {
+        // pod = currentBPM
+        currentBPM = currentBpmFunc()
+        c = ((new Date()).getTime() - starttime) / 1000;
+        _self.pod( ( Math.sin( c * Math.PI * ( currentBPM * currentMOD ) / 120 ) + 1 ) )
+    }
   }
 
   _self.render = function() {
@@ -197,19 +212,19 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
       pod = _num
 
       // evaluate current mix style
-      // 1 normal mix
+      // MIXMODE 1 normal mix
       if (mixmode == 1) {
         alpha1 = pod
         alpha2 = 1 - pod
       }
 
-      // 2 hard mix
+      // MIXMODE 2 hard mix
       if (mixmode == 2) {
         alpha1 = Math.round( pod )
         alpha2 = Math.round( 1-pod )
       }
 
-      // 3 NAM mix
+      // MIXMODE 3 NAM mix
       if (mixmode == 3) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -217,13 +232,13 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         if ( alpha2 > 1 ) alpha2 = 1;
       }
 
-      // 4 FAM mix
+      // MIXMODE 4 FAM mix
       if (mixmode == 4) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
       }
 
-      // 5 Non Dark mix
+      // MIXMODE 5 Non Dark mix
       if (mixmode == 5) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -233,25 +248,25 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         alpha2 += 0.36;
       }
 
-      // 6 left
+      // MIXMODE 6 left
       if (mixmode == 6) {
         alpha1 = 1;
         alpha2 = 0;
       }
 
-      // 7 right
+      // MIXMODE 7 right
       if (mixmode == 7) {
         alpha1 = 0;
         alpha2 = 1;
       }
 
-      // 8 center
+      // MIXMODE 8 center
       if (mixmode == 8) {
         alpha1 = 0.5;
         alpha2 = 0.5;
       }
 
-      // 9 BOOM
+      // MIXMODE 9 BOOM
       if (mixmode == 9) {
         alpha1 = 1;
         alpha2 = 1;
@@ -262,5 +277,20 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
       renderer.customUniforms[_self.uuid+'_alpha2'].value = alpha2;
     }
     return pod;
+  }
+
+
+  _self.bpm = function(_num) {
+      if ( _num  != undefined ) currentBPM = _num
+      return currentBPM
+  }
+
+  _self.bpmMod = function( _num ) {
+    if ( _num  != undefined ) currentMOD = _num
+    return currentMOD
+  }
+
+  _self.bindBpm = function( _func ) {
+      currentBpmFunc = _func
   }
 }

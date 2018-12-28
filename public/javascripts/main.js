@@ -27,40 +27,44 @@ var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // mixer5
 var effect1 = new ColorEffect( renderer, { source: mixer5 } )
-var effect2 = new FeedbackEffect( renderer, { source: effect1 } )
+// var effect2 = new FeedbackEffect( renderer, { source: effect1 } )
 
 // create the filemanager addon to manage the sources
-var giphymanager1 = new GiphyManager( testSource1 )
+// var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager1 = new FileManager( testSource1 )
-filemanager1.load('/sets/notv.json')
+filemanager1.load('/sets/notv_local.json')
 
 var filemanager2 = new FileManager( testSource2 )
-filemanager2.load('/sets/occupy_chaos.json')
+filemanager2.load('/sets/notv_local.json')
 
 var filemanager3 = new FileManager( testSource3 )
-filemanager3.load('/sets/occupy_chaos.json')
+filemanager3.load('/sets/notv_local.json')
 
 var filemanager4 = new FileManager( testSource4 )
-filemanager4.load('/sets/occupy_chaos.json')
+filemanager4.load('/sets/notv_local.json')
 
 
 // -----------------------------------------------------------------------------
 // create a bpm addon
 var bpm = new BPM( renderer )
-var audioanalysis1 = new AudioAnalysis(renderer)
+
+var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/audio/fear_is_the_mind_killer_audio.mp3' } )
+// var audioanalysis1 = new AudioAnalysis( renderer, { microphone: true } )
 
 // add the bpm to some of the mixer(-pod)
 bpm.add( mixer4.pod )
 audioanalysis1.add( mixer5.pod )
 
-//audioanalysis1.audio.muted = true
+// Or add the bpm, audioAnalysier to the mixer, with a mod
+// mixer4.autoFade( bpm )
+// mixer4.autoFade( audioanalysis1 )
+
+// audioanalysis1.audio.muted = true
 
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
-var output = new Output( renderer, effect2 )
-
-
+var output = new Output( renderer, testSource5 )
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
 // var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
@@ -85,6 +89,67 @@ var output = new Output( renderer, effect2 )
 // -----------------------------------------------------------------------------
 renderer.init();         // init
 renderer.render();       // start update & animation
+
+
+// new bindings syntax
+// mixer1.bindBpm( audioanalysis1["getBpm"] );
+// mixer1.bpmMod(0.25)
+
+
+// -----------------------------------------------------------------------------
+// Set up Controllers
+var midicontroller = new MidiController()
+//midicontroller.verbose = true
+
+// [ state, key, velocity ]
+// states:
+// 144 = down
+// 112 = up
+// 176 = sliding ( fader )
+// button
+midicontroller.bind( 1, function(e) {
+  // key 1, e[0] = state, e[1] = key, e[2] = velocity
+})
+
+midicontroller.bind( 1, function(e) { if (e[0]==144) mixer1.autoFade = !mixer1.autoFade; mixer1.autoFade? midicontroller.send([0x90, 1, 4]) : midicontroller.send([0x90, 1, 3]); })
+
+// fader
+midicontroller.bind( 48, function(e) { testSource5.color({r: e[2]/128,              g: testSource5.color().g, b: testSource5.color().b }) })
+midicontroller.bind( 49, function(e) { testSource5.color({r: testSource5.color().r, g: e[2]/128,              b: testSource5.color().b }) })
+midicontroller.bind( 50, function(e) { testSource5.color({r: testSource5.color().r, g: testSource5.color().g, b: e[2]/128              }) })
+
+midicontroller.bind( 49, function(e) { mixer1.bpmMod(e[2]/32) } )
+
+// this is the main keypad
+var midimap = [
+  [ 56, 57, 58, 59, 60, 61, 62, 63 ],
+  [ 48, 49, 50, 51, 52, 53, 54, 55 ],
+  [ 40, 41, 42, 43, 44, 45, 46, 47 ],
+  [ 32, 33, 34, 35, 36, 37, 38, 39 ],
+  [ 24, 25, 26, 27, 28, 29, 30, 31 ],
+  [ 16, 17, 18, 19, 20, 21, 22, 23 ],
+  [  8,  9, 10, 11, 12, 13, 14, 15 ],
+  [  0,  1,  2,  3,  4,  5,  6,  7 ]
+]
+
+var commands = []
+midimap.forEach( function( row, i ) {
+  row.forEach( function( value, j ) {
+    commands.push( 0x90, value, 0 )
+  });
+});
+
+setTimeout( function() {
+  console.log("MIDI SEND COMMANDS");
+  midicontroller.send( commands )
+  commands = []
+  commands.push( 0x90, 0, 3 )
+  commands.push( 0x90, 1, 3 )
+  commands.push( 0x90, 2, 3 )
+  midicontroller.send( commands )
+}, 1000 )
+
+
 
 
 // -----------------------------------------------------------------------------
