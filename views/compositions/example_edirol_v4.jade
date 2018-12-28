@@ -1,0 +1,57 @@
+doctype html
+html
+  head
+    title= title    
+      
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/example_edirol_v4.css')
+  
+  body 
+    canvas#glcanvas
+
+    #mixer
+      .switch_a
+        button#btn_switch_a_1.active
+        button#btn_switch_a_2
+        button#btn_switch_a_3
+        button#btn_switch_a_4
+      .switch_b
+        button#btn_switch_b_1
+        button#btn_switch_b_2.active
+        button#btn_switch_b_3
+        button#btn_switch_b_4
+      .bpm_control
+        .display#bpm_display 128
+        button#bpm_tab
+        input#bpm_slide(type='range')
+      .mix_control 
+        button#bpm_control_mix.round
+        button#bpm_control_wipe.round
+        button#bpm_control_efx.round
+        button#bpm_control_bpm_sync.round
+      .main_pod 
+        input#main_pod(type='range', min=0 max=1 step=0.01)
+      .effects_a
+        button#btn_effects_a_1.round
+        button#btn_effects_a_2.round
+        button#btn_effects_a_3.round
+        button#btn_effects_a_4.round
+      .effects_a_control
+        input#effects_a_control(type='range')
+      .effects_b
+        button#btn_effects_b_1.round
+        button#btn_effects_b_2.round
+        button#btn_effects_b_3.round
+        button#btn_effects_b_4.round
+      .effects_b_control
+        input#effects_b_control(type='range')
+      .transform_a
+        button#btn_transform_a
+      .transform_b
+        button#btn_transform_b
+      .dark
+        
+    script(src='/compositions/example_edirol_v4.js')

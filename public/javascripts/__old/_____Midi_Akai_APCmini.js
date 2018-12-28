@@ -1,33 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: controllers/MidiController.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: controllers/MidiController.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>MidiController.prototype = new Midi();  // assign prototype to marqer
-MidiController.constructor = MidiController;  // re-assign constructor
+Midi_Akai_APCmini.prototype = new Midi();  // assign prototype to marqer
+Midi_Akai_APCmini.constructor = Midi_Akai_APCmini;  // re-assign constructor
 
 // based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
 // ONLY WORKS PARTIALLY WITHOUT HTTPS://
@@ -49,24 +21,24 @@ MidiController.constructor = MidiController;  // re-assign constructor
 * @param {Options} options - options object
 */
 
-function MidiController( _renderer, _options ) {
+function Midi_Akai_APCmini( _renderer, _options ) {
+  // returns a floating point between 1 and 0, in sync with a bpm
+  console.log(" We have Midi_Akai_APCmini")
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
   // exposed variables.
-  _self.uuid = "Midi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "Control"
-  _self.controllers = {};
-  _self.bypass = true
-
-  // source.renderer ?
-  var nodes = []
-
-  // counter
-  var c = 0
+  _self.uuid = "Midi_Akai_APCmini_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Midi_Akai_APCmini"
 
   // add to renderer
   _renderer.add(_self)
+
+  //console.log("Midi_Akai_APCmini add listener")
+  //_self.addEventListener( "onMidi_Akai_APCminiMessage", this )
+
+  // counter
+  var c = 0
 
   // Check this image, with all the buttons etc.
   // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
@@ -101,34 +73,8 @@ function MidiController( _renderer, _options ) {
   var faders_opaque = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
   var listeners = []
 
-  // request MIDI access
-  if (navigator.requestMIDIAccess) {
-  	navigator.requestMIDIAccess()
-  		.then(success, failure);
-  }
-
-  // we have success!
-  function success (_midi) {
-    console.log("We have midi!09po ")
-  	midi = _midi
-  	var inputs = midi.inputs.values();
-  	var outputs = midi.outputs.values();
-
-  	for (i = inputs.next(); i &amp;&amp; !i.done; i = inputs.next()) {
-  		input = i.value;
-      input.onmidimessage = onMIDIMessage;
-  	}
-
-  	for (o = outputs.next(); o &amp;&amp; !o.done; o = outputs.next()) {
-  		output = o.value;
-      initMidi()
-  	}
-  }
-
-  // everything went wrong.
-  function failure () {
-  	console.error('No access to your midi devices.');
-  }
+  var commands = []
+  // send the comand
 
   function initMidi() {
     // make everything red!
@@ -145,34 +91,59 @@ function MidiController( _renderer, _options ) {
     });
 
     // send the comand
-    output.send( commands );
+    _self.output.send( commands );
+
+    console.log("self", _self.output)
+    console.log("this", this)
 
     // start the bpm sync
     var bpmonoff = true
     _self.blinkCallBack = function(_on) {
       if (bpmonoff) {
-        output.send( [ 0x90, 82, OFF ] )
+        //output.send( [ 0x90, 82, OFF ] )
         bpmonoff = false
       }else{
-        output.send( [ 0x90, 82, GREEN ] )
+        //output.send( [ 0x90, 82, GREEN ] )
         bpmonoff = true
       }
     }
+
+    //initRunText()
   }
 
   // some examples, this is the 'onpress' (and on slider) function
   var doubleclickbuffer = [ 0, 0, 0, 0 ]
   var doubleclickPattern = [ 128, 144, 128, 144 ]
   var doubleclick = false
-  function onMIDIMessage(e) {
+
+  _self.onMIDIMessage = function(e) {
+    // hello from Midi_Akai_APCmini
     //console.log(e.data)
 
     // Uint8Array(3) [176, 48, 117]
-    // [ state, key, value]
+    // [ state, key, velocity ]
+    // ### = state
+    // 144 = down
+    // 112 = up
+    // 176 = sliding ( fader ) or velocity (note)
+    //
+    if (e == "ready") initMidi();
+    console.log(" MIDIMESSAGE from Midi_Akai_APCmini >>", e.data)
+    initRunText()
+  }
+
+  function aap_onMIDIMessage(e) {
+    //console.log(e.data)
+
+    // Uint8Array(3) [176, 48, 117]
+    // [ state, key, velocity ]
     // state
     // 144 = down
     // 112 = up
-    // 176 = sliding
+    // 176 = sliding ( fader )
+    //
+
+    console.log(">>", e.data)
 
     var opaque = false
     if (doubleclick) return
@@ -287,40 +258,83 @@ function MidiController( _renderer, _options ) {
   	}
   }
 
+
   // init with a tap contoller
   _self.init = function() {
-    console.log("init MidiController contoller.")
+    console.log("init Midi_Akai_APCmini controller.")
     //window.addEventListener( 'keydown', keyHandler )
   }
-
   _self.update = function() {}
 
   _self.addEventListener = function( _num, _callback ) {
     listeners.push({ btn: _num, cb: _callback })
   }
 
-  _self.scheme = function() {}
+  // ---------------------------------------------------------------------------
+  // Helpers
+
+  var initRunText = function() {
+      var text = [
+        [ 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0 ],
+        [ 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 ],
+        [ 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 ]
+      ]
+
+
+      var text = [
+        [ 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0 ],
+        [ 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1 ],
+        [ 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 ],
+        [ 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0 ],
+        [ 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1 ],
+        [ 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1 ],
+        [ 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1 ],
+        [ 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0 ]
+      ]
+
+      var text = [
+        [1,	1,	1,	0,	0,	1,	1,	1,	0,	0,	0,	1,	1,	1,	0,	0,	0,	1,	1,	1,	0,	0,	1,	1,	1,	0,	0,	0,	0,	1,	1,	1,	1,	0,	0,	0,	1,	1,	1,	0,	0,	0,	0,	1,	1,	1,	0,	0,	1,	1,	1,	1,	1,	0,	0],
+        [0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0],
+        [0,	1,	0,	0,	1,	1,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	1,	1,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0],
+        [0,	1,	0,	0,	0,	0,	0,	1,	0,	0,	1,	1,	1,	1,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	1,	1,	1,	1,	1,	0,	0,	1,	1,	1,	1,	1,	0,	1,	1,	1,	1,	0,	0,	0],
+        [0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	0,	1,	0,	0,	1,	1,	1,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0],
+        [0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0],
+        [0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0],
+        [1,	1,	1,	0,	0,	1,	1,	1,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	1,	1,	0,	0,	1,	1,	1,	0,	0,	0,	0,	1,	1,	1,	1,	0,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	0,	1,	0,	1,	0,	0,	0,	0,	0,	0]
+      ]
+
+      var c = 0
+      var runText = function() {
+        var message = []
+        for ( var y = 0; y < text.length; y++ ) {
+          for ( var x = 0; x < text[y].length; x++ ) {
+              if ( y < midimap.length ) {
+                if (x < midimap[y].length ) {
+                    if ( text[y][x+c] == 1 ) {
+                      message.push( 0x90, midimap[y][x], RED );
+                    if ( text[y][x+c] == 2 ) {
+                        message.push( 0x90, midimap[y][x], GREEN );
+                    }else{
+                      message.push( 0x90, midimap[y][x], OFF );
+                    }
+                }
+              }
+          }
+        }
+        _self.output.send( message )
+      }
+
+      setInterval( function() {
+        runText()
+        console.log("tik")
+        c++
+        if ( c > text[0].length )  c = -8
+      }, 250)
+    }
+  } // end runtext
 }
-</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_ComputerKeyboard_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_Midi_SliderBoard.html">SliderBoard</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Dec 24 2018 00:44:53 GMT+0100 (CET)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>
