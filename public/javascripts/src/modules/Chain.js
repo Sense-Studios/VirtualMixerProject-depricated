@@ -74,6 +74,12 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
     return _self.sources( _num )
   }
 
+  _self.setAll = function( _alpha = 0 ) {
+    _self.sources.forEach( function( _num,i ) {
+      renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
+    })
+  }
+
   _self.toggle = function( _num, _state ) {
     if ( _state !== undefined ) {
       renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state

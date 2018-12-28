@@ -1,3 +1,10 @@
+/*
+* Example 1
+*
+* mixes 2 sold sources together
+*
+*/
+
 // create a renderer
 var renderer = new GlRenderer();
 
@@ -22,12 +29,8 @@ renderer.render();       // start update & animation
 var bpm = analysis;
 
 // add a function that moves the mixer handle from left to right.
-/*
 var c = 0;
 setInterval( function() {
   c += 0.01
   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })
-*/
-
-analysis.add( mixer1.pod )

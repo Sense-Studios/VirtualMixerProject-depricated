@@ -1,3 +1,6 @@
+GiphyManager.prototype = new Addon(); // assign prototype to marqer
+GiphyManager.constructor = GiphyManager;  // re-assign constructor
+
 /**
  * @summary
  *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
@@ -14,7 +17,7 @@
  * @param {GlRenderer} renderer
  * @param {GifSource} source
  */
- 
+
 function GiphyManager( _source ) {
 
   var _self = this

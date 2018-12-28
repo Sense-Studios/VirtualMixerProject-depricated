@@ -1,38 +1,44 @@
-/**
- * @summary
- *   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
- *
- * @description
- *   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
- *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
- *   the BPM is calculated based on an input music stream (mp3 file)
- *   ```
- *     options.audio (String) is a source, like /path/to/mymusic.mp3
- *     options.microphone (Boolean) use microphone (true) or audiosource (false)
- *   ```
- *
- *
- * @example
- * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- * var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
- * analysis.add( mixer1.pod )
- * @constructor Addon#AudioAnalysis
- * @implements Addon
- * @param {GlRenderer} renderer - current {@link GlRenderer}
- * @param {Object} options - object with several settings
- */
+AudioAnalysis.prototype = new Addon(); // assign prototype to marqer
+AudioAnalysis.constructor = AudioAnalysis;  // re-assign constructor
 
-function AudioAnalysis( renderer, _options ) {
-  // returns a floating point between 1 and 0, in sync with a bpm
+/**
+* @summary
+*   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+*
+* @description
+*   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
+*   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
+*   the BPM is calculated based on an input music stream (mp3 file)
+*
+*   ```
+*     options.audio (String) is a source, like /path/to/mymusic.mp3
+*     options.microphone (Boolean) use microphone (true) or audiosource (false)
+*   ```
+*
+*
+* @example
+* var mixer1 = new Mixer( _renderer, { source1: mySource, source2: myOtherSource })
+* var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
+* analysis.add( mixer1.pod )
+* @constructor Addon#AudioAnalysis
+* @implements Addon
+* @param {GlRenderer} renderer - current {@link GlRenderer}
+* @param {Object} options - object with several settings
+*/
+
+// returns a floating point between 1 and 0, in sync with a bpm
+// it also returns actual BPM numbers and a set of options
+function AudioAnalysis( _renderer, _options ) {
   var _self = this
 
   // exposed variables.
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
+
+  // NOTE: that externally "audio" refers to the audiofile
+  // internally it refers to the Audio HTMLMediaElement
   _self.audio = ""
   _self.bypass = false
-
-  // main bpm numbers
 
   /**
    * @description (calculated)bpm
@@ -51,29 +57,34 @@ function AudioAnalysis( renderer, _options ) {
 
   // default options
   _self.options = {
-    audio: '/radio/nsb',
+    //audio: '/radio/nsb',
+    audio: '/audio/fear_is_the_mind_killer_audio.mp3',
     microphone: false
   }
 
   if ( _options != undefined ) {
-    _options.forEach( function( _option, _value ) {
-      _self[_option] = _value
-    })
+    _self.options = _options;
   }
 
-  // TODO: needs an option override
-
-  // private
+  // somewhat private private
   var calibrating = true
   var nodes = []
   var c = 0
   var starttime = (new Date()).getTime()
 
   // add to renderer
-  renderer.add(_self)
+  _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
+
+  // create all necc. contexts
   var audio = new Audio()
+  var context = new AudioContext(); // AudioContext object instance
+  var source
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
 
   /**
    * @description Audio element
@@ -84,14 +95,6 @@ function AudioAnalysis( renderer, _options ) {
    *
   */
   _self.audio = audio
-
-  // create all necc. contexts
-  var context = new AudioContext(); // AudioContext object instance
-  var source = context.createMediaElementSource(audio);
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
   // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
@@ -104,16 +107,6 @@ function AudioAnalysis( renderer, _options ) {
   var peak_min = 15;
   var treshold = 1;
   var intervalCounts = [];
-
-  // set audio src to optioned value
-  audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
-
-  /**
-   * @description Audio element
-   * @member Addon#AudioAnalysis#audio_src
-   * @param {string} - reference to audiofile
-  */
-  _self.audio_src = _self.options.audio
 
   audio.controls = true;
   audio.loop = true;
@@ -138,7 +131,6 @@ function AudioAnalysis( renderer, _options ) {
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
-
   document.body.addEventListener('click', forceFullscreen)
 
   /**
@@ -161,11 +153,37 @@ function AudioAnalysis( renderer, _options ) {
     source.connect(context.destination);
   }
 
+  _self.getBpm = function() {
+    return _self.bpm
+  }
 
   // main ----------------------------------------------------------------------
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
-    initializeAutoBpm()
+
+    /**
+     * @description Audio element
+     * @member Addon#AudioAnalysis#audio_src
+     * @param {string} - reference to audiofile
+    */
+    // set audio src to optioned value
+    if ( !_self.options.microphone ) {
+      source = context.createMediaElementSource(audio);
+      audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+      _self.audio_src = _self.options.audio
+      initializeAutoBpm()
+
+    } else {
+
+      navigator.mediaDevices.getUserMedia({ audio })
+      .then(function(mediaStream) {
+        source = context.createMediaStreamSource(mediaStream);
+        initializeAutoBpm()
+
+      }).catch(function(err) {
+        console.log(err.name + ": " + err.message);
+      }); // always check for errors at the end.
+    }
   }
 
   _self.update = function() {
@@ -200,22 +218,6 @@ function AudioAnalysis( renderer, _options ) {
   }
 
   // actual --------------------------------------------------------------------
-  // initialize Audio, used in the first run
-  /**
-   * @description initialize audio element and connect filters and source
-   * @member Addon#AudioAnalysis.initializeAudio
-   *
-  */
-  var initializeAudio = new Promise( function( resolve, reject ) {
-    source.connect(bandpassFilter);
-    bandpassFilter.connect(analyser);
-
-    // COMMENT THIS LINE OUT FOR NO SOUND
-    source.connect(context.destination);
-
-    resolve(audio);
-    reject(err);
-  })
 
   /**
    * @description
@@ -226,15 +228,18 @@ function AudioAnalysis( renderer, _options ) {
    *
   */
   var initializeAutoBpm = function() {
-    initializeAudio.then( function(r) {
-      console.log("AudioAnalysis is initialized!", audio.src);
-      audio.play();
-      console.log("AudioAnalysis start sampling!")
-      setInterval( sampler, 1); // as fast as we can, we need those samples !!
+    // tries and play the audio
+    audio.play();
 
-    }).catch( function(err){
-      console.log("Error: AudioAnalysis ERROR ", err);
-    });
+    // connect the analysier and the filter
+    source.connect(bandpassFilter);
+    bandpassFilter.connect(analyser);
+
+    // send it to the speakers (or not)
+    source.connect(context.destination);
+
+    // start the sampler
+    setInterval( sampler, 1);
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
@@ -248,9 +253,12 @@ function AudioAnalysis( renderer, _options ) {
    * @member Addon#AudioAnalysis~sampler
    *
   */
+  _self.dataSet
+  _self.tempoData
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
+
     //if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
@@ -274,24 +282,19 @@ function AudioAnalysis( renderer, _options ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-
+      _self.tempoData = tempoData
       // Here are some ideas for a more complete analisis range
 
       // var tempoCounts = tempoData.tempoCounts
       // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
-      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+      if (tempoData == undefined) {
+        console.log("sampler is active, but no beat was found")
+      }else{
+        _self.tempodata_bpm = tempoData.bpm
+      }
 
-      // depricated failsafe
-      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
-
-      // depricated debug window
-      // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + _self.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
-      // console.log(" AudioAnalysis::AutoBPM: ",  calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
-
-      // write the test data globally (needs uiid?)
-      _self.tempodata_bpm = tempoData.bpm
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
@@ -348,8 +351,8 @@ function AudioAnalysis( renderer, _options ) {
     tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
       tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
-    }else{
 
+    }else{
 
       // DISPLAY, for debugging, requires element with an .info class
       var html = ""

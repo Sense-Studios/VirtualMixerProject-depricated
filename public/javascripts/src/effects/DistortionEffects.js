@@ -34,6 +34,24 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
 
 function DistortionEffect( _renderer, _options ) {
 
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "DistortionEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 12
+
   _self.update = function() {
     i += 0.001
     //renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
@@ -49,6 +67,7 @@ function DistortionEffect( _renderer, _options ) {
       renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
       // update uniform ?
     }
+
     return currentEffect
-    }
+  }
 }

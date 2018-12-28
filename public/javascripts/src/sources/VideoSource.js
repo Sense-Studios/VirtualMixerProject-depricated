@@ -2,15 +2,20 @@ VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
 /**
- * @description
- *  The videosource allows for playback of video files in the Mixer project
- *
- * @implements Source
- * @constructor Source#VideoSource
- * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
- * @param {GlRenderer} renderer - GlRenderer object
- * @param {Object} options - JSON Object
- */
+*
+* @summary
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @description
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @implements Source
+* @constructor Source#VideoSource
+* @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Object} options - JSON Object
+*/
+
 function VideoSource(renderer, options) {
 
   // create and instance
@@ -22,24 +27,20 @@ function VideoSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  _self.type = "VideoSource"
-
-  // allow bypass
-  _self.bypass = true;
-
-  // add to renderer
-  renderer.add(_self)
-
   // set options
-  var _options;
+  var _options = {};
   if ( options != undefined ) _options = options;
 
-  //_self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
   _self.currentSrc = "/video/placeholder.mp4"
+  _self.type = "VideoSource"
+  _self.bypass = true;
 
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
+
+  // add to renderer
+  renderer.add(_self)
 
   // initialize
   _self.init = function() {
