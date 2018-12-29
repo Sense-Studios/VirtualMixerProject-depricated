@@ -197,10 +197,9 @@ vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
    *  10. Monocolor purple,
    *  11. Sepia,
    *  ```
-   * @function Module#Mixer#effect
+   * @function Effect#ColorEffect#effect
    * @param {number} effect index of the effect
    */
-
 
   _self.effect = function( _num ){
     if ( _num != undefined ) {

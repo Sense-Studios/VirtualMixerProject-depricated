@@ -4,13 +4,13 @@
   z-index: 2
   width: 300px
   height: 350px
-  top: 0
-  left: 0
+  bottom: 0
+  left: calc( 50% - 150px )  
   background-color: #ccc
   display: grid
   justify-content: center
   grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%
-  grid-template-rows: 10% 10% 10% 20% 20% 10% 10% 10%
+  grid-template-rows: 10% 10% 10% 20% 15% 10% 10% 15%
   grid-template-areas: ". . . . . ." ". . bpm_control bpm_control        bpm_control bpm_control " "  switch_a          switch_a           dark           dark           switch_b    switch_b " " effects_a effects_a_control           dark           dark  effects_b_control   effects_b " " effects_a effects_a_control           dark           dark  effects_b_control   effects_b " " effects_a effects_a_control mix_control mix_control  effects_b_control   effects_b " "         transform_a       transform_a    main_pod    main_pod        transform_b           transform_b " "         transform_a                 transform_a    main_pod    main_pod                  transform_b           transform_b "
 
   > div
@@ -26,6 +26,9 @@
    width: 18px
    height: 18px
 
+   &:focus
+     outline: 0
+
    &.round
     background-color: #999
     border-bottom: solid 2px #666
@@ -33,9 +36,22 @@
     width: 12px
     height: 16px
 
+   &.redish
+    background-color: #511
+    border-bottom: solid 2px #755
+
    &:active, &.active
     background-color: red
     border-bottom: solid 2px #511
+
+   &.greenish
+    background-color: #252
+    border-bottom: solid 2px #755
+
+    &:active, &.active
+      background-color: #494
+      border-bottom: solid 2px #181
+
 
   .dark
     grid-area: dark
@@ -72,6 +88,11 @@
   .main_pod
     grid-area: main_pod
     padding: 8px
+    border: solid 1px #999
+    border-radius: 5px
+
+    #main_pod
+      width: 95%
 
   .effects_a
     grid-area: effects_a
