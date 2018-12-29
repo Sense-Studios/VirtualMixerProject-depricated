@@ -189,7 +189,7 @@ _self.update = function() {
 *  10. Monocolor purple,
 *  11. Sepia,
 *  ```
-* @function Module#Mixer#effect
+* @function Effect#FeedbackEffect#effect
 * @param {number} effect index of the effect
 */
 

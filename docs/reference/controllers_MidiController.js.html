@@ -26,154 +26,101 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>MidiController.prototype = new Midi();  // assign prototype to marqer
+            <pre class="prettyprint source linenums"><code>MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
-// based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
-// ONLY WORKS PARTIALLY WITHOUT HTTPS://
-
 /**
-* @summary
-*  Demo controller for midi interfaces
-*
-* @description
-*  Demo controller MidiController, implements controller and midicontroller
-*  for an AKAI APC Mini
-*  For some MIDI functions HTTPS is required!
-*  also see https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
-*
-* @implements Controller#Midi
-* @constructor Controller#Midi#MidiController
-* @example var myMidicontroller = new MidiController( _renderer, _options );
-* @param {GlRenderer} renderer - GlRenderer object
-* @param {Options} options - options object
-*/
+ * @implements Controller
+ * @constructor Controller#Midi
+ * @interface
+ */
 
-function MidiController( _renderer, _options ) {
+function MidiController( _options ) {
+  // base
+
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
   // exposed variables.
-  _self.uuid = "Midi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "Control"
-  _self.controllers = {};
+  _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "MidiController"
   _self.bypass = true
+  _self.verbose = false
+  _self.ready = false
+  _self.controllers = {};
 
   // source.renderer ?
   var nodes = []
+  var binds = []
 
   // counter
   var c = 0
 
   // add to renderer
-  _renderer.add(_self)
-
-  // Check this image, with all the buttons etc.
-  // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
-
-  // these are the available colors
-  var OFF = 0;
-  var GREEN = 1;
-  var GREEN_BLINK = 2;
-  var RED = 3;
-  var RED_BLINK = 4;
-  var YELLOW = 5;
-  var YELLOW_BLINK = 6;
+  //_renderer.add(_self)
 
   // needed for the program
   var midi, input, output
 
-  // this is the main keypad
-  var midimap = [
-  	[ 56, 57, 58, 59, 60, 61, 62, 63 ],
-  	[ 48, 49, 50, 51, 52, 53, 54, 55 ],
-  	[ 40, 41, 42, 43, 44, 45, 46, 47 ],
-  	[ 32, 33, 34, 35, 36, 37, 38, 39 ],
-  	[ 24, 25, 26, 27, 28, 29, 30, 31 ],
-  	[ 16, 17, 18, 19, 20, 21, 22, 23 ],
-  	[  8,  9, 10, 11, 12, 13, 14, 15 ],
-  	[  0,  1,  2,  3,  4,  5,  6,  7 ]
-  ]
-
-  // these are the rest of the buttons
-  var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
-  var faders        = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
-  var faders_opaque = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
-  var listeners = []
-
-  // request MIDI access
-  if (navigator.requestMIDIAccess) {
-  	navigator.requestMIDIAccess()
-  		.then(success, failure);
-  }
-
   // we have success!
-  function success (_midi) {
-    console.log("We have midi!09po ")
+  var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
   	var outputs = midi.outputs.values();
 
   	for (i = inputs.next(); i &amp;&amp; !i.done; i = inputs.next()) {
   		input = i.value;
-      input.onmidimessage = onMIDIMessage;
+      input.onmidimessage = _self.onMIDIMessage;
   	}
 
   	for (o = outputs.next(); o &amp;&amp; !o.done; o = outputs.next()) {
   		output = o.value;
-      initMidi()
+      // initMidi()
   	}
+
+    console.log("Midi READY")
+    _self.ready = true
   }
 
   // everything went wrong.
-  function failure () {
+  var failure = function () {
   	console.error('No access to your midi devices.');
   }
 
+  // request MIDI access
+  console.log("Midi check... ")
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess()
+      .then( success, failure );
+  }
+
   function initMidi() {
-    // make everything red!
-    var commands = []
-    midimap.forEach( function( row, i ) {
-      row.forEach( function( value, j ) {
-        commands.push( 0x90, value, RED_BLINK )
-      });
-    });
-
-    // switch the rest off, if there is still some led on
-    rest.forEach( function( r, i ) {
-      commands.push( 0x90, r, OFF )
-    });
-
-    // send the comand
-    output.send( commands );
-
-    // start the bpm sync
-    var bpmonoff = true
-    _self.blinkCallBack = function(_on) {
-      if (bpmonoff) {
-        output.send( [ 0x90, 82, OFF ] )
-        bpmonoff = false
-      }else{
-        output.send( [ 0x90, 82, GREEN ] )
-        bpmonoff = true
-      }
-    }
+    if ( _self.verbose ) console.log(" MIDI READY", "ready")
+    dispatchMidiEvent("ready")
   }
 
   // some examples, this is the 'onpress' (and on slider) function
   var doubleclickbuffer = [ 0, 0, 0, 0 ]
   var doubleclickPattern = [ 128, 144, 128, 144 ]
   var doubleclick = false
-  function onMIDIMessage(e) {
-    //console.log(e.data)
+
+  _self.onMIDIMessage = function(e) {
+    if (_self.verbose) console.log(" MIDIMESSAGE >>", e.data)
+    checkBindings(e.data)
+    dispatchMidiEvent(e)
+
+    // hello from midi
+    // console.log(e.data)
 
     // Uint8Array(3) [176, 48, 117]
-    // [ state, key, value]
+    // [ state, key, velocity ]
     // state
     // 144 = down
     // 112 = up
-    // 176 = sliding
+    // 176 = sliding ( fader )
+    //
 
+    /*
     var opaque = false
     if (doubleclick) return
     doubleclickbuffer.unshift([ e.data[0], e.data[1] ])
@@ -194,7 +141,7 @@ function MidiController( _renderer, _options ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
         // DO STUFF ON DOUBLECLICK
-        output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
+        _self.output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
         doubleclick = true
 
         // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
@@ -256,7 +203,7 @@ function MidiController( _renderer, _options ) {
   		rest.forEach( function( r, i ) {
   			commands.push( 0x90, r, OFF )
   		})
-  		output.send(commands)
+  		_self.output.send(commands)
 
   	}else if (e.data[1] == 65) {
   		// switch the main pads yellow
@@ -266,40 +213,71 @@ function MidiController( _renderer, _options ) {
   				commands.push( 0x90, value, YELLOW )
   			})
   		})
-      output.send( commands )
+      _self.output.send( commands )
 
   	}else{
   		// press a button, make it green
       if (e.data[0] == 128 ) {
-        output.send( [ 0x90, e.data[1], OFF ] );
+        _self.output.send( [ 0x90, e.data[1], OFF ] );
         //chain1.setChainLink(e.data[1], 0)
         //console.log("toggle chain")
         doubleclick = false
       }
 
       if (e.data[0] == 144  ) {
-        output.send( [ 0x90, e.data[1], GREEN ] );
+        _self.output.send( [ 0x90, e.data[1], GREEN ] );
         //chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         //console.log("toggle chain", faders[e.data[1]], e.data[1] )
         faders_opaque[e.data[1]] = 0
         doubleclick = false
       }
   	}
+    */
   }
 
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init MidiController contoller.")
-    //window.addEventListener( 'keydown', keyHandler )
-  }
-
+  // ---------------------------------------------------------------------------
+  _self.init = function() {}
   _self.update = function() {}
 
-  _self.addEventListener = function( _num, _callback ) {
-    listeners.push({ btn: _num, cb: _callback })
+
+  // ---------------------------------------------------------------------------
+  _self.bind = function( _key, _callback ) {
+    binds.push( { key: _key, callback: _callback } )
+    // check for double binds ?
   }
 
-  _self.scheme = function() {}
+  _self.removeBind = function( _key, _num ) {
+    // always remove first ?
+  }
+
+  // [ state, key, velocity ]
+  var checkBindings = function(e) {
+    binds.forEach( function( _obj ) {
+      if ( e[1] == _obj.key ) _obj.callback(e)
+    });
+  }
+
+  _self.send = function( commands ) {
+    if (_self.ready) {
+      //console.log("Midi send ", commands, "to", output)
+      output.send( commands )
+    }else{
+      console.log("Midi is not ready yet")
+    }
+  }
+
+  _self.addEventListener = function( _callbackName, _target ) {
+    console.log("midi add listener: " , _callbackName)
+    //listeners.push( _target )
+    nodes.push({callbackName: _callbackName, target: _target})
+    console.log("midi list: ", nodes)
+  }
+
+  var dispatchMidiEvent = function(e) {
+    nodes.forEach(function( _obj ){
+      _obj.target[_obj.callbackName](e)
+    });
+  }
 }
 </code></pre>
         </article>
@@ -311,13 +289,13 @@ function MidiController( _renderer, _options ) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_ComputerKeyboard_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="Controller_Midi_MidiController.html">MidiController</a></li><li><a href="Controller_Midi_SliderBoard.html">SliderBoard</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_ComputerKeyboard_NumpadBpmMixerControl.html">NumpadBpmMixerControl</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Controller_Midi.html">Midi</a></li><li><a href="Controller_Vidi.html">Vidi</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Dec 24 2018 00:44:53 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Dec 29 2018 00:54:38 GMT+0100 (STD)
 </footer>
 
 <script> prettyPrint(); </script>
