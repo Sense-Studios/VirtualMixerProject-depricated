@@ -36,8 +36,17 @@ var color_effect2 = new ColorEffect(renderer, { source: chain2 } );
 var nega_effect1 = new ColorEffect(renderer, { source: color_effect1 } );
 var nega_effect2 = new ColorEffect(renderer, { source: color_effect2 } );
 
+// lumakey
+var luma_effect1 = new ColorEffect(renderer, { source: nega_effect1 } );
+var luma_effect2 = new ColorEffect(renderer, { source: nega_effect2 } );
+
+// colorize
+var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } );
+var colorize_effect2 = new ColorEffect(renderer, { source: luma_effect2 } );
+
+
 // main mixer
-var main_mixer = new Mixer( renderer, {source1: nega_effect1, source2: nega_effect2 } );
+var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: colorize_effect2 } );
 
 // transformers
 // mix transformer signals (white and black)
@@ -75,39 +84,59 @@ trans_mixer2.pod(1)
 main_mixer.pod(0.5)
 // blackout_mixer.pod(0)
 
+// Some helper vars
+var original_mixmode = 1
+
 // -----------------------------------------------------------------------------
   // LEFT EFFECTS
 
 document.getElementById('btn_effects_a_1').onmousedown = function() {
   //main_mixer.mixMode(1) // NORMAL
-  var cycle = [1, 5, 6 , 7, 8, 9, 10, 11];
-  if ( color_effect1.effect() == 1 ) {
-    color_effect1.effect(17)
+  var cycle = [ 5, 6 , 7, 8, 9, 10, 11, 12 ];
+  if ( color_effect1.effect() != 1 ) {
+    color_effect1.effect(1)
     this.classList = 'mix_control round '
   }else{
-    color_effect1.effect(1)
+    color_effect1.effect(5)
     this.classList = 'mix_control round greenish active';
   }
 }
 
 document.getElementById('btn_effects_a_2').onmousedown = function() {
   //main_mixer.mixMode(1) // NORMAL
-  var cycle = [2, 3, 4]
-  if ( nega_effect1.effect() == 3 ) {
-    nega_effect1.effect(17)
+  var cycle = [ 2, 3, 4 ]
+  if ( nega_effect1.effect() != 1 ) {
+    nega_effect1.effect(1)
     this.classList = 'mix_control round '
   }else{
-    nega_effect1.effect(3)
+    nega_effect1.effect(2)
     this.classList = 'mix_control round greenish active'
   }
 }
 
 document.getElementById('btn_effects_a_3').onmousedown = function() {
-  //main_mixer.mixMode(1) // NORMAL
+  //main_mixer.mixMode(1) // NORMAL  //main_mixer.mixMode(1) // NORMAL
+  if ( luma_effect1.effect() != 1 ) {
+    luma_effect1.effect(1)
+    main_mixer.mixMode( original_mixmode );
+    this.classList = 'mix_control round '
+  }else{
+    original_mixmode = main_mixer.mixMode()
+    luma_effect1.effect(39);
+    main_mixer.mixMode(10);
+    this.classList = 'mix_control round greenish active'
+  }
 }
 
 document.getElementById('btn_effects_a_4').onmousedown = function() {
   //main_mixer.mixMode(1) // NORMAL
+  if ( colorize_effect1.effect() != 1 ) {
+    colorize_effect1.effect(1)
+    this.classList = 'mix_control round '
+  }else{
+    colorize_effect1.effect(41);
+    this.classList = 'mix_control round greenish active'
+  }
 }
 
 document.getElementById('effects_a_control').onmousedown = function() {
@@ -120,19 +149,21 @@ document.getElementById('effects_a_control').onmousedown = function() {
 // Add interaction
 document.getElementById('bpm_control_mix').onmousedown = function() {
   main_mixer.mixMode(1) // NORMAL
-
+  original_mixmode = 1
   document.querySelectorAll('.mix_control').forEach(function(elm) { elm.classList = elm.classList.toString().replace("active", "")})
   main_mixer.mixMode() == 1 ? this.classList = 'mix_control round greenish active' : this.classList = 'mix_control round greenish';
 }
 
 document.getElementById('bpm_control_wipe').onmousedown = function() {
   main_mixer.mixMode(2) // HARD
+  original_mixmode = 2
   document.querySelectorAll('.mix_control').forEach(function(elm) { elm.classList = elm.classList.toString().replace("active", "")})
   main_mixer.mixMode() == 2 ? this.classList = 'mix_control round greenish active' : this.classList = 'mix_control round greenish';
 }
 
 document.getElementById('bpm_control_efx').onmousedown = function() {
   main_mixer.mixMode(3) // NON DARK
+  original_mixmode = 3
   document.querySelectorAll('.mix_control').forEach(function(elm) { console.log( elm.classList ); elm.classList = elm.classList.toString().replace("active", "")})
   main_mixer.mixMode() == 3 ? this.classList = 'mix_control round greenish active' : this.classList = 'mix_control round greenish';
 }

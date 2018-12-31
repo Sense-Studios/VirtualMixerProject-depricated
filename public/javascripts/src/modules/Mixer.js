@@ -272,6 +272,18 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         alpha2 = 1;
       }
 
+      // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
+      if (mixmode == 10 ) {
+        alpha1 = pod
+        alpha2 = 1;
+      }
+
+      // MIXMODE X ADDITIVE MIX RIGHT (use with lumkey en chromkey)
+      if (mixmode == 11 ) {
+        alpha1 = 1;
+        alpha2 = pod
+      }
+
       // send alphas to the shader
       renderer.customUniforms[_self.uuid+'_alpha1'].value = alpha1;
       renderer.customUniforms[_self.uuid+'_alpha2'].value = alpha2;
