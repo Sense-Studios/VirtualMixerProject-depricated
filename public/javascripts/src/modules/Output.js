@@ -15,6 +15,14 @@
  * @param source{Source} any valid source node
  * @author Sense Studios
  */
+
+ // TODO: maybe remove this node, and change it for something on the renderer?
+ // like:
+ //
+ // renderer.output( node )
+ // renderer.init()
+ // renderer.render()
+
 function Output(renderer, _source ) {
 
   // create and instance

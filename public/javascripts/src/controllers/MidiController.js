@@ -2,9 +2,19 @@ MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
+ * @summary
+ *  ---
+ *
+ * @description
+ *  ---
+ *
+ * @example
+ *  ---
+ *
  * @implements Controller
- * @constructor Controller#Midi
- * @interface
+ * @constructor Controller#MidiController
+ * @param options:Object
+ * @author Sense Studios
  */
 
 function MidiController( _options ) {
@@ -91,6 +101,9 @@ function MidiController( _options ) {
     // 112 = up
     // 176 = sliding ( fader )
     //
+
+    // This is mainly experimental code for doubleclicking
+    // we could return this as 256, 257 or higher state values (?)
 
     /*
     var opaque = false
@@ -210,7 +223,6 @@ function MidiController( _options ) {
   // ---------------------------------------------------------------------------
   _self.init = function() {}
   _self.update = function() {}
-
 
   // ---------------------------------------------------------------------------
   _self.bind = function( _key, _callback ) {
