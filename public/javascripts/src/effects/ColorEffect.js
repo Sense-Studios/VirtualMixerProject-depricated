@@ -49,7 +49,8 @@ function ColorEffect( _renderer, _options ) {
 
   var source = _options.source
   var currentEffect = _options.effect
-  var currentEffect = 12
+  var currentEffect = 1
+  var currentExtra = 0.8
 
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
@@ -75,7 +76,8 @@ function ColorEffect( _renderer, _options ) {
 
     console.log("ColorEffect inits, with", _renderer)
     // add uniforms to renderer
-    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 100 }
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
     //_renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "t", value: null }
     // _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: tempTexture }
     //_renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
@@ -83,6 +85,7 @@ function ColorEffect( _renderer, _options ) {
     // add uniforms to fragmentshader
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_extra;\n/* custom_uniforms */')
 
     // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
     // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
@@ -98,29 +101,33 @@ function ColorEffect( _renderer, _options ) {
     // _output * uuid_alpha_1
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
-    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv ) {
-  if ( currentcoloreffect == 1  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
+vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
+  if ( currentcoloreffect == 1 ) return vec3( src.rgb );                                                                                // normal
+
+  // negative
   if ( currentcoloreffect == 2  ) return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                          // negtive 1
   if ( currentcoloreffect == 3  ) return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                              // negtive 2
   if ( currentcoloreffect == 4  ) return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                              // negtive 3
-  if ( currentcoloreffect == 5  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
-  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
-  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
-  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
-  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
-  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
-  if ( currentcoloreffect == 11 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
+
+  // monocolor
+  if ( currentcoloreffect == 5  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
+  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
+  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
+  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
+  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
+  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
+  if ( currentcoloreffect == 11 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
+  if ( currentcoloreffect == 12 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
 
   // color swapping
-  if ( currentcoloreffect == 12 ) return vec3( src.rrr );
-  if ( currentcoloreffect == 13 ) return vec3( src.rrg );
-  if ( currentcoloreffect == 14 ) return vec3( src.rrb );
-  if ( currentcoloreffect == 15 ) return vec3( src.rgr );
-  if ( currentcoloreffect == 16 ) return vec3( src.rgg );
-  if ( currentcoloreffect == 17 ) return vec3( src.rgb ); // normal
+  if ( currentcoloreffect == 13 ) return vec3( src.rrr );
+  if ( currentcoloreffect == 14 ) return vec3( src.rrg );
+  if ( currentcoloreffect == 15 ) return vec3( src.rrb );
+  if ( currentcoloreffect == 16 ) return vec3( src.rgr );
+  if ( currentcoloreffect == 17 ) return vec3( src.rgg );
   if ( currentcoloreffect == 18 ) return vec3( src.rbr );
   if ( currentcoloreffect == 19 ) return vec3( src.rbg );
   if ( currentcoloreffect == 20 ) return vec3( src.rbb );
@@ -142,7 +149,32 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv ) {
   if ( currentcoloreffect == 36 ) return vec3( src.bbr );
   if ( currentcoloreffect == 37 ) return vec3( src.bbg );
   if ( currentcoloreffect == 38 ) return vec3( src.bbb );
-  return src.rgb;
+
+  // lum key
+  if ( currentcoloreffect == 39 ) {
+    return vec3( clamp( src.r, extra, 1.) == extra ? .0 : src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, clamp( src.r, extra, 1.) == extra ? .0 : src.b );
+  }
+
+  // color key; Greenkey
+  if ( currentcoloreffect == 40 ) {
+    return vec3( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b );
+  }
+
+  // paint
+  if ( currentcoloreffect == 41 ) {
+    return vec3( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra  );
+  }
+
+  // colorise
+  if ( currentcoloreffect == 42 ) {
+  }
+
+  // wipes (move these to mixer?)
+  if ( gl_FragCoord.x > 200.0 ) {
+    return vec3(0.0,0.0,0.0);
+  }else {
+    return src;
+  }
 }
 
 /* custom_helpers */
@@ -151,7 +183,7 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, vec2 vUv ) {
   }
 
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', vUv );\n  /* custom_main */')
+vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
   } // init
 
 
@@ -207,6 +239,19 @@ vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
       renderer.customUniforms[_self.uuid+'_currentcoloreffect'].value = currentEffect
       // update uniform ?
     }
+
+    console.log("effect set to: ", currentEffect)
     return currentEffect
+  }
+
+  _self.extra = function( _num ){
+    if ( _num != undefined ) {
+      currentExtra = _num
+      renderer.customUniforms[_self.uuid+'_extra'].value = currentExtra
+      // update uniform ?
+    }
+
+    console.log("extra set to: ", currentExtra)
+    return currentExtra
   }
 }

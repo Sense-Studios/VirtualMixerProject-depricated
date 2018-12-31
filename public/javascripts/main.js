@@ -26,7 +26,7 @@ var mixer5 = new Mixer( renderer, { source1: mixer4, source2: testSource3 } );
 var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // mixer5
-var effect1 = new ColorEffect( renderer, { source: mixer5 } )
+var effect1 = new ColorEffect( renderer, { source: testSource1 } )
 // var effect2 = new FeedbackEffect( renderer, { source: effect1 } )
 
 // create the filemanager addon to manage the sources
@@ -64,7 +64,7 @@ audioanalysis1.add( mixer5.pod )
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
-var output = new Output( renderer, testSource5 )
+var output = new Output( renderer, effect1 )
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
 // var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )

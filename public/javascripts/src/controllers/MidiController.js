@@ -47,11 +47,11 @@ function MidiController( _options ) {
 
   	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
   		output = o.value;
-      // initMidi()
+      initMidi()
   	}
 
     console.log("Midi READY")
-    _self.ready = true
+    if ( output != undefined ) _self.ready = true
   }
 
   // everything went wrong.
@@ -231,7 +231,7 @@ function MidiController( _options ) {
 
   _self.send = function( commands ) {
     if (_self.ready) {
-      //console.log("Midi send ", commands, "to", output)
+      console.log("Midi send ", commands, "to", output)
       output.send( commands )
     }else{
       console.log("Midi is not ready yet")
