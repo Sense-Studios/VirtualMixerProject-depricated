@@ -1,3 +1,22 @@
+GamePadController.prototype = new Controller();  // assign prototype to marqer
+GamePadController.constructor = GamePadController;  // re-assign constructor
+
+/**
+ * @summary
+ *  ---
+ *
+ * @description
+ *  ---
+ *
+ * @example
+ *  ---
+ *
+ * @implements Controller
+ * @constructor Controller#GamePadController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
 function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
