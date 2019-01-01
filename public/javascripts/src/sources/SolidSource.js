@@ -30,7 +30,7 @@ function SolidSource(renderer, options) {
 
   // set options
   var _options;
-  var color = { r:0.0, g:0.0, b:0.0 } // add alpha
+  var color = { r:0.0, g:0.0, b:0.0, a: 1.0 }
 
   if ( options != undefined ) _options = options;
 
@@ -39,14 +39,14 @@ function SolidSource(renderer, options) {
     if (_options.color != undefined) color = _options.color
 
     // add uniforms
-    renderer.customUniforms[_self.uuid + "_color"] = { type: "v3", value: new THREE.Vector3( color.r, color.g, color.b ) }
+    renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector4( color.r, color.g, color.b, color.a ) }
 
     // ad variables to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_color;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_color;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // add output to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = '+_self.uuid+'_color;\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = '+_self.uuid+'_color;\n  /* custom_main */')
   }
 
   _self.update = function() {}
@@ -61,12 +61,14 @@ function SolidSource(renderer, options) {
   * @param {float} r - red value
   * @param {float} g - green value
   * @param {float} b - blue value
+  * @param {float} a - alpha value (optional)
   * @returns color
   */
   _self.color = function( c ) {
     if ( c != undefined ) {
       color = c
-      renderer.customUniforms[_self.uuid + "_color"] = { type: "v3", value: new THREE.Vector3( color.r, color.g, color.b ) }
+      if (color.a == undefined ) color.a = 1.0 // just to be sore
+      renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector3( color.r, color.g, color.b, color.a ) }
     }
     return color
   }

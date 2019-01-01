@@ -83,15 +83,16 @@ function FeedbackEffect( _renderer, _options ) {
     _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: effectsTexture }
     _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: 100 }
 
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int  '+_self.uuid+'_currentfeedbackeffect;\n/* custom_uniforms */')
 
 
-    if ( renderer.fragmentShader.indexOf('vec3 feedbackeffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv )') == -1 ) {
 
       _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-  vec3 feedbackeffect ( vec3 src, int currentfeedbackeffect, vec2 vUv ) {
+  vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv ) {
     if ( currentfeedbackeffect == 100 ) {
       //vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
       //gl_Position = vec4( vec2(0.,0.), 0., 0.);
@@ -143,7 +144,7 @@ function FeedbackEffect( _renderer, _options ) {
 }
 
 _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
+vec4 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
 } // init
 
 
