@@ -104,65 +104,69 @@ function ColorEffect( _renderer, _options ) {
     if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
-  if ( currentcoloreffect == 1 ) return vec3( src.rgb );                                                                                // normal
+vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
+  if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                               // normal
 
   // negative
-  if ( currentcoloreffect == 2  ) return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                          // negtive 1
-  if ( currentcoloreffect == 3  ) return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                              // negtive 2
-  if ( currentcoloreffect == 4  ) return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                              // negtive 3
+  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                   // negtive 1
+  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                       // negtive 2
+  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                       // negtive 3
 
   // monocolor
-  if ( currentcoloreffect == 5  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
-  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
-  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
-  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
-  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
-  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
-  if ( currentcoloreffect == 11 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
-  if ( currentcoloreffect == 12 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
+  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                             // black and white
+  if ( currentcoloreffect == 6  ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
+  if ( currentcoloreffect == 7  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
+  if ( currentcoloreffect == 8  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
+  if ( currentcoloreffect == 9  ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
+  if ( currentcoloreffect == 10 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
+  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
+  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                   // sepia
 
   // color swapping
-  if ( currentcoloreffect == 13 ) return vec3( src.rrr );
-  if ( currentcoloreffect == 14 ) return vec3( src.rrg );
-  if ( currentcoloreffect == 15 ) return vec3( src.rrb );
-  if ( currentcoloreffect == 16 ) return vec3( src.rgr );
-  if ( currentcoloreffect == 17 ) return vec3( src.rgg );
-  if ( currentcoloreffect == 18 ) return vec3( src.rbr );
-  if ( currentcoloreffect == 19 ) return vec3( src.rbg );
-  if ( currentcoloreffect == 20 ) return vec3( src.rbb );
-  if ( currentcoloreffect == 21 ) return vec3( src.grr );
-  if ( currentcoloreffect == 22 ) return vec3( src.grg );
-  if ( currentcoloreffect == 23 ) return vec3( src.grb );
-  if ( currentcoloreffect == 24 ) return vec3( src.ggr );
-  if ( currentcoloreffect == 25 ) return vec3( src.ggg );
-  if ( currentcoloreffect == 26 ) return vec3( src.ggb );
-  if ( currentcoloreffect == 27 ) return vec3( src.gbr );
-  if ( currentcoloreffect == 28 ) return vec3( src.gbg );
-  if ( currentcoloreffect == 29 ) return vec3( src.gbb );
-  if ( currentcoloreffect == 30 ) return vec3( src.brr );
-  if ( currentcoloreffect == 31 ) return vec3( src.brg );
-  if ( currentcoloreffect == 32 ) return vec3( src.brb );
-  if ( currentcoloreffect == 33 ) return vec3( src.bgr );
-  if ( currentcoloreffect == 34 ) return vec3( src.bgg );
-  if ( currentcoloreffect == 35 ) return vec3( src.bgb );
-  if ( currentcoloreffect == 36 ) return vec3( src.bbr );
-  if ( currentcoloreffect == 37 ) return vec3( src.bbg );
-  if ( currentcoloreffect == 38 ) return vec3( src.bbb );
+  if ( currentcoloreffect == 13 ) return vec4( src.rrra );
+  if ( currentcoloreffect == 14 ) return vec4( src.rrga );
+  if ( currentcoloreffect == 15 ) return vec4( src.rrba );
+  if ( currentcoloreffect == 16 ) return vec4( src.rgra );
+  if ( currentcoloreffect == 17 ) return vec4( src.rgga );
+  if ( currentcoloreffect == 18 ) return vec4( src.rbra );
+  if ( currentcoloreffect == 19 ) return vec4( src.rbga );
+  if ( currentcoloreffect == 20 ) return vec4( src.rbba );
+  if ( currentcoloreffect == 21 ) return vec4( src.grra );
+  if ( currentcoloreffect == 22 ) return vec4( src.grga );
+  if ( currentcoloreffect == 23 ) return vec4( src.grba );
+  if ( currentcoloreffect == 24 ) return vec4( src.ggra );
+  if ( currentcoloreffect == 25 ) return vec4( src.ggga );
+  if ( currentcoloreffect == 26 ) return vec4( src.ggba );
+  if ( currentcoloreffect == 27 ) return vec4( src.gbra );
+  if ( currentcoloreffect == 28 ) return vec4( src.gbga );
+  if ( currentcoloreffect == 29 ) return vec4( src.gbba );
+  if ( currentcoloreffect == 30 ) return vec4( src.brra );
+  if ( currentcoloreffect == 31 ) return vec4( src.brga );
+  if ( currentcoloreffect == 32 ) return vec4( src.brba );
+  if ( currentcoloreffect == 33 ) return vec4( src.bgra );
+  if ( currentcoloreffect == 34 ) return vec4( src.bgga );
+  if ( currentcoloreffect == 35 ) return vec4( src.bgba );
+  if ( currentcoloreffect == 36 ) return vec4( src.bbra );
+  if ( currentcoloreffect == 37 ) return vec4( src.bbga );
+  if ( currentcoloreffect == 38 ) return vec4( src.bbba );
 
   // lum key
   if ( currentcoloreffect == 39 ) {
-    return vec3( clamp( src.r, extra, 1.) == extra ? .0 : src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, clamp( src.r, extra, 1.) == extra ? .0 : src.b );
+    float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
+    float green = clamp( src.r, extra, 1.) == extra ? .0 : src.g;
+    float blue = clamp( src.r, extra, 1.) == extra ? .0 : src.b;
+    float alpha = red + green + blue == .0 ? .0 : src.a;
+    return vec4( red, green, blue, alpha );
   }
 
   // color key; Greenkey
   if ( currentcoloreffect == 40 ) {
-    return vec3( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b );
+    return vec4( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b, clamp( src.r, extra, 1.) == extra ? .0 : src.a );
   }
 
   // paint
   if ( currentcoloreffect == 41 ) {
-    return vec3( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra  );
+    return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
   }
 
   // colorise
@@ -171,7 +175,7 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // wipes (move these to mixer?)
   if ( gl_FragCoord.x > 200.0 ) {
-    return vec3(0.0,0.0,0.0);
+    return vec4(0.0,0.0,0.0,0.0);
   }else {
     return src;
   }
@@ -183,7 +187,7 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
+vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
   } // init
 
 

@@ -53,11 +53,11 @@ function Chain(renderer, options) {
     _self.sources.forEach( function( source, index ) {
       generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
     });
-    generatedOutput += ";\n"
+    //generatedOutput += ";\n"
 
     // put it in the shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+', 1.0); \/* custom_main */')
 
   }
 
