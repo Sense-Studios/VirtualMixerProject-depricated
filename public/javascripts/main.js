@@ -2,7 +2,7 @@ var renderer = new GlRenderer();
 
 // create sources
 var testSource1 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
-var testSource2 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
+var testSource2 = new VideoSource( renderer, { src: '/video/ignore/notv/VTS_01_0.mp4' } );
 var testSource3 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 var testSource4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 
@@ -15,8 +15,10 @@ var testSource4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } )
 // solid
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
 
+var effect1 = new ColorEffect( renderer, { source: testSource1 } )
+
 // create some modules
-var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
+var mixer1 = new Mixer( renderer, { source1: effect1, source2: testSource2 } );
 var mixer2 = new Mixer( renderer, { source1: testSource3, source2: testSource4 } );
 var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 } );
 
@@ -26,7 +28,6 @@ var mixer5 = new Mixer( renderer, { source1: mixer4, source2: testSource3 } );
 var switcher1 = new Switcher( renderer, { source1: mixer3, source2: mixer4 } );
 
 // mixer5
-var effect1 = new ColorEffect( renderer, { source: testSource1 } )
 // var effect2 = new FeedbackEffect( renderer, { source: effect1 } )
 
 // create the filemanager addon to manage the sources
@@ -64,7 +65,7 @@ audioanalysis1.add( mixer5.pod )
 // -----------------------------------------------------------------------------
 // set the output node (needs to be last!)
 //var output = new Output( renderer, switcher1 )
-var output = new Output( renderer, effect1 )
+var output = new Output( renderer, mixer1 )
 // -----------------------------------------------------------------------------
 // add a controller to mixer and bpm
 // var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
@@ -180,9 +181,9 @@ renderer.render();       // start update & animation
 //mixer5.pod(0)
 //mixer5.pod(0.5)
 setTimeout( function() {
-  filemanager1.change()
-  filemanager2.change()
-  filemanager3.change()
+  //filemanager1.change()
+  //filemanager2.change()
+  //filemanager3.change()
 
   //bpm.audio.muted = true
   //bpm.useAutoBpm = false

@@ -49,7 +49,7 @@ function Chain(renderer, options) {
 
   _self.init = function() {
     // bould output module
-    var generatedOutput = "vec3(0.0,0.0,0.0)"
+    var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
     _self.sources.forEach( function( source, index ) {
       generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
     });
@@ -57,7 +57,7 @@ function Chain(renderer, options) {
 
     // put it in the shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+', 1.0); \/* custom_main */')
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
 
   }
 
