@@ -2,15 +2,20 @@ VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
 /**
- * @description
- *  The videosource allows for playback of video files in the Mixer project
- *
- * @implements Source
- * @constructor Source#VideoSource
- * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
- * @param {GlRenderer} renderer - GlRenderer object
- * @param {Object} options - JSON Object
- */
+*
+* @summary
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @description
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @implements Source
+* @constructor Source#VideoSource
+* @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Object} options - JSON Object
+*/
+
 function VideoSource(renderer, options) {
 
   // create and instance
@@ -22,23 +27,20 @@ function VideoSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  _self.type = "VideoSource"
-
-  // allow bypass
-  _self.bypass = true;
-
-  // add to renderer
-  renderer.add(_self)
-
   // set options
-  var _options;
+  var _options = {};
   if ( options != undefined ) _options = options;
 
-  _self.currentSrc = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4"
+  _self.currentSrc = "/video/placeholder.mp4"
+  _self.type = "VideoSource"
+  _self.bypass = true;
 
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
+
+  // add to renderer
+  renderer.add(_self)
 
   // initialize
   _self.init = function() {
@@ -114,6 +116,10 @@ function VideoSource(renderer, options) {
 
     // create the videoTexture
     videoTexture = new THREE.Texture( canvasElement );
+    videoTexture.wrapS = THREE.RepeatWrapping;
+    videoTexture.wrapT = THREE.RepeatWrapping;
+
+
     // videoTexture.minFilter = THREE.LinearFilter;
 
     // -------------------------------------------------------------------------
@@ -123,14 +129,20 @@ function VideoSource(renderer, options) {
     // set the uniforms
     renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+    renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
+
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
 
     // expose video and canvas
     /**
@@ -144,10 +156,12 @@ function VideoSource(renderer, options) {
     _self.bypass = false
   }
 
+  var i = 0
   _self.update = function() {
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
       // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );

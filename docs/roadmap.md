@@ -1,6 +1,6 @@
 *** Roadmap ***
 
-* write some demo effects; Black and White, feedback
+* ~~write some demo effects; Black and White, feedback~~
 P write a uniform visualizer/ settings
 D hook up the gifSource, one way or another
 D write a simple control unit

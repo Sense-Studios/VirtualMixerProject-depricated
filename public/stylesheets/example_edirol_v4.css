@@ -1,0 +1,95 @@
+#mixer {
+  position: absolute;
+  z-index: 2;
+  width: 300px;
+  height: 350px;
+  bottom: 0;
+  left: calc( 50% - 150px);
+  background-color: #ccc;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
+  grid-template-rows: 10% 10% 10% 20% 15% 10% 10% 15%;
+  grid-template-areas: ". . . . . ." ". . bpm_control bpm_control        bpm_control bpm_control " "  switch_a          switch_a           dark           dark           switch_b    switch_b " " effects_a effects_a_control           dark           dark  effects_b_control   effects_b " " effects_a effects_a_control           dark           dark  effects_b_control   effects_b " " effects_a effects_a_control mix_control mix_control  effects_b_control   effects_b " "         transform_a       transform_a    main_pod    main_pod        transform_b           transform_b " "         transform_a                 transform_a    main_pod    main_pod                  transform_b           transform_b "; }
+  #mixer > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center; }
+  #mixer button {
+    background-color: #933;
+    border: 0;
+    border-bottom: solid 2px #511;
+    width: 18px;
+    height: 18px; }
+    #mixer button:focus {
+      outline: 0; }
+    #mixer button.round {
+      background-color: #999;
+      border-bottom: solid 2px #666;
+      border-radius: 12px;
+      width: 12px;
+      height: 16px; }
+    #mixer button.redish {
+      background-color: #511;
+      border-bottom: solid 2px #755; }
+    #mixer button:active, #mixer button.active {
+      background-color: red;
+      border-bottom: solid 2px #511; }
+    #mixer button.greenish {
+      background-color: #252;
+      border-bottom: solid 2px #755; }
+      #mixer button.greenish:active, #mixer button.greenish.active {
+        background-color: #494;
+        border-bottom: solid 2px #181; }
+  #mixer .dark {
+    grid-area: dark;
+    background-color: #888; }
+  #mixer .switch_a {
+    grid-area: switch_a;
+    background-color: #444; }
+  #mixer .switch_b {
+    grid-area: switch_b;
+    background-color: #444; }
+  #mixer .bpm_control {
+    grid-area: bpm_control;
+    background-color: #888; }
+    #mixer .bpm_control #bpm_display {
+      width: 45%;
+      text-align: center;
+      color: #822;
+      background-color: #200; }
+    #mixer .bpm_control #bpm_tap {
+      width: 20%; }
+    #mixer .bpm_control #bpm_slide {
+      width: 30%; }
+  #mixer .mix_control {
+    grid-area: mix_control;
+    background-color: #444; }
+  #mixer .main_pod {
+    grid-area: main_pod;
+    padding: 8px;
+    border: solid 1px #999;
+    border-radius: 5px; }
+    #mixer .main_pod #main_pod {
+      width: 95%; }
+  #mixer .effects_a {
+    grid-area: effects_a;
+    flex-direction: column; }
+  #mixer .effects_a_control {
+    grid-area: effects_a_control; }
+    #mixer .effects_a_control #effects_a_control {
+      transform: rotateZ(90deg); }
+  #mixer .effects_b {
+    grid-area: effects_b;
+    flex-direction: column; }
+  #mixer .effects_b_control {
+    grid-area: effects_b_control; }
+    #mixer .effects_b_control #effects_b_control {
+      transform: rotateZ(90deg); }
+  #mixer .transform_a {
+    grid-area: transform_a; }
+  #mixer .transform_b {
+    grid-area: transform_b; }
+
+/*# sourceMappingURL=example_edirol_v4.css.map */

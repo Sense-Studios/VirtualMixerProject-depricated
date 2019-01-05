@@ -3,7 +3,7 @@
  * @interface
  */
 
-function Controller( renderer, options ) {
+function Controller( options ) {
   var _self = this
 
   // set options
@@ -11,7 +11,7 @@ function Controller( renderer, options ) {
   if ( options != undefined ) _options = options;
 
   _self.type = "Controller"
-  _self.myLittleControllerVar = "Wakkawakka"
+  _self.testControllerVar = "test"
 
   // program interface
   _self.init =         function() {}

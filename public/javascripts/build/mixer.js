@@ -1,6 +1,11 @@
 
 /**
- * Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ * @summery
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ *
+ * @description
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
+ *
  * @constructor GlRenderer
  * @example
  *    <!-- a Canvas element with id: glcanvas is required! -->
@@ -18,13 +23,25 @@
  *    </script>
  */
 
-var GlRenderer = function() {
+ /*
+    We might try and change THREEJS and move to regl;
+    https://github.com/regl-project, http://regl.party/examples => video
+    133.6 => ~26kb
+ */
 
-  console.log("created renderer")
+var GlRenderer = function( _options ) {
 
   var _self = this
+
+  /** Set uop options */
+  _self.options = { element: 'glcanvas' }
+  if ( _options != undefined ) {
+    _self.options = _options
+  }
+
   /** This is a description of the foo function. */
   // set up threejs scene
+  _self.element = _self.options.element
   _self.scene = new THREE.Scene();
   _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   _self.camera.position.z = 20
@@ -37,23 +54,25 @@ var GlRenderer = function() {
   _self.customDefines = {}
 
   // base vertexShader
-  _self.vertexShader = "\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-\n  vUv = uv;\
-\n}"
+  _self.vertexShader = `
+    varying vec2 vUv;\
+    void main() {\
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+      vUv = uv;\
+    }
+  `
 
   // base fragment shader
-  _self.fragmentShader = "\
-\nuniform sampler2D textureTest;\
-\nuniform float wave;\
-\n/* custom_uniforms */\n\
-\n/* custom_helpers */\n\
-\nvarying vec2 vUv;\
-\nvoid main() {\
-\n  /* custom_main */\n\
-\n}"
+  _self.fragmentShader = `
+    uniform sampler2D textureTest;
+    uniform float wave;
+    /* custom_uniforms */\
+    /* custom_helpers */\
+    varying vec2 vUv;\
+    void main() {\
+      /* custom_main */\
+    }
+  `
 
   // ---------------------------------------------------------------------------
   /** @function GlRenderer.init */
@@ -129,76 +148,228 @@ var GlRenderer = function() {
      * The vertex shader
      * @member GlRenderer#vertexShader
      */
-    _self.vertexShader = "\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-  \n  vUv = uv;\
-  \n}"
+    _self.vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vUv = uv;
+      }
+    `
 
   /**
    * The fragment shader
    * @member GlRenderer#fragmentShader
    */
     // base fragment shader
-    _self.fragmentShader = "\
-  \nuniform sampler2D textureTest;\
-  \nuniform float wave;\
-  \n/* custom_uniforms */\n\
-  \n/* custom_helpers */\n\
-  \nvarying vec2 vUv;\
-  \nvoid main() {\
-  \n  /* custom_main */\n\
-  \n}"
+    _self.fragmentShader = `
+      uniform sampler2D textureTest;
+      ununiform float wave;
+      /* custom_uniforms */
+      /* custom_helpers */
+      varying vec2 vUv;
+      void main() {
+        /* custom_main */
+      }
+    `
+
     _self.nodes = []
   }
 }
 
-function AudioAnalysis( renderer ) {
-  // returns a floating point between 1 and 0, in sync with a bpm
+AudioAnalysis.prototype = new Addon(); // assign prototype to marqer
+AudioAnalysis.constructor = AudioAnalysis;  // re-assign constructor
+
+/**
+* @summary
+*   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+*
+* @description
+*   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
+*   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
+*   the BPM is calculated based on an input music stream (mp3 file)
+*
+*   ```
+*     options.audio (String) is a source, like /path/to/mymusic.mp3
+*     options.microphone (Boolean) use microphone (true) or audiosource (false)
+*   ```
+*
+*
+* @example
+* var mixer1 = new Mixer( _renderer, { source1: mySource, source2: myOtherSource })
+* var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
+* analysis.add( mixer1.pod )
+* @constructor Addon#AudioAnalysis
+* @implements Addon
+* @param {GlRenderer} renderer - current {@link GlRenderer}
+* @param {Object} options - object with several settings
+*/
+
+// returns a floating point between 1 and 0, in sync with a bpm
+// it also returns actual BPM numbers and a set of options
+function AudioAnalysis( _renderer, _options ) {
   var _self = this
 
   // exposed variables.
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
+
+  // NOTE: that externally "audio" refers to the audiofile
+  // internally it refers to the Audio HTMLMediaElement
   _self.audio = ""
   _self.bypass = false
 
-  // keep an internal of this
+  /**
+   * @description (calculated)bpm
+   * @member Addon#AudioAnalysis#bpm
+  */
   _self.bpm = 128
   _self.bpm_float = 128
+
+  /**
+   * @description bpm mod, multiplyer for bpm output, usuall 0.125, 0.25, 0.5, 2, 4 etc.
+   * @member Addon#AudioAnalysis#mod
+  */
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
 
-  var calibrating = true
-
-    // source.renderer ?
-  var nodes = []
-
-  // counter
-  var c = 0
-
-  // not implemented
-  // _self.scheme = function() {}
-
-  // add to renderer
-  renderer.add(_self)
-
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init AudioAnalysis Addon.")
-    //window.addEventListener( 'keydown', keyHandler )
-    initializeAutoBpm()
+  // default options
+  _self.options = {
+    //audio: '/radio/nsb',
+    audio: '/audio/fear_is_the_mind_killer_audio.mp3',
+    microphone: false
   }
 
+  if ( _options != undefined ) {
+    _self.options = _options;
+  }
+
+  // somewhat private private
+  var calibrating = true
+  var nodes = []
+  var c = 0
   var starttime = (new Date()).getTime()
+
+  // add to renderer
+  _renderer.add(_self)
+
+  // setup ---------------------------------------------------------------------
+
+  // create all necc. contexts
+  var audio = new Audio()
+  var context = new AudioContext(); // AudioContext object instance
+  var source
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
+
+  /**
+   * @description Audio element
+   * @member Addon#AudioAnalysis#audio
+   * @param {HTMLMediaElement} - reference to the virtual media element
+   *
+   *  HTMLMediaElement AUDIO reference
+   *
+  */
+  _self.audio = audio
+
+  // config --------------------------------------------------------------------
+  // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
+  var sampleLength = 4000;
+  var dataSet = new Array(sampleLength);
+  var peaks = new Array(sampleLength);
+  var bufferLength
+  var foundpeaks = [];
+  var peak_max = 60;
+  var peak_min = 15;
+  var treshold = 1;
+  var intervalCounts = [];
+
+  audio.controls = true;
+  audio.loop = true;
+  audio.autoplay = true;
+
+  // or as argument(settings.passFreq ? settings.passFreq : 350);
+  bandpassFilter.type = "lowpass";
+  bandpassFilter.frequency.value = 350
+  bandpassFilter.Q.value = 1
+  analyser.fftSize = 128;
+  bufferLength = analyser.frequencyBinCount;
+
+  /**
+   * @description
+   *  firstload for mobile, forces all control to the site on click
+   * @member Addon#AudioAnalysis~disconnectOutput
+   *
+  */
+  var forceFullscreen = function() {
+    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
+    audio.play();
+    document.body.webkitRequestFullScreen()
+    document.body.removeEventListener('click', forceFullscreen);
+  }
+  document.body.addEventListener('click', forceFullscreen)
+
+  /**
+   * @description
+   *  disconnects audio to output, this will mute the analalyser, but won't stop analysing
+   * @member Addon#AudioAnalysis#disconnectOutput
+   *
+  */
+  _self.disconnectOutput = function() {
+    source.disconnect(context.destination);
+  }
+
+  /**
+   * @description
+   *   connects the audio source to output, making it audible
+   * @member Addon#AudioAnalysis#connectOutput
+   *
+  */
+  _self.connectOutput = function() {
+    source.connect(context.destination);
+  }
+
+  _self.getBpm = function() {
+    return _self.bpm
+  }
+
+  // main ----------------------------------------------------------------------
+  _self.init = function() {
+    console.log("init AudioAnalysis Addon.")
+
+    /**
+     * @description Audio element
+     * @member Addon#AudioAnalysis#audio_src
+     * @param {string} - reference to audiofile
+    */
+    // set audio src to optioned value
+    if ( !_self.options.microphone ) {
+      source = context.createMediaElementSource(audio);
+      audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+      _self.audio_src = _self.options.audio
+      initializeAutoBpm()
+
+    } else {
+
+      navigator.mediaDevices.getUserMedia({ audio })
+      .then(function(mediaStream) {
+        source = context.createMediaStreamSource(mediaStream);
+        initializeAutoBpm()
+
+      }).catch(function(err) {
+        console.log(err.name + ": " + err.message);
+      }); // always check for errors at the end.
+    }
+  }
+
   _self.update = function() {
+    if ( _self.bypass ) return
+
     // var tempoData = getTempo(dataSet)
     // getBlackout // TODO
     // getAmbience // TODO
-    //
-    if ( _self.bypass ) return
 
     // update nodes
     if ( !_self.disabled ) {
@@ -207,7 +378,7 @@ function AudioAnalysis( renderer ) {
       });
     }
 
-    // get new numbers
+    // set new numbers
     _self.bpm = _self.tempodata_bpm
     c = ((new Date()).getTime() - starttime) / 1000;
     _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
@@ -224,99 +395,48 @@ function AudioAnalysis( renderer ) {
     nodes.push( _func )
   }
 
-  // ---------------------------------------------------------------------------
+  // actual --------------------------------------------------------------------
 
-  // setup ---------------------------------------------------------------------
-  var audio = new Audio()
-  _self.audio = audio
-  var context = new AudioContext(); // AudioContext object instance
-  var source = context.createMediaElementSource(audio);
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
-
-  // config --------------------------------------------------------------------
-  // with ~ 200 samples/s it takes ~ 20 seconds to adjust
-  var sampleLength = 4000;
-  var dataSet = new Array(sampleLength);
-  var peaks = new Array(sampleLength);
-  var bufferLength
-  var foundpeaks = [];
-  var peak_max = 60;
-  var peak_min = 15;
-  var treshold = 1;
-  var intervalCounts = [];
-
-  // this should be set externally (at createion)
-  // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
-  console.log("SET AUDIO SRC")
-  //audio.setAttribute('crossorigin', 'anonymous');
-  // audio.src =  'http://37.220.36.53:7904';
-  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/fulke_absurd.mp3'
-
-  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/proxy/nsb'
-  // audio.src = '/proxy/dunklenacht' // dunklenacht
-
-  // if ( _self.options.audio ) audio.src = _self.options.audio
-
-  // audio.src = '/audio/rage_hard.mp3'
-  // audio.src = '/audio/i_own_it.mp3'
-  // audio.src = '/audio/100_metronome.mp3'
-  // audio.src = '/audio/120_metronome.mp3'
-  // audio.src = '/audio/140_metronome.mp3'
-
-  audio.controls = true;
-  audio.loop = true;
-  audio.autoplay = true;
-
-  // or as argument(settings.passFreq ? settings.passFreq : 350);
-  bandpassFilter.type = "lowpass";
-  bandpassFilter.frequency.value = 350
-  bandpassFilter.Q.value = 1
-
-  analyser.fftSize = 128;
-
-  bufferLength = analyser.frequencyBinCount;
-
-  // firstload for mobile, forces all control to the site on click
-  document.body.addEventListener('click', function() {
-    console.log("AudioAnalysis is initialized!", audio.src);
+  /**
+   * @description
+   *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
+   *  start the {@link Addon#AudioAnalysis~sampler}
+   *
+   * @member Addon#AudioAnalysis.initializeAutoBpm
+   *
+  */
+  var initializeAutoBpm = function() {
+    // tries and play the audio
     audio.play();
-    document.body.webkitRequestFullScreen()
-  });
 
-  // initialize Audio, used in the first run
-  var initializeAudio = new Promise( function( resolve, reject ) {
+    // connect the analysier and the filter
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS LINE OUT FOR NO SOUND
+    // send it to the speakers (or not)
     source.connect(context.destination);
 
-    resolve(audio);
-    reject(err);
-  })
-
-  var initializeAutoBpm = function() {
-    initializeAudio.then( function(r) {
-      console.log("AudioAnalysis is initialized!", audio.src);
-      audio.play();
-      console.log("AudioAnalysis start sampling!")
-      setInterval( sampler, 1); // as fast as we can, we need those samples !!
-
-    }).catch( function(err){
-      console.log("Error: AudioAnalysis ERROR ", err);
-    });
+    // start the sampler
+    setInterval( sampler, 1);
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
-
+  /**
+   * @description
+   *   gets the analyser.getByteTimeDomainData
+   *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
+   *   returns the most occuring bpm
+   *
+   *
+   * @member Addon#AudioAnalysis~sampler
+   *
+  */
+  _self.dataSet
+  _self.tempoData
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
+
     //if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
@@ -340,24 +460,19 @@ function AudioAnalysis( renderer ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-
+      _self.tempoData = tempoData
       // Here are some ideas for a more complete analisis range
 
       // var tempoCounts = tempoData.tempoCounts
       // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
-      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+      if (tempoData == undefined) {
+        console.log("sampler is active, but no beat was found")
+      }else{
+        _self.tempodata_bpm = tempoData.bpm
+      }
 
-      // depricated failsafe
-      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
-
-      // depricated debug window
-      // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + _self.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
-      // console.log(" AudioAnalysis::AutoBPM: ",  calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
-
-      // write the test data globally (needs uiid?)
-      _self.tempodata_bpm = tempoData.bpm
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
@@ -380,7 +495,14 @@ function AudioAnalysis( renderer ) {
   }
   doBlink()
 
-  // get bpm tempo by analyising audio stream
+  /**
+   * @description
+   *  returns 'tempodata', a list of found BPMs sorted on occurrence
+   *  object includes: bpm (ie. 128), confidence (0-1), calibrating (true/false),
+   *  treshold, tempocounts, foundpeaks and peaks
+   * @member Addon#AudioAnalysis~getTempo
+   *
+  */
   var getTempo = function( _data ) {
     foundpeaks = []                    // reset foundpeaks
     peaks = new Array( _data.length )  // reset peaks
@@ -404,11 +526,11 @@ function AudioAnalysis( renderer ) {
     // see: http://joesul.li/van/beat-detection-using-web-audio/
     // for more information on this method and the sources of the algroritm
     var tempoCounts = groupNeighborsByTempo( countIntervalsBetweenNearbyPeaks( foundpeaks ) );
-    tempoCounts.sort( mycomparator );                             // sort tempo's by 'score', or most neighbours
+    tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
       tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
-    }else{
 
+    }else{
 
       // DISPLAY, for debugging, requires element with an .info class
       var html = ""
@@ -462,7 +584,7 @@ function AudioAnalysis( renderer ) {
       calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
-      foundpeaks:  foundpeaks,       // current found peaks
+      foundpeaks: foundpeaks,        // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
 
@@ -473,11 +595,15 @@ function AudioAnalysis( renderer ) {
 
   // HELPERS
   // sort helper
-  var mycomparator = function ( a,b ) {
+  var sortHelper = function ( a,b ) {
     return parseInt( a.count, 10 ) - parseInt( b.count, 10 );
   }
 
-  // generate interval counter
+  /**
+   * @description Finds peaks in the audiodata and groups them together
+   * @member Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
+   *
+  */
   var countIntervalsBetweenNearbyPeaks = function( _peaks ) {
 
     // reset
@@ -499,6 +625,13 @@ function AudioAnalysis( renderer ) {
   }
 
   // group intervalcounts by temp
+  /**
+   * @description
+   *  map found intervals together and returns 'tempocounts', a list of found
+   *  tempos and their occurences
+   * @member Addon#AudioAnalysis~groupNeighborsByTempo
+   *
+  */
   var groupNeighborsByTempo = function( intervalCounts ) {
 
     // reset
@@ -540,13 +673,20 @@ function AudioAnalysis( renderer ) {
   } // end groupNeighborsByTempo
 }
 
+BPM.prototype = new Addon(); // assign prototype to marqer
+BPM.constructor = BPM;  // re-assign constructor
+
 /**
+ * @summary
+ *   BPM calculates beat per minutes based on a 'tap' function
+ *
  * @description
- *   BPM (Audio analysis)
+ *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- * var bpm = new BPM( renderer, { audio: 'mymusic.mp3' } );
+ * var bpm = new BPM( renderer );
+ * bpm.bpm = 100
  * bpm.add( mixer1.pod )
  * @constructor Addon#BPM
  * @implements Addon
@@ -557,7 +697,6 @@ function AudioAnalysis( renderer ) {
 function BPM( renderer, options ) {
 
   var _self = this
-
   _self.function_list = [
     ["AUTO", "method", "toggleAutoBpm"],
     ["MODDOWN", "method", "modDown"],
@@ -565,32 +704,8 @@ function BPM( renderer, options ) {
     ["MOD", "method", "modNum"]
   ]
 
-  // define scheme for this Addon?
-  /*
-  _self.scheme = function() {
-    var scheme = {
-      description: {
-        "name": "BPM",
-        "type": "Addon"
-      },
-      inputs: {
-        "bypass": "Boolean",
-        "audio": "Addon",
-        "mod": "number"
-      },
-      outputs: {
-        "bpm": "number",
-        "bpm_float": "float"
-      }
-    }
-    return scheme;
-  }
-  */
-
+  // only return the functionlist
   if ( renderer == undefined ) return
-  // returns a floating point between 1 and 0, in sync with a bpm
-
-
 
   // exposed variables.
   _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
@@ -676,7 +791,7 @@ function BPM( renderer, options ) {
   renderer.add( _self )
 
 
-
+  // main ----------------------------------------------------------------------
   // init with a tap contoller
   _self.init = function() {
     console.log("init BPM contoller.")
@@ -706,6 +821,18 @@ function BPM( renderer, options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+
+  // actual --------------------------------------------------------------------
   /**
    * @description double the bpm
    * @function Addon#BPM#modUp
@@ -735,16 +862,6 @@ function BPM( renderer, options ) {
     bpm.useAutoBpm = false
   }
 
-  // add nodes, implicit
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
-  }
-
   // ---------------------------------------------------------------------------
   // Tapped beat control
   var last = Number(new Date());
@@ -769,6 +886,10 @@ function BPM( renderer, options ) {
     }
   }
 
+  _self.getBpm = function() {
+    return _self.bpm
+  }
+
   console.log("set keypress")
   window.addEventListener('keypress', function(ev) {
     console.log(">>> ", ev.which)
@@ -780,13 +901,30 @@ function BPM( renderer, options ) {
 
 } // end BPM
 
+FileManager.prototype = new Addon(); // assign prototype to marqer
+FileManager.constructor = FileManager;  // re-assign constructor
 
-
+/**
+* @summary
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @description
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @example
+* var myFilemanager = new FileManager( VideoSource )
+* myFilemanager.load_set( "myset.json")
+* myFilemanager.change()
+* @constructor Addon#FileManager
+* @implements Addon
+* @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
+*/
 
 function FileManager( _source ) {
 
   var _self = this
 
+  // to be honest, this is kind of stupid; shouldnt it check for source 
   try {
     renderer
   } catch(e) {
@@ -916,9 +1054,15 @@ function FileManager( _source ) {
   }
 }
 
+GiphyManager.prototype = new Addon(); // assign prototype to marqer
+GiphyManager.constructor = GiphyManager;  // re-assign constructor
+
 /**
+ * @summary
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *
  * @description
- *   GiphyManager
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
  *
  * @example
  * var gifmanager1 = new Gyphymanager( renderer );
@@ -929,6 +1073,7 @@ function FileManager( _source ) {
  * @param {GlRenderer} renderer
  * @param {GifSource} source
  */
+
 function GiphyManager( _source ) {
 
   var _self = this
@@ -941,6 +1086,7 @@ function GiphyManager( _source ) {
   _self.renderer = renderer // do we even need this ?!!
 
   // set in environment
+  // this key is for demo purposes only
   var key = "tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu"
 
   /**
@@ -949,7 +1095,7 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    utils.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    utils.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })
@@ -998,9 +1144,19 @@ function GiphyManager( _source ) {
 }
 
 /**
- * @constructor Addon
- * @interface
- */
+* @summary
+*   Helper classes that add on other classes in the mixer.
+*
+* @description
+*   Helper classes that add on other classes in the mixer.
+*   ```
+*
+* @constructor Addon
+* @interface
+* @author Sense Studios
+*/
+
+function Addon() {}
 
 /*
 
@@ -1016,13 +1172,24 @@ function GiphyManager( _source ) {
 0 ______________________________________________________________________________
 
 
+THIS IS UNDER HEAVY CONSTRUCTION!
 
+The idea of a 'behaviour' is to trigger certain functions on a set interval.
+For instance; a behaviour could be to trigger 10s, 20s and 40s, every 2, 4 and
+8 beats. of the song.
 
+This is not to be confused with 'trackdata', which does pretty much the same
+thing. trackdata should move over to "sheets", which in itself would qualitfy
+as a behaviour in it's own right
+
+So alternatively, behaviour could siply be random triggers, much like
+autonomous controllers, setting changes, scratch and what not, every so
+often.
 
 */
 
 
-function Behaviour( renderer, options ) {
+function Behaviour( _renderer, options ) {
 
   // create and instance
   var _self = this;
@@ -1030,6 +1197,9 @@ function Behaviour( renderer, options ) {
   // set or get uid
   _self.uuid = "Behaviour" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Behaviour"
+
+  // add to renderer
+  _renderer.add(_self)
 
   _self.beats = 0
   _self.time = (new Date()).getTime()
@@ -1039,8 +1209,6 @@ function Behaviour( renderer, options ) {
 
   // requires a bpm
   _self.bpm = options.bpm
-
-  renderer.add(_self)
 
   function addTrigger( _obj ) {
     if ( _obj.mod.type == "seconds" ) {
@@ -1076,8 +1244,6 @@ function Behaviour( renderer, options ) {
     // updat beats
     var bpsr = Math.round( bpm.render() * 4 )
 
-
-
     if ( bpsr != old_bpm ) {
       _self.beats += 1
       old_bpm = bpsr
@@ -1085,7 +1251,7 @@ function Behaviour( renderer, options ) {
     //if ( bpsr == 0 ) old_bpm = 1
 
     // checkTriggers()
-    //checkSheets()
+    // checkSheets()
   }
 
   // ---------------------------------------------------------------------------
@@ -1315,7 +1481,6 @@ function Behaviour( renderer, options ) {
   */
 }
 
-
 function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -1478,12 +1643,12 @@ window.addEventListener("gamepadconnected", function(e) {
 });
 */
 
-function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
+function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
   // exposed variables.
-  _self.uuid = "GamePad_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.uuid = "GamePadController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.controllers = {};
   _self.bypass = true
@@ -1499,10 +1664,10 @@ function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
 
   // init with a tap contoller
   _self.init = function() {
-    console.log("init GamepadController contoller.")
+    console.log("init GamePadController.")
     //window.addEventListener( 'keydown', keyHandler )
 
-    window.addEventListener("gamepadconnected", connecthandler )
+    window.addEventListener("GamePadController connected", connecthandler )
 
 
   }
@@ -1511,16 +1676,16 @@ function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
   var lock
   _self.update = function() {
     // console.log(_self.controllers[0].axes)
-    // console.log( navigator.getGamepads()[0].axes )
-    // console.log( navigator.getGamepads()[0].axes
+    // console.log( navigator.getGamePadControllers()[0].axes )
+    // console.log( navigator.getGamePadControllers()[0].axes
     // [0.003921627998352051, 0.003921627998352051, 0, 0, 0, 0.003921627998352051, 0.003921627998352051, 0, 0, 3.2857141494750977]
     // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
     //   LP                RP         W
     if ( _self.bypass ) return;
 
-    var buttons = navigator.getGamepads()[0].buttons
-    //console.log(navigator.getGamepads()[0].buttons)
-    navigator.getGamepads()[0].buttons.forEach(function(b, i){
+    var buttons = navigator.getGamePadControllers()[0].buttons
+    //console.log(navigator.getGamePadControllers()[0].buttons)
+    navigator.getGamePadControllers()[0].buttons.forEach(function(b, i){
       if ( b.pressed ) {
         console.log(" i press you ", i, b)
         // HACKITY
@@ -1539,7 +1704,7 @@ function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
       }
     })
 
-    var axes = navigator.getGamepads()[0].axes
+    var axes = navigator.getGamePadControllers()[0].axes
     var leftx = axes[0];
     var lefty = axes[1];
 
@@ -1575,14 +1740,14 @@ function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
   // ---------------------------------------------------------------------------
   // "Private"
 
-  var addgamepad = function( gamepad ) {
-    _self.controllers[gamepad.index] = gamepad
-    console.log(gamepad.id, gamepad.index )
+  var addGamePadController = function( GamePadController ) {
+    _self.controllers[GamePadController.index] = GamePadController
+    console.log(GamePadController.id, GamePadController.index )
   }
 
   var connecthandler = function( e ) {
-    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.", e.gamepad.index, e.gamepad.id);
-    addgamepad(e.gamepad)
+    console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.", e.GamePadController.index, e.GamePadController.id);
+    addGamePadController(e.GamePadController)
     _self.bypass = false
   }
 
@@ -1595,183 +1760,133 @@ function GamePad( renderer, _mixer1, _mixer2, _mixer3 ) {
 
 
 /*
-window.addEventListener("gamepadconnected", function(e) {
-  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-    e.gamepad.index, e.gamepad.id,
-    e.gamepad.buttons.length, e.gamepad.axes.length);
-    var gp = navigator.getGamepads()[e.gamepad.index];
-    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+window.addEventListener("GamePadControllerconnected", function(e) {
+  console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.",
+    e.GamePadController.index, e.GamePadController.id,
+    e.GamePadController.buttons.length, e.GamePadController.axes.length);
+    var gp = navigator.getGamePadControllers()[e.GamePadController.index];
+    console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.",
       gp.index, gp.id,
       gp.buttons.length, gp.axes.length);
 });
 */
 
-function GamePadHorizontalControl( renderer ) {
-}
-
-function GamePadVerticalControl( renderer ) {
-
-}
-
-// -------------------------------------------------------------------------- //
-
-// refers to ...
-// https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
-MidiController.prototype = new Midi();  // assign prototype to marqer
+MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
-//MidiController.prototype = new Controller();  // assign prototype to marqer
-//MidiController.constructor = MidiController;  // re-assign constructor
-
-// based on https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
-// ONLY WORKS PARTIALLY WITHOUT HTTPS://
 /**
-* @description
-*  Demo controller MidiController, implements controller and midicontroller
-* @implements Controller#Midi
-* @constructor Controller#Midi#MidiController
-* @example var myMidicontroller = new MidiController( renderer, { sources: [ source1, source2, ... ], bpm: bpm1 } );
-* @param {GlRenderer} renderer - GlRenderer object
-* @param {Source} Source - a Source instance
-* @param {Addon#BPM} bpm - a BPM instance
-*/
+ * @implements Controller
+ * @constructor Controller#Midi
+ * @interface
+ */
 
-function MidiController( renderer, options ) {
+function MidiController( _options ) {
+  // base
+
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
   // exposed variables.
-  _self.uuid = "Midi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "Control"
-  _self.controllers = {};
+  _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "MidiController"
   _self.bypass = true
+  _self.verbose = false
+  _self.ready = false
+  _self.controllers = {};
 
   // source.renderer ?
   var nodes = []
+  var binds = []
 
   // counter
   var c = 0
 
   // add to renderer
-  renderer.add(_self)
-
-  // Check this image, with all the buttons etc.
-  // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
-
-  // these are the available colors
-  var OFF = 0;
-  var GREEN = 1;
-  var GREEN_BLINK = 2;
-  var RED = 3;
-  var RED_BLINK = 4;
-  var YELLOW = 5;
-  var YELLOW_BLINK = 6;
+  //_renderer.add(_self)
 
   // needed for the program
   var midi, input, output
 
-  // this is the main keypad
-  var midimap = [
-  	[ 56, 57, 58, 59, 60, 61, 62, 63 ],
-  	[ 48, 49, 50, 51, 52, 53, 54, 55 ],
-  	[ 40, 41, 42, 43, 44, 45, 46, 47 ],
-  	[ 32, 33, 34, 35, 36, 37, 38, 39 ],
-  	[ 24, 25, 26, 27, 28, 29, 30, 31 ],
-  	[ 16, 17, 18, 19, 20, 21, 22, 23 ],
-  	[  8,  9, 10, 11, 12, 13, 14, 15 ],
-  	[  0,  1,  2,  3,  4,  5,  6,  7 ]
-  ]
-
-  // these are the rest of the buttons
-  var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
-  var faders        = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
-  var faders_opaque = [ 0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
-  var listeners = []
-
-  // request MIDI access
-  if (navigator.requestMIDIAccess) {
-  	navigator.requestMIDIAccess()
-  		.then(success, failure);
-  }
-
   // we have success!
-  function success (_midi) {
-    console.log("We have midi!09po ")
+  var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
   	var outputs = midi.outputs.values();
 
   	for (i = inputs.next(); i && !i.done; i = inputs.next()) {
   		input = i.value;
-      input.onmidimessage = onMIDIMessage;
+      input.onmidimessage = _self.onMIDIMessage;
   	}
 
   	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
   		output = o.value;
       initMidi()
   	}
+
+    console.log("Midi READY")
+    if ( output != undefined ) _self.ready = true
   }
 
   // everything went wrong.
-  function failure () {
+  var failure = function () {
   	console.error('No access to your midi devices.');
   }
 
+  // request MIDI access
+  console.log("Midi check... ")
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess()
+      .then( success, failure );
+  }
+
   function initMidi() {
-    // make everything red!
-    var commands = []
-    midimap.forEach( function( row, i ) {
-      row.forEach( function( value, j ) {
-        commands.push( 0x90, value, RED_BLINK )
-      });
-    });
-
-    // switch the rest off, if there is still some led on
-    rest.forEach( function( r, i ) {
-      commands.push( 0x90, r, OFF )
-    });
-
-    // send the comand
-    output.send( commands );
-
-    // start the bpm sync
-    var bpmonoff = true
-    _self.blinkCallBack = function(_on) {
-      if (bpmonoff) {
-        output.send( [ 0x90, 82, OFF ] )
-        bpmonoff = false
-      }else{
-        output.send( [ 0x90, 82, GREEN ] )
-        bpmonoff = true
-      }
-    }
+    if ( _self.verbose ) console.log(" MIDI READY", "ready")
+    dispatchMidiEvent("ready")
   }
 
   // some examples, this is the 'onpress' (and on slider) function
   var doubleclickbuffer = [ 0, 0, 0, 0 ]
   var doubleclickPattern = [ 128, 144, 128, 144 ]
   var doubleclick = false
-  function onMIDIMessage(e) {
-    //console.log(e.data)
+
+  _self.onMIDIMessage = function(e) {
+    if (_self.verbose) console.log(" MIDIMESSAGE >>", e.data)
+    checkBindings(e.data)
+    dispatchMidiEvent(e)
+
+    // hello from midi
+    // console.log(e.data)
 
     // Uint8Array(3) [176, 48, 117]
-    // [ state, key, value]
+    // [ state, key, velocity ]
     // state
     // 144 = down
     // 112 = up
-    // 176 = sliding
+    // 176 = sliding ( fader )
+    //
 
+    /*
     var opaque = false
     if (doubleclick) return
     doubleclickbuffer.unshift([ e.data[0], e.data[1] ])
     doubleclickbuffer.pop()
+
     if ( doubleclickbuffer.map(function(m) { return m[0] } ).join(",") == doubleclickPattern.join(",") ) {
+
       console.log("blink1")
+      // update event listeners
+      listeners.forEach( function( val, i ) {
+        // doubleclick
+        if ( val.btn == e.data[1] ) {
+          val.cb( e.data, true )
+        }
+      })
+
       if ( doubleclickbuffer.map( function(m) { return m[1] } ).every( (val, i, arr) => val === arr[0] ) ) {
         doubleclickbuffer = [ 0, 0, 0, 0 ]
 
         // DO STUFF ON DOUBLECLICK
-        output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
+        _self.output.send( [ 0x90, e.data[1], GREEN_BLINK ] )
         doubleclick = true
 
         // chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
@@ -1783,14 +1898,17 @@ function MidiController( renderer, options ) {
         return
       }
     }
-    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
-    //console.log( doubleclickbuffer )
 
+    // update event listeners
     listeners.forEach( function( val, i ) {
+      // doubleclick
       if ( val.btn == e.data[1] ) {
-        val.cb( e.data )
+        val.cb( e.data, false )
       }
     })
+
+    setTimeout(function() { doubleclickbuffer = [ 0, 0, 0, 0 ]; doubleclick = false }, 350)
+    //console.log( doubleclickbuffer )
 
     if (e.data[1] == 48) {
       //console.log( e.data[2] / 126 )
@@ -1830,7 +1948,7 @@ function MidiController( renderer, options ) {
   		rest.forEach( function( r, i ) {
   			commands.push( 0x90, r, OFF )
   		})
-  		output.send(commands)
+  		_self.output.send(commands)
 
   	}else if (e.data[1] == 65) {
   		// switch the main pads yellow
@@ -1840,57 +1958,101 @@ function MidiController( renderer, options ) {
   				commands.push( 0x90, value, YELLOW )
   			})
   		})
-      output.send( commands )
+      _self.output.send( commands )
 
   	}else{
   		// press a button, make it green
       if (e.data[0] == 128 ) {
-        output.send( [ 0x90, e.data[1], OFF ] );
+        _self.output.send( [ 0x90, e.data[1], OFF ] );
         //chain1.setChainLink(e.data[1], 0)
         //console.log("toggle chain")
         doubleclick = false
       }
 
       if (e.data[0] == 144  ) {
-        output.send( [ 0x90, e.data[1], GREEN ] );
+        _self.output.send( [ 0x90, e.data[1], GREEN ] );
         //chain1.setChainLink(e.data[1], faders[e.data[1]]/126)
         //console.log("toggle chain", faders[e.data[1]], e.data[1] )
         faders_opaque[e.data[1]] = 0
         doubleclick = false
       }
   	}
+    */
   }
 
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init MidiController contoller.")
-    //window.addEventListener( 'keydown', keyHandler )
-  }
-
+  // ---------------------------------------------------------------------------
+  _self.init = function() {}
   _self.update = function() {}
 
-  _self.addEventListener = function( _num, _callback ) {
-    listeners.push({ btn: _num, cb: _callback })
+
+  // ---------------------------------------------------------------------------
+  _self.bind = function( _key, _callback ) {
+    binds.push( { key: _key, callback: _callback } )
+    // check for double binds ?
   }
 
-  _self.scheme = function() {}
+  _self.removeBind = function( _key, _num ) {
+    // always remove first ?
+  }
+
+  // [ state, key, velocity ]
+  var checkBindings = function(e) {
+    binds.forEach( function( _obj ) {
+      if ( e[1] == _obj.key ) _obj.callback(e)
+    });
+  }
+
+  _self.send = function( commands ) {
+    if (_self.ready) {
+      console.log("Midi send ", commands, "to", output)
+      output.send( commands )
+    }else{
+      console.log("Midi is not ready yet")
+    }
+  }
+
+  _self.addEventListener = function( _callbackName, _target ) {
+    console.log("midi add listener: " , _callbackName)
+    //listeners.push( _target )
+    nodes.push({callbackName: _callbackName, target: _target})
+    console.log("midi list: ", nodes)
+  }
+
+  var dispatchMidiEvent = function(e) {
+    nodes.forEach(function( _obj ){
+      _obj.target[_obj.callbackName](e)
+    });
+  }
 }
 
-NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.prototype = new ComputerKeyboard(); // assign prototype to marqer
 NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
 
 /**
+* @summary
+*  A controller utilizing the Numpad
+*
 * @description
 *  Test en demo controller NumpadBpmMixerControl
-* @implements Controller
-* @constructor Controller#NumpadBpmMixerControl
-* @example var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );
-* @param {GlRenderer} renderer - GlRenderer object
+*  It's basically a wrapper around a single mixer with the numpad
+*
+*  ```
+*  L / * -
+*  7 8 9 +
+*  4 5 6 +
+*  1 2 3 e
+*   0  . e
+*  ```
+*
+* @implements Controller#ComputerKeyboard
+* @constructor Controller#ComputerKeyboard#NumpadBpmMixerControl
+* @example var numpad = new NumpadBpmMixerControl( _renderer, mixer1, bpm );
+* @param {Glrenderer} renderer - Glrenderer object
 * @param {Module#Mixer} mixer - a Mixer instance
 * @param {Addon#BPM} bpm - a BPM instance
 */
 
-function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
+function NumpadBpmMixerControl( _renderer, _mixer, _bpm ) {
 
   var _self = this
 
@@ -1905,8 +2067,8 @@ function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
   // counter
   var c = 0
 
-  // add to renderer
-  renderer.add(_self)
+  // add to _renderer
+  _renderer.add(_self)
 
   // init with a tap contoller
   _self.init = function() {
@@ -2034,10 +2196,21 @@ function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
 
 }
 
-
 function SourceControl( renderer, source ) {
   // source.renderer ?
 
+}
+
+ComputerKeyboard.prototype = new Controller();  // assign prototype to marqer
+ComputerKeyboard.constructor = ComputerKeyboard;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#ComputerKeyboard
+ * @interface
+ */
+
+function ComputerKeyboard() {
 }
 
 /**
@@ -2053,7 +2226,7 @@ function Controller( renderer, options ) {
   if ( options != undefined ) _options = options;
 
   _self.type = "Controller"
-  _self.myLittleControllerVar = "Wakkawakka"
+  _self.myLittleControllerVar = "test"
 
   // program interface
   _self.init =         function() {}
@@ -2064,107 +2237,16 @@ function Controller( renderer, options ) {
 
 }
 
-
-
-Midi.prototype = new Controller();  // assign prototype to marqer
-Midi.constructor = Midi;  // re-assign constructor
+Gamepad.prototype = new Controller();  // assign prototype to marqer
+Gamepad.constructor = Gamepad;  // re-assign constructor
 
 /**
  * @implements Controller
- * @constructor Controller#Midi
+ * @constructor Controller#Gamepad
  * @interface
  */
 
-function Midi() {
-  // base
-
-  // returns a floating point between 1 and 0, in sync with a bpm
-  var _self = this
-
-  // exposed variables.
-  _self.uuid = "Midi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "MidiControl"
-  //_self.controllers = {};
-  //_self.bypass = true
-  _self.mylittlevar = "boejaka"
-  /*
-
-  // Check this image, with all the buttons etc.
-  // https://d2r1vs3d9006ap.cloudfront.net/s3_images/1143703/apc_mini_midi.jpg
-
-  // these are the available colors
-  var OFF = 0;
-  var GREEN = 1;
-  var GREEN_BLINK = 2;
-  var RED = 3;
-  var RED_BLINK = 4;
-  var YELLOW = 5;
-  var YELLOW_BLINK = 6;
-
-  // needed for the program
-  var midi, input, output
-
-  // this is the main keypad
-  var midimap = [
-  	[ 56, 57, 58, 59, 60, 61, 62, 63 ],
-  	[ 48, 49, 50, 51, 52, 53, 54, 55 ],
-  	[ 40, 41, 42, 43, 44, 45, 46, 47 ],
-  	[ 32, 33, 34, 35, 36, 37, 38, 39 ],
-  	[ 24, 25, 26, 27, 28, 29, 30, 31 ],
-  	[ 16, 17, 18, 19, 20, 21, 22, 23 ],
-  	[  8,  9, 10, 11, 12, 13, 14, 15 ],
-  	[  0,  1,  2,  3,  4,  5,  6,  7 ]
-  ]
-
-  // these are the rest of the buttons
-  var rest = [ 64, 65, 66, 67, 68, 69, 70, 71, 82, 83, 84, 85, 86, 87, 88, 89 ]
-  var faders        = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-127
-  var faders_opaque = [  0, 0, 0 ,0 , 0 , 0 , 0 , 0 ,0 ] // 0-1
-
-  // request MIDI access
-  if (navigator.requestMIDIAccess) {
-  	navigator.requestMIDIAccess()
-  		.then(success, failure);
-  }
-
-  // we have success!
-  function success (_midi) {
-    console.log("We have midi!09po ")
-  	midi = _midi
-  	var inputs = midi.inputs.values();
-  	var outputs = midi.outputs.values();
-
-  	for (i = inputs.next(); i && !i.done; i = inputs.next()) {
-  		input = i.value;
-      input.onmidimessage = onMIDIMessage;
-  	}
-
-  	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
-  		output = o.value;
-      initMidi()
-  	}
-  }
-
-  // everything went wrong.
-  function failure () {
-  	console.error('No access to your midi devices.');
-  }
-
-  function initMidi() {
-    // make everything red!
-    var commands = []
-    midimap.forEach( function( row, i ) {
-      row.forEach( function( value, j ) {
-        commands.push( 0x90, value, RED_BLINK )
-      });
-    });
-  }
-
-  function onMIDIMessage(e) {
-    commands.push( 0x90, value, YELLOW )
-    output.send( commands )
-  }
-  */
+function Gamepad() {
 }
 
 Vidi.prototype = new Controller();  // assign prototype to marqer
@@ -2175,7 +2257,8 @@ Vidi.constructor = Vidi;  // re-assign constructor
  * @constructor Controller#Vidi
  * @interface
  *
- * Yes, The Visual Instrument Digital Interface is here.
+ * @description
+ *  Yes, The Visual Instrument Digital Interface is here. We're not sure what it does though.
  */
 
 function Vidi() {
@@ -2193,24 +2276,564 @@ function Vidi() {
 
 }
 
+ColorEffect.prototype = new Effect(); // assign prototype to marqer
+ColorEffect.constructor = ColorEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#ColorEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
 // fragment
 // vec3 b_w = ( source.x + source.y + source.z) / 3
 // vec3 amount = source.xyz + ( b_w.xyx * _alpha )
 // col = vec3(col.r+col.g+col.b)/3.0;
 // col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
 
-function BlackAndWhite( renderer, _source ) {
+function ColorEffect( _renderer, _options ) {
 
   // create and instance
   var _self = this;
 
   // set or get uid
-  if ( options.uuid == undefined ) {
-    _self.uuid = "Effect_BlackAndWhite_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "ColorEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   } else {
-    _self.uuid = options.uuid
+    _self.uuid = _options.uuid
   }
 
+  // add to renderer
+  _renderer.add(_self)
+
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 1
+  var currentExtra = 0.8
+
+  var dpr = window.devicePixelRatio;
+  var textureSize = 128 * dpr;
+  var data = new Uint8Array( textureSize * textureSize * 3 );
+  //var dataTexture = new THREE.DataTexture( canvasElement );
+  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+  //dataTexture.minFilter = THREE.NearestFilter;
+	//dataTexture.magFilter = THREE.NearestFilter;
+	//dataTexture.needsUpdate = true;
+
+  var canvasElement, canvasContext, tempTexture
+
+
+  _self.init = function() {
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+    canvasElementContext.fillStyle = "#FF0000";
+    canvasElementContext.fillRect( 0, 0, 500,500)
+
+    console.log("ColorEffect inits, with", _renderer)
+    // add uniforms to renderer
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
+    //_renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "t", value: null }
+    // _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: tempTexture }
+    //_renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
+
+    // add uniforms to fragmentshader
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_extra;\n/* custom_uniforms */')
+
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_noisesampler;\n/* custom_uniforms */')
+
+    // uniform float noiseScale;
+    // uniform float time;
+    // uniform float baseSpeed;
+
+
+    //_renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_output;\n/* custom_uniforms */')
+
+    // _output * uuid_alpha_1
+    // uuid_alpha_1 * -pod
+    // uuid_alpha_2 * +pod
+    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
+  if ( currentcoloreffect == 1 ) return vec3( src.rgb );                                                                                // normal
+
+  // negative
+  if ( currentcoloreffect == 2  ) return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                          // negtive 1
+  if ( currentcoloreffect == 3  ) return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                              // negtive 2
+  if ( currentcoloreffect == 4  ) return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                              // negtive 3
+
+  // monocolor
+  if ( currentcoloreffect == 5  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
+  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
+  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
+  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
+  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
+  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
+  if ( currentcoloreffect == 11 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
+  if ( currentcoloreffect == 12 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
+
+  // color swapping
+  if ( currentcoloreffect == 13 ) return vec3( src.rrr );
+  if ( currentcoloreffect == 14 ) return vec3( src.rrg );
+  if ( currentcoloreffect == 15 ) return vec3( src.rrb );
+  if ( currentcoloreffect == 16 ) return vec3( src.rgr );
+  if ( currentcoloreffect == 17 ) return vec3( src.rgg );
+  if ( currentcoloreffect == 18 ) return vec3( src.rbr );
+  if ( currentcoloreffect == 19 ) return vec3( src.rbg );
+  if ( currentcoloreffect == 20 ) return vec3( src.rbb );
+  if ( currentcoloreffect == 21 ) return vec3( src.grr );
+  if ( currentcoloreffect == 22 ) return vec3( src.grg );
+  if ( currentcoloreffect == 23 ) return vec3( src.grb );
+  if ( currentcoloreffect == 24 ) return vec3( src.ggr );
+  if ( currentcoloreffect == 25 ) return vec3( src.ggg );
+  if ( currentcoloreffect == 26 ) return vec3( src.ggb );
+  if ( currentcoloreffect == 27 ) return vec3( src.gbr );
+  if ( currentcoloreffect == 28 ) return vec3( src.gbg );
+  if ( currentcoloreffect == 29 ) return vec3( src.gbb );
+  if ( currentcoloreffect == 30 ) return vec3( src.brr );
+  if ( currentcoloreffect == 31 ) return vec3( src.brg );
+  if ( currentcoloreffect == 32 ) return vec3( src.brb );
+  if ( currentcoloreffect == 33 ) return vec3( src.bgr );
+  if ( currentcoloreffect == 34 ) return vec3( src.bgg );
+  if ( currentcoloreffect == 35 ) return vec3( src.bgb );
+  if ( currentcoloreffect == 36 ) return vec3( src.bbr );
+  if ( currentcoloreffect == 37 ) return vec3( src.bbg );
+  if ( currentcoloreffect == 38 ) return vec3( src.bbb );
+
+  // lum key
+  if ( currentcoloreffect == 39 ) {
+    return vec3( clamp( src.r, extra, 1.) == extra ? .0 : src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, clamp( src.r, extra, 1.) == extra ? .0 : src.b );
+  }
+
+  // color key; Greenkey
+  if ( currentcoloreffect == 40 ) {
+    return vec3( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b );
+  }
+
+  // paint
+  if ( currentcoloreffect == 41 ) {
+    return vec3( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra  );
+  }
+
+  // colorise
+  if ( currentcoloreffect == 42 ) {
+  }
+
+  // wipes (move these to mixer?)
+  if ( gl_FragCoord.x > 200.0 ) {
+    return vec3(0.0,0.0,0.0);
+  }else {
+    return src;
+  }
+}
+
+/* custom_helpers */
+`
+    );
+  }
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
+  } // init
+
+
+  var vector = new THREE.Vector2();
+  //var glcanvas = document.getElementById('glcanvas');
+  //var glcanvas = _renderer.glrenderer.context.canvas
+  var i = 0
+  _self.update = function() {
+    i++
+    // mixmode
+    // blendmode
+    // pod
+    //console.log( "--", glcanvas.width, glcanvas.height )
+
+    //glcanvas = _renderer.glrenderer.context.canvas
+    //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
+
+    //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+  	//vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+
+    //_renderer.copyFramebufferToTexture( vector, dataTexture );
+
+    glcanvas = document.getElementById('glcanvas');
+    canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
+    if ( tempTexture ) tempTexture.needsUpdate = true;
+  }
+
+  /* ------------------------------------------------------------------------ */
+
+  /**
+   * @description
+   *  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
+   *  ```
+   *  1. BlackAndWhite (default),
+   *  2. Negative 1,
+   *  3. Negative 2,
+   *  4. Negative 3,
+   *  5. Monocolor red,
+   *  6. Monocolor blue,
+   *  7. Monocolor green,
+   *  8. Monocolor yellow,
+   *  9. Monocolor turqoise,
+   *  10. Monocolor purple,
+   *  11. Sepia,
+   *  ```
+   * @function Effect#ColorEffect#effect
+   * @param {number} effect index of the effect
+   */
+
+  _self.effect = function( _num ){
+    if ( _num != undefined ) {
+      currentEffect = _num
+      renderer.customUniforms[_self.uuid+'_currentcoloreffect'].value = currentEffect
+      // update uniform ?
+    }
+
+    console.log("effect set to: ", currentEffect)
+    return currentEffect
+  }
+
+  _self.extra = function( _num ){
+    if ( _num != undefined ) {
+      currentExtra = _num
+      renderer.customUniforms[_self.uuid+'_extra'].value = currentExtra
+      // update uniform ?
+    }
+
+    console.log("extra set to: ", currentExtra)
+    return currentExtra
+  }
+}
+
+DistortionEffect.prototype = new Effect(); // assign prototype to marqer
+DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new DistortionEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#DistortionEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+// TO THINK ON: Seems we need to connect this to SOURCES somehow
+
+function DistortionEffect( _renderer, _options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "DistortionEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 12
+
+  _self.update = function() {
+    i += 0.001
+    //renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
+
+    // ONLY WORKS ON VIDEO SOURCE, IF IT WORKS
+    renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }
+    renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
+  }
+
+  _self.effect = function( _num ){
+    if ( _num != undefined ) {
+      currentEffect = _num
+      renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
+      // update uniform ?
+    }
+
+    return currentEffect
+  }
+}
+
+FeedbackEffect.prototype = new Effect(); // assign prototype to marqer
+FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
+
+/**
+ * @summary
+ *   The color effect has a series of simple color effects
+ *
+ * @description
+ *   Color effect allows for a series of color effect, mostly
+ *   mimicing classic mixers like MX50 and V4
+ *   ```
+ *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
+ *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
+ *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   ```
+ *
+ * @example
+ *   let myEffect = new FeedbackEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *
+ * @constructor Effect#FeedbackEffect
+ * @implements Effect
+ * @param renderer:GlRenderer
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+function FeedbackEffect( _renderer, _options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "FeedbackEffect_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  _self.type = "Effect"
+
+  var source = _options.source
+  var currentEffect = _options.effect
+  var currentEffect = 12
+
+  var dpr = window.devicePixelRatio;
+  var textureSize = 128 * dpr;
+  var data = new Uint8Array( textureSize * textureSize * 3 );
+  //var dataTexture = new THREE.DataTexture( canvasElement );
+  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+  //dataTexture.minFilter = THREE.NearestFilter;
+	//dataTexture.magFilter = THREE.NearestFilter;
+	//dataTexture.needsUpdate = true;
+
+  var canvasElement, canvasContext, effectsTexture
+
+
+  _self.init = function() {
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+    canvasElementContext.fillStyle = "#FF0000";
+    canvasElementContext.fillRect( 0, 0, 500,500)
+
+    console.log("FeedbackEffect inits, with", _renderer)
+
+    effectsTexture = new THREE.Texture( canvasElement );
+    effectsTexture.wrapS = THREE.RepeatWrapping;
+    effectsTexture.wrapT = THREE.RepeatWrapping;
+    effectsTexture.repeat.set( 4, 4 );
+
+    _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: effectsTexture }
+    _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: 100 }
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int  '+_self.uuid+'_currentfeedbackeffect;\n/* custom_uniforms */')
+
+
+    if ( renderer.fragmentShader.indexOf('vec3 feedbackeffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+
+      _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+  vec3 feedbackeffect ( vec3 src, int currentfeedbackeffect, vec2 vUv ) {
+    if ( currentfeedbackeffect == 100 ) {
+      //vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
+      //gl_Position = vec4( vec2(0.,0.), 0., 0.);
+      //return inbetween.rrr;
+      // return src;
+      return ( texture2D( `+_self.uuid+`_effectsampler, vUv + vec2( 1., 0.99999999) ).rgb ) + src * 0.3;
+      // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb * 1.4 + src * .8) * 0.5; //* vec3(.5, .5, .5
+      // return ( texture2D( src, vUv ).rgb );
+      // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb ) * src + src;
+
+      vec4 tex = texture2D( `+_self.uuid+`_effectsampler, vUv * 2. ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
+
+      // return src.rrr;
+      // tex.rgb = vec3(src.r, src.g, src.b);
+      // tex.xy = vec2(1.0,1.0);
+      // tex = tex + vec4( src.r, src.g, src.b, vUv * 2. );
+
+
+      // * 0.52 + vec4( src * 0.52, vUv ) *
+      // vec4 tex = vec4( src, vUv * .5 );
+      // return mix( tex, `+_self.uuid+`_effectsampler, 0.).rgb;
+      //return mix(tex.rgb, src.rgb, 1.);
+    }
+
+    // uniform float noiseScale;
+    // uniform float time;
+    // uniform float baseSpeed;
+    // uniform sampler2D noiseTexture;
+
+    if ( currentfeedbackeffect == 101 ) {
+      // vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+      // vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
+      // vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.a );
+
+      // _effectsampler
+      // return  vec4 texture2D( baseTexture1, uvNoiseTimeShift )
+
+      // https://stackoverflow.com/questions/19872524/threejs-fragment-shader-using-recycled-frame-buffers
+      // http://labs.sense-studios.com/webgl/index4.html?r=sdad
+
+      // return _effectsampler.rgb
+      return src;
+    }
+
+    return src;
+  }
+`
+  );
+}
+
+_renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
+} // init
+
+
+var vector = new THREE.Vector2();
+//var glcanvas = document.getElementById('glcanvas');
+//var glcanvas = _renderer.glrenderer.context.canvas
+var i = 0
+_self.update = function() {
+  i++
+  // mixmode
+  // blendmode
+  // pod
+  //console.log( "--", glcanvas.width, glcanvas.height )
+
+  //glcanvas = _renderer.glrenderer.context.canvas
+  //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
+
+  //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+  //vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+
+  //_renderer.copyFramebufferToTexture( vector, dataTexture );
+
+  glcanvas = document.getElementById('glcanvas');
+  canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
+  if ( effectsTexture ) effectsTexture.needsUpdate = true;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/**
+* @description
+*  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
+*  ```
+*  1. BlackAndWhite (default),
+*  2. Negative 1,
+*  3. Negative 2,
+*  4. Negative 3,
+*  5. Monocolor red,
+*  6. Monocolor blue,
+*  7. Monocolor green,
+*  8. Monocolor yellow,
+*  9. Monocolor turqoise,
+*  10. Monocolor purple,
+*  11. Sepia,
+*  ```
+* @function Effect#FeedbackEffect#effect
+* @param {number} effect index of the effect
+*/
+
+
+_self.effect = function( _num ){
+  if ( _num != undefined ) {
+    currentEffect = _num
+    renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'].value = currentEffect
+    // update uniform ?
+  }
+  return currentEffect
+  }
+}
+
+// fragment
+// vec3 b_w = ( source.x + source.y + source.z) / 3
+// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
+// col = vec3(col.r+col.g+col.b)/3.0;
+// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
+
+function BlackAndWhite( _renderer, _source, _options ) {
+
+  // create and instance
+  var _self = this;
+
+  // set or get uid
+  if ( _options.uuid == undefined ) {
+    _self.uuid = "Effect_BlackAndWhite_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = _options.uuid
+  }
+
+  // add to renderer
+  _renderer.add(_self)
 
   _self.type = "Effect"
 
@@ -2218,19 +2841,43 @@ function BlackAndWhite( renderer, _source ) {
 
   _self.init = function() {
 
+    console.log("Effect inits, with", _renderer)
     // add uniforms to renderer
     // renderer.customUniforms[_self.uuid+'_mixmode'] = { type: "i", value: 1 }
 
     // add uniforms to fragmentshader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
+    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // _output * uuid_alpha_1
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_output, '+_self.uuid+'_blendmode );\n  /* custom_main */')
-  }
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 effect ( vec3 src ) {
+  // return vec3( src.r + src.g + src.b ) / 3.;                                                             // black and white
+  // return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                           // negtive 1
+  // return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                               // negtive 2
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
+  // return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor red
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor blue
+  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) *3   ) / 3.;   // mopnocolor green
+  // return vec3( (src.r+src.g+src.b) *2.   , (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;   // mopnocolor yellow
+  // return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor turqoise
+  // return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor purple
+  // return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                     // sepia
+}
+
+/* custom_helpers */
+`
+    );
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec3 '+_self.uuid+'_output = effect( '+_source.uuid+'_output );\n  /* custom_main */')
+  } // init
 
   _self.update = function() {
 
@@ -2241,9 +2888,31 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output ,'+source2.uuid+'_ou
 }
 
 /**
+ * @constructor Effect
+ * @interface
+ */
+
+ function Effect( renderer, options ) {
+   var _self = this
+
+   /*
+     renderer
+   */
+
+   _self.type = "Effect"
+
+   // program interface
+   _self.init =         function() {}
+   _self.update =       function() {}
+   _self.render =       function() {}
+ }
+
+/**
+ * @summary
+ *    A Chain is string of sources, stacked on top of each other
+ *
  * @description
- *   Chains together a string of sources, gives them an alpha channel, and allows for
- *   switching them on and off with fade effects. Ideal for a piano board or a midicontroller
+ *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
  * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
  * @constructor Module#Chain
@@ -2314,6 +2983,12 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
     return _self.sources( _num )
   }
 
+  _self.setAll = function( _alpha = 0 ) {
+    _self.sources.forEach( function( _num,i ) {
+      renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
+    })
+  }
+
   _self.toggle = function( _num, _state ) {
     if ( _state !== undefined ) {
       renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
@@ -2334,8 +3009,7 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
  *    A mixer mixes two sources together.
  *
  * @description
- *   It can crossfade the sources with different _MixModes_ and _BlendModes_
- *   requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
+ *   It can crossfade the sources with different _MixModes_ and _BlendModes_ requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
  * @constructor Module#Mixer
@@ -2344,7 +3018,6 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
  * @param options:Object
  * @author Sense Studios
  */
-
 
  // of 18: 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN,
  // 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE,
@@ -2383,6 +3056,13 @@ function Mixer( renderer, options ) {
   var alpha2 = 0;
   var pod = 0;
 
+  // hoist an own bpm here
+  var currentBPM = 128
+  var currentMOD = 1
+  var currentBpmFunc = function() { return currentBPM; }
+  _self.autoFade = false
+
+
   var mixmode = 1;
   _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 
@@ -2414,35 +3094,47 @@ function Mixer( renderer, options ) {
 
     // add blendmodes helper, we only need it once
     if ( renderer.fragmentShader.indexOf('vec3 blend ( vec3 src, vec3 dst, int blendmode )') == -1 ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 blend ( vec3 src, vec3 dst, int blendmode ) {\
-\n  if ( blendmode ==  1 ) return src + dst;\
-\n  if ( blendmode ==  2 ) return src - dst;\
-\n  if ( blendmode ==  3 ) return src * dst;\
-\n  if ( blendmode ==  4 ) return min(src, dst);\
-\n  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));\
-\n  if ( blendmode ==  6 ) return (src + dst) - 1.0;\
-\n  if ( blendmode ==  7 ) return max(src, dst);\
-\n  if ( blendmode ==  8 ) return (src + dst) - (src * dst);\
-\n  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));\
-\n  if ( blendmode == 10 ) return src + dst;\
-\n  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));\
-\n  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));\
-\n  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));\
-\n  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));\
-\n  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;\
-\n  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));\
-\n  if ( blendmode == 17 ) return abs(dst - src);\
-\n  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;\
-\n  return src + dst;\
-\n}\n/* custom_helpers */');
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
+  if ( blendmode ==  1 ) return src + dst;
+  if ( blendmode ==  2 ) return src - dst;
+  if ( blendmode ==  3 ) return src * dst;
+  if ( blendmode ==  4 ) return min(src, dst);
+  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));
+  if ( blendmode ==  6 ) return (src + dst) - 1.0;
+  if ( blendmode ==  7 ) return max(src, dst);
+  if ( blendmode ==  8 ) return (src + dst) - (src * dst);
+  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));
+  if ( blendmode == 10 ) return src + dst;
+  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));
+  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));
+  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));
+  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));
+  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
+  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));
+  if ( blendmode == 17 ) return abs(dst - src);
+  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
+  return src + dst;
+}
+/* custom_helpers */
+`
+      );
     }
 
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */')
+vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */' )
   }
 
+  var starttime = (new Date()).getTime()
+  var c = 0
   _self.update = function() {
+    if ( _self.autoFade ) {
+        // pod = currentBPM
+        currentBPM = currentBpmFunc()
+        c = ((new Date()).getTime() - starttime) / 1000;
+        _self.pod( ( Math.sin( c * Math.PI * ( currentBPM * currentMOD ) / 120 ) + 1 ) )
+    }
   }
 
   _self.render = function() {
@@ -2526,19 +3218,19 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
       pod = _num
 
       // evaluate current mix style
-      // 1 normal mix
+      // MIXMODE 1 normal mix
       if (mixmode == 1) {
         alpha1 = pod
         alpha2 = 1 - pod
       }
 
-      // 2 hard mix
+      // MIXMODE 2 hard mix
       if (mixmode == 2) {
         alpha1 = Math.round( pod )
         alpha2 = Math.round( 1-pod )
       }
 
-      // 3 NAM mix
+      // MIXMODE 3 NAM mix
       if (mixmode == 3) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -2546,13 +3238,13 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         if ( alpha2 > 1 ) alpha2 = 1;
       }
 
-      // 4 FAM mix
+      // MIXMODE 4 FAM mix
       if (mixmode == 4) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
       }
 
-      // 5 Non Dark mix
+      // MIXMODE 5 Non Dark mix
       if (mixmode == 5) {
         alpha1 = ( pod * 2 );
         alpha2 = 2 - ( pod * 2 );
@@ -2562,28 +3254,40 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
         alpha2 += 0.36;
       }
 
-      // 6 left
+      // MIXMODE 6 left
       if (mixmode == 6) {
         alpha1 = 1;
         alpha2 = 0;
       }
 
-      // 7 right
+      // MIXMODE 7 right
       if (mixmode == 7) {
         alpha1 = 0;
         alpha2 = 1;
       }
 
-      // 8 center
+      // MIXMODE 8 center
       if (mixmode == 8) {
         alpha1 = 0.5;
         alpha2 = 0.5;
       }
 
-      // 9 BOOM
+      // MIXMODE 9 BOOM
       if (mixmode == 9) {
         alpha1 = 1;
         alpha2 = 1;
+      }
+
+      // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
+      if (mixmode == 10 ) {
+        alpha1 = pod
+        alpha2 = 1;
+      }
+
+      // MIXMODE X ADDITIVE MIX RIGHT (use with lumkey en chromkey)
+      if (mixmode == 11 ) {
+        alpha1 = 1;
+        alpha2 = pod
       }
 
       // send alphas to the shader
@@ -2592,11 +3296,29 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
     }
     return pod;
   }
+
+
+  _self.bpm = function(_num) {
+      if ( _num  != undefined ) currentBPM = _num
+      return currentBPM
+  }
+
+  _self.bpmMod = function( _num ) {
+    if ( _num  != undefined ) currentMOD = _num
+    return currentMOD
+  }
+
+  _self.bindBpm = function( _func ) {
+      currentBpmFunc = _func
+  }
 }
 
 /**
+ * @summary
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the @GlRenderer
+ *
  * @description
- *   Output
+ *   The output node is the mandatory last node of the mixer, it passes it's content directly to the {@link GlRenderer}
  *
  * @example
  *  let myChain = new output( renderer, source );
@@ -2604,8 +3326,8 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
  *  renderer.render()
  * @implements Module
  * @constructor Module#Output
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer} a reference to the GLrenderer
+ * @param source{Source} any valid source node
  * @author Sense Studios
  */
 function Output(renderer, _source ) {
@@ -2632,6 +3354,9 @@ function Output(renderer, _source ) {
 }
 
 /**
+ * @summary
+ *   A switcher selects either one of two sources
+ *
  * @description
  *   Switcher
  *
@@ -2639,8 +3364,8 @@ function Output(renderer, _source ) {
  *  let mySwitcher = new Switcher( renderer, [ source1, source2 ]] );
  * @constructor Module#Switcher
  * @implements Module
- * @param renderer:GlRenderer
- * @param source:Source
+ * @param renderer{GlRenderer}
+ * @param source{Source}
  * @author Sense Studios
  */
 
@@ -2670,12 +3395,14 @@ function Switcher(renderer, options ) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // we actually need this for each instance itt. the Mixer
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 get_source_'+_self.uuid+' ( int active_source, vec3 src1, vec3 src2 ) {\
-\n  if ( active_source ==  0 ) return src1;\
-\n  if ( active_source ==  1 ) return src2;\
-\n}'
-);
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',`
+vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
+  if ( active_source ==  0 ) return src1;\
+  if ( active_source ==  1 ) return src2;\
+}
+/* custom_helpers */
+`
+    );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
@@ -2711,6 +3438,21 @@ vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
  * @interface
  */
 
+ function Module( renderer, options ) {
+   var _self = this
+
+   /*
+     renderer
+   */
+
+   _self.type = "Module"
+
+   // program interface
+   _self.init =         function() {}
+   _self.update =       function() {}
+   _self.render =       function() {}
+ }
+
 
 
 GifSource.prototype = new Source(); // assign prototype to marqer
@@ -2744,6 +3486,14 @@ function GifSource( renderer, options ) {
   // set options
   var _options;
   if ( options != undefined ) _options = options;
+
+  // set the source
+  if ( options.src == undefined ) {
+     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+  } else {
+    _self.currentSrc = options.src
+  }
+
 
   // create elements (private)
   var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
@@ -2780,14 +3530,18 @@ function GifSource( renderer, options ) {
     window.image_source = new Image()
 
     //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
-    gifElement = document.createElement('div')
+    gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
     supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
+    supergifelement.draw_while_loading = true
+
     // sup1.load();
-    console.log(_self.uuid, " Load...")
-    supergifelement.load_url("http://nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif")
-    _self.bypass = false
+    console.log(_self.uuid, " Load", _self.currentSrc, "..." )
+    //supergifelement.load_url( _self.currentSrc )
+    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
+    console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
+     _self.bypass = false
   }
 
   _self.update = function() {
@@ -2812,11 +3566,9 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
-    gifElement = document.createElement('div')
-    gifElement.setAttribute('id', 'gif_'+_self.uuid)
-    gifElement.setAttribute('rel:auto_play', '1')
-    supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
-    supergifelement.load_url(_file)
+    _self.currentSrc = _file
+    supergifelement.pause()
+    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
   }
 
   _self.play =         function() { return supergifelement.play() }
@@ -2833,6 +3585,262 @@ function GifSource( renderer, options ) {
   }  // seconds
   _self.duration =     function() { return supergifelement.get_length() }        // seconds
 };
+
+MultiVideoSource.prototype = new Source(); // assign prototype to marqer
+MultiVideoSource.constructor = MultiVideoSource;  // re-assign constructor
+
+  // TODO: implement these as arrays !
+  // This is new, but better?
+  // Or let file manager handle it?
+  // var videos =        [];   // video1, video2, video3, ...
+  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
+  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
+
+/**
+ * @description
+ *  The MultiVideoSource allows for playback of video files in the Mixer project.
+ *  It is very similar to the regular videosource, however it used multiple references to the videofile.
+ *  In doing so it allows for very fast jumping through the video even when it is loading from a remote server.
+ *  The main features are random jumping and a cue list, allowing for smart referincing in video files.
+ *
+ * @implements Source
+ * @constructor Source#MultiVideoSource
+ * @example let myMultiVideoSource = new MultiVideoSource( renderer, { src: 'myfile.mp4', cues: [ 0, 10, 20, 30 ] } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object, with src (file path) and cues, cuepoints in seconds
+ */
+
+function MultiVideoSource(renderer, options) {
+
+  // create and instance
+  var _self = this;
+
+  if ( options.uuid == undefined ) {
+    _self.uuid = "MultiVideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  _self.type = "MultiVideoSource"
+  _self.bypass = true;
+  renderer.add(_self)
+
+  var _options;
+  if ( options != undefined ) _options = options;
+  var canvasElement, canvasElementContext, videoTexture;
+  var videoElements = []; // maybe as array?
+  var currentVideo = null // the curret video
+
+  var alpha = 1;
+
+  // initialize
+  _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
+
+    console.log("init video source", _self.uuid)
+
+    // create video element
+    videoElement = document.createElement('video');
+    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.muted= true
+
+    // set the source
+    if ( options.src == undefined ) {
+      videoElement.src = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4";
+    } else {
+      videoElement.src = options.src
+    }
+    console.log('loaded source: ', videoElement.src )
+
+    // set properties
+    videoElement.height = 1024
+    videoElement.width = 1024
+    videoElement.loop = true          // must call after setting/changing source
+    videoElement.load();              // must call after setting/changing source
+    _self.firstplay = false
+
+    // Here we wait for a user to click and take over
+    // especially for mobile
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        var r = Math.random() * videoElement.duration
+        videoElement.currentTime = r
+        videoElement.play();
+        _self.firstplay = true
+        console.log(_self.uuid, "First Play; ", r)
+        clearInterval(playInterval)
+      }
+    }, 400 )
+
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', function() {
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    videoElement.volume = 0;
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
+    // listen for a timer update (as it is playing)
+    // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
+    // video2.currentTime = 20;
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    // create the videoTexture
+    videoTexture = new THREE.Texture( canvasElement );
+    // videoTexture.minFilter = THREE.LinearFilter;
+
+    // -------------------------------------------------------------------------
+    // Set shader params
+    // -------------------------------------------------------------------------
+
+    // set the uniforms
+    renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+
+    // add uniform
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+
+    // add main
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#MultiVideoSource#video
+     */
+    _self.video = videoElement
+    _self.canvas = canvasElement
+
+    // remove the bypass
+    _self.bypass = false
+  }
+
+  _self.update = function() {
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
+    }
+  }
+
+  // return the video texture, for direct customUniforms injection (or something)
+  _self.render = function() {
+    return videoTexture
+  }
+
+  // ===========================================================================
+  // Actual HELPERS
+  // ===========================================================================
+
+  /**
+   * @description
+   *  gets or sets source @file for the MultiVideoSource
+   *  file has to be compatible with HTMLMediaElement Video ie. webm, mp4 etc.
+   *  We recommend **mp4**
+   *
+   * @function Source#MultiVideoSource#src
+   * @param {file} Videofile - full path to file
+   */
+  _self.src = function( file ) {
+    videoElement.src = file
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        videoElement.play();
+        console.log(_self.uuid, "First Play.")
+        clearInterval(playInterval)
+      }
+    }, 400 )
+  }
+
+  /**
+   * @description start the current video
+   * @function Source#MultiVideoSource#play
+   */
+  _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#MultiVideoSource#pause
+   */
+  _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#MultiVideoSource#paused
+   */
+  _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#MultiVideoSource#currentTime
+   * @param {float} time - time in seconds
+   */
+  _self.currentTime = function( _num ) {
+    if ( _num === undefined ) {
+      return videoElement.currentTime;
+    } else {
+      console.log("set time", _num)
+      videoElement.currentTime = _num;
+      return _num;
+    }
+
+  }
+
+  // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#MultiVideoSource#duration
+   */
+  _self.duration =     function() { return videoElement.duration }    // seconds
+
+  // ===========================================================================
+  // For now only here, move to _source?
+  // ===========================================================================
+
+  _self.alpha = function(a) {
+    if (a == undefined) {
+      return renderer.customUniforms[_self.uuid+'_alpha'].value
+    }else{
+      renderer.customUniforms[_self.uuid+'_alpha'].value = a
+    }
+  }
+
+  _self.jump = function( _num) {
+    if ( _num == undefined || isNaN(_num) ) {
+      try {
+        videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
+      }catch(e){
+        console.log("prevented a race error")
+      }
+    } else {
+      videoElement.currentTime = _num
+    }
+
+    return videoElement.currentTime
+  }
+
+  // ===========================================================================
+  // Rerturn a reference to self
+  // ===========================================================================
+
+  // _self.init()
+}
 
 
 SVGSource.prototype = new Source(); // assign prototype to marqer
@@ -3160,22 +4168,21 @@ function TextSource(renderer, options) {
 VideoSource.prototype = new Source(); // assign prototype to marqer
 VideoSource.constructor = VideoSource;  // re-assign constructor
 
-  // TODO: implement these as arrays ?
-  // This is new, but better?
-  // Or let file manager handle it?
-  // var videos =        [];   // video1, video2, video3, ...
-  // var videoTextures = [];   // videoTexture1, videoTextures,  ...
-  // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
-
 /**
- * @description
- *  The videosource allows for playback of video files in the Mixer project
- * @implements Source
- * @constructor Source#VideoSource
- * @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
- * @param {GlRenderer} renderer - GlRenderer object
- * @param {Object} options - JSON Object
- */
+*
+* @summary
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @description
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @implements Source
+* @constructor Source#VideoSource
+* @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Object} options - JSON Object
+*/
+
 function VideoSource(renderer, options) {
 
   // create and instance
@@ -3187,35 +4194,36 @@ function VideoSource(renderer, options) {
     _self.uuid = options.uuid
   }
 
-  _self.type = "VideoSource"
-
-  // allow bypass
-  _self.bypass = true;
-
-  // add to renderer
-  renderer.add(_self)
-
   // set options
-  var _options;
+  var _options = {};
   if ( options != undefined ) _options = options;
+
+  _self.currentSrc = "/video/placeholder.mp4"
+  _self.type = "VideoSource"
+  _self.bypass = true;
 
   // create elements (private)
   var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
   var alpha = 1;
 
+  // add to renderer
+  renderer.add(_self)
+
   // initialize
   _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
 
     console.log("init video source", _self.uuid)
 
     // create video element
     videoElement = document.createElement('video');
-    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("crossorigin", "anonymous")
     videoElement.muted= true
 
     // set the source
     if ( options.src == undefined ) {
-      videoElement.src = "//nabu-dev.s3.amazonaws.com/uploads/video/567498216465766873000000/720p_h264.mp4";
+      videoElement.src = _self.currentSrc;
     } else {
       videoElement.src = options.src
     }
@@ -3263,6 +4271,10 @@ function VideoSource(renderer, options) {
 
     // create the videoTexture
     videoTexture = new THREE.Texture( canvasElement );
+    videoTexture.wrapS = THREE.RepeatWrapping;
+    videoTexture.wrapT = THREE.RepeatWrapping;
+
+
     // videoTexture.minFilter = THREE.LinearFilter;
 
     // -------------------------------------------------------------------------
@@ -3272,14 +4284,20 @@ function VideoSource(renderer, options) {
     // set the uniforms
     renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+    renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
+
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
 
     // expose video and canvas
     /**
@@ -3293,10 +4311,12 @@ function VideoSource(renderer, options) {
     _self.bypass = false
   }
 
+  var i = 0
   _self.update = function() {
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
       // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
@@ -3312,7 +4332,7 @@ function VideoSource(renderer, options) {
   }
 
   // ===========================================================================
-  // HELPERS
+  // Actual HELPERS
   // ===========================================================================
 
   /**
@@ -3324,8 +4344,9 @@ function VideoSource(renderer, options) {
    * @function Source#VideoSource#src
    * @param {file} Videofile - full path to file
    */
-  _self.src = function( file ) {
-    videoElement.src = file
+  _self.src = function( _file ) {
+    _self.currentSrc = _file
+    videoElement.src = _file
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
@@ -3409,6 +4430,235 @@ function VideoSource(renderer, options) {
   // _self.init()
 }
 
+WebcamSource.prototype = new Source(); // assign prototype to marqer
+WebcamSource.constructor = WebcamSource;  // re-assign constructor
+
+/**
+ * @description
+ *  The WebcamSource allows for playback of video files in the Mixer project
+ *
+ * @implements Source
+ * @constructor Source#WebcamSource
+ * @example let myWebcamSource = new WebcamSource( renderer, { src: 'myfile.mp4' } );
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
+function WebcamSource(renderer, options) {
+
+  // create and instance
+  var _self = this;
+
+  if ( options.uuid == undefined ) {
+    _self.uuid = "WebcamSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  _self.type = "WebcamSource"
+
+  // allow bypass
+  _self.bypass = true;
+
+  // add to renderer
+  renderer.add(_self)
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  // create elements (private)
+  var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
+  var alpha = 1;
+
+  // initialize
+  _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
+    console.log("init video source", _self.uuid)
+
+    // create video element
+    videoElement = document.createElement('video');
+    videoElement.setAttribute("crossorigin","anonymous")
+    //videoElement.muted = true
+
+    // set properties
+    videoElement.height = 1024
+    videoElement.width = 1024
+    videoElement.loop = true          // must call after setting/changing source
+    videoElement.load();              // must call after setting/changing source
+    _self.firstplay = false
+
+    // here is the getUserMediaMagic, note that it only works in HTTPS
+    // Prefer camera resolution nearest to 1280x720.
+    var constraints = { audio: false, video: { width: 1024, height: 1024 } };
+
+    //
+    // Call the webcam, NOTE: you MUST run on HTTPS for this.
+    // or make an exception
+    //
+
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(mediaStream) {
+      //var video = document.querySelector('video');
+      videoElement.srcObject = mediaStream;
+      videoElement.onloadedmetadata = function(e) {
+        videoElement.play();
+      };
+    })
+    .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+    //ocument.body.appendChild(newChild)
+
+    // Here we wait for a user to click and take over
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        var r = Math.random() * videoElement.duration
+        //videoElement.currentTime = r
+        videoElement.play();
+        _self.firstplay = true
+        console.log(_self.uuid, "First Play; ", r)
+        clearInterval(playInterval)
+      }
+    }, 400 )
+
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', function() {
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    videoElement.volume = 0;
+
+    // videoElement.currentTime = Math.random() * 60   // use random in point
+
+    // FOR FIREBASE
+    // listen for a timer update (as it is playing)
+    // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
+    // video2.currentTime = 20;
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    // create the videoTexture
+    videoTexture = new THREE.Texture( canvasElement );
+    // videoTexture.minFilter = THREE.LinearFilter;
+
+    // -------------------------------------------------------------------------
+    // Set shader params
+    // -------------------------------------------------------------------------
+
+    // set the uniforms
+    renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+
+    // add uniform
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+
+    // add main
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#WebcamSource#video
+     */
+    _self.video = videoElement
+    _self.canvas = canvasElement
+
+    // remove the bypass
+    _self.bypass = false
+  }
+
+  _self.update = function() {
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
+    }
+  }
+
+  // return the video texture, for direct customUniforms injection (or something)
+  _self.render = function() {
+    return videoTexture
+  }
+
+  // ===========================================================================
+  // Actual HELPERS
+  // ===========================================================================
+
+  /**
+   * @description start the current video
+   * @function Source#WebcamSource#play
+   */
+  _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#WebcamSource#pause
+   */
+  _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#WebcamSource#paused
+   */
+  _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#WebcamSource#currentTime
+   * @param {float} time - time in seconds
+   */
+   /*
+  _self.currentTime = function( _num ) {
+    returns false
+    if ( _num === undefined ) {
+      return videoElement.currentTime;
+    } else {
+      console.log("set time", _num)
+      videoElement.currentTime = _num;
+      return _num;
+    }
+
+  }
+  */
+
+  // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#WebcamSource#duration
+   */
+  _self.duration =     function() { return videoElement.duration }    // seconds
+
+  // ===========================================================================
+  // For now only here, move to _source?
+  // ===========================================================================
+
+  _self.alpha = function(a) {
+    if (a == undefined) {
+      return renderer.customUniforms[_self.uuid+'_alpha'].value
+    }else{
+      renderer.customUniforms[_self.uuid+'_alpha'].value = a
+    }
+  }
+
+  // ===========================================================================
+  // Rerturn a reference to self
+  // ===========================================================================
+
+  // _self.init()
+}
+
 /**
  * @constructor Source
  * @interface
@@ -3417,15 +4667,10 @@ function VideoSource(renderer, options) {
 function Source( renderer, options ) {
   var _self = this
 
-  /*
-    renderer
-  */
-
-
   _self.type = "Source"
   _self.function_list = [["JUMP","method","jump"]]
-  // override these
 
+  // override these
   // program interface
   _self.init =         function() {}
   _self.update =       function() {}
@@ -3439,1148 +4684,7 @@ function Source( renderer, options ) {
   _self.paused =       function() {}
   _self.currentFrame = function( _num ) {}  // seconds
   _self.duration =     function() {}        // seconds
+
+  _self.jump =         function() {}
+  //_self.cue =          function() {}      // still no solid solution
 }
-
-/*
-	SuperGif
-
-	Example usage:
-
-		<img src="./example1_preview.gif" rel:animated_src="./example1.gif" width="360" height="360" rel:auto_play="1" />
-
-		<script type="text/javascript">
-			$$('img').each(function (img_tag) {
-				if (/.*\.gif/.test(img_tag.src)) {
-					var rub = new SuperGif({ gif: img_tag } );
-					rub.load();
-				}
-			});
-		</script>
-
-	Image tag attributes:
-
-		rel:animated_src -	If this url is specified, it's loaded into the player instead of src.
-							This allows a preview frame to be shown until animated gif data is streamed into the canvas
-
-		rel:auto_play -		Defaults to 1 if not specified. If set to zero, a call to the play() method is needed
-
-	Constructor options args
-
-		gif 				Required. The DOM element of an img tag.
-		loop_mode			Optional. Setting this to false will force disable looping of the gif.
-		auto_play 			Optional. Same as the rel:auto_play attribute above, this arg overrides the img tag info.
-		max_width			Optional. Scale images over max_width down to max_width. Helpful with mobile.
- 		on_end				Optional. Add a callback for when the gif reaches the end of a single loop (one iteration). The first argument passed will be the gif HTMLElement.
-		loop_delay			Optional. The amount of time to pause (in ms) after each single loop (iteration).
-		draw_while_loading	Optional. Determines whether the gif will be drawn to the canvas whilst it is loaded.
-		show_progress_bar	Optional. Only applies when draw_while_loading is set to true.
-
-	Instance methods
-
-		// loading
-		load( callback )		Loads the gif specified by the src or rel:animated_src sttributie of the img tag into a canvas element and then calls callback if one is passed
-		load_url( src, callback )	Loads the gif file specified in the src argument into a canvas element and then calls callback if one is passed
-
-		// play controls
-		play -				Start playing the gif
-		pause -				Stop playing the gif
-		move_to(i) -		Move to frame i of the gif
-		move_relative(i) -	Move i frames ahead (or behind if i < 0)
-
-		// getters
-		get_canvas			The canvas element that the gif is playing in. Handy for assigning event handlers to.
-		get_playing			Whether or not the gif is currently playing
-		get_loading			Whether or not the gif has finished loading/parsing
-		get_auto_play		Whether or not the gif is set to play automatically
-		get_length			The number of frames in the gif
-		get_current_frame	The index of the currently displayed frame of the gif
-
-		For additional customization (viewport inside iframe) these params may be passed:
-		c_w, c_h - width and height of canvas
-		vp_t, vp_l, vp_ w, vp_h - top, left, width and height of the viewport
-
-		A bonus: few articles to understand what is going on
-			http://enthusiasms.org/post/16976438906
-			http://www.matthewflickinger.com/lab/whatsinagif/bits_and_bytes.asp
-			http://humpy77.deviantart.com/journal/Frame-Delay-Times-for-Animated-GIFs-214150546
-
-*/
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define([], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory();
-    } else {
-        root.SuperGif = factory();
-    }
-}(this, function () {
-    // Generic functions
-    var bitsToNum = function (ba) {
-        return ba.reduce(function (s, n) {
-            return s * 2 + n;
-        }, 0);
-    };
-
-    var byteToBitArr = function (bite) {
-        var a = [];
-        for (var i = 7; i >= 0; i--) {
-            a.push( !! (bite & (1 << i)));
-        }
-        return a;
-    };
-
-    // Stream
-    /**
-     * @constructor
-     */
-    // Make compiler happy.
-    var Stream = function (data) {
-        this.data = data;
-        this.len = this.data.length;
-        this.pos = 0;
-
-        this.readByte = function () {
-            if (this.pos >= this.data.length) {
-                throw new Error('Attempted to read past end of stream.');
-            }
-            if (data instanceof Uint8Array)
-                return data[this.pos++];
-            else
-                return data.charCodeAt(this.pos++) & 0xFF;
-        };
-
-        this.readBytes = function (n) {
-            var bytes = [];
-            for (var i = 0; i < n; i++) {
-                bytes.push(this.readByte());
-            }
-            return bytes;
-        };
-
-        this.read = function (n) {
-            var s = '';
-            for (var i = 0; i < n; i++) {
-                s += String.fromCharCode(this.readByte());
-            }
-            return s;
-        };
-
-        this.readUnsigned = function () { // Little-endian.
-            var a = this.readBytes(2);
-            return (a[1] << 8) + a[0];
-        };
-    };
-
-    var lzwDecode = function (minCodeSize, data) {
-        // TODO: Now that the GIF parser is a bit different, maybe this should get an array of bytes instead of a String?
-        var pos = 0; // Maybe this streaming thing should be merged with the Stream?
-        var readCode = function (size) {
-            var code = 0;
-            for (var i = 0; i < size; i++) {
-                if (data.charCodeAt(pos >> 3) & (1 << (pos & 7))) {
-                    code |= 1 << i;
-                }
-                pos++;
-            }
-            return code;
-        };
-
-        var output = [];
-
-        var clearCode = 1 << minCodeSize;
-        var eoiCode = clearCode + 1;
-
-        var codeSize = minCodeSize + 1;
-
-        var dict = [];
-
-        var clear = function () {
-            dict = [];
-            codeSize = minCodeSize + 1;
-            for (var i = 0; i < clearCode; i++) {
-                dict[i] = [i];
-            }
-            dict[clearCode] = [];
-            dict[eoiCode] = null;
-
-        };
-
-        var code;
-        var last;
-
-        while (true) {
-            last = code;
-            code = readCode(codeSize);
-
-            if (code === clearCode) {
-                clear();
-                continue;
-            }
-            if (code === eoiCode) break;
-
-            if (code < dict.length) {
-                if (last !== clearCode) {
-                    dict.push(dict[last].concat(dict[code][0]));
-                }
-            }
-            else {
-                if (code !== dict.length) throw new Error('Invalid LZW code.');
-                dict.push(dict[last].concat(dict[last][0]));
-            }
-            output.push.apply(output, dict[code]);
-
-            if (dict.length === (1 << codeSize) && codeSize < 12) {
-                // If we're at the last code and codeSize is 12, the next code will be a clearCode, and it'll be 12 bits long.
-                codeSize++;
-            }
-        }
-
-        // I don't know if this is technically an error, but some GIFs do it.
-        //if (Math.ceil(pos / 8) !== data.length) throw new Error('Extraneous LZW bytes.');
-        return output;
-    };
-
-
-    // The actual parsing; returns an object with properties.
-    var parseGIF = function (st, handler) {
-        handler || (handler = {});
-
-        // LZW (GIF-specific)
-        var parseCT = function (entries) { // Each entry is 3 bytes, for RGB.
-            var ct = [];
-            for (var i = 0; i < entries; i++) {
-                ct.push(st.readBytes(3));
-            }
-            return ct;
-        };
-
-        var readSubBlocks = function () {
-            var size, data;
-            data = '';
-            do {
-                size = st.readByte();
-                data += st.read(size);
-            } while (size !== 0);
-            return data;
-        };
-
-        var parseHeader = function () {
-            var hdr = {};
-            hdr.sig = st.read(3);
-            hdr.ver = st.read(3);
-            if (hdr.sig !== 'GIF') throw new Error('Not a GIF file.'); // XXX: This should probably be handled more nicely.
-            hdr.width = st.readUnsigned();
-            hdr.height = st.readUnsigned();
-
-            var bits = byteToBitArr(st.readByte());
-            hdr.gctFlag = bits.shift();
-            hdr.colorRes = bitsToNum(bits.splice(0, 3));
-            hdr.sorted = bits.shift();
-            hdr.gctSize = bitsToNum(bits.splice(0, 3));
-
-            hdr.bgColor = st.readByte();
-            hdr.pixelAspectRatio = st.readByte(); // if not 0, aspectRatio = (pixelAspectRatio + 15) / 64
-            if (hdr.gctFlag) {
-                hdr.gct = parseCT(1 << (hdr.gctSize + 1));
-            }
-            handler.hdr && handler.hdr(hdr);
-        };
-
-        var parseExt = function (block) {
-            var parseGCExt = function (block) {
-                var blockSize = st.readByte(); // Always 4
-                var bits = byteToBitArr(st.readByte());
-                block.reserved = bits.splice(0, 3); // Reserved; should be 000.
-                block.disposalMethod = bitsToNum(bits.splice(0, 3));
-                block.userInput = bits.shift();
-                block.transparencyGiven = bits.shift();
-
-                block.delayTime = st.readUnsigned();
-
-                block.transparencyIndex = st.readByte();
-
-                block.terminator = st.readByte();
-
-                handler.gce && handler.gce(block);
-            };
-
-            var parseComExt = function (block) {
-                block.comment = readSubBlocks();
-                handler.com && handler.com(block);
-            };
-
-            var parsePTExt = function (block) {
-                // No one *ever* uses this. If you use it, deal with parsing it yourself.
-                var blockSize = st.readByte(); // Always 12
-                block.ptHeader = st.readBytes(12);
-                block.ptData = readSubBlocks();
-                handler.pte && handler.pte(block);
-            };
-
-            var parseAppExt = function (block) {
-                var parseNetscapeExt = function (block) {
-                    var blockSize = st.readByte(); // Always 3
-                    block.unknown = st.readByte(); // ??? Always 1? What is this?
-                    block.iterations = st.readUnsigned();
-                    block.terminator = st.readByte();
-                    handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
-                };
-
-                var parseUnknownAppExt = function (block) {
-                    block.appData = readSubBlocks();
-                    // FIXME: This won't work if a handler wants to match on any identifier.
-                    handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
-                };
-
-                var blockSize = st.readByte(); // Always 11
-                block.identifier = st.read(8);
-                block.authCode = st.read(3);
-                switch (block.identifier) {
-                    case 'NETSCAPE':
-                        parseNetscapeExt(block);
-                        break;
-                    default:
-                        parseUnknownAppExt(block);
-                        break;
-                }
-            };
-
-            var parseUnknownExt = function (block) {
-                block.data = readSubBlocks();
-                handler.unknown && handler.unknown(block);
-            };
-
-            block.label = st.readByte();
-            switch (block.label) {
-                case 0xF9:
-                    block.extType = 'gce';
-                    parseGCExt(block);
-                    break;
-                case 0xFE:
-                    block.extType = 'com';
-                    parseComExt(block);
-                    break;
-                case 0x01:
-                    block.extType = 'pte';
-                    parsePTExt(block);
-                    break;
-                case 0xFF:
-                    block.extType = 'app';
-                    parseAppExt(block);
-                    break;
-                default:
-                    block.extType = 'unknown';
-                    parseUnknownExt(block);
-                    break;
-            }
-        };
-
-        var parseImg = function (img) {
-            var deinterlace = function (pixels, width) {
-                // Of course this defeats the purpose of interlacing. And it's *probably*
-                // the least efficient way it's ever been implemented. But nevertheless...
-                var newPixels = new Array(pixels.length);
-                var rows = pixels.length / width;
-                var cpRow = function (toRow, fromRow) {
-                    var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
-                    newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
-                };
-
-                // See appendix E.
-                var offsets = [0, 4, 2, 1];
-                var steps = [8, 8, 4, 2];
-
-                var fromRow = 0;
-                for (var pass = 0; pass < 4; pass++) {
-                    for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
-                        cpRow(toRow, fromRow)
-                        fromRow++;
-                    }
-                }
-
-                return newPixels;
-            };
-
-            img.leftPos = st.readUnsigned();
-            img.topPos = st.readUnsigned();
-            img.width = st.readUnsigned();
-            img.height = st.readUnsigned();
-
-            var bits = byteToBitArr(st.readByte());
-            img.lctFlag = bits.shift();
-            img.interlaced = bits.shift();
-            img.sorted = bits.shift();
-            img.reserved = bits.splice(0, 2);
-            img.lctSize = bitsToNum(bits.splice(0, 3));
-
-            if (img.lctFlag) {
-                img.lct = parseCT(1 << (img.lctSize + 1));
-            }
-
-            img.lzwMinCodeSize = st.readByte();
-
-            var lzwData = readSubBlocks();
-
-            img.pixels = lzwDecode(img.lzwMinCodeSize, lzwData);
-
-            if (img.interlaced) { // Move
-                img.pixels = deinterlace(img.pixels, img.width);
-            }
-
-            handler.img && handler.img(img);
-        };
-
-        var parseBlock = function () {
-            var block = {};
-            block.sentinel = st.readByte();
-
-            switch (String.fromCharCode(block.sentinel)) { // For ease of matching
-                case '!':
-                    block.type = 'ext';
-                    parseExt(block);
-                    break;
-                case ',':
-                    block.type = 'img';
-                    parseImg(block);
-                    break;
-                case ';':
-                    block.type = 'eof';
-                    handler.eof && handler.eof(block);
-                    break;
-                default:
-                    throw new Error('Unknown block: 0x' + block.sentinel.toString(16)); // TODO: Pad this with a 0.
-            }
-
-            if (block.type !== 'eof') setTimeout(parseBlock, 0);
-        };
-
-        var parse = function () {
-            parseHeader();
-            setTimeout(parseBlock, 0);
-        };
-
-        parse();
-    };
-
-    var SuperGif = function ( opts ) {
-
-        var options = {
-            //viewport position
-            vp_l: 0,
-            vp_t: 0,
-            vp_w: null,
-            vp_h: null,
-            //canvas sizes
-            c_w: null,
-            c_h: null
-        };
-        for (var i in opts ) { options[i] = opts[i] }
-        if (options.vp_w && options.vp_h) options.is_vp = true;
-
-        //console.log(">>> >> ", options)
-
-        var stream;
-        var hdr;
-
-        var loadError = null;
-        var loading = false;
-
-        var transparency = null;
-        var delay = null;
-        var disposalMethod = null;
-        var disposalRestoreFromIdx = null;
-        var lastDisposalMethod = null;
-        var frame = null;
-        var lastImg = null;
-
-        var playing = true;
-        var forward = true;
-
-        var ctx_scaled = false;
-
-        var frames = [];
-        var frameOffsets = []; // elements have .x and .y properties
-
-        var gif = options.gif;
-        if (typeof options.auto_play == 'undefined')
-            options.auto_play = (!gif.getAttribute('rel:auto_play') || gif.getAttribute('rel:auto_play') == '1');
-
-        var onEndListener = (options.hasOwnProperty('on_end') ? options.on_end : null);
-        var loopDelay = (options.hasOwnProperty('loop_delay') ? options.loop_delay : 0);
-        var overrideLoopMode = (options.hasOwnProperty('loop_mode') ? options.loop_mode : 'auto');
-        var drawWhileLoading = (options.hasOwnProperty('draw_while_loading') ? options.draw_while_loading : false);
-        var showProgressBar = drawWhileLoading ? (options.hasOwnProperty('show_progress_bar') ? options.show_progress_bar : true) : false;
-        var progressBarHeight = (options.hasOwnProperty('progressbar_height') ? options.progressbar_height : 25);
-        var progressBarBackgroundColor = (options.hasOwnProperty('progressbar_background_color') ? options.progressbar_background_color : 'rgba(255,255,255,0.4)');
-        var progressBarForegroundColor = (options.hasOwnProperty('progressbar_foreground_color') ? options.progressbar_foreground_color : 'rgba(255,0,22,.8)');
-
-        var clear = function () {
-            transparency = null;
-            delay = null;
-            lastDisposalMethod = disposalMethod;
-            disposalMethod = null;
-            frame = null;
-        };
-
-        // XXX: There's probably a better way to handle catching exceptions when
-        // callbacks are involved.
-        var doParse = function () {
-            try {
-                parseGIF(stream, handler);
-            }
-            catch (err) {
-                doLoadError('parse');
-            }
-        };
-
-        var doText = function (text) {
-            toolbar.innerHTML = text; // innerText? Escaping? Whatever.
-            toolbar.style.visibility = 'visible';
-        };
-
-        var setSizes = function(w, h) {
-            canvas.width = w * get_canvas_scale();
-            canvas.height = h * get_canvas_scale();
-            toolbar.style.minWidth = ( w * get_canvas_scale() ) + 'px';
-
-            tmpCanvas.width = w;
-            tmpCanvas.height = h;
-            tmpCanvas.style.width = w + 'px';
-            tmpCanvas.style.height = h + 'px';
-            tmpCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
-        };
-
-        var setFrameOffset = function(frame, offset) {
-            if (!frameOffsets[frame]) {
-                frameOffsets[frame] = offset;
-                return;
-            }
-            if (typeof offset.x !== 'undefined') {
-                frameOffsets[frame].x = offset.x;
-            }
-            if (typeof offset.y !== 'undefined') {
-                frameOffsets[frame].y = offset.y;
-            }
-        };
-
-        var doShowProgress = function (pos, length, draw) {
-            if (draw && showProgressBar) {
-                var height = progressBarHeight;
-                var left, mid, top, width;
-                if (options.is_vp) {
-                    if (!ctx_scaled) {
-                        top = (options.vp_t + options.vp_h - height);
-                        height = height;
-                        left = options.vp_l;
-                        mid = left + (pos / length) * options.vp_w;
-                        width = canvas.width;
-                    } else {
-                        top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
-                        height = height / get_canvas_scale();
-                        left = (options.vp_l / get_canvas_scale() );
-                        mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
-                        width = canvas.width / get_canvas_scale();
-                    }
-                    //some debugging, draw rect around viewport
-                    if (false) {
-                        if (!ctx_scaled) {
-                            var l = options.vp_l, t = options.vp_t;
-                            var w = options.vp_w, h = options.vp_h;
-                        } else {
-                            var l = options.vp_l/get_canvas_scale(), t = options.vp_t/get_canvas_scale();
-                            var w = options.vp_w/get_canvas_scale(), h = options.vp_h/get_canvas_scale();
-                        }
-                        ctx.rect(l,t,w,h);
-                        ctx.stroke();
-                    }
-                }
-                else {
-                    top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
-                    mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
-                    width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1 );
-                    height /= ctx_scaled ? get_canvas_scale() : 1;
-                }
-
-                ctx.fillStyle = progressBarBackgroundColor;
-                ctx.fillRect(mid, top, width - mid, height);
-
-                ctx.fillStyle = progressBarForegroundColor;
-                ctx.fillRect(0, top, mid, height);
-            }
-        };
-
-        var doLoadError = function (originOfError) {
-            var drawError = function () {
-                ctx.fillStyle = 'black';
-                ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
-                ctx.strokeStyle = 'red';
-                ctx.lineWidth = 3;
-                ctx.moveTo(0, 0);
-                ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
-                ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
-                ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
-                ctx.stroke();
-            };
-
-            loadError = originOfError;
-            hdr = {
-                width: gif.width,
-                height: gif.height
-            }; // Fake header.
-            frames = [];
-            drawError();
-        };
-
-        var doHdr = function (_hdr) {
-            hdr = _hdr;
-            setSizes(hdr.width, hdr.height)
-        };
-
-        var doGCE = function (gce) {
-            pushFrame();
-            clear();
-            transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
-            delay = gce.delayTime;
-            disposalMethod = gce.disposalMethod;
-            // We don't have much to do with the rest of GCE.
-        };
-
-        var pushFrame = function () {
-            if (!frame) return;
-            frames.push({
-                            data: frame.getImageData(0, 0, hdr.width, hdr.height),
-                            delay: delay
-                        });
-            frameOffsets.push({ x: 0, y: 0 });
-        };
-
-        var doImg = function (img) {
-            if (!frame) frame = tmpCanvas.getContext('2d');
-
-            var currIdx = frames.length;
-
-            //ct = color table, gct = global color table
-            var ct = img.lctFlag ? img.lct : hdr.gct; // TODO: What if neither exists?
-
-            /*
-            Disposal method indicates the way in which the graphic is to
-            be treated after being displayed.
-
-            Values :    0 - No disposal specified. The decoder is
-                            not required to take any action.
-                        1 - Do not dispose. The graphic is to be left
-                            in place.
-                        2 - Restore to background color. The area used by the
-                            graphic must be restored to the background color.
-                        3 - Restore to previous. The decoder is required to
-                            restore the area overwritten by the graphic with
-                            what was there prior to rendering the graphic.
-
-                            Importantly, "previous" means the frame state
-                            after the last disposal of method 0, 1, or 2.
-            */
-            if (currIdx > 0) {
-                if (lastDisposalMethod === 3) {
-                    // Restore to previous
-                    // If we disposed every frame including first frame up to this point, then we have
-                    // no composited frame to restore to. In this case, restore to background instead.
-                    if (disposalRestoreFromIdx !== null) {
-                    	frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
-                    } else {
-                    	frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
-                    }
-                } else {
-                    disposalRestoreFromIdx = currIdx - 1;
-                }
-
-                if (lastDisposalMethod === 2) {
-                    // Restore to background color
-                    // Browser implementations historically restore to transparent; we do the same.
-                    // http://www.wizards-toolkit.org/discourse-server/viewtopic.php?f=1&t=21172#p86079
-                    frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
-                }
-            }
-            // else, Undefined/Do not dispose.
-            // frame contains final pixel data from the last frame; do nothing
-
-            //Get existing pixels for img region after applying disposal method
-            var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
-
-            //apply color table colors
-            img.pixels.forEach(function (pixel, i) {
-                // imgData.data === [R,G,B,A,R,G,B,A,...]
-                if (pixel !== transparency) {
-                    imgData.data[i * 4 + 0] = ct[pixel][0];
-                    imgData.data[i * 4 + 1] = ct[pixel][1];
-                    imgData.data[i * 4 + 2] = ct[pixel][2];
-                    imgData.data[i * 4 + 3] = 255; // Opaque.
-                }
-            });
-
-            frame.putImageData(imgData, img.leftPos, img.topPos);
-
-            if (!ctx_scaled) {
-                ctx.scale(get_canvas_scale(),get_canvas_scale());
-                ctx_scaled = true;
-            }
-
-            // We could use the on-page canvas directly, except that we draw a progress
-            // bar for each image chunk (not just the final image).
-            if (drawWhileLoading) {
-                ctx.drawImage(tmpCanvas, 0, 0);
-                drawWhileLoading = options.auto_play;
-            }
-
-            lastImg = img;
-        };
-
-        var player = (function () {
-            var i = -1;
-            var iterationCount = 0;
-
-            var showingInfo = false;
-            var pinned = false;
-
-            /**
-             * Gets the index of the frame "up next".
-             * @returns {number}
-             */
-            var getNextFrameNo = function () {
-                var delta = (forward ? 1 : -1);
-                return (i + delta + frames.length) % frames.length;
-            };
-
-            var stepFrame = function (amount) { // XXX: Name is confusing.
-                i = i + amount;
-
-                putFrame();
-            };
-
-            var step = (function () {
-                var stepping = false;
-
-                var completeLoop = function () {
-                    if (onEndListener !== null)
-                        onEndListener(gif);
-                    iterationCount++;
-
-                    if (overrideLoopMode !== false || iterationCount < 0) {
-                        doStep();
-                    } else {
-                        stepping = false;
-                        playing = false;
-                    }
-                };
-
-                var doStep = function () {
-                    stepping = playing;
-                    if (!stepping) return;
-
-                    stepFrame(1);
-                    var delay = frames[i].delay * 10;
-                    if (!delay) delay = 100; // FIXME: Should this even default at all? What should it be?
-
-                    var nextFrameNo = getNextFrameNo();
-                    if (nextFrameNo === 0) {
-                        delay += loopDelay;
-                        setTimeout(completeLoop, delay);
-                    } else {
-                        setTimeout(doStep, delay);
-                    }
-                };
-
-                return function () {
-                    if (!stepping) setTimeout(doStep, 0);
-                };
-            }());
-
-            var putFrame = function () {
-                var offset;
-                i = parseInt(i, 10);
-
-                if (i > frames.length - 1){
-                    i = 0;
-                }
-
-                if (i < 0){
-                    i = 0;
-                }
-
-                offset = frameOffsets[i];
-
-                tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
-                ctx.globalCompositeOperation = "copy";
-                ctx.drawImage(tmpCanvas, 0, 0);
-            };
-
-            var play = function () {
-                playing = true;
-                step();
-            };
-
-            var pause = function () {
-                playing = false;
-            };
-
-
-            return {
-                init: function () {
-                    if (loadError) return;
-
-                    if ( ! (options.c_w && options.c_h) ) {
-                        ctx.scale(get_canvas_scale(),get_canvas_scale());
-                    }
-
-                    if (options.auto_play) {
-                        step();
-                    }
-                    else {
-                        i = 0;
-                        putFrame();
-                    }
-                },
-                step: step,
-                play: play,
-                pause: pause,
-                playing: playing,
-                move_relative: stepFrame,
-                current_frame: function() { return i; },
-                length: function() { return frames.length },
-                move_to: function ( frame_idx ) {
-                    i = frame_idx;
-                    putFrame();
-                }
-            }
-        }());
-
-        var doDecodeProgress = function (draw) {
-            doShowProgress(stream.pos, stream.data.length, draw);
-        };
-
-        var doNothing = function () {};
-        /**
-         * @param{boolean=} draw Whether to draw progress bar or not; this is not idempotent because of translucency.
-         *                       Note that this means that the text will be unsynchronized with the progress bar on non-frames;
-         *                       but those are typically so small (GCE etc.) that it doesn't really matter. TODO: Do this properly.
-         */
-        var withProgress = function (fn, draw) {
-            return function (block) {
-                fn(block);
-                doDecodeProgress(draw);
-            };
-        };
-
-
-        var handler = {
-            hdr: withProgress(doHdr),
-            gce: withProgress(doGCE),
-            com: withProgress(doNothing),
-            // I guess that's all for now.
-            app: {
-                // TODO: Is there much point in actually supporting iterations?
-                NETSCAPE: withProgress(doNothing)
-            },
-            img: withProgress(doImg, true),
-            eof: function (block) {
-                //toolbar.style.display = '';
-                pushFrame();
-                doDecodeProgress(false);
-                if ( ! (options.c_w && options.c_h) ) {
-                    canvas.width = hdr.width * get_canvas_scale();
-                    canvas.height = hdr.height * get_canvas_scale();
-                }
-                player.init();
-                loading = false;
-                if (load_callback) {
-                    load_callback(gif);
-                }
-
-            }
-        };
-
-        var init = function () {
-            var parent = gif.parentNode;
-
-            var div = document.createElement('div');
-            canvas = document.createElement('canvas');
-            ctx = canvas.getContext('2d');
-            toolbar = document.createElement('div');
-
-            tmpCanvas = document.createElement('canvas');
-
-            div.width = canvas.width = gif.width;
-            div.height = canvas.height = gif.height;
-            toolbar.style.minWidth = gif.width + 'px';
-
-            div.className = 'jsgif';
-            toolbar.className = 'jsgif_toolbar';
-            div.appendChild(canvas);
-            div.appendChild(toolbar);
-
-            //parent.insertBefore(div, gif);
-            //parent.removeChild(gif);
-
-            if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
-            initialized=true;
-        };
-
-        var get_canvas_scale = function() {
-            var scale;
-            if (options.max_width && hdr && hdr.width > options.max_width) {
-                scale = options.max_width / hdr.width;
-            }
-            else {
-                scale = 1;
-            }
-            return scale;
-        }
-
-        var canvas, ctx, toolbar, tmpCanvas;
-        var initialized = false;
-        var load_callback = false;
-
-        var load_setup = function(callback) {
-            if (loading) return false;
-            if (callback) load_callback = callback;
-            else load_callback = false;
-
-            loading = true;
-            frames = [];
-            clear();
-            disposalRestoreFromIdx = null;
-            lastDisposalMethod = null;
-            frame = null;
-            lastImg = null;
-
-            return true;
-        }
-
-        return {
-            // play controls
-            play: player.play,
-            pause: player.pause,
-            move_relative: player.move_relative,
-            move_to: player.move_to,
-
-            // getters for instance vars
-            get_playing      : function() { return playing },
-            get_canvas       : function() { return canvas },
-            get_canvas_scale : function() { return get_canvas_scale() },
-            get_loading      : function() { return loading },
-            get_auto_play    : function() { return options.auto_play },
-            get_length       : function() { return player.length() },
-            get_current_frame: function() { return player.current_frame() },
-            load_url: function(src,callback){
-                if (!load_setup(callback)) return;
-
-                var h = new XMLHttpRequest();
-                // new browsers (XMLHttpRequest2-compliant)
-                h.open('GET', src, true);
-
-                if ('overrideMimeType' in h) {
-                    h.overrideMimeType('text/plain; charset=x-user-defined');
-                }
-
-                // old browsers (XMLHttpRequest-compliant)
-                else if ('responseType' in h) {
-                    h.responseType = 'arraybuffer';
-                }
-
-                // IE9 (Microsoft.XMLHTTP-compliant)
-                else {
-                    h.setRequestHeader('Accept-Charset', 'x-user-defined');
-                }
-
-                h.onloadstart = function() {
-                    // Wait until connection is opened to replace the gif element with a canvas to avoid a blank img
-                    if (!initialized) init();
-                };
-                h.onload = function(e) {
-                    if (this.status != 200) {
-                        doLoadError('xhr - response');
-                    }
-                    // emulating response field for IE9
-                    if (!('response' in this)) {
-                        this.response = new VBArray(this.responseText).toArray().map(String.fromCharCode).join('');
-                    }
-                    var data = this.response;
-                    if (data.toString().indexOf("ArrayBuffer") > 0) {
-                        data = new Uint8Array(data);
-                    }
-
-                    stream = new Stream(data);
-                    setTimeout(doParse, 0);
-                };
-                h.onprogress = function (e) {
-                    if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
-                };
-                h.onerror = function() { doLoadError('xhr'); };
-                h.send();
-            },
-            load: function (callback) {
-                this.load_url(gif.getAttribute('rel:animated_src') || gif.src,callback);
-            },
-            load_raw: function(arr, callback) {
-                if (!load_setup(callback)) return;
-                if (!initialized) init();
-                stream = new Stream(arr);
-                setTimeout(doParse, 0);
-            },
-            set_frame_offset: setFrameOffset
-        };
-    };
-
-    return SuperGif;
-}));
-
-/*
-	RubbableGif
-
-	Example usage:
-
-		<img src="./example1_preview.gif" rel:animated_src="./example1.gif" width="360" height="360" rel:auto_play="1" />
-
-		<script type="text/javascript">
-			$$('img').each(function (img_tag) {
-				if (/.*\.gif/.test(img_tag.src)) {
-					var rub = new RubbableGif({ gif: img_tag } );
-					rub.load();
-				}
-			});
-		</script>
-
-	Image tag attributes:
-
-		rel:animated_src -	If this url is specified, it's loaded into the player instead of src.
-							This allows a preview frame to be shown until animated gif data is streamed into the canvas
-
-		rel:auto_play -		Defaults to 1 if not specified. If set to zero, the gif will be rubbable but will not
-							animate unless the user is rubbing it.
-
-	Constructor options args
-
-		gif 				Required. The DOM element of an img tag.
-		auto_play 			Optional. Same as the rel:auto_play attribute above, this arg overrides the img tag info.
-		max_width			Optional. Scale images over max_width down to max_width. Helpful with mobile.
-
-	Instance methods
-
-		// loading
-		load( callback )	Loads the gif into a canvas element and then calls callback if one is passed
-
-		// play controls
-		play -				Start playing the gif
-		pause -				Stop playing the gif
-		move_to(i) -		Move to frame i of the gif
-		move_relative(i) -	Move i frames ahead (or behind if i < 0)
-
-		// getters
-		get_canvas			The canvas element that the gif is playing in.
-		get_playing			Whether or not the gif is currently playing
-		get_loading			Whether or not the gif has finished loading/parsing
-		get_auto_play		Whether or not the gif is set to play automatically
-		get_length			The number of frames in the gif
-		get_current_frame	The index of the currently displayed frame of the gif
-
-		For additional customization (viewport inside iframe) these params may be passed:
-		c_w, c_h - width and height of canvas
-		vp_t, vp_l, vp_ w, vp_h - top, left, width and height of the viewport
-
-*/
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(['./libgif'], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('./libgif'));
-    } else {
-        root.RubbableGif = factory(root.SuperGif);
-    }
-}(this, function (SuperGif) {
-    var RubbableGif = function( options ) {
-        var sup = new SuperGif( options );
-
-        var register_canvas_handers = function () {
-
-            var isvp = function(x) {
-                return (options.vp_l ? ( x - options.vp_l ) : x );
-            }
-
-            var canvas = sup.get_canvas();
-            var maxTime = 1000,
-            // allow movement if < 1000 ms (1 sec)
-                w = ( options.vp_w ? options.vp_w : canvas.width ),
-                maxDistance = Math.floor(w / (sup.get_length() * 2)),
-            // swipe movement of 50 pixels triggers the swipe
-                startX = 0,
-                startTime = 0;
-
-            var cantouch = "ontouchend" in document;
-
-            var aj = 0;
-            var last_played = 0;
-
-            canvas.addEventListener((cantouch) ? 'touchstart' : 'mousedown', function (e) {
-                // prevent image drag (Firefox)
-                e.preventDefault();
-                if (sup.get_auto_play()) sup.pause();
-
-                var pos = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
-
-                var x = (pos.layerX > 0) ? isvp(pos.layerX) : w / 2;
-                var progress = x / w;
-
-                sup.move_to( Math.floor(progress * (sup.get_length() - 1)) );
-
-                startTime = e.timeStamp;
-                startX = isvp(pos.pageX);
-            });
-
-            canvas.addEventListener((cantouch) ? 'touchend' : 'mouseup', function (e) {
-                startTime = 0;
-                startX = 0;
-                if (sup.get_auto_play()) sup.play();
-            });
-
-            canvas.addEventListener((cantouch) ? 'touchmove' : 'mousemove', function (e) {
-                e.preventDefault();
-                var pos = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
-
-                var currentX = isvp(pos.pageX);
-                currentDistance = (startX === 0) ? 0 : Math.abs(currentX - startX);
-                // allow if movement < 1 sec
-                currentTime = e.timeStamp;
-                if (startTime !== 0 && currentDistance > maxDistance) {
-                    if (currentX < startX && sup.get_current_frame() > 0) {
-                        sup.move_relative(-1);
-                    }
-                    if (currentX > startX && sup.get_current_frame() < sup.get_length() - 1) {
-                        sup.move_relative(1);
-                    }
-                    startTime = e.timeStamp;
-                    startX = isvp(pos.pageX);
-                }
-
-                var time_since_last_play = e.timeStamp - last_played;
-                {
-                    aj++;
-                    if (document.getElementById('tickles' + ((aj % 5) + 1))) document.getElementById('tickles' + ((aj % 5) + 1)).play();
-                    last_played = e.timeStamp;
-                }
-
-
-            });
-        };
-
-        sup.orig_load = sup.load;
-        sup.load = function(callback) {
-            sup.orig_load( function() {
-                if (callback) callback();
-                register_canvas_handers( sup );
-            } );
-        }
-
-        return sup;
-    }
-
-    return RubbableGif;
-}));

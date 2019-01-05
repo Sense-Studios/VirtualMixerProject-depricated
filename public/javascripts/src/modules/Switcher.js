@@ -40,16 +40,18 @@ function Switcher(renderer, options ) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // we actually need this for each instance itt. the Mixer
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */','\
-\nvec3 get_source_'+_self.uuid+' ( int active_source, vec3 src1, vec3 src2 ) {\
-\n  if ( active_source ==  0 ) return src1;\
-\n  if ( active_source ==  1 ) return src2;\
-\n}'
-);
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',`
+vec4 get_source_`+_self.uuid+` ( int active_source, vec4 src1, vec4 src2 ) {
+  if ( active_source ==  0 ) return src1;\
+  if ( active_source ==  1 ) return src2;\
+}
+/* custom_helpers */
+`
+    );
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
+vec4 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
   }
 
   _self.update = function() {}

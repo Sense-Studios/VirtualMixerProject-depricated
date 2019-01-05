@@ -34,11 +34,11 @@ html
 
     // FIREBASE
     // Firebase (remove)
-    script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase.js')
-    script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js')
-    script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js')
-    script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js')
-    script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js')
+    //script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase.js')
+    //script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js')
+    //script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js')
+    //script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js')
+    //script(src='https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js')
 
     // SOURCES        
     // Sources
@@ -56,22 +56,30 @@ html
     script(src='/javascripts/src/modules/Switcher.js')
     script(src='/javascripts/src/modules/Output.js')
 
-    // CONTROLLERS
+    // CONTROLLERS    
     script(src='/javascripts/src/controllers/_controller.js')
-    script(src='/javascripts/src/controllers/_midi.js')
-
-    script(src='/javascripts/src/controllers/GamePad.js')
-    script(src='/javascripts/src/controllers/FireBaseControl.js')
-    script(src='/javascripts/src/controllers/NumPadBPMMixerControl.js')    
     script(src='/javascripts/src/controllers/MidiController.js')
+    script(src='/javascripts/src/controllers/_vidi.js')
+    script(src='/javascripts/src/controllers/_computerkeyboard.js')
+    //script(src='/javascripts/src/controllers/_gamepad.js')
+
+    script(src='/javascripts/src/controllers/GamePadController.js')
+    //script(src='/javascripts/src/controllers/FireBaseControl.js')
+    script(src='/javascripts/src/controllers/NumPadBPMMixerControl.js')    
+    //script(src='/javascripts/src/controllers/Midi_Akai_APCmini.js')
+    //script(src='/javascripts/src/controllers/Midi_Akai_MPKmini.js')
 
     // BEHAVIOURS
     script(src='/javascripts/src/behaviours/_behaviour.js')
 
     // EFFECTS
-    script(src='/javascripts/src/effects/BlackAndWhite.js')
+    script(src='/javascripts/src/effects/_effect.js')
+    script(src='/javascripts/src/effects/ColorEffect.js')
+    script(src='/javascripts/src/effects/FeedbackEffect.js')
+    // script(src='/javascripts/src/effects/DistortionEffect.js')
 
     // ADD-ONS
+    script(src='/javascripts/src/addons/_addon.js')
     script(src='/javascripts/src/addons/BPM.js')
     script(src='/javascripts/src/addons/AudioAnalysis.js')
     script(src='/javascripts/src/addons/FileManager.js')

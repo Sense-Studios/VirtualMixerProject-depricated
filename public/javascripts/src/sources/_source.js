@@ -6,15 +6,10 @@
 function Source( renderer, options ) {
   var _self = this
 
-  /*
-    renderer
-  */
-
-
   _self.type = "Source"
   _self.function_list = [["JUMP","method","jump"]]
-  // override these
 
+  // override these
   // program interface
   _self.init =         function() {}
   _self.update =       function() {}
@@ -30,5 +25,5 @@ function Source( renderer, options ) {
   _self.duration =     function() {}        // seconds
 
   _self.jump =         function() {}
-  //_self.cue =          function() {}
+  //_self.cue =          function() {}      // still no solid solution
 }

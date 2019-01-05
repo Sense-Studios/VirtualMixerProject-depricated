@@ -12,13 +12,24 @@
 0 ______________________________________________________________________________
 
 
+THIS IS UNDER HEAVY CONSTRUCTION!
 
+The idea of a 'behaviour' is to trigger certain functions on a set interval.
+For instance; a behaviour could be to trigger 10s, 20s and 40s, every 2, 4 and
+8 beats. of the song.
 
+This is not to be confused with 'trackdata', which does pretty much the same
+thing. trackdata should move over to "sheets", which in itself would qualitfy
+as a behaviour in it's own right
+
+So alternatively, behaviour could siply be random triggers, much like
+autonomous controllers, setting changes, scratch and what not, every so
+often.
 
 */
 
 
-function Behaviour( renderer, options ) {
+function Behaviour( _renderer, options ) {
 
   // create and instance
   var _self = this;
@@ -26,6 +37,9 @@ function Behaviour( renderer, options ) {
   // set or get uid
   _self.uuid = "Behaviour" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Behaviour"
+
+  // add to renderer
+  _renderer.add(_self)
 
   _self.beats = 0
   _self.time = (new Date()).getTime()
@@ -35,8 +49,6 @@ function Behaviour( renderer, options ) {
 
   // requires a bpm
   _self.bpm = options.bpm
-
-  renderer.add(_self)
 
   function addTrigger( _obj ) {
     if ( _obj.mod.type == "seconds" ) {
@@ -72,8 +84,6 @@ function Behaviour( renderer, options ) {
     // updat beats
     var bpsr = Math.round( bpm.render() * 4 )
 
-
-
     if ( bpsr != old_bpm ) {
       _self.beats += 1
       old_bpm = bpsr
@@ -81,7 +91,7 @@ function Behaviour( renderer, options ) {
     //if ( bpsr == 0 ) old_bpm = 1
 
     // checkTriggers()
-    //checkSheets()
+    // checkSheets()
   }
 
   // ---------------------------------------------------------------------------
