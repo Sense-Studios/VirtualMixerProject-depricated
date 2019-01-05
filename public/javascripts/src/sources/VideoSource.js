@@ -50,7 +50,11 @@ function VideoSource(renderer, options) {
     // create video element
     videoElement = document.createElement('video');
     videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("playsinline",true)
+    videoElement.playsinline = true
+    videoElement.preload = 'none'
     videoElement.muted= true
+    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
 
     // set the source
     if ( options.src == undefined ) {
@@ -71,7 +75,7 @@ function VideoSource(renderer, options) {
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         var r = Math.random() * videoElement.duration
-        videoElement.currentTime = r
+        //videoElement.currentTime = r
         videoElement.play();
         _self.firstplay = true
         console.log(_self.uuid, "First Play; ", r)
@@ -81,9 +85,17 @@ function VideoSource(renderer, options) {
 
     // firstload handler for mobile; neest at least 1 user click
     document.body.addEventListener('click', function() {
+      console.log("clikcity")
       videoElement.play();
       _self.firstplay = true
     });
+
+    document.body.addEventListener('touchstart', function() {
+      console.log("clikcity")
+      videoElement.play();
+      _self.firstplay = true
+    });
+
 
     videoElement.volume = 0;
 
@@ -166,13 +178,16 @@ function VideoSource(renderer, options) {
   _self.src = function( _file ) {
     _self.currentSrc = _file
     videoElement.src = _file
-    var playInterval = setInterval( function() {
+    videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
         console.log(_self.uuid, "First Play.")
-        clearInterval(playInterval)
       }
-    }, 400 )
+    })
+    //var playInterval = setInterval(
+    //    clearInterval(playInterval)
+    //  }
+    //}, 400 )
   }
 
   /**
