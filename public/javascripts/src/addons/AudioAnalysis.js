@@ -52,7 +52,7 @@ function AudioAnalysis( renderer ) {
   */
   _self.audio = audio
 
-  var context = new AudioContext(); // AudioContext object instance
+  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
   var source = context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
   var analyser = context.createAnalyser();
@@ -107,12 +107,16 @@ function AudioAnalysis( renderer ) {
   // firstload for mobile, forces all control to the site on click
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    audio.play();
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+    });
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
 
   document.body.addEventListener('click', forceFullscreen)
+  document.body.addEventListener('touchstart', forceFullscreen)
 
   _self.disconnectOutput = function() {
     source.disconnect(context.destination);
