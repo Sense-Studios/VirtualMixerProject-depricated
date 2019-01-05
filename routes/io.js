@@ -159,16 +159,10 @@ router.get('/test', function(req, res, next) {
 
 /* Return data for io. */
 router.post('/', function (req, res) {
-  // uipdate sheetsres.send('POST request to the homepage')
-  // something something res
-  console.log("got post,", req.body.sheets)
-  console.log("got post,", req.body.sheetindex)
-
-  sheets = JSON.parse( req.body.sheets )
+  // update sheetsres.send('POST request to the homepage')
+  io.emit('command', 'ping')
+  io.emit( 'command', {'command': 'updatesheets', "payload": req.body.sheets })
   res.send(sheets[ req.body.sheetindex ])
-
-  //sheets = req.body.sheets
-  router.io.emit('command', {'command': 'updatesheets', "payload": req.body })
 })
 
 router.get('/', function(req, res, next) {

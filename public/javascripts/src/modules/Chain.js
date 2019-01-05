@@ -53,11 +53,11 @@ function Chain(renderer, options) {
     _self.sources.forEach( function( source, index ) {
       generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
     });
-    generatedOutput += ";\n"
+    //generatedOutput += ";\n"
 
     // put it in the shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+', 1.0); \/* custom_main */')
 
   }
 
@@ -72,6 +72,12 @@ vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
 
   _self.getChainLink = function( _num ) {
     return _self.sources( _num )
+  }
+
+  _self.setAll = function( _alpha = 0 ) {
+    _self.sources.forEach( function( _num,i ) {
+      renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
+    })
   }
 
   _self.toggle = function( _num, _state ) {

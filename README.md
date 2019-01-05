@@ -18,17 +18,26 @@ Or continue with the Quickstart
 
 1) clone the package, defaults to VirtualMixerProject/
 
-`$ git clone git@github.com:Sense-Studios/VirtualMixerProject.git `
+```
+  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git
+```
 
 2) run the installer
 
-`$ VirtualMixerProject/ npm install `
+```
+  $ VirtualMixerProject/ npm install
+```
 
 3) start the app
 
-`$ VirtualMixerProject/  npm start `
+```
+  $ VirtualMixerProject/  npm start
+```
+
+4) Go to 127.0.0.1:3000 and enjoy the show!
 
 Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs
+
 Or continue with the Quick start
 
 ## Quickstart
@@ -47,7 +56,7 @@ Write a minimum of Webpage:
 
 <html>
   <head>
-    <script src="path/to//vendor-min.js"></script>
+    <script src="path/to/vendor-min.js"></script>
     <script src="path/to/mixer-min.js"></script>
   </head>
   <body>
@@ -125,15 +134,17 @@ The Mixmode defines the curvature of the crossfade.
 
 In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is **darker** in the middle of  the crossfade then it is at both ends. This is the default _Mixmode_, the other modes play with these settings
 
-* 1: **NORMAL** (default),   regular, linear crossfade
-* 2: **HARD**,               switches with a hard cut at 50%
-* 3: **NAM**,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
-* 4: **FAM**,                fades with a downward curve, forcing a 'overlay' period
-* 5: **NON DARK**,           Never goes dark, 0-2 linear curve, capped at 1 and .36
-* 6: **LEFT**,               forces the pod on 0 (locks pod)
-* 7: **RIGHT**,              forces the pod on 1 (locks pod)
-* 8: **CENTER**,             forces both sources at ~66% (locks pod)
-* 9: **BOOM**                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+```
+  1: NORMAL (default),   regular, linear crossfade
+  2: HARD,               switches with a hard cut at 50%
+  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+  4: FAM,                fades with a downward curve, forcing a 'overlay' period
+  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+  6: LEFT,               forces the pod on 0 (locks pod)
+  7: RIGHT,              forces the pod on 1 (locks pod)
+  8: CENTER,             forces both sources at ~66% (locks pod)
+  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+```
 
 ### Blendmode
 Mixers also support a [`Blendmode`](Mixer.html#blendMode).
@@ -169,32 +180,20 @@ mixer1.blendMode(1)    // set blendmode to ADD (default)
 mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT
 ```
 
-## Installation
+## Other documentation;
 
-1) clone the package, defaults to VirtualMixerProject/
-
-` git clone git@github.com:Sense-Studios/VirtualMixerProject.git `
-
-2) run the installer
-
-` npm install `
-
-3) start the app
-
-` npm start `
-
-You might want to test the program with `npm test`.
-point your browser to `127.0.0.1:3000` and enjoy the show.
-
-check out the docs for more info
+* Limitations
+* References
+* Roadmap
 
 ## Roadmap
 
 * Set up a Node editor
-* Hook up Midi controller
+* ~~Hook up Midi controller~~
+* add wipe MixModes
 * add configuration for Firebase
 * Phase out express for lightweight server/ templating
-* Phase out jQuery
+* ~~Phase out jQuery~~
 * Phase out ThreeJS
 
 

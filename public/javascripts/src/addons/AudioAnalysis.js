@@ -1,51 +1,95 @@
-/**
- * @description
- *   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
- *   the BPM is calculated based on an input music stream (mp3 file)
- *
- * @example
- * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
- * var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
- * analysis.add( mixer1.pod )
- * @constructor Addon#AudioAnalysis
- * @implements Addon
- * @param {GlRenderer} renderer
- * @param {Object} w. audio audio is a source, like /path/to/mymusic.mp3
- */
+AudioAnalysis.prototype = new Addon(); // assign prototype to marqer
+AudioAnalysis.constructor = AudioAnalysis;  // re-assign constructor
 
-function AudioAnalysis( renderer ) {
-  // returns a floating point between 1 and 0, in sync with a bpm
+/**
+* @summary
+*   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+*
+* @description
+*   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
+*   AudioAnalysis returns a floating point between 1 and 0, in sync with a bpm
+*   the BPM is calculated based on an input music stream (mp3 file)
+*
+*   ```
+*     options.audio (String) is a source, like /path/to/mymusic.mp3
+*     options.microphone (Boolean) use microphone (true) or audiosource (false)
+*   ```
+*
+*
+* @example
+* var mixer1 = new Mixer( _renderer, { source1: mySource, source2: myOtherSource })
+* var analysis = new AudioAnalysis( renderer, { audio: 'mymusic.mp3' } );
+* analysis.add( mixer1.pod )
+* @constructor Addon#AudioAnalysis
+* @implements Addon
+* @param {GlRenderer} renderer - current {@link GlRenderer}
+* @param {Object} options - object with several settings
+*/
+
+// returns a floating point between 1 and 0, in sync with a bpm
+// it also returns actual BPM numbers and a set of options
+function AudioAnalysis( _renderer, _options ) {
   var _self = this
 
   // exposed variables.
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
+
+  // NOTE: that externally "audio" refers to the audiofile
+  // internally it refers to the Audio HTMLMediaElement
   _self.audio = ""
   _self.bypass = false
 
-  // main bpm numbers
+  /**
+   * @description (calculated)bpm
+   * @member Addon#AudioAnalysis#bpm
+  */
   _self.bpm = 128
   _self.bpm_float = 128
+
+  /**
+   * @description bpm mod, multiplyer for bpm output, usuall 0.125, 0.25, 0.5, 2, 4 etc.
+   * @member Addon#AudioAnalysis#mod
+  */
   _self.mod = 1
   _self.bps = 1
   _self.sec = 0
 
-  // private
+  // default options
+  _self.options = {
+    //audio: '/radio/nsb',
+    audio: '/audio/fear_is_the_mind_killer_audio.mp3',
+    microphone: false
+  }
+
+  if ( _options != undefined ) {
+    _self.options = _options;
+  }
+
+  // somewhat private private
   var calibrating = true
   var nodes = []
   var c = 0
   var starttime = (new Date()).getTime()
 
   // add to renderer
-  renderer.add(_self)
+  _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
+
+  // create all necc. contexts
   var audio = new Audio()
+  var context = new AudioContext(); // AudioContext object instance
+  var source
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
 
   /**
    * @description Audio element
-   * @member Addon#BPM#audio_src
-   * @param {HTMLMediaElement} reference to the virtual media element
+   * @member Addon#AudioAnalysis#audio
+   * @param {HTMLMediaElement} - reference to the virtual media element
    *
    *  HTMLMediaElement AUDIO reference
    *
@@ -60,7 +104,7 @@ function AudioAnalysis( renderer ) {
   var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
-  // with ~ 200 samples/s it takes ~ 20 seconds to adjust
+  // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
   var sampleLength = 4000;
   var dataSet = new Array(sampleLength);
   var peaks = new Array(sampleLength);
@@ -71,26 +115,6 @@ function AudioAnalysis( renderer ) {
   var treshold = 1;
   var intervalCounts = [];
 
-  // this should be set externally (at createion)
-  // audio.src = 'http://nabu.sense-studios.com/proxy.php?url=http://208.123.119.17:7904';
-  console.log("SET AUDIO SRC")
-  //audio.setAttribute('crossorigin', 'anonymous');
-  // audio.src =  'http://37.220.36.53:7904';
-  // audio.src = '/audio/fear_is_the_mind_killer_audio.mp3'
-  // audio.src = '/audio/fulke_absurd.mp3'
-
-  audio.src = '/proxy/nsb' // NSB RADIO --> 'http://37.220.36.53:7904';
-  _self.audio_src = '/proxy/nsb'
-  // audio.src = '/proxy/dunklenacht' // dunklenacht
-
-  // if ( _self.options.audio ) audio.src = _self.options.audio
-
-  // audio.src = '/audio/rage_hard.mp3'
-  // audio.src = '/audio/i_own_it.mp3'
-  // audio.src = '/audio/100_metronome.mp3'
-  // audio.src = '/audio/120_metronome.mp3'
-  // audio.src = '/audio/140_metronome.mp3'
-
   audio.controls = true;
   audio.loop = true;
   audio.autoplay = true;
@@ -99,12 +123,15 @@ function AudioAnalysis( renderer ) {
   bandpassFilter.type = "lowpass";
   bandpassFilter.frequency.value = 350
   bandpassFilter.Q.value = 1
-
   analyser.fftSize = 128;
-
   bufferLength = analyser.frequencyBinCount;
 
-  // firstload for mobile, forces all control to the site on click
+  /**
+   * @description
+   *  firstload for mobile, forces all control to the site on click
+   * @member Addon#AudioAnalysis~disconnectOutput
+   *
+  */
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     context.resume().then(() => {
@@ -114,23 +141,60 @@ function AudioAnalysis( renderer ) {
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
-
   document.body.addEventListener('click', forceFullscreen)
   document.body.addEventListener('touchstart', forceFullscreen)
 
+  /**
+   * @description
+   *  disconnects audio to output, this will mute the analalyser, but won't stop analysing
+   * @member Addon#AudioAnalysis#disconnectOutput
+   *
+  */
   _self.disconnectOutput = function() {
     source.disconnect(context.destination);
   }
 
+  /**
+   * @description
+   *   connects the audio source to output, making it audible
+   * @member Addon#AudioAnalysis#connectOutput
+   *
+  */
   _self.connectOutput = function() {
     source.connect(context.destination);
   }
 
+  _self.getBpm = function() {
+    return _self.bpm
+  }
 
   // main ----------------------------------------------------------------------
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
-    initializeAutoBpm()
+
+    /**
+     * @description Audio element
+     * @member Addon#AudioAnalysis#audio_src
+     * @param {string} - reference to audiofile
+    */
+    // set audio src to optioned value
+    if ( !_self.options.microphone ) {
+      source = context.createMediaElementSource(audio);
+      audio.src = _self.options.audio  // NSB RADIO --> 'http://37.220.36.53:7904';
+      _self.audio_src = _self.options.audio
+      initializeAutoBpm()
+
+    } else {
+
+      navigator.mediaDevices.getUserMedia({ audio })
+      .then(function(mediaStream) {
+        source = context.createMediaStreamSource(mediaStream);
+        initializeAutoBpm()
+
+      }).catch(function(err) {
+        console.log(err.name + ": " + err.message);
+      }); // always check for errors at the end.
+    }
   }
 
   _self.update = function() {
@@ -165,36 +229,47 @@ function AudioAnalysis( renderer ) {
   }
 
   // actual --------------------------------------------------------------------
-  // initialize Audio, used in the first run
-  var initializeAudio = new Promise( function( resolve, reject ) {
+
+  /**
+   * @description
+   *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
+   *  start the {@link Addon#AudioAnalysis~sampler}
+   *
+   * @member Addon#AudioAnalysis.initializeAutoBpm
+   *
+  */
+  var initializeAutoBpm = function() {
+    // tries and play the audio
+    audio.play();
+
+    // connect the analysier and the filter
     source.connect(bandpassFilter);
     bandpassFilter.connect(analyser);
 
-    // COMMENT THIS LINE OUT FOR NO SOUND
+    // send it to the speakers (or not)
     source.connect(context.destination);
-    audioanalysis1
 
-    resolve(audio);
-    reject(err);
-  })
-
-  var initializeAutoBpm = function() {
-    initializeAudio.then( function(r) {
-      console.log("AudioAnalysis is initialized!", audio.src);
-      audio.play();
-      console.log("AudioAnalysis start sampling!")
-      setInterval( sampler, 1); // as fast as we can, we need those samples !!
-
-    }).catch( function(err){
-      console.log("Error: AudioAnalysis ERROR ", err);
-    });
+    // start the sampler
+    setInterval( sampler, 1);
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
-
+  /**
+   * @description
+   *   gets the analyser.getByteTimeDomainData
+   *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
+   *   returns the most occuring bpm
+   *
+   *
+   * @member Addon#AudioAnalysis~sampler
+   *
+  */
+  _self.dataSet
+  _self.tempoData
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
+
     //if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
@@ -218,24 +293,19 @@ function AudioAnalysis( renderer ) {
     if ( ( now - start) > 100 ) {
 
       var tempoData = getTempo(dataSet)
-
+      _self.tempoData = tempoData
       // Here are some ideas for a more complete analisis range
 
       // var tempoCounts = tempoData.tempoCounts
       // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
-      // drawData(dataSet) // DEPRICATED -- draw the wavelines (for testing)
+      if (tempoData == undefined) {
+        console.log("sampler is active, but no beat was found")
+      }else{
+        _self.tempodata_bpm = tempoData.bpm
+      }
 
-      // depricated failsafe
-      // if (tempoCounts[0] !== undefined) window.bpm = tempoCounts[0].tempo
-
-      // depricated debug window
-      // $('#info').html( dataSet.length + "\t " + c * 10 + " samples/s" + "\t peaks: "  + foundpeaks.length + "\tBPM: <strong>"+ Math.round(window.bpm) + " </strong> ("+Math.round(window.bpm2)+") \t\tconfidence: <em>" + window.confidence + " <strong>" + _self.calibrating + "</strong></em>" ) //.+ " -- " + _dataSet[ _dataSet.length - 1 ] )
-      // console.log(" AudioAnalysis::AutoBPM: ",  calibrating, tempoData.bpm, d, tempoData.foundpeaks.length, treshold )
-
-      // write the test data globally (needs uiid?)
-      _self.tempodata_bpm = tempoData.bpm
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
       start = Date.now()
       d = 0
@@ -258,7 +328,14 @@ function AudioAnalysis( renderer ) {
   }
   doBlink()
 
-  // get bpm tempo by analyising audio stream
+  /**
+   * @description
+   *  returns 'tempodata', a list of found BPMs sorted on occurrence
+   *  object includes: bpm (ie. 128), confidence (0-1), calibrating (true/false),
+   *  treshold, tempocounts, foundpeaks and peaks
+   * @member Addon#AudioAnalysis~getTempo
+   *
+  */
   var getTempo = function( _data ) {
     foundpeaks = []                    // reset foundpeaks
     peaks = new Array( _data.length )  // reset peaks
@@ -282,11 +359,11 @@ function AudioAnalysis( renderer ) {
     // see: http://joesul.li/van/beat-detection-using-web-audio/
     // for more information on this method and the sources of the algroritm
     var tempoCounts = groupNeighborsByTempo( countIntervalsBetweenNearbyPeaks( foundpeaks ) );
-    tempoCounts.sort( mycomparator );                             // sort tempo's by 'score', or most neighbours
+    tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
       tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
-    }else{
 
+    }else{
 
       // DISPLAY, for debugging, requires element with an .info class
       var html = ""
@@ -340,7 +417,7 @@ function AudioAnalysis( renderer ) {
       calibrating: calibrating,      // ~24 seconds
       treshold: treshold,            // current treshold
       tempoCounts: tempoCounts,      // current tempoCounts
-      foundpeaks:  foundpeaks,       // current found peaks
+      foundpeaks: foundpeaks,        // current found peaks
       peaks: peaks                   // all peaks, for display only
     }
 
@@ -351,11 +428,15 @@ function AudioAnalysis( renderer ) {
 
   // HELPERS
   // sort helper
-  var mycomparator = function ( a,b ) {
+  var sortHelper = function ( a,b ) {
     return parseInt( a.count, 10 ) - parseInt( b.count, 10 );
   }
 
-  // generate interval counter
+  /**
+   * @description Finds peaks in the audiodata and groups them together
+   * @member Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
+   *
+  */
   var countIntervalsBetweenNearbyPeaks = function( _peaks ) {
 
     // reset
@@ -377,6 +458,13 @@ function AudioAnalysis( renderer ) {
   }
 
   // group intervalcounts by temp
+  /**
+   * @description
+   *  map found intervals together and returns 'tempocounts', a list of found
+   *  tempos and their occurences
+   * @member Addon#AudioAnalysis~groupNeighborsByTempo
+   *
+  */
   var groupNeighborsByTempo = function( intervalCounts ) {
 
     // reset

@@ -1,6 +1,12 @@
+GiphyManager.prototype = new Addon(); // assign prototype to marqer
+GiphyManager.constructor = GiphyManager;  // re-assign constructor
+
 /**
+ * @summary
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *
  * @description
- *   GiphyManager
+ *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
  *
  * @example
  * var gifmanager1 = new Gyphymanager( renderer );
@@ -11,6 +17,7 @@
  * @param {GlRenderer} renderer
  * @param {GifSource} source
  */
+
 function GiphyManager( _source ) {
 
   var _self = this
@@ -23,6 +30,7 @@ function GiphyManager( _source ) {
   _self.renderer = renderer // do we even need this ?!!
 
   // set in environment
+  // this key is for demo purposes only
   var key = "tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu"
 
   /**
@@ -31,7 +39,7 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    utils.get('http://api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    utils.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })

@@ -66,23 +66,20 @@ var switcher1 = new Switcher( renderer, { source1: mixer5, source2: mixer3 } );
 // ## ADDONS ##################################################################
 
 // create the filemanager addon for the sources
-var giphymanager1 = new GiphyManager( testSource1 )
+// var giphymanager1 = new GiphyManager( testSource1 )
 var filemanager2 = new FileManager( testSource2 )
 var filemanager3 = new FileManager( testSource3 )
 var filemanager4 = new FileManager( testSource4 )
-
-// create a bpm addon
-var bpm = new BPM( renderer, { audio: '/audio/fear_is_the_mind_killer_audio.mp3' } )
-
-// add the bpm to the mixer (-pod)
-bpm.add( mixer4.pod )
-bpm.add( mixer1.pod )
 
 // ## OUTPUT ###################################################################
 
 // set the output node (needs to be last!)
 var output = new Output( renderer, switcher1 )
 //var output = new Output( renderer, testSource6 )
+
+// create a bpm addon
+var bpm = new BPM( renderer )
+var analysis1 = new AudioAnalysis( renderer, { audio: '/audio/fear_is_the_mind_killer_audio.mp3'} )
 
 // ## CONTROLLERS ##############################################################
 
@@ -108,6 +105,10 @@ numpad1.addMixer( mixer4 )
 // -----------------------------------------------------------------------------
 renderer.init();         // init
 renderer.render();       // start update & animation
+
+// add the bpm to the mixer (-pod)
+analysis1.add( mixer4.pod )
+analysis1.add( mixer1.pod )
 
 // ## DELAYED START ############################################################
 

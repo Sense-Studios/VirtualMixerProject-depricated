@@ -61,11 +61,11 @@ function GifSource( renderer, options ) {
 
     // add uniforms to shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
 
     // add output to main function
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose gif and canvas
     _self.gif = supergifelement
@@ -75,13 +75,16 @@ function GifSource( renderer, options ) {
     window.image_source = new Image()
 
     //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
-    gifElement = document.createElement('div')
+    gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
     supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
+    supergifelement.draw_while_loading = true
+
     // sup1.load();
     console.log(_self.uuid, " Load", _self.currentSrc, "..." )
-    supergifelement.load_url( _self.currentSrc )
+    //supergifelement.load_url( _self.currentSrc )
+    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
     console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
      _self.bypass = false
   }
@@ -92,7 +95,9 @@ function GifSource( renderer, options ) {
     // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
-      if (c%5 == 0) {
+      // modulo is here because gif encoding is insanley expensive
+      // TODO: MAKE THE MODULE SETTABLE.
+      if (c%6 == 0) {
         canvasElementContext.clearRect(0, 0, 1024, 1024);
         canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
         if ( gifTexture ) gifTexture.needsUpdate = true;
@@ -114,11 +119,8 @@ function GifSource( renderer, options ) {
   _self.src = function( _file ) {
     console.log("executed src")
     _self.currentSrc = _file
-    gifElement = document.createElement('div')
-    gifElement.setAttribute('id', 'gif_'+_self.uuid)
-    gifElement.setAttribute('rel:auto_play', '1')
-    supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
-    supergifelement.load_url(_file)
+    supergifelement.pause()
+    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
   }
 
   _self.play =         function() { return supergifelement.play() }

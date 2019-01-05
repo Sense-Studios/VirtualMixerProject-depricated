@@ -1,7 +1,9 @@
 npm-debug.log
 /node_modules
 /node_modules/*
-/public/javascripts/build
-/public/javascripts/build/*
 /docs/reference
 /docs/reference/*
+/public/gif/ignore
+/public/gif/gifshow
+/public/video/ignore
+/public/audio/ignore

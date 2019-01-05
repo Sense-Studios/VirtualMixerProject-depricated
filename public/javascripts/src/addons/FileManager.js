@@ -1,24 +1,27 @@
-/**
- * @summary
- *   Allows for fast switching between a prefefined list of files (or 'sets' )
- *
- * @description
- *   Allows for fast switching between a prefefined list of files (or 'sets' )
- *
- * @example
- * var myFilemanager = new FileManager( VideoSource )
- * myFilemanager.load_set( "myset.json")
- * myFilemanager.change()
- * @constructor Addon#FileManager
- * @implements Addon
- * @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
- */
+FileManager.prototype = new Addon(); // assign prototype to marqer
+FileManager.constructor = FileManager;  // re-assign constructor
 
+/**
+* @summary
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @description
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @example
+* var myFilemanager = new FileManager( VideoSource )
+* myFilemanager.load_set( "myset.json")
+* myFilemanager.change()
+* @constructor Addon#FileManager
+* @implements Addon
+* @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
+*/
 
 function FileManager( _source ) {
 
   var _self = this
 
+  // to be honest, this is kind of stupid; shouldnt it check for source 
   try {
     renderer
   } catch(e) {

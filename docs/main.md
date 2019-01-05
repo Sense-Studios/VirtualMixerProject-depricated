@@ -207,10 +207,11 @@ It loads all components, it builds the shaders and starts rendering them.
 ### Sources
 
 #### VideoSource
-abc
+Takes a video file (mp4 or the like) and renders it to a canvas, that canvas is
+then ported to a texture.
 
 #### GifSource
-Yes, we support gif! Which is a pain in the ass, but luckili I found libgif-js; https://github.com/buzzfeed/libgif-js.
+Yes, we support gif! Which is a pain in the ass, but luckily I found libgif-js; https://github.com/buzzfeed/libgif-js.
 I've added an interface that is similar to that of the VideoSource.
 
 #### Solidcolor
@@ -221,7 +222,7 @@ var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 }
 ```
 
 #### SVGSource
-SVG rendering, straight from After Effects with Body movin; http://airbnb.io/lottie/after-effects/bodymovin-installation.html and
+SVG rendering, straight from After Effects with Body movin'; http://airbnb.io/lottie/after-effects/bodymovin-installation.html and
 Lottie. http://airbnb.io/lottie/
 
 #### TextSource
@@ -252,10 +253,10 @@ mixer3.pod(0.5)
 This is the pod, it's on the left side.
 
 ```
- LEFT (A,1)         RIGHT (B,2)
+   LEFT (A)         RIGHT (B)
    ____
   /    \
-  |    | ______________    
+  |    |_______________    
   |    |-------.       |
   |    /.______/       |
   |    |_______________|
@@ -264,6 +265,20 @@ This is the pod, it's on the left side.
 
 ```
 
+Move it to the right;
+
+```
+   LEFT (A)         RIGHT (B)
+                       ____
+                      /    \
+       _______________|    |
+      |        .------|    |  
+      |        \______|    |
+      |_______________|    |
+                      |    |
+                      \____/
+
+```
 
 These are the available _Blendmodes_
 ```

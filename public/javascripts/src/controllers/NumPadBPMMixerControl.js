@@ -1,18 +1,31 @@
-NumpadBpmMixerControl.prototype = new Controller(); // assign prototype to marqer
+NumpadBpmMixerControl.prototype = new ComputerKeyboard(); // assign prototype to marqer
 NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
 
 /**
+* @summary
+*  A controller utilizing the Numpad
+*
 * @description
 *  Test en demo controller NumpadBpmMixerControl
-* @implements Controller
-* @constructor Controller#NumpadBpmMixerControl
-* @example var numpad = new NumpadBpmMixerControl( renderer, mixer1, bpm );
-* @param {GlRenderer} renderer - GlRenderer object
+*  It's basically a wrapper around a single mixer with the numpad
+*
+*  ```
+*  L / * -
+*  7 8 9 +
+*  4 5 6 +
+*  1 2 3 e
+*   0  . e
+*  ```
+*
+* @implements Controller#ComputerKeyboard
+* @constructor Controller#ComputerKeyboard#NumpadBpmMixerControl
+* @example var numpad = new NumpadBpmMixerControl( _renderer, mixer1, bpm );
+* @param {Glrenderer} renderer - Glrenderer object
 * @param {Module#Mixer} mixer - a Mixer instance
 * @param {Addon#BPM} bpm - a BPM instance
 */
 
-function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
+function NumpadBpmMixerControl( _renderer, _mixer, _bpm ) {
 
   var _self = this
 
@@ -27,8 +40,8 @@ function NumpadBpmMixerControl( renderer, _mixer, _bpm ) {
   // counter
   var c = 0
 
-  // add to renderer
-  renderer.add(_self)
+  // add to _renderer
+  _renderer.add(_self)
 
   // init with a tap contoller
   _self.init = function() {

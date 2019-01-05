@@ -1,4 +1,10 @@
+BPM.prototype = new Addon(); // assign prototype to marqer
+BPM.constructor = BPM;  // re-assign constructor
+
 /**
+ * @summary
+ *   BPM calculates beat per minutes based on a 'tap' function
+ *
  * @description
  *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
  *
@@ -16,7 +22,6 @@
 function BPM( renderer, options ) {
 
   var _self = this
-
   _self.function_list = [
     ["AUTO", "method", "toggleAutoBpm"],
     ["MODDOWN", "method", "modDown"],
@@ -204,6 +209,10 @@ function BPM( renderer, options ) {
       _self.bpm = avg
       _self.bps = avg/60
     }
+  }
+
+  _self.getBpm = function() {
+    return _self.bpm
   }
 
   console.log("set keypress")
