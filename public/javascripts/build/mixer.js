@@ -1158,6 +1158,30 @@ function GiphyManager( _source ) {
 
 function Addon() {}
 
+ComputerKeyboard.prototype = new Controller();  // assign prototype to marqer
+ComputerKeyboard.constructor = ComputerKeyboard;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#ComputerKeyboard
+ * @interface
+ */
+
+function ComputerKeyboard() {
+}
+
+Gamepad.prototype = new Controller();  // assign prototype to marqer
+Gamepad.constructor = Gamepad;  // re-assign constructor
+
+/**
+ * @implements Controller
+ * @constructor Controller#Gamepad
+ * @interface
+ */
+
+function Gamepad() {
+}
+
 /*
 
 1 ______________________________________________________________________________
@@ -1643,6 +1667,25 @@ window.addEventListener("gamepadconnected", function(e) {
 });
 */
 
+GamePadController.prototype = new Controller();  // assign prototype to marqer
+GamePadController.constructor = GamePadController;  // re-assign constructor
+
+/**
+ * @summary
+ *  ---
+ *
+ * @description
+ *  ---
+ *
+ * @example
+ *  ---
+ *
+ * @implements Controller
+ * @constructor Controller#GamePadController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
 function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
@@ -1775,9 +1818,19 @@ MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
+ * @summary
+ *  ---
+ *
+ * @description
+ *  ---
+ *
+ * @example
+ *  ---
+ *
  * @implements Controller
- * @constructor Controller#Midi
- * @interface
+ * @constructor Controller#MidiController
+ * @param options:Object
+ * @author Sense Studios
  */
 
 function MidiController( _options ) {
@@ -1864,6 +1917,9 @@ function MidiController( _options ) {
     // 112 = up
     // 176 = sliding ( fader )
     //
+
+    // This is mainly experimental code for doubleclicking
+    // we could return this as 256, 257 or higher state values (?)
 
     /*
     var opaque = false
@@ -1983,7 +2039,6 @@ function MidiController( _options ) {
   // ---------------------------------------------------------------------------
   _self.init = function() {}
   _self.update = function() {}
-
 
   // ---------------------------------------------------------------------------
   _self.bind = function( _key, _callback ) {
@@ -2201,24 +2256,12 @@ function SourceControl( renderer, source ) {
 
 }
 
-ComputerKeyboard.prototype = new Controller();  // assign prototype to marqer
-ComputerKeyboard.constructor = ComputerKeyboard;  // re-assign constructor
-
-/**
- * @implements Controller
- * @constructor Controller#ComputerKeyboard
- * @interface
- */
-
-function ComputerKeyboard() {
-}
-
 /**
  * @constructor Controller
  * @interface
  */
 
-function Controller( renderer, options ) {
+function Controller( options ) {
   var _self = this
 
   // set options
@@ -2226,7 +2269,7 @@ function Controller( renderer, options ) {
   if ( options != undefined ) _options = options;
 
   _self.type = "Controller"
-  _self.myLittleControllerVar = "test"
+  _self.testControllerVar = "test"
 
   // program interface
   _self.init =         function() {}
@@ -2234,45 +2277,6 @@ function Controller( renderer, options ) {
   _self.render =       function() {}
   _self.add =          function() {}
   //_self.start =        function() {}
-
-}
-
-Gamepad.prototype = new Controller();  // assign prototype to marqer
-Gamepad.constructor = Gamepad;  // re-assign constructor
-
-/**
- * @implements Controller
- * @constructor Controller#Gamepad
- * @interface
- */
-
-function Gamepad() {
-}
-
-Vidi.prototype = new Controller();  // assign prototype to marqer
-Vidi.constructor = Vidi;  // re-assign constructor
-
-/**
- * @implements Controller
- * @constructor Controller#Vidi
- * @interface
- *
- * @description
- *  Yes, The Visual Instrument Digital Interface is here. We're not sure what it does though.
- */
-
-function Vidi() {
-  // base
-
-  // returns a floating point between 1 and 0, in sync with a bpm
-  var _self = this
-
-  // exposed variables.
-  _self.uuid = "Vidi_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "VidiControl"
-  //_self.controllers = {};
-  //_self.bypass = true
-  _self.mylittlevar = "boejaka"
 
 }
 
@@ -2379,68 +2383,72 @@ function ColorEffect( _renderer, _options ) {
     // _output * uuid_alpha_1
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
-    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
-  if ( currentcoloreffect == 1 ) return vec3( src.rgb );                                                                                // normal
+vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
+  if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                               // normal
 
   // negative
-  if ( currentcoloreffect == 2  ) return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                          // negtive 1
-  if ( currentcoloreffect == 3  ) return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                              // negtive 2
-  if ( currentcoloreffect == 4  ) return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                              // negtive 3
+  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                   // negtive 1
+  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                       // negtive 2
+  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                       // negtive 3
 
   // monocolor
-  if ( currentcoloreffect == 5  ) return vec3( src.r + src.g + src.b ) / 3.;                                                            // black and white
-  if ( currentcoloreffect == 6  ) return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor red
-  if ( currentcoloreffect == 7  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;  // mopnocolor blue
-  if ( currentcoloreffect == 8  ) return vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3.;  // mopnocolor green
-  if ( currentcoloreffect == 9  ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;  // mopnocolor yellow
-  if ( currentcoloreffect == 10 ) return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor turqoise
-  if ( currentcoloreffect == 11 ) return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;  // mopnocolor purple
-  if ( currentcoloreffect == 12 ) return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                    // sepia
+  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                             // black and white
+  if ( currentcoloreffect == 6  ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
+  if ( currentcoloreffect == 7  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
+  if ( currentcoloreffect == 8  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
+  if ( currentcoloreffect == 9  ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
+  if ( currentcoloreffect == 10 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
+  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
+  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                   // sepia
 
   // color swapping
-  if ( currentcoloreffect == 13 ) return vec3( src.rrr );
-  if ( currentcoloreffect == 14 ) return vec3( src.rrg );
-  if ( currentcoloreffect == 15 ) return vec3( src.rrb );
-  if ( currentcoloreffect == 16 ) return vec3( src.rgr );
-  if ( currentcoloreffect == 17 ) return vec3( src.rgg );
-  if ( currentcoloreffect == 18 ) return vec3( src.rbr );
-  if ( currentcoloreffect == 19 ) return vec3( src.rbg );
-  if ( currentcoloreffect == 20 ) return vec3( src.rbb );
-  if ( currentcoloreffect == 21 ) return vec3( src.grr );
-  if ( currentcoloreffect == 22 ) return vec3( src.grg );
-  if ( currentcoloreffect == 23 ) return vec3( src.grb );
-  if ( currentcoloreffect == 24 ) return vec3( src.ggr );
-  if ( currentcoloreffect == 25 ) return vec3( src.ggg );
-  if ( currentcoloreffect == 26 ) return vec3( src.ggb );
-  if ( currentcoloreffect == 27 ) return vec3( src.gbr );
-  if ( currentcoloreffect == 28 ) return vec3( src.gbg );
-  if ( currentcoloreffect == 29 ) return vec3( src.gbb );
-  if ( currentcoloreffect == 30 ) return vec3( src.brr );
-  if ( currentcoloreffect == 31 ) return vec3( src.brg );
-  if ( currentcoloreffect == 32 ) return vec3( src.brb );
-  if ( currentcoloreffect == 33 ) return vec3( src.bgr );
-  if ( currentcoloreffect == 34 ) return vec3( src.bgg );
-  if ( currentcoloreffect == 35 ) return vec3( src.bgb );
-  if ( currentcoloreffect == 36 ) return vec3( src.bbr );
-  if ( currentcoloreffect == 37 ) return vec3( src.bbg );
-  if ( currentcoloreffect == 38 ) return vec3( src.bbb );
+  if ( currentcoloreffect == 13 ) return vec4( src.rrra );
+  if ( currentcoloreffect == 14 ) return vec4( src.rrga );
+  if ( currentcoloreffect == 15 ) return vec4( src.rrba );
+  if ( currentcoloreffect == 16 ) return vec4( src.rgra );
+  if ( currentcoloreffect == 17 ) return vec4( src.rgga );
+  if ( currentcoloreffect == 18 ) return vec4( src.rbra );
+  if ( currentcoloreffect == 19 ) return vec4( src.rbga );
+  if ( currentcoloreffect == 20 ) return vec4( src.rbba );
+  if ( currentcoloreffect == 21 ) return vec4( src.grra );
+  if ( currentcoloreffect == 22 ) return vec4( src.grga );
+  if ( currentcoloreffect == 23 ) return vec4( src.grba );
+  if ( currentcoloreffect == 24 ) return vec4( src.ggra );
+  if ( currentcoloreffect == 25 ) return vec4( src.ggga );
+  if ( currentcoloreffect == 26 ) return vec4( src.ggba );
+  if ( currentcoloreffect == 27 ) return vec4( src.gbra );
+  if ( currentcoloreffect == 28 ) return vec4( src.gbga );
+  if ( currentcoloreffect == 29 ) return vec4( src.gbba );
+  if ( currentcoloreffect == 30 ) return vec4( src.brra );
+  if ( currentcoloreffect == 31 ) return vec4( src.brga );
+  if ( currentcoloreffect == 32 ) return vec4( src.brba );
+  if ( currentcoloreffect == 33 ) return vec4( src.bgra );
+  if ( currentcoloreffect == 34 ) return vec4( src.bgga );
+  if ( currentcoloreffect == 35 ) return vec4( src.bgba );
+  if ( currentcoloreffect == 36 ) return vec4( src.bbra );
+  if ( currentcoloreffect == 37 ) return vec4( src.bbga );
+  if ( currentcoloreffect == 38 ) return vec4( src.bbba );
 
   // lum key
   if ( currentcoloreffect == 39 ) {
-    return vec3( clamp( src.r, extra, 1.) == extra ? .0 : src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, clamp( src.r, extra, 1.) == extra ? .0 : src.b );
+    float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
+    float green = clamp( src.r, extra, 1.) == extra ? .0 : src.g;
+    float blue = clamp( src.r, extra, 1.) == extra ? .0 : src.b;
+    float alpha = red + green + blue == .0 ? .0 : src.a;
+    return vec4( red, green, blue, alpha );
   }
 
   // color key; Greenkey
   if ( currentcoloreffect == 40 ) {
-    return vec3( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b );
+    return vec4( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b, clamp( src.r, extra, 1.) == extra ? .0 : src.a );
   }
 
   // paint
   if ( currentcoloreffect == 41 ) {
-    return vec3( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra  );
+    return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
   }
 
   // colorise
@@ -2449,7 +2457,7 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // wipes (move these to mixer?)
   if ( gl_FragCoord.x > 200.0 ) {
-    return vec3(0.0,0.0,0.0);
+    return vec4(0.0,0.0,0.0,0.0);
   }else {
     return src;
   }
@@ -2461,7 +2469,7 @@ vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
+vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
   } // init
 
 
@@ -2693,15 +2701,16 @@ function FeedbackEffect( _renderer, _options ) {
     _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: effectsTexture }
     _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: 100 }
 
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int  '+_self.uuid+'_currentfeedbackeffect;\n/* custom_uniforms */')
 
 
-    if ( renderer.fragmentShader.indexOf('vec3 feedbackeffect ( vec3 src, int currentcoloreffect, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv )') == -1 ) {
 
       _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-  vec3 feedbackeffect ( vec3 src, int currentfeedbackeffect, vec2 vUv ) {
+  vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv ) {
     if ( currentfeedbackeffect == 100 ) {
       //vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
       //gl_Position = vec4( vec2(0.,0.), 0., 0.);
@@ -2753,7 +2762,7 @@ function FeedbackEffect( _renderer, _options ) {
 }
 
 _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
+vec4 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
 } // init
 
 
@@ -2811,79 +2820,6 @@ _self.effect = function( _num ){
     // update uniform ?
   }
   return currentEffect
-  }
-}
-
-// fragment
-// vec3 b_w = ( source.x + source.y + source.z) / 3
-// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
-// col = vec3(col.r+col.g+col.b)/3.0;
-// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
-
-function BlackAndWhite( _renderer, _source, _options ) {
-
-  // create and instance
-  var _self = this;
-
-  // set or get uid
-  if ( _options.uuid == undefined ) {
-    _self.uuid = "Effect_BlackAndWhite_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  } else {
-    _self.uuid = _options.uuid
-  }
-
-  // add to renderer
-  _renderer.add(_self)
-
-  _self.type = "Effect"
-
-  var source = _source
-
-  _self.init = function() {
-
-    console.log("Effect inits, with", _renderer)
-    // add uniforms to renderer
-    // renderer.customUniforms[_self.uuid+'_mixmode'] = { type: "i", value: 1 }
-
-    // add uniforms to fragmentshader
-    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
-
-    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
-
-    // _output * uuid_alpha_1
-    // uuid_alpha_1 * -pod
-    // uuid_alpha_2 * +pod
-
-    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
-`
-vec3 effect ( vec3 src ) {
-  // return vec3( src.r + src.g + src.b ) / 3.;                                                             // black and white
-  // return vec3( 1.-src.r, 1.-src.g, 1.-src.b );                                                           // negtive 1
-  // return vec3( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0 );                                               // negtive 2
-  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
-  // return vec3( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0 );                                               // negtive 3
-  // return vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor red
-  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3.;   // mopnocolor blue
-  // return vec3( (src.r+src.g+src.b) *1.7 , (src.r+src.g+src.b)  /1.7., (src.r+src.g+src.b) *3   ) / 3.;   // mopnocolor green
-  // return vec3( (src.r+src.g+src.b) *2.   , (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b) /1.2 ) / 3.;   // mopnocolor yellow
-  // return vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor turqoise
-  // return vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3.;   // mopnocolor purple
-  // return vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 );                                     // sepia
-}
-
-/* custom_helpers */
-`
-    );
-
-    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = effect( '+_source.uuid+'_output );\n  /* custom_main */')
-  } // init
-
-  _self.update = function() {
-
-    // mixmode
-    // blendmode
-    // pod
   }
 }
 
@@ -2958,15 +2894,15 @@ function Chain(renderer, options) {
 
   _self.init = function() {
     // bould output module
-    var generatedOutput = "vec3(0.0,0.0,0.0)"
+    var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
     _self.sources.forEach( function( source, index ) {
       generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
     });
-    generatedOutput += ";\n"
+    //generatedOutput += ";\n"
 
     // put it in the shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = '+generatedOutput+' \/* custom_main */')
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
 
   }
 
@@ -3093,26 +3029,26 @@ function Mixer( renderer, options ) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // add blendmodes helper, we only need it once
-    if ( renderer.fragmentShader.indexOf('vec3 blend ( vec3 src, vec3 dst, int blendmode )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 blend ( vec4 src, vec4 dst, int blendmode )') == -1 ) {
       renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',
 `
-vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
+vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   if ( blendmode ==  1 ) return src + dst;
   if ( blendmode ==  2 ) return src - dst;
   if ( blendmode ==  3 ) return src * dst;
   if ( blendmode ==  4 ) return min(src, dst);
-  if ( blendmode ==  5)  return vec3((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)));
+  if ( blendmode ==  5)  return vec4((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)),1.0);
   if ( blendmode ==  6 ) return (src + dst) - 1.0;
   if ( blendmode ==  7 ) return max(src, dst);
   if ( blendmode ==  8 ) return (src + dst) - (src * dst);
-  if ( blendmode ==  9 ) return vec3((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)));
+  if ( blendmode ==  9 ) return vec4((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)), 1.0);
   if ( blendmode == 10 ) return src + dst;
-  if ( blendmode == 11 ) return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));
-  if ( blendmode == 12 ) return vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));
-  if ( blendmode == 13 ) return vec3((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)));
-  if ( blendmode == 14 ) return vec3((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))));
+  if ( blendmode == 11 ) return vec4((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)), 1.0);
+  if ( blendmode == 12 ) return vec4((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))), 1.0);
+  if ( blendmode == 13 ) return vec4((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)), 1.0);
+  if ( blendmode == 14 ) return vec4((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))),1.0);
   if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
-  if ( blendmode == 16 ) return vec3((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z));
+  if ( blendmode == 16 ) return vec4((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z),1.0);
   if ( blendmode == 17 ) return abs(dst - src);
   if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
   return src + dst;
@@ -3123,7 +3059,7 @@ vec3 blend ( vec3 src, vec3 dst, int blendmode ) {
     }
 
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1,'+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode );\n  /* custom_main */' )
+vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */' )
   }
 
   var starttime = (new Date()).getTime()
@@ -3330,6 +3266,14 @@ vec3 '+_self.uuid+'_output = blend( '+source1.uuid+'_output * '+_self.uuid+'_alp
  * @param source{Source} any valid source node
  * @author Sense Studios
  */
+
+ // TODO: maybe remove this node, and change it for something on the renderer?
+ // like:
+ //
+ // renderer.output( node )
+ // renderer.init()
+ // renderer.render()
+
 function Output(renderer, _source ) {
 
   // create and instance
@@ -3347,7 +3291,7 @@ function Output(renderer, _source ) {
 
   _self.init = function() {
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\n  gl_FragColor = vec4( '+ source.uuid +'_output, 1.0 );\n')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\n  gl_FragColor = vec4( '+ source.uuid +'_output );\n')
   }
 
   _self.update = function() {}
@@ -3396,7 +3340,7 @@ function Switcher(renderer, options ) {
 
     // we actually need this for each instance itt. the Mixer
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',`
-vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
+vec4 get_source_`+_self.uuid+` ( int active_source, vec4 src1, vec4 src2 ) {
   if ( active_source ==  0 ) return src1;\
   if ( active_source ==  1 ) return src2;\
 }
@@ -3406,7 +3350,7 @@ vec3 get_source_`+_self.uuid+` ( int active_source, vec3 src1, vec3 src2 ) {
 
     // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'final_output = '+ source.uuid +'_output;\n  /* custom_main */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec3 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
+vec4 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_source, '+_self.sources[0].uuid +'_output, '+_self.sources[1].uuid +'_output );\n  /* custom_main */')
   }
 
   _self.update = function() {}
@@ -3516,11 +3460,11 @@ function GifSource( renderer, options ) {
 
     // add uniforms to shader
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
 
     // add output to main function
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose gif and canvas
     _self.gif = supergifelement
@@ -3708,11 +3652,11 @@ function MultiVideoSource(renderer, options) {
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose video and canvas
     /**
@@ -3883,7 +3827,7 @@ function SolidSource(renderer, options) {
 
   // set options
   var _options;
-  var color = { r:0.0, g:0.0, b:0.0 } // add alpha
+  var color = { r:0.0, g:0.0, b:0.0, a: 1.0 }
 
   if ( options != undefined ) _options = options;
 
@@ -3892,14 +3836,14 @@ function SolidSource(renderer, options) {
     if (_options.color != undefined) color = _options.color
 
     // add uniforms
-    renderer.customUniforms[_self.uuid + "_color"] = { type: "v3", value: new THREE.Vector3( color.r, color.g, color.b ) }
+    renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector4( color.r, color.g, color.b, color.a ) }
 
     // ad variables to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_color;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_color;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
 
     // add output to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = '+_self.uuid+'_color;\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = '+_self.uuid+'_color;\n  /* custom_main */')
   }
 
   _self.update = function() {}
@@ -3914,12 +3858,14 @@ function SolidSource(renderer, options) {
   * @param {float} r - red value
   * @param {float} g - green value
   * @param {float} b - blue value
+  * @param {float} a - alpha value (optional)
   * @returns color
   */
   _self.color = function( c ) {
     if ( c != undefined ) {
       color = c
-      renderer.customUniforms[_self.uuid + "_color"] = { type: "v3", value: new THREE.Vector3( color.r, color.g, color.b ) }
+      if (color.a == undefined ) color.a = 1.0 // just to be sore
+      renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector3( color.r, color.g, color.b, color.a ) }
     }
     return color
   }
@@ -4040,11 +3986,11 @@ function TextSource(renderer, options) {
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose video and canvas
     _self.divElement = divElement
@@ -4067,7 +4013,7 @@ function TextSource(renderer, options) {
   var title_text_font_size = 64
   var small_text_x = 512
   _self.update = function() {
-    
+
     title_text_font_size *= 0.990
 
     if (_self.bypass = false) return
@@ -4289,14 +4235,14 @@ function VideoSource(renderer, options) {
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
 
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
 
     // expose video and canvas
@@ -4345,7 +4291,12 @@ function VideoSource(renderer, options) {
    * @param {file} Videofile - full path to file
    */
   _self.src = function( _file ) {
-    _self.currentSrc = _file
+    try {
+      _self.currentSrc = _file
+    }catch(e){
+      console.log("VideoSource returned empty promise, retrying ...")
+      return;
+    }
     videoElement.src = _file
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
@@ -4560,7 +4511,7 @@ function WebcamSource(renderer, options) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec3 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).xyz * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose video and canvas
     /**

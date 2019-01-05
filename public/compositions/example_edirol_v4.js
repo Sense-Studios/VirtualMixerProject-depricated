@@ -117,6 +117,7 @@ document.getElementById('btn_effects_a_2').onmousedown = function() {
 document.getElementById('btn_effects_a_3').onmousedown = function() {
   //main_mixer.mixMode(1) // NORMAL  //main_mixer.mixMode(1) // NORMAL
   if ( luma_effect1.effect() != 1 ) {
+    //luma_effect1.extra(0.8)
     luma_effect1.effect(1)
     main_mixer.mixMode( original_mixmode );
     this.classList = 'mix_control round '
