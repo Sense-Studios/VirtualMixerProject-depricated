@@ -116,9 +116,18 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */' )
-  }
+//    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
+//vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
+//    }
+
+
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
+  vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
+)
+//`vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode )
+
+    }
+
 
   var starttime = (new Date()).getTime()
   var c = 0

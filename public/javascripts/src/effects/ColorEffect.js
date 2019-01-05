@@ -101,7 +101,7 @@ function ColorEffect( _renderer, _options ) {
     // _output * uuid_alpha_1
     // uuid_alpha_1 * -pod
     // uuid_alpha_2 * +pod
-    if ( renderer.fragmentShader.indexOf('vec3 coloreffect ( vec3 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
 vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
