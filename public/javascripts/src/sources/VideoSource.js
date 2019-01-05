@@ -178,7 +178,12 @@ function VideoSource(renderer, options) {
    * @param {file} Videofile - full path to file
    */
   _self.src = function( _file ) {
-    _self.currentSrc = _file
+    try {
+      _self.currentSrc = _file
+    }catch(e){
+      console.log("VideoSource returned empty promise, retrying ...")
+      return;
+    }
     videoElement.src = _file
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
