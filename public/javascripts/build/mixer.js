@@ -254,16 +254,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-
-  // create all necc. contexts
-  var audio = new Audio()
-  var context = new AudioContext(); // AudioContext object instance
-  var source
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
-
   /**
    * @description Audio element
    * @member Addon#AudioAnalysis#audio
@@ -272,7 +262,17 @@ function AudioAnalysis( _renderer, _options ) {
    *  HTMLMediaElement AUDIO reference
    *
   */
+
+  // create all necc. contexts
+  var audio = new Audio()
   _self.audio = audio
+
+  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
+  var source //= context.createMediaElementSource(audio);
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
   // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
@@ -305,11 +305,15 @@ function AudioAnalysis( _renderer, _options ) {
   */
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    audio.play();
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+    });
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
   document.body.addEventListener('click', forceFullscreen)
+  document.body.addEventListener('touchstart', forceFullscreen)
 
   /**
    * @description
@@ -1814,6 +1818,7 @@ window.addEventListener("GamePadControllerconnected", function(e) {
 });
 */
 
+
 MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
@@ -2080,177 +2085,6 @@ function MidiController( _options ) {
   }
 }
 
-NumpadBpmMixerControl.prototype = new ComputerKeyboard(); // assign prototype to marqer
-NumpadBpmMixerControl.constructor = NumpadBpmMixerControl;  // re-assign constructor
-
-/**
-* @summary
-*  A controller utilizing the Numpad
-*
-* @description
-*  Test en demo controller NumpadBpmMixerControl
-*  It's basically a wrapper around a single mixer with the numpad
-*
-*  ```
-*  L / * -
-*  7 8 9 +
-*  4 5 6 +
-*  1 2 3 e
-*   0  . e
-*  ```
-*
-* @implements Controller#ComputerKeyboard
-* @constructor Controller#ComputerKeyboard#NumpadBpmMixerControl
-* @example var numpad = new NumpadBpmMixerControl( _renderer, mixer1, bpm );
-* @param {Glrenderer} renderer - Glrenderer object
-* @param {Module#Mixer} mixer - a Mixer instance
-* @param {Addon#BPM} bpm - a BPM instance
-*/
-
-function NumpadBpmMixerControl( _renderer, _mixer, _bpm ) {
-
-  var _self = this
-
-  // exposed variables.
-  _self.uuid = "NumpadBpmMixer_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "Control"
-  _self.controllers = {};
-
-  var _bpms = []
-  var _mixers = []
-
-  // counter
-  var c = 0
-
-  // add to _renderer
-  _renderer.add(_self)
-
-  // init with a tap contoller
-  _self.init = function() {
-    window.addEventListener( 'keydown', keyDownHandler )
-    window.addEventListener( 'keyup', keyUpHandler )
-  }
-
-  _self.update = function() {}
-  _self.render = function() {}
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  _self.addMixer = function( _mixer ) {
-    _mixers.push( _mixer )
-
-  }
-
-  _self.addBpm = function( _bpm ) {
-    _bpms.push( _bpm )
-  }
-
-  // --------------------------------------------------------------------------
-  var blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
-  var mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-  var _to;
-
-  //$('body').click( function() { _bpms.forEach( function( b ) { b.tap() } ) } );
-  document.body.addEventListener('click', function() { _bpms.forEach( function( b ) { b.tap() } ) } );
-
-  var keyDownHandler = function( _event ) {
-    // should be some way to check focus of this BPM instance
-    // if _self.hasFocus
-
-    // 36 / 103, 38 / 104, 33 / 105, 107
-
-    // 37 / 103, 38 / 101, 39 / 102
-
-    // 35 /  97, 40 /  98, 33 / 105,  13
-
-    // 45 /  96,         , 46 / 110
-
-    console.log("had key: ", _event.which)
-
-    var keybindings = [
-
-      // BPM
-      //[ 219, function() { _bpms.forEach( function( b ) { b.bpm -= 1   } ); } ], // [[]
-      //[ 221, function() { _bpms.forEach( function( b ) { b.bpm += 1   } ); } ],  // ]
-      [ 109, function() { _bpms.forEach( function( b ) { b.bpm -= 1   } ); } ], //  numpad -
-      [ 107, function() { _bpms.forEach( function( b ) { b.bpm += 1   } ); } ],  // numpad +
-
-      [ 106, function() { _bpms.forEach( function( b ) { b.bpm *= 2   } ); } ],  // numpad *
-      [ 111, function() { _bpms.forEach( function( b ) { b.bpm *= 0.5 } ); } ],  // numpad /
-
-      [ 101, function() { _bpms.forEach( function( b ) { b.tap()      } ); }  ],  // numpad 5
-
-      // hackity
-      [  96, function() { switcher1.doSwitch(0) } ],  // 0
-      [ 110, function() { switcher1.doSwitch(1) } ],  // .
-      [  75, function() { switcher1.doSwitch(0) } ],  // k
-      [  76, function() { switcher1.doSwitch(1) } ],  // l
-      [  66, function() { _bpms.forEach( function( b ) { b.tap()      } ); }  ],  // b
-      [  32, function() { _bpms.forEach( function( b ) { b.tap()      } ); }  ],  // [space]
-
-      // hack
-      //[  219, function() { clearTimeout(_to); _to = setTimeout( function() { filemanager1.change() } , 200 ) } ], // [
-      [  81, function() { clearTimeout(_to); _to = setTimeout( function() { giphymanager1.change() } , 200 ) } ], // q
-      //[  87, function() { clearTimeout(_to); _to = setTimeout( function() { giphymanager1.change() } , 200 ) } ], // w
-
-      [  87, function() { clearTimeout(_to); _to = setTimeout( function() { filemanager2.change("awesome") } , 200 ) } ], // w
-      [  69, function() { clearTimeout(_to); _to = setTimeout( function() { filemanager3.change("runner") } , 200 ) } ], // e
-      [  82, function() { clearTimeout(_to); _to = setTimeout( function() { filemanager4.change() } , 200 ) } ], // r
-
-      [  65, function() { giphymanager1.source.currentFrame( Math.floor( Math.random() * giphymanager1.source.duration() ) ) } ], // a
-      [  83, function() { filemanager2.source.currentTime( Math.floor( Math.random() * filemanager2.source.duration() ) ) } ], // b
-      [  68, function() { filemanager3.source.currentTime( Math.floor( Math.random() * filemanager3.source.duration() ) ) } ], // c
-
-      [  188, function() { mixer3.pod( mixer3.pod() - 0.1 ) } ], // ,
-      [  190, function() { mixer3.pod( mixer3.pod() + 0.1 ) } ], // .
-      //[  190, function() { mixer3.pod( mixer3.pod() + 0.1 ) } ], // .
-
-
-      // MIXER
-      // [ 219, function() { return i -= 1 } ], // 4
-      // [ 221, function() { return i += 1 } ]  // 6
-
-      // reset
-      [ 104, function() { _mixers.forEach( function(m) { m.blendMode(1); m.mixMode(1); blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ]; mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }) }],  // 8
-
-      [ 103, function() { blendmodes.unshift( blendmodes.pop() ); _mixers.forEach( function(m) { m.blendMode(blendmodes[0]); } ) } ],  // 7
-      [ 105, function() { blendmodes.push( blendmodes.shift());   _mixers.forEach( function(m) { m.blendMode(blendmodes[0]); } ) } ],  // 9
-      [ 100, function() { mixmodes.unshift( mixmodes.pop() );     _mixers.forEach( function(m) { m.mixMode(mixmodes[0]);     } ) } ],  // 4
-      [ 102, function() { mixmodes.push( mixmodes.shift());       _mixers.forEach( function(m) { m.mixMode(mixmodes[0]);     } ) } ],  // 6
-
-      [ 97, function() { console.log("mix trans left, down") } ],  // 6
-      //[ 95, function() { transmodes.unshift( transmodes.pop() ); mixmode = transmodes[0]; } ],  // 6
-      [ 99, function() { console.log("mmix trans right, down") } ]  // 6
-
-    ]
-
-    keybindings.forEach( function( bind ) {
-      if ( bind[0] == _event.which ) {
-        bind[1]();
-        //console.log("numpad Handled key", bind[0], _bpm.bpm,  _mixer.mixMode(),  _mixer.blendMode() )
-        console.log("numpad Handled key DOWN", bind[0], _bpm.bpm,  _mixer.mixMode(),  _mixer.blendMode() )
-      }
-    })
-  }
-
-  var keyUpHandler = function( _event ) {
-    var keybindings = [
-      [ 97, function() { console.log("mix trans left, up") } ],  // 6
-      //[ 95, function() { transmodes.unshift( transmodes.pop() ); mixmode = transmodes[0]; } ],  // 6
-      [ 99, function() { console.log("mmix trans right, up") } ]  // 6
-    ]
-
-    keybindings.forEach( function( bind ) {
-      if ( bind[0] == _event.which ) {
-        bind[1]();
-        console.log("numpad Handled key UP", bind[0], _bpm.bpm,  _mixer.mixMode(),  _mixer.blendMode() )
-      }
-    })
-  }
-
-}
-
 function SourceControl( renderer, source ) {
   // source.renderer ?
 
@@ -2435,8 +2269,8 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   // lum key
   if ( currentcoloreffect == 39 ) {
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
-    float green = clamp( src.r, extra, 1.) == extra ? .0 : src.g;
-    float blue = clamp( src.r, extra, 1.) == extra ? .0 : src.b;
+    float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
+    float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
     float alpha = red + green + blue == .0 ? .0 : src.a;
     return vec4( red, green, blue, alpha );
   }
@@ -3058,9 +2892,33 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */' )
-  }
+// renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
+// vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
+// }
+
+    var shadercode = ""
+    //shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    //shadercode += "vec4 "+_self.uuid+"_output = "
+    //shadercode += "vec4( blend( "
+    shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
+    shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
+    shadercode += _self.uuid+"_blendmode ) "
+    shadercode += ")"
+    shadercode += " + vec4(  "+source1.uuid+"_output.a < 1.0 ? "+source2.uuid+"_output.rgba * ( "+_self.uuid+"_alpha1 - "+source1.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += " + vec4(  "+source2.uuid+"_output.a < 1.0 ? "+source1.uuid+"_output.rgba * ( "+_self.uuid+"_alpha2 - - "+source2.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += ";\n"
+    shadercode += "  /* custom_main */  "
+
+    /* custom_main */
+
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
+// vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// `vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
+
+    }
+
 
   var starttime = (new Date()).getTime()
   var c = 0
@@ -3069,7 +2927,7 @@ vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid
         // pod = currentBPM
         currentBPM = currentBpmFunc()
         c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * ( currentBPM * currentMOD ) / 120 ) + 1 ) )
+        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
     }
   }
 
@@ -3488,14 +3346,20 @@ function GifSource( renderer, options ) {
      _self.bypass = false
   }
 
+  var c = 0;
   _self.update = function() {
 
     // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
-      if ( gifTexture ) gifTexture.needsUpdate = true;
+      // modulo is here because gif encoding is insanley expensive
+      // TODO: MAKE THE MODULE SETTABLE.
+      if (c%6 == 0) {
+        canvasElementContext.clearRect(0, 0, 1024, 1024);
+        canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
+        if ( gifTexture ) gifTexture.needsUpdate = true;
+      }
+      c++;
     }catch(e){
       // not yet
     }
@@ -3510,6 +3374,7 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
+    console.log("executed src")
     _self.currentSrc = _file
     supergifelement.pause()
     supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
@@ -4164,8 +4029,12 @@ function VideoSource(renderer, options) {
 
     // create video element
     videoElement = document.createElement('video');
-    videoElement.setAttribute("crossorigin", "anonymous")
+    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("playsinline",true)
+    videoElement.playsinline = true
+    videoElement.preload = 'none'
     videoElement.muted= true
+    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
 
     // set the source
     if ( options.src == undefined ) {
@@ -4186,7 +4055,7 @@ function VideoSource(renderer, options) {
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         var r = Math.random() * videoElement.duration
-        videoElement.currentTime = r
+        //videoElement.currentTime = r
         videoElement.play();
         _self.firstplay = true
         console.log(_self.uuid, "First Play; ", r)
@@ -4196,9 +4065,17 @@ function VideoSource(renderer, options) {
 
     // firstload handler for mobile; neest at least 1 user click
     document.body.addEventListener('click', function() {
+      console.log("clikcity")
       videoElement.play();
       _self.firstplay = true
     });
+
+    document.body.addEventListener('touchstart', function() {
+      console.log("clikcity")
+      videoElement.play();
+      _self.firstplay = true
+    });
+
 
     videoElement.volume = 0;
 
@@ -4298,13 +4175,16 @@ function VideoSource(renderer, options) {
       return;
     }
     videoElement.src = _file
-    var playInterval = setInterval( function() {
+    videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
         console.log(_self.uuid, "First Play.")
-        clearInterval(playInterval)
       }
-    }, 400 )
+    })
+    //var playInterval = setInterval(
+    //    clearInterval(playInterval)
+    //  }
+    //}, 400 )
   }
 
   /**

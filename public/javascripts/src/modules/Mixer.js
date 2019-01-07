@@ -116,15 +116,30 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-//    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-//vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
-//    }
+// renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
+// vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
+// }
 
+    var shadercode = ""
+    //shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    //shadercode += "vec4 "+_self.uuid+"_output = "
+    //shadercode += "vec4( blend( "
+    shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
+    shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
+    shadercode += _self.uuid+"_blendmode ) "
+    shadercode += ")"
+    shadercode += " + vec4(  "+source1.uuid+"_output.a < 1.0 ? "+source2.uuid+"_output.rgba * ( "+_self.uuid+"_alpha1 - "+source1.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += " + vec4(  "+source2.uuid+"_output.a < 1.0 ? "+source1.uuid+"_output.rgba * ( "+_self.uuid+"_alpha2 - - "+source2.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += ";\n"
+    shadercode += "  /* custom_main */  "
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-  vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
-)
-//`vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode )
+    /* custom_main */
+
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
+// vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// `vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
 
     }
 
@@ -136,7 +151,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         // pod = currentBPM
         currentBPM = currentBpmFunc()
         c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * ( currentBPM * currentMOD ) / 120 ) + 1 ) )
+        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
     }
   }
 

@@ -76,16 +76,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-
-  // create all necc. contexts
-  var audio = new Audio()
-  var context = new AudioContext(); // AudioContext object instance
-  var source
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
-
   /**
    * @description Audio element
    * @member Addon#AudioAnalysis#audio
@@ -94,10 +84,13 @@ function AudioAnalysis( _renderer, _options ) {
    *  HTMLMediaElement AUDIO reference
    *
   */
+
+  // create all necc. contexts
+  var audio = new Audio()
   _self.audio = audio
 
   var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
-  var source = context.createMediaElementSource(audio);
+  var source //= context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
   var analyser = context.createAnalyser();
   var start = Date.now();
