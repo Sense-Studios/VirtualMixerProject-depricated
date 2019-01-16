@@ -1,3 +1,7 @@
+@font-face {
+  font-family: 'MINI7';
+  src: url("/fonts/MINI 7 Tight.ttf") format("truetype"); }
+
 #mixer {
   position: absolute;
   z-index: 2;
@@ -22,26 +26,68 @@
     border-bottom: solid 2px #511;
     width: 18px;
     height: 18px; }
+    #mixer button:active, #mixer button.active {
+      background-color: red;
+      border-bottom: solid 2px #511; }
+    #mixer button label {
+      font-size: 8px;
+      font-family: 'MINI7', monospace;
+      display: inline-block;
+      position: relative;
+      top: -3px;
+      left: 11px;
+      margin-left: -16px; }
     #mixer button:focus {
       outline: 0; }
     #mixer button.round {
       background-color: #999;
       border-bottom: solid 2px #666;
       border-radius: 12px;
-      width: 12px;
-      height: 16px; }
-    #mixer button.redish {
-      background-color: #511;
-      border-bottom: solid 2px #755; }
-    #mixer button:active, #mixer button.active {
-      background-color: red;
-      border-bottom: solid 2px #511; }
-    #mixer button.greenish {
-      background-color: #252;
-      border-bottom: solid 2px #755; }
-      #mixer button.greenish:active, #mixer button.greenish.active {
+      width: 14px;
+      height: 14px;
+      margin-left: -16px; }
+      #mixer button.round.effect_a {
+        margin-left: -16px; }
+        #mixer button.round.effect_a label {
+          top: -3px;
+          left: 30px;
+          width: 100px;
+          text-align: left; }
+      #mixer button.round.effect_b {
+        margin-left: 16px; }
+        #mixer button.round.effect_b label {
+          top: -3px;
+          left: -28px;
+          width: 100px;
+          text-align: left; }
+      #mixer button.round.greenish {
+        background-color: #252;
+        border-bottom: solid 2px #755; }
+      #mixer button.round:active, #mixer button.round.active {
         background-color: #494;
         border-bottom: solid 2px #181; }
+      #mixer button.round.redish {
+        background-color: #511;
+        border-bottom: solid 2px #755; }
+        #mixer button.round.redish:active, #mixer button.round.redish.active {
+          background-color: red;
+          border-bottom: solid 2px #511; }
+      #mixer button.round.blinking {
+        animation: blinkin-anim 0.8s infinite; }
+
+@keyframes blinkin-anim {
+  0% {
+    background-color: #494;
+    border-bottom: solid 2px #181; }
+  50% {
+    background-color: #494;
+    border-bottom: solid 2px #181; }
+  51% {
+    background-color: #999;
+    border-bottom: solid 2px #666; }
+  100% {
+    background-color: #999;
+    border-bottom: solid 2px #666; } }
   #mixer .dark {
     grid-area: dark;
     background-color: #888; }
@@ -66,6 +112,8 @@
   #mixer .mix_control {
     grid-area: mix_control;
     background-color: #444; }
+    #mixer .mix_control button.round {
+      margin: 0; }
   #mixer .main_pod {
     grid-area: main_pod;
     padding: 8px;

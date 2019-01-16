@@ -67,8 +67,9 @@ function VideoSource(renderer, options) {
     console.log('loaded source: ', videoElement.src )
 
     // set properties
-    videoElement.height = 1024
-    videoElement.width = 1024
+    videoElement.height = 1024;
+    videoElement.width = 1024;
+    videoElement.volume = 0;
     videoElement.loop = true          // must call after setting/changing source
     videoElement.load();              // must call after setting/changing source
     _self.firstplay = false
@@ -98,11 +99,6 @@ function VideoSource(renderer, options) {
       _self.firstplay = true
     });
 
-
-    videoElement.volume = 0;
-
-    // videoElement.currentTime = Math.random() * 60   // use random in point
-
     // FOR FIREBASE
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
@@ -118,8 +114,6 @@ function VideoSource(renderer, options) {
     videoTexture = new THREE.Texture( canvasElement );
     videoTexture.wrapS = THREE.RepeatWrapping;
     videoTexture.wrapT = THREE.RepeatWrapping;
-
-
     // videoTexture.minFilter = THREE.LinearFilter;
 
     // -------------------------------------------------------------------------
@@ -139,10 +133,8 @@ function VideoSource(renderer, options) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
 
-
     // add main
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
-
 
     // expose video and canvas
     /**
