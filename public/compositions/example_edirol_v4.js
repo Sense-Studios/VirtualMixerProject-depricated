@@ -28,22 +28,17 @@ var source4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 var chain1 = new Chain( renderer, { sources: [ source1, source2, source3, source4 ] } );
 var chain2 = new Chain( renderer, { sources: [ source1, source2, source3, source4 ] } );
 
-// mono color effects
-var color_effect1 = new ColorEffect(renderer, { source: chain1 } );
-var color_effect2 = new ColorEffect(renderer, { source: chain2 } );
+var color_effect1 = new ColorEffect(renderer, { source: chain1 } ); // mono color effects
+var paint_effect2 = new ColorEffect(renderer, { source: chain2 } ); // paint
 
-// negatief
-var nega_effect1 = new ColorEffect(renderer, { source: color_effect1 } );
-var nega_effect2 = new ColorEffect(renderer, { source: color_effect2 } );
+var nega_effect1 = new ColorEffect(renderer, { source: color_effect1 } ); // negatief
+var multi_effect2 = new ColorEffect(renderer, { source: paint_effect2 } ); // multi ==> DISTORT!, works on source directly
 
-// lumakey
-var luma_effect1 = new ColorEffect(renderer, { source: nega_effect1 } );
-var luma_effect2 = new ColorEffect(renderer, { source: nega_effect2 } );
+var luma_effect1 = new ColorEffect(renderer, { source: nega_effect1 } ); // Whitekey
+var color_effect2 = new ColorEffect(renderer, { source: multi_effect2 } ); // c-key
 
-// colorize
-var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } );
-var colorize_effect2 = new ColorEffect(renderer, { source: luma_effect2 } );
-
+var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } ); // Blackkey
+var colorize_effect2 = new ColorEffect(renderer, { source: color_effect2 } ); // feedback
 
 // main mixer
 var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: colorize_effect2 } );
@@ -95,10 +90,10 @@ document.getElementById('btn_effects_a_1').onmousedown = function() {
   var cycle = [ 5, 6 , 7, 8, 9, 10, 11, 12 ];
   if ( color_effect1.effect() != 1 ) {
     color_effect1.effect(1)
-    this.classList = 'mix_control round '
+    this.classList = 'effect_a round '
   }else{
     color_effect1.effect(5)
-    this.classList = 'mix_control round greenish active';
+    this.classList = 'effect_a round greenish active';
   }
 }
 
@@ -107,10 +102,10 @@ document.getElementById('btn_effects_a_2').onmousedown = function() {
   var cycle = [ 2, 3, 4 ]
   if ( nega_effect1.effect() != 1 ) {
     nega_effect1.effect(1)
-    this.classList = 'mix_control round '
+    this.classList = 'effect_a round '
   }else{
     nega_effect1.effect(2)
-    this.classList = 'mix_control round greenish active'
+    this.classList = 'effect_a round greenish active'
   }
 }
 
@@ -119,14 +114,15 @@ document.getElementById('btn_effects_a_3').onmousedown = function() {
   if ( luma_effect1.effect() != 1 ) {
     //luma_effect1.extra(0.8)
     luma_effect1.effect(1)
-    main_mixer.mixMode( original_mixmode );
-    this.classList = 'mix_control round '
+    //main_mixer.mixMode( original_mixmode );
+    this.classList = 'effect_a round '
   }else{
     original_mixmode = main_mixer.mixMode()
     luma_effect1.effect(39);
     luma_effect1.extra(0.5);
+    document.getElementById('effects_a_control').value = 0.5
     //main_mixer.mixMode(1);
-    this.classList = 'mix_control round greenish active'
+    this.classList = 'effect_a round greenish active'
   }
 }
 
@@ -134,14 +130,41 @@ document.getElementById('btn_effects_a_4').onmousedown = function() {
   //main_mixer.mixMode(1) // NORMAL
   if ( colorize_effect1.effect() != 1 ) {
     colorize_effect1.effect(1)
-    this.classList = 'mix_control round '
+    this.classList = 'effect_a round '
   }else{
     colorize_effect1.effect(41);
-    this.classList = 'mix_control round greenish active'
+    this.classList = 'effect_a round greenish active'
   }
 }
 
 document.getElementById('effects_a_control').onmousedown = function() {
+}
+
+// does this work on mobile?
+document.getElementById('effects_a_control').oninput = function() {
+  console.log("effects_a_control >>", this.value)
+
+  if ( document.getElementById('btn_effects_a_1').classList.contains('active') ) { // add "blinking?"
+    var calc = Math.ceil( this.value * 7 ) + 5
+    console.log("color effect 1 >>", calc)
+    color_effect1.effect( calc ) // [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+  }else{
+    color_effect1.effect(1)
+  }
+
+  if ( document.getElementById('btn_effects_a_2').classList.contains('active') ) { // add "blinking?"
+    var calc = Math.ceil( this.value * 3 ) + 1
+    console.log("effects_a_control 2 >>", calc)
+    nega_effect1.effect( calc ) // [2, 3, 4]
+  }else{
+    nega_effect1.effect(1)
+  }
+
+  if ( document.getElementById('btn_effects_a_3').classList.contains('active') ) { // add "blinking?"
+    luma_effect1.extra( this.value )
+  }else{
+    //nega_effect1.extra(1)
+  }
 }
 
 

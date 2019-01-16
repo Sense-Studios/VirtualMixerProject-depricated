@@ -54,7 +54,7 @@ function DistortionEffect( _renderer, _options ) {
 
   _self.update = function() {
     i += 0.001
-    //renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
+    // renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
 
     // ONLY WORKS ON VIDEO SOURCE, IF IT WORKS
     renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }

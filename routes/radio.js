@@ -26,6 +26,7 @@ router.get('/1', function(req, res, next) {
 
 router.get('/nsb', function(req, res, next) { request('http://37.220.36.53:7904').pipe(res); });
 router.get('/electrodancefloor', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
+router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
 // router.get( '/dunklenacht', function(req, res, next) { request('http://93.90.201.81:8000').pipe(res); }); //offline
 
 

@@ -1,3 +1,6 @@
+@font-face
+  font-family: 'MINI7'
+  src: url("/fonts/MINI 7 Tight.ttf") format("truetype")
 
 #mixer
   position: absolute
@@ -26,6 +29,19 @@
    width: 18px
    height: 18px
 
+   &:active, &.active
+    background-color: red
+    border-bottom: solid 2px #511
+
+   label
+    font-size: 8px
+    font-family: 'MINI7', monospace
+    display: inline-block
+    position: relative
+    top: -3px
+    left: 11px
+    margin-left: -16px
+
    &:focus
      outline: 0
 
@@ -33,25 +49,58 @@
     background-color: #999
     border-bottom: solid 2px #666
     border-radius: 12px
-    width: 12px
-    height: 16px
+    width: 14px
+    height: 14px
+    margin-left: -16px
 
-   &.redish
-    background-color: #511
-    border-bottom: solid 2px #755
+    &.effect_a
+      margin-left: -16px
+      label
+        top: -3px
+        left: 30px
+        width: 100px
+        text-align: left
 
-   &:active, &.active
-    background-color: red
-    border-bottom: solid 2px #511
+    &.effect_b
+      margin-left: 16px
+      label
+        top: -3px
+        left: -28px
+        width: 100px
+        text-align: left
 
-   &.greenish
-    background-color: #252
-    border-bottom: solid 2px #755
+    &.greenish
+     background-color: #252
+     border-bottom: solid 2px #755
 
     &:active, &.active
+     background-color: #494
+     border-bottom: solid 2px #181
+
+    &.redish
+     background-color: #511
+     border-bottom: solid 2px #755
+
+     &:active, &.active
+      background-color: red
+      border-bottom: solid 2px #511
+
+    &.blinking
+     animation: blinkin-anim 0.8s infinite
+
+    @keyframes blinkin-anim
+     0%
       background-color: #494
       border-bottom: solid 2px #181
-
+     50%
+      background-color: #494
+      border-bottom: solid 2px #181
+     51%
+      background-color: #999
+      border-bottom: solid 2px #666
+     100%
+      background-color: #999
+      border-bottom: solid 2px #666
 
   .dark
     grid-area: dark
@@ -84,6 +133,9 @@
   .mix_control
     grid-area: mix_control
     background-color: #444
+
+    button.round
+      margin: 0
 
   .main_pod
     grid-area: main_pod
