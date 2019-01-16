@@ -46,7 +46,8 @@ var clutter = new VideoSource( renderer, { src: '/video/16MMDUSTproc.mp4' } );
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
 
 // text
-var testSource6 = new TextSource( renderer, {} );
+// var testSource6 = new TextSource( renderer, {} );
+var testSource6 = new GifSource(   renderer, { src:'/gif/gifshow/5b4cccdec8c97546ca88f2efc589ba58.gif' } );
 
 // ## MODULES ##################################################################
 

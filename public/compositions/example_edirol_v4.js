@@ -124,7 +124,8 @@ document.getElementById('btn_effects_a_3').onmousedown = function() {
   }else{
     original_mixmode = main_mixer.mixMode()
     luma_effect1.effect(39);
-    main_mixer.mixMode(10);
+    luma_effect1.extra(0.5);
+    //main_mixer.mixMode(1);
     this.classList = 'mix_control round greenish active'
   }
 }

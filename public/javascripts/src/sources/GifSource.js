@@ -89,14 +89,20 @@ function GifSource( renderer, options ) {
      _self.bypass = false
   }
 
+  var c = 0;
   _self.update = function() {
 
     // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
-      if ( gifTexture ) gifTexture.needsUpdate = true;
+      // modulo is here because gif encoding is insanley expensive
+      // TODO: MAKE THE MODULE SETTABLE.
+      if (c%6 == 0) {
+        canvasElementContext.clearRect(0, 0, 1024, 1024);
+        canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
+        if ( gifTexture ) gifTexture.needsUpdate = true;
+      }
+      c++;
     }catch(e){
       // not yet
     }
@@ -111,6 +117,7 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
+    console.log("executed src")
     _self.currentSrc = _file
     supergifelement.pause()
     supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )

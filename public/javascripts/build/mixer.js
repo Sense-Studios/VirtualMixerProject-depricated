@@ -254,16 +254,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-
-  // create all necc. contexts
-  var audio = new Audio()
-  var context = new AudioContext(); // AudioContext object instance
-  var source
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
-
   /**
    * @description Audio element
    * @member Addon#AudioAnalysis#audio
@@ -272,7 +262,17 @@ function AudioAnalysis( _renderer, _options ) {
    *  HTMLMediaElement AUDIO reference
    *
   */
+
+  // create all necc. contexts
+  var audio = new Audio()
   _self.audio = audio
+
+  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
+  var source //= context.createMediaElementSource(audio);
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
   // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
@@ -305,11 +305,15 @@ function AudioAnalysis( _renderer, _options ) {
   */
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    audio.play();
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+    });
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
   document.body.addEventListener('click', forceFullscreen)
+  document.body.addEventListener('touchstart', forceFullscreen)
 
   /**
    * @description
@@ -2265,8 +2269,8 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   // lum key
   if ( currentcoloreffect == 39 ) {
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
-    float green = clamp( src.r, extra, 1.) == extra ? .0 : src.g;
-    float blue = clamp( src.r, extra, 1.) == extra ? .0 : src.b;
+    float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
+    float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
     float alpha = red + green + blue == .0 ? .0 : src.a;
     return vec4( red, green, blue, alpha );
   }
@@ -2888,15 +2892,30 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-//    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-//vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
-//    }
+// renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
+// vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
+// }
 
+    var shadercode = ""
+    //shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    //shadercode += "vec4 "+_self.uuid+"_output = "
+    //shadercode += "vec4( blend( "
+    shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+    shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
+    shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
+    shadercode += _self.uuid+"_blendmode ) "
+    shadercode += ")"
+    shadercode += " + vec4(  "+source1.uuid+"_output.a < 1.0 ? "+source2.uuid+"_output.rgba * ( "+_self.uuid+"_alpha1 - "+source1.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += " + vec4(  "+source2.uuid+"_output.a < 1.0 ? "+source1.uuid+"_output.rgba * ( "+_self.uuid+"_alpha2 - - "+source2.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+    shadercode += ";\n"
+    shadercode += "  /* custom_main */  "
 
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-  vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
-)
-//`vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode )
+    /* custom_main */
+
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
+// vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// `vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
+// vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
 
     }
 
@@ -2908,7 +2927,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         // pod = currentBPM
         currentBPM = currentBpmFunc()
         c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * ( currentBPM * currentMOD ) / 120 ) + 1 ) )
+        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
     }
   }
 
@@ -3327,14 +3346,20 @@ function GifSource( renderer, options ) {
      _self.bypass = false
   }
 
+  var c = 0;
   _self.update = function() {
 
     // FIXME: something evil happened here.
     //if (_self.bypass == false) return
     try {
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
-      if ( gifTexture ) gifTexture.needsUpdate = true;
+      // modulo is here because gif encoding is insanley expensive
+      // TODO: MAKE THE MODULE SETTABLE.
+      if (c%6 == 0) {
+        canvasElementContext.clearRect(0, 0, 1024, 1024);
+        canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
+        if ( gifTexture ) gifTexture.needsUpdate = true;
+      }
+      c++;
     }catch(e){
       // not yet
     }
@@ -3349,6 +3374,7 @@ function GifSource( renderer, options ) {
 
   // Helpers
   _self.src = function( _file ) {
+    console.log("executed src")
     _self.currentSrc = _file
     supergifelement.pause()
     supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
@@ -4003,8 +4029,12 @@ function VideoSource(renderer, options) {
 
     // create video element
     videoElement = document.createElement('video');
-    videoElement.setAttribute("crossorigin", "anonymous")
+    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("playsinline",true)
+    videoElement.playsinline = true
+    videoElement.preload = 'none'
     videoElement.muted= true
+    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
 
     // set the source
     if ( options.src == undefined ) {
@@ -4025,7 +4055,7 @@ function VideoSource(renderer, options) {
     var playInterval = setInterval( function() {
       if ( videoElement.readyState == 4 ) {
         var r = Math.random() * videoElement.duration
-        videoElement.currentTime = r
+        //videoElement.currentTime = r
         videoElement.play();
         _self.firstplay = true
         console.log(_self.uuid, "First Play; ", r)
@@ -4035,9 +4065,17 @@ function VideoSource(renderer, options) {
 
     // firstload handler for mobile; neest at least 1 user click
     document.body.addEventListener('click', function() {
+      console.log("clikcity")
       videoElement.play();
       _self.firstplay = true
     });
+
+    document.body.addEventListener('touchstart', function() {
+      console.log("clikcity")
+      videoElement.play();
+      _self.firstplay = true
+    });
+
 
     videoElement.volume = 0;
 
@@ -4137,13 +4175,16 @@ function VideoSource(renderer, options) {
       return;
     }
     videoElement.src = _file
-    var playInterval = setInterval( function() {
+    videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
         console.log(_self.uuid, "First Play.")
-        clearInterval(playInterval)
       }
-    }, 400 )
+    })
+    //var playInterval = setInterval(
+    //    clearInterval(playInterval)
+    //  }
+    //}, 400 )
   }
 
   /**
