@@ -76,16 +76,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-
-  // create all necc. contexts
-  var audio = new Audio()
-  var context = new AudioContext(); // AudioContext object instance
-  var source
-  var bandpassFilter = context.createBiquadFilter();
-  var analyser = context.createAnalyser();
-  var start = Date.now();
-  var d = 0; // counter for non-rendered bpm
-
   /**
    * @description Audio element
    * @member Addon#AudioAnalysis#audio
@@ -94,7 +84,17 @@ function AudioAnalysis( _renderer, _options ) {
    *  HTMLMediaElement AUDIO reference
    *
   */
+
+  // create all necc. contexts
+  var audio = new Audio()
   _self.audio = audio
+
+  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
+  var source //= context.createMediaElementSource(audio);
+  var bandpassFilter = context.createBiquadFilter();
+  var analyser = context.createAnalyser();
+  var start = Date.now();
+  var d = 0; // counter for non-rendered bpm
 
   // config --------------------------------------------------------------------
   // with ~ 200 samples/s it takes ~ 20 seconds to adjust at 4000 sampleLength
@@ -127,11 +127,15 @@ function AudioAnalysis( _renderer, _options ) {
   */
   var forceFullscreen = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    audio.play();
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+    });
     document.body.webkitRequestFullScreen()
     document.body.removeEventListener('click', forceFullscreen);
   }
   document.body.addEventListener('click', forceFullscreen)
+  document.body.addEventListener('touchstart', forceFullscreen)
 
   /**
    * @description

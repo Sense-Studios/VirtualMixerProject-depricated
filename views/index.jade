@@ -10,8 +10,9 @@ block content
   .blink
   
   pre#info
-    
   
+  button(onclick="console.log('little clickityepi'); testSource1.video.play(); this.style.display = 'none';") Play   
+
   script.
     var giphy_id = '#{environment}'
     var marduq_key = '#{environment}'
@@ -23,4 +24,4 @@ block content
   link(rel='stylesheet', href='/stylesheets/style.css')
 
   
-  include editors/hud
+  //include editors/hud

@@ -153,8 +153,8 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   // lum key
   if ( currentcoloreffect == 39 ) {
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
-    float green = clamp( src.r, extra, 1.) == extra ? .0 : src.g;
-    float blue = clamp( src.r, extra, 1.) == extra ? .0 : src.b;
+    float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
+    float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
     float alpha = red + green + blue == .0 ? .0 : src.a;
     return vec4( red, green, blue, alpha );
   }
