@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sources/VideoSource.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sources/VideoSource.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>VideoSource.prototype = new Source(); // assign prototype to marqer
+VideoSource.constructor = VideoSource;  // re-assign constructor
+
+/**
+*
+* @summary
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @description
+*  The videosource allows for playback of video files in the Mixer project
+*
+* @implements Source
+* @constructor Source#VideoSource
+* @example let myVideoSource = new VideoSource( renderer, { src: 'myfile.mp4' } );
+* @param {GlRenderer} renderer - GlRenderer object
+* @param {Object} options - JSON Object
+*/
+
+function VideoSource(renderer, options) {
+
+  // create and instance
+  var _self = this;
+
+  if ( options.uuid == undefined ) {
+    _self.uuid = "VideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  // set options
+  var _options = {};
+  if ( options != undefined ) _options = options;
+
+  _self.currentSrc = "/video/placeholder.mp4"
+  _self.type = "VideoSource"
+  _self.bypass = true;
+
+  // create elements (private)
+  var canvasElement, videoElement, canvasElementContext, videoTexture; // wrapperElemen
+  var alpha = 1;
+
+  // add to renderer
+  renderer.add(_self)
+
+  // initialize
+  _self.init = function() {
+
+    // FIXME: Can we clean this up and split into several functions
+
+    console.log("init video source", _self.uuid)
+
+    // create video element
+    videoElement = document.createElement('video');
+    videoElement.setAttribute("crossorigin","anonymous")
+    videoElement.setAttribute("playsinline",true)
+    videoElement.playsinline = true
+    videoElement.preload = 'none'
+    videoElement.muted= true
+    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
+
+    // set the source
+    if ( options.src == undefined ) {
+      videoElement.src = _self.currentSrc;
+    } else {
+      videoElement.src = options.src
+    }
+    console.log('loaded source: ', videoElement.src )
+
+    // set properties
+    videoElement.height = 1024;
+    videoElement.width = 1024;
+    videoElement.volume = 0;
+    videoElement.loop = true          // must call after setting/changing source
+    videoElement.load();              // must call after setting/changing source
+    _self.firstplay = false
+
+    // Here we wait for a user to click and take over
+    var playInterval = setInterval( function() {
+      if ( videoElement.readyState == 4 ) {
+        var r = Math.random() * videoElement.duration
+        //videoElement.currentTime = r
+        videoElement.play();
+        _self.firstplay = true
+        console.log(_self.uuid, "First Play; ", r)
+        clearInterval(playInterval)
+      }
+    }, 400 )
+
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', function() {
+      console.log("clikcity")
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    document.body.addEventListener('touchstart', function() {
+      console.log("clikcity")
+      videoElement.play();
+      _self.firstplay = true
+    });
+
+    // FOR FIREBASE
+    // listen for a timer update (as it is playing)
+    // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
+    // video2.currentTime = 20;
+
+    // create canvas
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    // create the videoTexture
+    videoTexture = new THREE.Texture( canvasElement );
+    videoTexture.wrapS = THREE.RepeatWrapping;
+    videoTexture.wrapT = THREE.RepeatWrapping;
+    // videoTexture.minFilter = THREE.LinearFilter;
+
+    // -------------------------------------------------------------------------
+    // Set shader params
+    // -------------------------------------------------------------------------
+
+    // set the uniforms
+    renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+    renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
+
+    // add uniform
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
+
+    // add main
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose video and canvas
+    /**
+     * @description exposes the HTMLMediaElement Video for listeners and control
+     * @member Source#VideoSource#video
+     */
+    _self.video = videoElement
+    _self.canvas = canvasElement
+
+    // remove the bypass
+    _self.bypass = false
+  }
+
+  var i = 0
+  _self.update = function() {
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA &amp;&amp; !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      // console.log("SEND IN BLACK!")
+      canvasElementContext.clearRect(0, 0, 1024, 1024);
+      _self.alpha = 0
+    }
+  }
+
+  // return the video texture, for direct customUniforms injection (or something)
+  _self.render = function() {
+    return videoTexture
+  }
+
+  // ===========================================================================
+  // Actual HELPERS
+  // ===========================================================================
+
+  /**
+   * @description
+   *  gets or sets source @file for the videosource
+   *  file has to be compatible with HTMLMediaElement Video ie. webm, mp4 etc.
+   *  We recommend **mp4**
+   *
+   * @function Source#VideoSource#src
+   * @param {file} Videofile - full path to file
+   */
+  _self.src = function( _file ) {
+    try {
+      _self.currentSrc = _file
+    }catch(e){
+      console.log("VideoSource returned empty promise, retrying ...")
+      return;
+    }
+    videoElement.src = _file
+    videoElement.oncanplay( function() {
+      if ( videoElement.readyState == 4 ) {
+        videoElement.play();
+        console.log(_self.uuid, "First Play.")
+      }
+    })
+    //var playInterval = setInterval(
+    //    clearInterval(playInterval)
+    //  }
+    //}, 400 )
+  }
+
+  /**
+   * @description start the current video
+   * @function Source#VideoSource#play
+   */
+  _self.play =         function() { return videoElement.play() }
+
+  /**
+   * @description pauses the video
+   * @function Source#VideoSource#pause
+   */
+  _self.pause =        function() { return videoElement.pause() }
+
+  /**
+   * @description returns true then the video is paused. False otherwise
+   * @function Source#VideoSource#paused
+   */
+  _self.paused =       function() { return videoElement.paused }
+
+  /**
+   * @description skip to _time_ (in seconds) or gets `currentTime` in seconds
+   * @function Source#VideoSource#currentTime
+   * @param {float} time - time in seconds
+   */
+  _self.currentTime = function( _num ) {
+    if ( _num === undefined ) {
+      return videoElement.currentTime;
+    } else {
+      console.log("set time", _num)
+      videoElement.currentTime = _num;
+      return _num;
+    }
+
+  }
+
+  // seconds
+  /**
+   * @description give the duration of the video in seconds (cannot be changed)
+   * @function Source#VideoSource#duration
+   */
+  _self.duration =     function() { return videoElement.duration }    // seconds
+
+  // ===========================================================================
+  // For now only here, move to _source?
+  // ===========================================================================
+
+  _self.alpha = function(a) {
+    if (a == undefined) {
+      return renderer.customUniforms[_self.uuid+'_alpha'].value
+    }else{
+      renderer.customUniforms[_self.uuid+'_alpha'].value = a
+    }
+  }
+
+  _self.jump = function( _num) {
+    if ( _num == undefined || isNaN(_num) ) {
+      try {
+        videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
+      }catch(e){
+        console.log("prevented a race error")
+      }
+    } else {
+      videoElement.currentTime = _num
+    }
+
+    return videoElement.currentTime
+  }
+
+  // ===========================================================================
+  // Rerturn a reference to self
+  // ===========================================================================
+
+  // _self.init()
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 02:01:55 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

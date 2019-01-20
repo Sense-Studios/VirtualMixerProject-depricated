@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: addons/BPM.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: addons/BPM.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>BPM.prototype = new Addon(); // assign prototype to marqer
+BPM.constructor = BPM;  // re-assign constructor
+
+/**
+ * @summary
+ *   BPM calculates beat per minutes based on a 'tap' function
+ *
+ * @description
+ *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
+ *
+ * @example
+ * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
+ * var bpm = new BPM( renderer );
+ * bpm.bpm = 100
+ * bpm.add( mixer1.pod )
+ * @constructor Addon#BPM
+ * @implements Addon
+ * @param {GlRenderer} renderer
+ * @param {Object} options optional
+ */
+
+function BPM( renderer, options ) {
+
+  var _self = this
+  _self.function_list = [
+    ["AUTO", "method", "toggleAutoBpm"],
+    ["MODDOWN", "method", "modDown"],
+    ["MODUP", "method", "modUp"],
+    ["MOD", "method", "modNum"]
+  ]
+
+  // only return the functionlist
+  if ( renderer == undefined ) return
+
+  // exposed variables.
+  _self.uuid = "BPM_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  window["bpm_" + _self.uuid]
+  _self.type = "Addon"
+
+  // set options
+  _self.options = {}
+  if ( options != undefined ) _self.options = options
+  /**
+   * @description Beats Per Minute
+   * @member Addon#BPM#bpm
+   * @param {number} Beats per minute
+   *
+   *  actual Beats Per Minute
+   *
+  */
+  _self.bpm = 128
+
+  /**
+   * @description Tapping beat control
+   * @member Addon#BPM#bps
+   *
+   *  beats per second
+   *
+  */
+  _self.bps = 2.133333         //
+
+
+  /**
+   * @description Second counter
+   * @member Addon#BPM#sec
+   *
+   *  second counter, from which the actual float is calculated
+   *
+  */
+  _self.sec = 0                //
+
+  /**
+   * @description
+   *  BPM Float, current *position* of the BPM
+   *  If the BMP is a Sinus going up and down, the float shows up where it is on the curve
+   *  'up' is 1 and down is '0', oscillating.
+   * @member Addon#BPM#bpm_float
+  */
+  _self.bpm_float = 0.46875    // 60 / 128, current float of bpm
+
+  /**
+   * @description Tapping beat control
+   * @member Addon#BPM#mod
+  */
+  _self.mod = 1                // 0.25, 0.5, 1, 2, 4, etc.
+
+  /**
+   * @description Audio analysis
+   * @member Addon#BPM#useAutoBpm#
+   * @member Addon#BPM#autoBpmData#
+   * @member Addon#BPM#tempodata_bpm#
+   * @member Addon#BPM#audio_src
+   * @member Addon#BPM#useMicrophone
+   */
+  _self.useAutoBpm = false      // auto bpm
+  _self.tempodata_bpm = 128     // from music
+  _self.mute = false
+  _self.autoBpmData = {}       // info object for the auto bpm
+
+  _self.audio_src = ""         // audio file or stream (useMicrophone = false)
+
+  // TODO
+  _self.useMicrophone = false  // use useMicrophone for autoBPM
+
+  // DEPRICATED
+  _self.bypass = false
+
+
+  // source.renderer ?
+  var nodes = []
+
+  // counter
+  var c = 0
+
+  // add to renderer
+  renderer.add( _self )
+
+
+  // main ----------------------------------------------------------------------
+  // init with a tap contoller
+  _self.init = function() {
+    console.log("init BPM contoller.")
+
+    // initialize autoBPM with an audio object
+    // initializeAutoBpm()
+  }
+
+  // UPDATE
+  var starttime = (new Date()).getTime()
+  _self.update = function() {
+
+    if ( _self.bypass ) return
+    // rename useAnalyser?
+    //if ( _self.useAutoBpm ) {
+    //  _self.bpm = _self.tempodata_bpm
+    //}
+
+    if ( !_self.disabled ) {
+      nodes.forEach( function( node ) {
+        node( _self.render() );
+      });
+    }
+
+    c = ((new Date()).getTime() - starttime) / 1000;
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
+  }
+
+  // add nodes, implicit
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+
+  // actual --------------------------------------------------------------------
+  /**
+   * @description double the bpm
+   * @function Addon#BPM#modUp
+  */
+  _self.modUp = function() { _self.mod *= 2; }
+  /**
+   * @description half the bpm
+   * @function Addon#BPM#modDown
+  */
+  _self.modDown = function() { _self.mod *= .5; }
+
+
+  _self.modNum = function(_num) {
+    console.log("MOD ", _num)
+    var oldState = _self.useAutoBpm
+    _self.mod = _num;
+    _self.useAutoBpm = oldState
+  }
+
+  _self.toggleAutoBpm = function( _num ) {
+    _self.useAutoBpm  = !_self.useAutoBpm
+    console.log("--->", _self.useAutoBpm  )
+  }
+
+  _self.turnOff = function() {
+    bpm.audio.muted = false
+    bpm.useAutoBpm = false
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tapped beat control
+  var last = Number(new Date());
+  var bpms = [ 128, 128 ,128 ,128 ,128 ];
+  var time = 0;
+  var avg = 0;
+
+  /**
+   * @description Tapping beat control
+   * @function BPM#tap
+   */
+  _self.tap = function() {
+    _self.useAutoBPM = false
+    time  = Number(new Date()) - last
+    last = Number(new Date());
+    if ( time &lt; 10000 &amp;&amp; time > 10 ) {
+      bpms.splice(0,1)
+      bpms.push( 60000/time )
+      avg = bpms.reduce(function(a, b) { return a + b; }) / bpms.length;
+      _self.bpm = avg
+      _self.bps = avg/60
+    }
+  }
+
+  _self.getBpm = function() {
+    return _self.bpm
+  }
+
+  console.log("set keypress")
+  window.addEventListener('keypress', function(ev) {
+    console.log(">>> ", ev.which)
+    if ( ev.which == 116 || ev.which == 32    ) {
+      _self.tap()
+      console.log(_self.bpm)
+    }
+  })
+
+} // end BPM
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 02:01:55 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
