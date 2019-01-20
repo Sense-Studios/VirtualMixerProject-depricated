@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: addons/FileManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: addons/FileManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>FileManager.prototype = new Addon(); // assign prototype to marqer
+FileManager.constructor = FileManager;  // re-assign constructor
+
+/**
+* @summary
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @description
+*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*
+* @example
+* var myFilemanager = new FileManager( VideoSource )
+* myFilemanager.load_set( "myset.json")
+* myFilemanager.change()
+* @constructor Addon#FileManager
+* @implements Addon
+* @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
+*/
+
+function FileManager( _source ) {
+
+  var _self = this
+
+  // to be honest, this is kind of stupid; shouldnt it check for source 
+  try {
+    renderer
+  } catch(e) {
+    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
+    return
+  }
+
+  _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "AddOn"
+  _self.defaultQuality = ""
+  _self.source = _source
+  _self.set = []
+  //_self.programs = []
+  _self.file
+  _self.renderer = renderer // do we even need this ?!!
+
+  _self.load_set = function( _set ) {
+    var u = new Utils()
+    u.get( _set, function(d) {
+      console.log("-->", d)
+      _self.set = JSON.parse(d)
+    })
+  }
+
+  _self.setSrc = function( file ) {
+    console.log("set source: ", file)
+    _self.source.src(file)
+  }
+
+  _self.getFileById = function( _id ) {
+    var match = null
+  }
+
+  _self.getSrcByTags = function( _tags ) {
+    // _tags = array
+    if ( programs.length == 0 ) return "no programs"
+
+    var matches = []
+    programs.forEach( function( p, i) {
+      //console.log(i, p)
+      _tags.forEach( function( t, j) {
+        //console.log( j, t)
+        if ( p.tags.includes(t) &amp;&amp; p.assets != undefined ) {
+          if ( p.assets._type == "Video" ) matches.push(p)
+        }
+      })
+    })
+
+    if ( matches.length == 0 ) return "no matches"
+    var program = matches[ Math.floor( Math.random() * matches.length )]
+    console.log(">> ", matches.length, program.title)
+    _self.setSrc( _self.getSrcByQuality( program ) );
+  }
+
+  // ---------------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------------
+
+  _self.load = function( _file ) {
+    utils.get( _file, function(d) {
+      console.log('got:', JSON.parse(d) )
+      _self.set = JSON.parse(d)
+    } )
+  }
+
+  // load another source from the stack
+  _self.change = function( _tag ) {
+
+    if ( _self.set.length != 0 ) {
+      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
+      console.log("from set:", r )
+      _self.setSrc( r )
+    }
+    return
+
+    if ( programs.length == 0 ) return "no programs"
+    if ( _tag ) {
+      _self.getSrcByTags( [ _tag ] );
+      return;
+    }
+
+    console.log("change video")
+    var program = programs[ Math.floor( Math.random() * programs.length ) ]
+    if ( program.assets._type != "Video" ) {
+      // noit elegible, try again
+      _self.change()
+      return
+    }
+
+    //var notv = null
+    //$.get('/set/notv', function(d) { notv = JSON.parse(d) })
+
+    console.log("SOURCE")
+    //var source = notv[ Math.floor( Math.random() * notv.length) ];
+    //var source = occupy_chaos[ Math.floor( Math.random() * occupy_chaos.length) ];
+
+    if (_self.set.length > 0) {
+      var source = _self.set[ Math.floor( Math.random() * _self.set.length) ];
+
+      //var source = _self.getSrcByQuality( program )
+      _self.setSrc( source );
+    }
+
+
+    /*
+    if (Math.random() > 0.5 ) {
+      _self.getSrcByTags(["awesome"])
+    }else{
+      _self.getSrcByTags(["runner"])
+    }
+    */
+  }
+
+  // for old times sake,
+  _self.changez = function( _tag ){
+    _self.change( _tag )
+  }
+
+  // get the version by it's quality ( marduq asset library )
+  _self.getSrcByQuality = function( _program, _quality ) {
+    if ( _quality == undefined ) _quality = "720p_h264"
+    var match = null
+    _program.assets.versions.forEach( function(version) {
+      if ( version.label == _quality ) match = version
+    })
+    return match.url;
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 02:01:55 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
