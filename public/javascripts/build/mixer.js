@@ -928,7 +928,7 @@ function FileManager( _source ) {
 
   var _self = this
 
-  // to be honest, this is kind of stupid; shouldnt it check for source 
+  // to be honest, this is kind of stupid; shouldnt it check for source
   try {
     renderer
   } catch(e) {
@@ -992,6 +992,17 @@ function FileManager( _source ) {
       console.log('got:', JSON.parse(d) )
       _self.set = JSON.parse(d)
     } )
+  }
+
+  _self.changeToNum = function( _num ) {
+    var source = _self.set[_num];
+    //var source = _self.getSrcByQuality( program )
+    _self.setSrc( source );
+  }
+
+  _self.changeToUrl = function( _url ) {
+    //var source = _self.getSrcByQuality( program )
+    _self.setSrc( _url );
   }
 
   // load another source from the stack
@@ -2168,75 +2179,36 @@ function ColorEffect( _renderer, _options ) {
   var currentEffect = 1
   var currentExtra = 0.8
 
-  var dpr = window.devicePixelRatio;
-  var textureSize = 128 * dpr;
-  var data = new Uint8Array( textureSize * textureSize * 3 );
-  //var dataTexture = new THREE.DataTexture( canvasElement );
-  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
-  //dataTexture.minFilter = THREE.NearestFilter;
-	//dataTexture.magFilter = THREE.NearestFilter;
-	//dataTexture.needsUpdate = true;
-
-  var canvasElement, canvasContext, tempTexture
-
-
   _self.init = function() {
-
-    // create canvas
-    canvasElement = document.createElement('canvas');
-    canvasElement.width = 1024;
-    canvasElement.height = 1024;
-    canvasElementContext = canvasElement.getContext( '2d' );
-    canvasElementContext.fillStyle = "#FF0000";
-    canvasElementContext.fillRect( 0, 0, 500,500)
-
-    console.log("ColorEffect inits, with", _renderer)
     // add uniforms to renderer
     _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
     _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
-    //_renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "t", value: null }
-    // _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: tempTexture }
-    //_renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
 
     // add uniforms to fragmentshader
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_extra;\n/* custom_uniforms */')
 
-    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentcoloreffect;\n/* custom_uniforms */')
-    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
-    // _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_noisesampler;\n/* custom_uniforms */')
-
-    // uniform float noiseScale;
-    // uniform float time;
-    // uniform float baseSpeed;
-
-
-    //_renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_output;\n/* custom_uniforms */')
-
-    // _output * uuid_alpha_1
-    // uuid_alpha_1 * -pod
-    // uuid_alpha_2 * +pod
     if ( renderer.fragmentShader.indexOf('vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
 vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
-  if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                               // normal
+  if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                                              // normal
 
   // negative
-  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                   // negtive 1
-  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                       // negtive 2
-  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                       // negtive 3
+  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                                  // negtive 1
+  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                                      // negtive 2
+  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                                      // negtive 3
 
   // monocolor
-  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                             // black and white
+  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
   if ( currentcoloreffect == 6  ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
   if ( currentcoloreffect == 7  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
   if ( currentcoloreffect == 8  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
   if ( currentcoloreffect == 9  ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
   if ( currentcoloreffect == 10 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
   if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
-  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                   // sepia
+  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                     // sepia
 
   // color swapping
   if ( currentcoloreffect == 13 ) return vec4( src.rrra );
@@ -2282,11 +2254,43 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // paint
   if ( currentcoloreffect == 41 ) {
-    return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
+    //return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
+    // devide the image up in color bars
+    vec4 pnt = vec4(
+      src.x < .1 ? .1 : src.x < .2 ? .2 : src.x < .3 ? .3 : src.x < .4 ? .4 : src.x < .5 ? .5 : src.x < .6 ? .6 : src.x < .7 ? .7 : src.x < .8 ? .8 : src.x < .9 ? .9 : src.x,
+      src.y < .1 ? .1 : src.y < .2 ? .2 : src.y < .3 ? .3 : src.y < .4 ? .4 : src.y < .5 ? .5 : src.y < .6 ? .6 : src.y < .7 ? .7 : src.y < .8 ? .8 : src.y < .9 ? .9 : src.y,
+      src.z < .1 ? .1 : src.z < .2 ? .2 : src.z < .3 ? .3 : src.z < .4 ? .4 : src.z < .5 ? .5 : src.z < .6 ? .6 : src.z < .7 ? .7 : src.z < .8 ? .8 : src.z < .9 ? .9 : src.z,
+      src.a
+    );
+
+    return pnt;
   }
 
   // colorise
   if ( currentcoloreffect == 42 ) {
+
+    // TODO: mix paint and colorize together?
+
+    // devide the image up in color bars
+    vec4 pnt = vec4(
+      src.x < .1 ? .1 : src.x < .2 ? .2 : src.x < .3 ? .3 : src.x < .4 ? .4 : src.x < .5 ? .5 : src.x < .6 ? .6 : src.x < .7 ? .7 : src.x < .8 ? .8 : src.x < .9 ? .9 : src.x,
+      src.y < .1 ? .1 : src.y < .2 ? .2 : src.y < .3 ? .3 : src.y < .4 ? .4 : src.y < .5 ? .5 : src.y < .6 ? .6 : src.y < .7 ? .7 : src.y < .8 ? .8 : src.y < .9 ? .9 : src.y,
+      src.z < .1 ? .1 : src.z < .2 ? .2 : src.z < .3 ? .3 : src.z < .4 ? .4 : src.z < .5 ? .5 : src.z < .6 ? .6 : src.z < .7 ? .7 : src.z < .8 ? .8 : src.z < .9 ? .9 : src.z,
+      src.a
+    );
+
+    // colorize effect, fill the colors with random values
+    ( pnt.r == .1 || pnt.g == .1 || pnt.b == .1 ) ? pnt.rgb = vec3( 1.0, 0.0, 0.0) : pnt.rgb;
+    ( pnt.r == .2 || pnt.g == .2 || pnt.b == .2 ) ? pnt.rgb = vec3( 0.0, 1.0, 0.0) : pnt.rgb;
+    ( pnt.r == .3 || pnt.g == .3 || pnt.b == .3 ) ? pnt.rgb = vec3( 0.0, 0.0, 1.0) : pnt.rgb;
+    ( pnt.r == .4 || pnt.g == .4 || pnt.b == .4 ) ? pnt.rgb = vec3( 1.0, 1.0, 0.0) : pnt.rgb;
+    ( pnt.r == .5 || pnt.g == .5 || pnt.b == .5 ) ? pnt.rgb = vec3( 0.0, 1.0, 1.0) : pnt.rgb;
+    ( pnt.r == .6 || pnt.g == .6 || pnt.b == .6 ) ? pnt.rgb = vec3( 1.0, 0.0, 1.0) : pnt.rgb;
+    ( pnt.r == .7 || pnt.g == .7 || pnt.b == .7 ) ? pnt.rgb = vec3( 1.0, 0.49, 0.49) : pnt.rgb;
+    ( pnt.r == .8 || pnt.g == .8 || pnt.b == .8 ) ? pnt.rgb = vec3( 0.49, 1.0, 0.49) : pnt.rgb;
+    ( pnt.r == .9 || pnt.g == .9 || pnt.b == .9 ) ? pnt.rgb = vec3( 0.49, 0.49, 1.0) : pnt.rgb;
+
+    return pnt;
   }
 
   // wipes (move these to mixer?)
@@ -2306,30 +2310,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid+'_currentcoloreffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
   } // init
 
-
-  var vector = new THREE.Vector2();
-  //var glcanvas = document.getElementById('glcanvas');
-  //var glcanvas = _renderer.glrenderer.context.canvas
-  var i = 0
-  _self.update = function() {
-    i++
-    // mixmode
-    // blendmode
-    // pod
-    //console.log( "--", glcanvas.width, glcanvas.height )
-
-    //glcanvas = _renderer.glrenderer.context.canvas
-    //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
-
-    //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
-  	//vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
-
-    //_renderer.copyFramebufferToTexture( vector, dataTexture );
-
-    glcanvas = document.getElementById('glcanvas');
-    canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
-    if ( tempTexture ) tempTexture.needsUpdate = true;
-  }
+  _self.update = function() {}
 
   /* ------------------------------------------------------------------------ */
 
@@ -2432,7 +2413,7 @@ function DistortionEffect( _renderer, _options ) {
 
   _self.update = function() {
     i += 0.001
-    //renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
+    // renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
 
     // ONLY WORKS ON VIDEO SOURCE, IF IT WORKS
     renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }
@@ -4032,7 +4013,7 @@ function VideoSource(renderer, options) {
     videoElement.setAttribute("crossorigin","anonymous")
     videoElement.setAttribute("playsinline",true)
     videoElement.playsinline = true
-    videoElement.preload = 'none'
+    videoElement.preload = 'auto'
     videoElement.muted= true
     videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
 
@@ -4045,8 +4026,9 @@ function VideoSource(renderer, options) {
     console.log('loaded source: ', videoElement.src )
 
     // set properties
-    videoElement.height = 1024
-    videoElement.width = 1024
+    videoElement.height = 1024;
+    videoElement.width = 1024;
+    videoElement.volume = 0;
     videoElement.loop = true          // must call after setting/changing source
     videoElement.load();              // must call after setting/changing source
     _self.firstplay = false
@@ -4076,11 +4058,6 @@ function VideoSource(renderer, options) {
       _self.firstplay = true
     });
 
-
-    videoElement.volume = 0;
-
-    // videoElement.currentTime = Math.random() * 60   // use random in point
-
     // FOR FIREBASE
     // listen for a timer update (as it is playing)
     // video1.addEventListener('timeupdate', function() {firebase.database().ref('/client_1/video1').child('currentTime').set( video1.currentTime );})
@@ -4096,8 +4073,6 @@ function VideoSource(renderer, options) {
     videoTexture = new THREE.Texture( canvasElement );
     videoTexture.wrapS = THREE.RepeatWrapping;
     videoTexture.wrapT = THREE.RepeatWrapping;
-
-
     // videoTexture.minFilter = THREE.LinearFilter;
 
     // -------------------------------------------------------------------------
@@ -4117,10 +4092,8 @@ function VideoSource(renderer, options) {
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
 
-
     // add main
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
-
 
     // expose video and canvas
     /**
@@ -4175,12 +4148,17 @@ function VideoSource(renderer, options) {
       return;
     }
     videoElement.src = _file
+    videoElement.play();
+
+    setTimeout( function() { _self.jump() }, 300 )
+    /*
     videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
         console.log(_self.uuid, "First Play.")
       }
     })
+    */
     //var playInterval = setInterval(
     //    clearInterval(playInterval)
     //  }

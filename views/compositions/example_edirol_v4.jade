@@ -7,9 +7,16 @@ html
     script(src='/javascripts/build/mixer.js')
     
     link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/stylesheets/example_edirol_v4.css')
+    link(rel='stylesheet', href='/stylesheets/compositions/example_edirol_v4.css')
   
   body 
+    .loader#loader 
+      | COMPILING SHADERS ...
+      br
+      | Your computer might seem stuck for a couple of seconds, sorry.
+      br
+      br
+      | Afaik there is no real way around this.
     canvas#glcanvas
 
     #mixer
@@ -23,10 +30,12 @@ html
         button#btn_switch_b_2.active
         button#btn_switch_b_3
         button#btn_switch_b_4
+      
       .bpm_control
         .display#bpm_display 128
         button#bpm_tab
         input#bpm_slide(type='range', min=20 max=240 step=1)
+      
       .mix_control 
         button.mix_control#bpm_control_mix.round.greenish.active
         button.mix_control#bpm_control_wipe.round.greenish
@@ -34,6 +43,7 @@ html
         button#bpm_control_bpm_sync.round.redish
       .main_pod 
         input#main_pod(type='range', min=0 max=1 step=0.01)
+        
       .effects_a
         button.effect_a#btn_effects_a_1.round
           label MONO
@@ -42,10 +52,10 @@ html
         button.effect_a#btn_effects_a_3.round 
           label B-KEY          
         button.effect_a#btn_effects_a_4.round 
-          label W-KEY          
-          
+          label COLRZ                    
       .effects_a_control
         input#effects_a_control(type='range', min=0 max=1 step=0.01)
+      
       .effects_b
         button.effect_b#btn_effects_b_1.round
           label PAINT
@@ -55,13 +65,13 @@ html
           label C-KEY
         button.effect_b#btn_effects_b_4.round
           label FDBCK
-
       .effects_b_control
         input#effects_b_control(type='range', min=0 max=1 step=0.01)
+        
       .transform_a
         button#btn_transform_a
       .transform_b
         button#btn_transform_b
       .dark
-        
+
     script(src='/compositions/example_edirol_v4.js')

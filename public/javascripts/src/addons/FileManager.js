@@ -21,7 +21,7 @@ function FileManager( _source ) {
 
   var _self = this
 
-  // to be honest, this is kind of stupid; shouldnt it check for source 
+  // to be honest, this is kind of stupid; shouldnt it check for source
   try {
     renderer
   } catch(e) {
@@ -85,6 +85,17 @@ function FileManager( _source ) {
       console.log('got:', JSON.parse(d) )
       _self.set = JSON.parse(d)
     } )
+  }
+
+  _self.changeToNum = function( _num ) {
+    var source = _self.set[_num];
+    //var source = _self.getSrcByQuality( program )
+    _self.setSrc( source );
+  }
+
+  _self.changeToUrl = function( _url ) {
+    //var source = _self.getSrcByQuality( program )
+    _self.setSrc( _url );
   }
 
   // load another source from the stack
