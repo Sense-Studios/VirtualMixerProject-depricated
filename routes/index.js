@@ -21,6 +21,10 @@ router.get('/example1', function(req, res, next) {
   res.render('compositions/example1', { title: 'Example 1' });
 });
 
+router.get('/docs', function(req, res, next) {
+  res.render('docs/');
+});
+
 // FIXME: routing scheme should be nicer
 // editors and controllers
 router.get('/editors/*', function(req, res, next) {

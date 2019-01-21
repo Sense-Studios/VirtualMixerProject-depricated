@@ -1,0 +1,175 @@
+
+@font-face
+  font-family: mini7_bold
+  src: url('https://virtualmixproject.com/fonts/MINI 7 Bold.ttf')
+
+@font-face
+  font-family: mini7_bold_condensed
+  src: url('https://virtualmixproject.com/fonts/MINI 7 Condensed Bold.ttf')
+
+@font-face
+  font-family: mini7_condensed
+  src: url('https://virtualmixproject.com/fonts/MINI 7 Condensed.ttf')
+
+//@font-face
+//  font-family: mini7_tight
+// src: url('https://virtualmixproject.com/fonts/MINI 7 Condensed Bold.ttf')
+
+
+body
+  background-color: black
+  color: white
+  font-family: mini7_condensed
+  font-size: 12px
+  line-height: 18px
+  -webkit-tap-highlight-color: transparent
+
+strong
+  font-family: mini7_bold_condensed
+  font-size: 110%
+  line-height: 18px
+
+verystrong
+  font-family: mini7_bold
+  font-size: 120%
+  line-height: 18px
+
+.scroll_container
+  width: 100%
+  height: 100%
+  position: absolute
+  overflow-y: scroll
+
+.grid_container
+  display: grid
+  grid-column-gap: 10px
+  grid-row-gap: 10px
+  grid-template-columns: repeat(auto-fill, 0.33fr)
+  grid-template-rows: fit-content(33%) fit-content(33%) fit-content(33%)
+  position: absolute
+  left: calc( 50% - 40vw)
+  top: 8%
+  height: 50vh
+  width: 80vw
+  grid-auto-flow: column
+
+  > div
+    background-color: #231f20
+    display: grid
+    grid-template-columns: 30% 20% 50%
+    grid-template-rows: max-content
+    mix-blend-mode: overlay
+    filter: contrast(120%) brightness(100%)
+    cursor: pointer
+    transition-duration: 0.3s
+    -webkit-tap-highlight-color: transparent
+    outline: none
+    pointer-events: all
+
+    .go_button
+      display: none
+
+    &:hover
+      //transform: scale(1.2)
+      transform: scale(1.15)
+      box-shadow: 0px 24px 32px rgba( #151515, 0.72)
+      z-index: 3
+      mix-blend-mode: luminosity
+      filter: contrast(80%) brightness(120%)
+      outline: none
+      transition-duration: 0.1s
+
+    &.active
+      z-index: 2
+      transform: scale(1.2)
+      mix-blend-mode: hard-light
+      //filter: contrast(120%) brightness(70%) opacity(80%) saturate(60%)
+      filter: contrast(100%) brightness(100%) opacity(100%) saturate(60%)
+      box-shadow: 0px 24px 32px rgba( #151515, 0.72)
+
+      .go_button
+        display: inline
+
+    .item_image
+      background-color: black
+      grid-row-end: span 2
+      margin: 8px
+      background-image: url('https://lorempixel.com/g/400/500/')
+      //background-size: cover
+      background-size: cover
+      background-repeat: no-repeat
+
+
+    .titel
+      font-size: 18px
+      grid-column-end: span 2
+      padding: 9px
+      text-align: center
+      color: #d7d0cd
+
+    .content
+      background-color: #d7d0cd
+      grid-column-end: span 2
+      color: #231f20
+      margin: 8px
+      margin-left: 0px
+      text-align: justify
+      padding: 9px
+
+  .grid_item_large
+    grid-row-end: span 2
+
+    .titel
+      grid-column-end: span 3
+
+    .content
+      grid-column-end: span 3
+      margin-left: 8px
+
+  .grid_item
+
+    &:nth-child(2)
+      .item_image
+        background-image: url('/images/vmp_demo/notv.png')
+
+    &:nth-child(3)
+      .item_image
+        background-image: url('/images/vmp_demo/veejays.png')
+
+    &:nth-child(4)
+      .item_image
+        background-image: url('/images/vmp_demo/occupy.png')
+
+    &:nth-child(5)
+      .item_image
+        background-image: url('/images/vmp_demo/edirol.png')
+
+
+@media only screen and (max-width: 720px)
+  .grid_container
+    display: grid
+    grid-column-gap: 10px
+    grid-row-gap: 10px
+    grid-template-columns: 100%
+    grid-template-rows: auto
+    position: absolute
+    left: calc( 50% - 40vw)
+    top: 10%
+    height: 50vh
+    width: 80vw
+    grid-auto-flow: column
+    grid-auto-flow: row
+
+    > div
+      //mix-blend-mode: color-dodge
+      //filter: contrast(140%) brightness(80%) opacity(62%)
+      &:hover
+        transform: scale(1)
+
+      &:last-child
+        margin-bottom: 1280px
+
+      &.active
+        transform: scale(1.2)
+        mix-blend-mode: hard-light
+        filter: contrast(100%) brightness(120%) opacity(92%)

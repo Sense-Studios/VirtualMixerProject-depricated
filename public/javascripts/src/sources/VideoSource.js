@@ -54,7 +54,7 @@ function VideoSource(renderer, options) {
     videoElement.setAttribute("crossorigin","anonymous")
     videoElement.setAttribute("playsinline",true)
     videoElement.playsinline = true
-    videoElement.preload = 'none'
+    videoElement.preload = 'auto'
     videoElement.muted= true
     videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
 
@@ -189,12 +189,17 @@ function VideoSource(renderer, options) {
       return;
     }
     videoElement.src = _file
+    videoElement.play();
+
+    setTimeout( function() { _self.jump() }, 300 )
+    /*
     videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
         videoElement.play();
         console.log(_self.uuid, "First Play.")
       }
     })
+    */
     //var playInterval = setInterval(
     //    clearInterval(playInterval)
     //  }
