@@ -2,12 +2,14 @@ var renderer = new GlRenderer()
 
 
 // sources
+var source0 = new SolidSource( renderer, {r:0.2, g:0.4, b:0.9})
 var source1 = new VideoSource( renderer, { src: 'https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/FC240_1.mp4?r=9843759843yjkdsfh' } );
 var source2 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 var source3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
 var source4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 
-var trans_mixer1 = new Mixer( renderer, { source1: source1, source2: source2 }  )
+var premixer = new Mixer(renderer, { source1: source0, source2: source1 } )
+var trans_mixer1 = new Mixer( renderer, { source1: premixer, source2: source2 }  )
 var output = new Output( renderer, trans_mixer1 )
 
 // start to render
