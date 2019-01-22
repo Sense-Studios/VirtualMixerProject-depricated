@@ -237,7 +237,6 @@ function VideoSource(renderer, options) {
       videoElement.currentTime = _num;
       return _num;
     }
-
   }
 
   // seconds
@@ -250,6 +249,14 @@ function VideoSource(renderer, options) {
   // ===========================================================================
   // For now only here, move to _source?
   // ===========================================================================
+  _self.setUVMap = function( _x, _y ) {
+     renderer.customUniforms[_self.uuid+'_uvmap'].value = new THREE.Vector2( _x, _y )
+  }
+
+  _self.setUVMapMod = function( _x, _y ) {
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'].value = new THREE.Vector2( _x, _y )    
+  }
+
 
   _self.alpha = function(a) {
     if (a == undefined) {

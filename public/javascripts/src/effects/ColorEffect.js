@@ -167,11 +167,11 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // wipes (move these to mixer?)
-  if ( gl_FragCoord.x > 200.0 ) {
-    return vec4(0.0,0.0,0.0,0.0);
-  }else {
-    return src;
-  }
+  //if ( gl_FragCoord.x > 200.0 ) {
+  //  return vec4(0.0,0.0,0.0,0.0);
+  //}else {
+  //  return src;
+  //}
 }
 
 /* custom_helpers */
