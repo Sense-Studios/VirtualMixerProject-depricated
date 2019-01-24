@@ -19,17 +19,17 @@ setTimeout( function() {
   var source4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 
   // distortion effects work on sources directly
-  // var distortion_effect1 = new DistortionEffect(renderer, { source: source1 } )
-  // var distortion_effect2 = new DistortionEffect(renderer, { source: source2 } )
-  // var distortion_effect3 = new DistortionEffect(renderer, { source: source3 } )
-  // var distortion_effect4 = new DistortionEffect(renderer, { source: source4 } )
+  var distortion_effect1 = new DistortionEffect(renderer, { source: source1 } )
+  var distortion_effect2 = new DistortionEffect(renderer, { source: source2 } )
+  var distortion_effect3 = new DistortionEffect(renderer, { source: source3 } )
+  var distortion_effect4 = new DistortionEffect(renderer, { source: source4 } )
 
   // source switch
   // var chain1 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
   // var chain2 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
 
   var chain1 = new Chain( renderer, { sources: [ source1, source2, source3, source4 ] } );
-  var chain2 = new Chain( renderer, { sources: [ source1, source2, source3, source4 ] } );
+  var chain2 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
 
   var color_effect1 = new ColorEffect(renderer, { source: chain1 } ); // mono color effects
   var paint_effect2 = new ColorEffect(renderer, { source: chain2 } ); // paint
@@ -190,12 +190,46 @@ setTimeout( function() {
   }
 
   document.getElementById('btn_effects_b_2').onmousedown = function() {
+    // multi
+    // pip
+    //main_mixer.mixMode(1) // NORMAL
+    if ( distortion_effect1.effect() != 1 ) {
+      distortion_effect1.effect(1)
+      distortion_effect2.effect(1)
+      distortion_effect3.effect(1)
+      distortion_effect4.effect(1)
+      this.classList = 'effect_b round '
+    }else{
+      distortion_effect1.effect(3)
+      distortion_effect2.effect(3)
+      distortion_effect3.effect(3)
+      distortion_effect4.effect(3)
+      //colorize_effect2.effect(41);
+      this.classList = 'effect_b round greenish active'
+    }
   }
 
   document.getElementById('btn_effects_b_3').onmousedown = function() {
+    // pip
+    //main_mixer.mixMode(1) // NORMAL
+    if ( distortion_effect1.effect() != 1 ) {
+      distortion_effect1.effect(1)
+      distortion_effect2.effect(1)
+      distortion_effect3.effect(1)
+      distortion_effect4.effect(1)
+      this.classList = 'effect_b round '
+    }else{
+      distortion_effect1.effect(4)
+      distortion_effect2.effect(4)
+      distortion_effect3.effect(4)
+      distortion_effect4.effect(4)
+      //colorize_effect2.effect(41);
+      this.classList = 'effect_b round greenish active'
+    }
   }
 
   document.getElementById('btn_effects_b_4').onmousedown = function() {
+    // feedback
   }
 
   // effects slider

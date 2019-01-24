@@ -53,7 +53,15 @@ var GlRenderer = function( _options ) {
   _self.customUniforms = {}
   _self.customDefines = {}
 
-  // base vertexShader
+  // base config, screensize and time
+  var cnt = 0.;
+  _self.customUniforms['time'] = { type: "f", value: cnt }
+  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+  /**
+   * The vertex shader
+   * @member GlRenderer#vertexShader
+   */
   _self.vertexShader = `
     varying vec2 vUv;\
     void main() {\
@@ -62,10 +70,15 @@ var GlRenderer = function( _options ) {
     }
   `
 
-  // base fragment shader
+   /**
+    * The fragment shader
+    * @member GlRenderer#fragmentShader
+    */
+     // base fragment shader
   _self.fragmentShader = `
-    uniform sampler2D textureTest;
-    uniform float wave;
+    uniform float time;
+    uniform vec2 screenSize;
+
     /* custom_uniforms */\
     /* custom_helpers */\
     varying vec2 vUv;\
@@ -112,14 +125,22 @@ var GlRenderer = function( _options ) {
   }
 
   // ---------------------------------------------------------------------------
-  var r = Math.round(Math.random()*100)
+
   /** @function GlRenderer.render */
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
     _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
     _self.nodes.forEach( function(n) { n.update() } );
+
+    cnt++;
+    _self.customUniforms['time'].value = cnt;
   }
+
+  // update size!
+  window.addEventListener('resize', function() {
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  })
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -142,12 +163,12 @@ var GlRenderer = function( _options ) {
     _self.glrenderer.resetGLState()
     _self.customUniforms = {}
     _self.customDefines = {}
-    // base vertexShader
 
-    /**
-     * The vertex shader
-     * @member GlRenderer#vertexShader
-     */
+    cnt = 0.;
+    _self.customUniforms['time'] = { type: "f", value: cnt }
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // reset the vertexshader
     _self.vertexShader = `
       varying vec2 vUv;
       void main() {
@@ -156,14 +177,11 @@ var GlRenderer = function( _options ) {
       }
     `
 
-  /**
-   * The fragment shader
-   * @member GlRenderer#fragmentShader
-   */
-    // base fragment shader
+    // reset the fragment shader
     _self.fragmentShader = `
-      uniform sampler2D textureTest;
-      ununiform float wave;
+      uniform int time;
+      uniform vec2 screenSize;
+
       /* custom_uniforms */
       /* custom_helpers */
       varying vec2 vUv;
@@ -2294,11 +2312,11 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // wipes (move these to mixer?)
-  if ( gl_FragCoord.x > 200.0 ) {
-    return vec4(0.0,0.0,0.0,0.0);
-  }else {
-    return src;
-  }
+  //if ( gl_FragCoord.x > 200.0 ) {
+  //  return vec4(0.0,0.0,0.0,0.0);
+  //}else {
+  //  return src;
+  //}
 }
 
 /* custom_helpers */
@@ -2408,26 +2426,140 @@ function DistortionEffect( _renderer, _options ) {
   _self.type = "Effect"
 
   var source = _options.source
-  var currentEffect = _options.effect
-  var currentEffect = 12
+  // var currentEffect = _options.effect
+  // var currentEffect = 12
 
+  var currentEffect = _options.effect
+  var currentEffect = 1
+  var currentExtra = 0.8
+
+  _self.init = function() {
+    // add uniforms to renderer
+    _renderer.customUniforms[_self.uuid+'_currentdistortioneffect'] = { type: "i", value: 1 }
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
+
+    // add uniforms to fragmentshader
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentdistortioneffect;\n/* custom_uniforms */')
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_extra;\n/* custom_uniforms */')
+
+    if ( renderer.fragmentShader.indexOf('vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra, vec2 vUv )') == -1 ) {
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
+`
+vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra, vec2 vUv ) {
+  // normal
+  if ( currentdistortioneffect == 1 ) {
+    return texture2D( src, vUv ).rgba;
+  }
+
+  // phasing sides (test)
+  if ( currentdistortioneffect == 2 ) {
+    vec2 wuv = vec2(0,0);
+    if ( gl_FragCoord.x > screenSize.x * 0.5 ) wuv = vUv * vec2( 1., cos( time * .01 ) * 1. );
+    if ( gl_FragCoord.x < screenSize.x * 0.5 ) wuv = vUv * vec2( 1., sin( time * .01 ) * 1. );
+    wuv = wuv + vec2( .0, .0 );
+    return texture2D( src, wuv ).rgba;
+  }
+
+  // multi
+  if ( currentdistortioneffect == 3 ) {
+    vec2 wuv = vec2(0,0);
+    wuv = vUv * vec2( 4., 4. );
+    return texture2D( src, wuv ).rgba;
+  }
+
+  // pip
+  if ( currentdistortioneffect == 4 ) {
+    vec2 wuv = vec2(0,0);
+    wuv = vUv * vec2( 2, 2 ) + vec2( 0., 0. );
+    float sil = 1.;
+
+    // top-left
+    if ( gl_FragCoord.x < ( screenSize.x * 0.07 ) || ( gl_FragCoord.x > screenSize.x * 0.37 ) ) sil = 0.;
+    if ( gl_FragCoord.y < ( screenSize.y * 0.60 ) || ( gl_FragCoord.y > screenSize.y * 0.97 ) ) sil = 0.;
+    return texture2D( src, wuv ).rgba * vec4( sil, sil, sil, sil );
+  }
+}
+
+/* custom_helpers */
+`
+  );
+}
+
+    // (re) use the sampler to make another output, with distortion
+//    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
+//vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+
+//renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
+vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'_currentdistortioneffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
+} // init
+
+  var i = 0.;
   _self.update = function() {
     i += 0.001
     // renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
 
+    /*
+    if (currentEffect == 1) {
+      source.setUVMapMod(0., 0.)
+      source.setUVMap(0., 0.)
+    }
+
+    // multi
+    if (currentEffect == 2) {
+      source.setUVMapMod(0.25, 0.25)
+      source.setUVMap(2., 2.)
+    }
+
+    // pip
+    if (currentEffect == 3 ) {
+      source.setUVMapMod(0.2,0.2)
+      source.setUVMap(0.5,0.4)
+    }
+    */
+
+    if (currentEffect == 4) {
+    }
+    //--------------------------------------------------------------------------------------------------------
+    // testSource1.setUVMapMod(0.25, 0.25)
+    // testSource1.setUVMapMod(0.25, 0.25)
+
+    // testSource1.setUVMap(1, 1)
+    // testSource1.setUVMap(1, 1)
+
+    // pip
+    /*
+    testSource1.setUVMapMod(0, 0)
+    var c = 0
+    setInterval( function() {
+      c+= 0.02
+      //testSource1.setUVMap( Math.sin(c)+2, Math.sin(c)+1 )
+      testSource1.setUVMapMod( Math.sin(c)-1, -Math.cos(c)-1 )
+    }, 50)
+    */
+    //--------------------------------------------------------------------------------------------------------
+
+
     // ONLY WORKS ON VIDEO SOURCE, IF IT WORKS
-    renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }
-    renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
+    //renderer.customUniforms[source.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( i, Math.cos(i) ) }
+    //renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
   }
 
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
-      renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
+      if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
       // update uniform ?
     }
 
     return currentEffect
+  }
+
+  _self.extra = function( _num ){
+    return _num
   }
 }
 
@@ -4082,18 +4214,18 @@ function VideoSource(renderer, options) {
     // set the uniforms
     renderer.customUniforms[_self.uuid] = { type: "t", value: videoTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
-    renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
-    renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
+    // renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 0., 0. ) }
+    // renderer.customUniforms[_self.uuid+'_uvmap_mod'] = { type: "v2", value: new THREE.Vector2( 1., 1. ) }
 
     // add uniform
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
+    // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap;\n/* custom_uniforms */')
+    // renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec2 '+_self.uuid+'_uvmap_mod;\n/* custom_uniforms */')
 
     // add main
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv + '+_self.uuid+'_uvmap * vUv + '+_self.uuid+'_uvmap_mod ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    // split output in distorted and orig?
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
 
     // expose video and canvas
     /**
@@ -4196,7 +4328,6 @@ function VideoSource(renderer, options) {
       videoElement.currentTime = _num;
       return _num;
     }
-
   }
 
   // seconds
@@ -4209,6 +4340,14 @@ function VideoSource(renderer, options) {
   // ===========================================================================
   // For now only here, move to _source?
   // ===========================================================================
+  _self.setUVMap = function( _x, _y ) {
+     renderer.customUniforms[_self.uuid+'_uvmap'].value = new THREE.Vector2( _x, _y )
+  }
+
+  _self.setUVMapMod = function( _x, _y ) {
+    renderer.customUniforms[_self.uuid+'_uvmap_mod'].value = new THREE.Vector2( _x, _y )
+  }
+
 
   _self.alpha = function(a) {
     if (a == undefined) {

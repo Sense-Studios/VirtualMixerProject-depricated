@@ -53,7 +53,15 @@ var GlRenderer = function( _options ) {
   _self.customUniforms = {}
   _self.customDefines = {}
 
-  // base vertexShader
+  // base config, screensize and time
+  var cnt = 0.;
+  _self.customUniforms['time'] = { type: "f", value: cnt }
+  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+  /**
+   * The vertex shader
+   * @member GlRenderer#vertexShader
+   */
   _self.vertexShader = `
     varying vec2 vUv;\
     void main() {\
@@ -62,10 +70,15 @@ var GlRenderer = function( _options ) {
     }
   `
 
-  // base fragment shader
+   /**
+    * The fragment shader
+    * @member GlRenderer#fragmentShader
+    */
+     // base fragment shader
   _self.fragmentShader = `
-    uniform sampler2D textureTest;
-    uniform float wave;
+    uniform float time;
+    uniform vec2 screenSize;
+
     /* custom_uniforms */\
     /* custom_helpers */\
     varying vec2 vUv;\
@@ -112,14 +125,22 @@ var GlRenderer = function( _options ) {
   }
 
   // ---------------------------------------------------------------------------
-  var r = Math.round(Math.random()*100)
+
   /** @function GlRenderer.render */
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
     _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
     _self.nodes.forEach( function(n) { n.update() } );
+
+    cnt++;
+    _self.customUniforms['time'].value = cnt;
   }
+
+  // update size!
+  window.addEventListener('resize', function() {
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  })
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -142,12 +163,12 @@ var GlRenderer = function( _options ) {
     _self.glrenderer.resetGLState()
     _self.customUniforms = {}
     _self.customDefines = {}
-    // base vertexShader
 
-    /**
-     * The vertex shader
-     * @member GlRenderer#vertexShader
-     */
+    cnt = 0.;
+    _self.customUniforms['time'] = { type: "f", value: cnt }
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // reset the vertexshader
     _self.vertexShader = `
       varying vec2 vUv;
       void main() {
@@ -156,14 +177,11 @@ var GlRenderer = function( _options ) {
       }
     `
 
-  /**
-   * The fragment shader
-   * @member GlRenderer#fragmentShader
-   */
-    // base fragment shader
+    // reset the fragment shader
     _self.fragmentShader = `
-      uniform sampler2D textureTest;
-      ununiform float wave;
+      uniform int time;
+      uniform vec2 screenSize;
+
       /* custom_uniforms */
       /* custom_helpers */
       varying vec2 vUv;
