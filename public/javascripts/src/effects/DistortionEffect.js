@@ -66,47 +66,42 @@ function DistortionEffect( _renderer, _options ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_currentdistortioneffect;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_extra;\n/* custom_uniforms */')
 
-    if ( renderer.fragmentShader.indexOf('vec4 distorioneffect ( vec4 src, int currentdistortioneffect, float extra, vec2 vUv )') == -1 ) {
+    if ( renderer.fragmentShader.indexOf('vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
-vec4 distorioneffect ( vec4 src, int currentdistortioneffect, float extra, vec2 vUv ) {
-  // multi
-  if (currentdistortioneffect == 1) {
-    return src;
+vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra, vec2 vUv ) {
+  // normal
+  if ( currentdistortioneffect == 1 ) {
+    return texture2D( src, vUv ).rgba;
   }
 
-  if (currentdistortioneffect == 2) {
-    //vUv = vUv * vec2(2.0, 2.0)
-    //vUv = vUv
-    //_self.uuid+'_uvmap
-    //_self.uuid+'_uvmap_mod
+  // phasing sides (test)
+  if ( currentdistortioneffect == 2 ) {
+    vec2 wuv = vec2(0,0);
+    if ( gl_FragCoord.x > screenSize.x * 0.5 ) wuv = vUv * vec2( 1., cos( time * .01 ) * 1. );
+    if ( gl_FragCoord.x < screenSize.x * 0.5 ) wuv = vUv * vec2( 1., sin( time * .01 ) * 1. );
+    wuv = wuv + vec2( .0, .0 );
+    return texture2D( src, wuv ).rgba;
+  }
 
-    return src;
-
-
+  // multi
+  if ( currentdistortioneffect == 3 ) {
+    vec2 wuv = vec2(0,0);
+    wuv = vUv * vec2( 4., 4. );
+    return texture2D( src, wuv ).rgba;
   }
 
   // pip
-  if (currentdistortioneffect == 3) {
-    // wipes (move these to mixer?)
-    vec4 box = src;
+  if ( currentdistortioneffect == 4 ) {
+    vec2 wuv = vec2(0,0);
+    wuv = vUv * vec2( 2, 2 ) + vec2( 0., 0. );
+    float sil = 1.;
 
-    if ( gl_FragCoord.x < 36.0 || gl_FragCoord.x > 436.0 ) {
-      box = vec4(0.0,0.0,0.0,0.0);
-    }
-
-    if ( gl_FragCoord.y < 36.0 || gl_FragCoord.y > 436.0 ) {
-      box = vec4(0.0,0.0,0.0,0.0);
-    }
-
-    return box;
+    // top-left
+    if ( gl_FragCoord.x < ( screenSize.x * 0.07 ) || ( gl_FragCoord.x > screenSize.x * 0.37 ) ) sil = 0.;
+    if ( gl_FragCoord.y < ( screenSize.y * 0.60 ) || ( gl_FragCoord.y > screenSize.y * 0.97 ) ) sil = 0.;
+    return texture2D( src, wuv ).rgba * vec4( sil, sil, sil, sil );
   }
-
-  if (currentdistortioneffect == 4) {
-    return src;
-  }
-
-  //return src;
 }
 
 /* custom_helpers */
@@ -114,14 +109,23 @@ vec4 distorioneffect ( vec4 src, int currentdistortioneffect, float extra, vec2 
   );
 }
 
+    // (re) use the sampler to make another output, with distortion
+//    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
+//vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+
+//renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */', '\
-vec4 '+_self.uuid+'_output = distorioneffect( '+source.uuid+'_output, ' + _self.uuid+'_currentdistortioneffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
-  } // init
+vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'_currentdistortioneffect' + ', '+ _self.uuid+'_extra' +', vUv );\n  /* custom_main */');
+} // init
 
   var i = 0.;
   _self.update = function() {
     i += 0.001
     // renderer.customUniforms[_self.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .5, 1 - Math.random() * .5 ) }
+
+    /*
     if (currentEffect == 1) {
       source.setUVMapMod(0., 0.)
       source.setUVMap(0., 0.)
@@ -134,10 +138,11 @@ vec4 '+_self.uuid+'_output = distorioneffect( '+source.uuid+'_output, ' + _self.
     }
 
     // pip
-    if (currentEffect == 3 ) {      
+    if (currentEffect == 3 ) {
       source.setUVMapMod(0.2,0.2)
       source.setUVMap(0.5,0.4)
     }
+    */
 
     if (currentEffect == 4) {
     }
