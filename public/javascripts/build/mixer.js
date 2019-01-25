@@ -2658,12 +2658,17 @@ function FeedbackEffect( _renderer, _options ) {
       _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
   vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv ) {
+
     if ( currentfeedbackeffect == 100 ) {
-      //vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
-      //gl_Position = vec4( vec2(0.,0.), 0., 0.);
-      //return inbetween.rrr;
+      // vec4 inbetween = vec4( src.r, src.g, src.b, vUv * 0.9. );
+      // gl_Position = vec4( vec2(0.,0.), 0., 0.);
+      // return inbetween.rrr;
       // return src;
-      return ( texture2D( `+_self.uuid+`_effectsampler, vUv + vec2( 1., 0.99999999) ).rgb ) + src * 0.3;
+
+      // return vec4(0., 0., 1., 1.);
+
+      return ( texture2D( `+_self.uuid+`_effectsampler, vUv + vec2( 1., 0.99999999) ).rgba ) + src * 0.3;
+
       // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb * 1.4 + src * .8) * 0.5; //* vec3(.5, .5, .5
       // return ( texture2D( src, vUv ).rgb );
       // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb ) * src + src;
@@ -2704,6 +2709,8 @@ function FeedbackEffect( _renderer, _options ) {
 
     return src;
   }
+
+  /* custom_helpers */
 `
   );
 }
@@ -2722,15 +2729,15 @@ _self.update = function() {
   // mixmode
   // blendmode
   // pod
-  //console.log( "--", glcanvas.width, glcanvas.height )
+  // console.log( "--", glcanvas.width, glcanvas.height )
 
-  //glcanvas = _renderer.glrenderer.context.canvas
-  //canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
+  // glcanvas = _renderer.glrenderer.context.canvas
+  // canvasElementContext.drawImage( glcanvas, Math.sin(i/20)*20-10, 1, glcanvas.width*1.0000000001, glcanvas.height*1.0000000001 );
 
-  //vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
-  //vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+  // vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+  // vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
 
-  //_renderer.copyFramebufferToTexture( vector, dataTexture );
+  // _renderer.copyFramebufferToTexture( vector, dataTexture );
 
   glcanvas = document.getElementById('glcanvas');
   canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
@@ -4177,18 +4184,18 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    // firstload handler for mobile; neest at least 1 user click
-    document.body.addEventListener('click', function() {
-      console.log("clikcity")
+    function firstTouch() {      
       videoElement.play();
       _self.firstplay = true
-    });
+      document.body.removeEventListener('click', firstTouch)
+      document.body.removeEventListener('touchstart', firstTouch)
 
-    document.body.addEventListener('touchstart', function() {
-      console.log("clikcity")
-      videoElement.play();
-      _self.firstplay = true
-    });
+    }
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', firstTouch)
+    document.body.addEventListener('touchstart', firstTouch)
+
+
 
     // FOR FIREBASE
     // listen for a timer update (as it is playing)
