@@ -6,6 +6,17 @@
 *
 */
 
+var forceFullscreen = function() {
+  console.log("FULLSCREEN")
+  document.body.webkitRequestFullScreen()
+
+  //document.getElementById('mixer').removeEventListener('click', forceFullscreen);
+  //document.getElementById('mixer').removeEventListener('touchstart', forceFullscreen)
+}
+
+document.getElementById('mixer').addEventListener('click', forceFullscreen)
+document.getElementById('mixer').addEventListener('touchstart', forceFullscreen)
+
 // renderer
 var renderer = new GlRenderer()
 
@@ -88,11 +99,13 @@ setTimeout( function() {
   // Some helper vars
   var original_mixmode = 1
 
-  // -----------------------------------------------------------------------------
-    // LEFT EFFECTS
+  // ---------------------------------------------------------------------------
+    // LEFT EFFECTS, EFFECTS A
+  // ---------------------------------------------------------------------------
 
+  // Monocolor
   document.getElementById('btn_effects_a_1').onmousedown = function() {
-    //main_mixer.mixMode(1) // NORMAL
+
     var cycle = [ 5, 6 , 7, 8, 9, 10, 11, 12 ];
     if ( color_effect1.effect() != 1 ) {
       color_effect1.effect(1)
@@ -103,8 +116,8 @@ setTimeout( function() {
     }
   }
 
+  // Negative
   document.getElementById('btn_effects_a_2').onmousedown = function() {
-    //main_mixer.mixMode(1) // NORMAL
     var cycle = [ 2, 3, 4 ]
     if ( nega_effect1.effect() != 1 ) {
       nega_effect1.effect(1)
@@ -115,35 +128,32 @@ setTimeout( function() {
     }
   }
 
+  // Black-Key
   document.getElementById('btn_effects_a_3').onmousedown = function() {
-    //main_mixer.mixMode(1) // NORMAL  //main_mixer.mixMode(1) // NORMAL
     if ( luma_effect1.effect() != 1 ) {
-      //luma_effect1.extra(0.8)
       luma_effect1.effect(1)
-      //main_mixer.mixMode( original_mixmode );
       this.classList = 'effect_a round '
     }else{
       original_mixmode = main_mixer.mixMode()
       luma_effect1.effect(39);
       luma_effect1.extra(0.5);
       document.getElementById('effects_a_control').value = 0.5
-      //main_mixer.mixMode(1);
       this.classList = 'effect_a round greenish active'
     }
   }
 
+  // Colorize
   document.getElementById('btn_effects_a_4').onmousedown = function() {
-    //main_mixer.mixMode(1) // NORMAL
     if ( colorize_effect1.effect() != 1 ) {
       colorize_effect1.effect(1)
       this.classList = 'effect_a round '
     }else{
-      // colorize_effect1.effect(41); paint?
       colorize_effect1.effect(42);
       this.classList = 'effect_a round greenish active'
     }
   }
 
+  // ---------------------------------------------------------------------------
   // effects slider
   document.getElementById('effects_a_control').onmousedown = function() {
   }
@@ -174,9 +184,12 @@ setTimeout( function() {
       //nega_effect1.extra(1)
     }
   }
-  // -----------------------------------------------------------------------------
-  // EFFECTS B
 
+  // ---------------------------------------------------------------------------
+    // RIGHT EFFECTS, EFFECTS B
+  // ---------------------------------------------------------------------------
+
+  // Paint
   document.getElementById('btn_effects_b_1').onmousedown = function() {
     //main_mixer.mixMode(1) // NORMAL
     if ( colorize_effect2.effect() != 1 ) {
@@ -189,62 +202,64 @@ setTimeout( function() {
     }
   }
 
+  // Multi
   document.getElementById('btn_effects_b_2').onmousedown = function() {
     // multi
-    // pip
-    //main_mixer.mixMode(1) // NORMAL
-    if ( distortion_effect1.effect() != 1 ) {
+    if ( distortion_effect1.effect() == 3 || distortion_effect1.effect() == 4 ) {
       distortion_effect1.effect(1)
       distortion_effect2.effect(1)
       distortion_effect3.effect(1)
       distortion_effect4.effect(1)
+      document.getElementById('btn_effects_b_3').classList = 'effect_b round '
       this.classList = 'effect_b round '
     }else{
       distortion_effect1.effect(3)
       distortion_effect2.effect(3)
       distortion_effect3.effect(3)
       distortion_effect4.effect(3)
-      //colorize_effect2.effect(41);
       this.classList = 'effect_b round greenish active'
     }
   }
 
+  // PiP
   document.getElementById('btn_effects_b_3').onmousedown = function() {
     // pip
-    //main_mixer.mixMode(1) // NORMAL
-    if ( distortion_effect1.effect() != 1 ) {
+    if ( distortion_effect1.effect() == 3 || distortion_effect1.effect() == 4 ) {
       distortion_effect1.effect(1)
       distortion_effect2.effect(1)
       distortion_effect3.effect(1)
       distortion_effect4.effect(1)
+      document.getElementById('btn_effects_b_2').classList = 'effect_b round '
       this.classList = 'effect_b round '
     }else{
       distortion_effect1.effect(4)
       distortion_effect2.effect(4)
       distortion_effect3.effect(4)
       distortion_effect4.effect(4)
-      //colorize_effect2.effect(41);
       this.classList = 'effect_b round greenish active'
     }
   }
 
+  // Feedback
   document.getElementById('btn_effects_b_4').onmousedown = function() {
     // feedback
   }
 
+  // ---------------------------------------------------------------------------
   // effects slider
   document.getElementById('effects_b_control').onmousedown = function() {
   }
 
-  document.getElementById('effects_b_control').onmousedown = function() {
+  document.getElementById('effects_b_control').oninput = function() {
     console.log("effects_b_control >>", parseFloat(this.value) + 1.0)
     colorize_effect2.extra(  parseFloat(this.value) + 1.0)
   }
 
 
 
-  // -----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
     // MIX EN BEAT CONTROL
+  // ---------------------------------------------------------------------------
 
   // Add interaction
   document.getElementById('bpm_control_mix').onmousedown = function() {
@@ -282,29 +297,16 @@ setTimeout( function() {
     document.getElementById('bpm_display').textContent = Math.round(bpm_tap.bpm)
   }
 
-  var changeInterval_bpm_slide = null
-  document.getElementById('bpm_slide').onmousedown = function() {
-    clearInterval(changeInterval_bpm_slide)
-    changeInterval_bpm_slide = setInterval( function() {
-      main_mixer.bpm(document.getElementById('bpm_slide').value)
-      document.getElementById('bpm_display').textContent = Math.round(main_mixer.bpm())
-    }, 50 )
+  document.getElementById('bpm_slide').oninput = function() {
+    main_mixer.bpm(document.getElementById('bpm_slide').value)
   }
-  document.getElementById('bpm_slide').onmouseup = function() { clearInterval(changeInterval_bpm_slide) }
-  document.body.onmouseup = function() { clearInterval(changeInterval_bpm_slide) }
 
   // -----------------------------------------------------------------------------
     // MAIN POD
 
-  var changeInterval_main_pod = null
-  document.getElementById('main_pod').onmousedown = function() {
-    clearInterval(changeInterval_main_pod)
-    changeInterval_main_pod = setInterval( function() {
-      main_mixer.pod(1-document.getElementById('main_pod').value)
-    }, 50 )
+  document.getElementById('main_pod').oninput = function() {
+    main_mixer.pod(1-document.getElementById('main_pod').value)
   }
-  document.getElementById('main_pod').onmouseup = function() { clearInterval(changeInterval_main_pod) }
-  document.body.onmouseup = function() { clearInterval(changeInterval_main_pod) }
 
   // -----------------------------------------------------------------------------
     // LEFT SOURCE SWITCHES
@@ -376,25 +378,4 @@ setTimeout( function() {
   document.getElementById('btn_transform_b').onmousedown = function() { trans_mixer2.pod(0)  }
   document.getElementById('btn_transform_b').onmouseup = function() { trans_mixer2.pod(1) }
 
-  // -----------------------------------------------------------------------------
-    // TESTS
-
-  /*
-  document.getElementById('btn_effects_a_1').onclick = function() {
-    console.log("oi")
-    color_effect1.effect(1)
-  }
-
-  document.getElementById('btn_effects_a_2').onclick = function() {
-    console.log("oi")
-  }
-
-  document.getElementById('btn_effects_a_3').onclick = function() {
-    console.log("oi")
-  }
-
-  document.getElementById('btn_effects_a_4').onclick = function() {
-    console.log("oi")
-  }
-  */
 }, 200 )

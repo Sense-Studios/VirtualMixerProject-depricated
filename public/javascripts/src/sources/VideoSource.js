@@ -86,18 +86,18 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    // firstload handler for mobile; neest at least 1 user click
-    document.body.addEventListener('click', function() {
-      console.log("clikcity")
+    function firstTouch() {      
       videoElement.play();
       _self.firstplay = true
-    });
+      document.body.removeEventListener('click', firstTouch)
+      document.body.removeEventListener('touchstart', firstTouch)
 
-    document.body.addEventListener('touchstart', function() {
-      console.log("clikcity")
-      videoElement.play();
-      _self.firstplay = true
-    });
+    }
+    // firstload handler for mobile; neest at least 1 user click
+    document.body.addEventListener('click', firstTouch)
+    document.body.addEventListener('touchstart', firstTouch)
+
+
 
     // FOR FIREBASE
     // listen for a timer update (as it is playing)
