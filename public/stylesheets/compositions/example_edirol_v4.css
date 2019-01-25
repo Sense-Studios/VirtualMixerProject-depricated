@@ -150,4 +150,18 @@ body {
   #mixer .transform_b {
     grid-area: transform_b; }
 
+@media only screen and (max-width: 720px) {
+  #mixer {
+    width: 90vw !important;
+    height: 50vh !important;
+    left: 5vw !important;
+    bottom: 0 !important; }
+  #glcanvas {
+    width: 100vw !important;
+    height: 60vh !important;
+    top: 0 !important; }
+  body {
+    height: 100vh !important;
+    width: 100vw !important; } }
+
 /*# sourceMappingURL=example_edirol_v4.css.map */
