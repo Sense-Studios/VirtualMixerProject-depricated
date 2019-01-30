@@ -87,7 +87,8 @@ vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra,
   // multi
   if ( currentdistortioneffect == 3 ) {
     vec2 wuv = vec2(0,0);
-    wuv = vUv * vec2( 4., 4. );
+    wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
+    // wuv = vUv + vec2( extra, extra );
     return texture2D( src, wuv ).rgba;
   }
 
@@ -174,7 +175,7 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
-      if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
+      if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = _num
       // update uniform ?
     }
 
@@ -182,6 +183,12 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
   }
 
   _self.extra = function( _num ){
+    if ( _num != undefined ) {
+      currentExtra = _num
+      if (renderer.customUniforms[_self.uuid+'_extra']) renderer.customUniforms[_self.uuid+'_extra'].value = currentExtra
+      // update uniform ?
+    }
+
     return _num
   }
 }

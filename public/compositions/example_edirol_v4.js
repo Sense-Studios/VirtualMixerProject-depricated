@@ -21,13 +21,13 @@ document.getElementById('mixer').addEventListener('touchstart', forceFullscreen)
 var renderer = new GlRenderer()
 
 // here we go, delay included so we can see the loader message
-setTimeout( function() {
+// setTimeout( function() {
 
   // sources
-  var source1 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
-  var source2 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
+  var source1 = new VideoSource( renderer, { src: '/video/placeholder_lg.mp4' } );
+  var source2 = new VideoSource( renderer, { src: '/video/veejays_demoreel.mp4' } );
   var source3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
-  var source4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
+  var source4 = new VideoSource( renderer, { src: '/video/composition_12.mp4' } );
 
   // distortion effects work on sources directly
   var distortion_effect1 = new DistortionEffect(renderer, { source: source1 } )
@@ -52,10 +52,10 @@ setTimeout( function() {
   var color_effect2 = new ColorEffect(renderer, { source: multi_effect2 } ); // c-key
 
   var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } ); // Blackkey
-  var colorize_effect2 = new ColorEffect(renderer, { source: color_effect2 } ); // feedback
+  var feedback_effect2 = new FeedbackEffect(renderer, { source: color_effect2 } ); // feedback
 
   // main mixer
-  var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: colorize_effect2 } );
+  var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: feedback_effect2 } );
 
   // transformers
   // mix transformer signals (white and black)
@@ -111,7 +111,8 @@ setTimeout( function() {
       color_effect1.effect(1)
       this.classList = 'effect_a round '
     }else{
-      color_effect1.effect(5)
+      var calc = Math.ceil( document.getElementById('effects_a_control').value * 7 ) + 5
+      color_effect1.effect( calc ) // [ 5, 6, 7, 8, 9, 10, 11, 12 ]
       this.classList = 'effect_a round greenish active';
     }
   }
@@ -192,12 +193,12 @@ setTimeout( function() {
   // Paint
   document.getElementById('btn_effects_b_1').onmousedown = function() {
     //main_mixer.mixMode(1) // NORMAL
-    if ( colorize_effect2.effect() != 1 ) {
-      colorize_effect2.effect(1)
+    if ( paint_effect2.effect() != 1 ) {
+      paint_effect2.effect(1)
       this.classList = 'effect_b round '
     }else{
-      colorize_effect2.effect(41);
-      //colorize_effect2.effect(41);
+      paint_effect2.effect(41);
+      //feedback_effect2.effect(41);
       this.classList = 'effect_b round greenish active'
     }
   }
@@ -242,7 +243,16 @@ setTimeout( function() {
 
   // Feedback
   document.getElementById('btn_effects_b_4').onmousedown = function() {
+
     // feedback
+    if ( feedback_effect2.effect() != 1 ) {
+      feedback_effect2.effect(1)
+      this.classList = 'effect_b round '
+    }else{
+      feedback_effect2.effect(100)
+      //feedback_effect2.effect(41);
+      this.classList = 'effect_b round greenish active'
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -251,8 +261,48 @@ setTimeout( function() {
   }
 
   document.getElementById('effects_b_control').oninput = function() {
-    console.log("effects_b_control >>", parseFloat(this.value) + 1.0)
-    colorize_effect2.extra(  parseFloat(this.value) + 1.0)
+    console.log("effects_b_control >>", parseFloat(this.value) )
+    //
+
+    if ( document.getElementById('btn_effects_b_1').classList.contains('active') ) { // add "blinking?"
+      //var calc = Math.ceil( this.value * 7 ) + 5
+      //console.log("color effect 1 >>", calc)
+      //color_effect1.effect( calc ) // [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+    }else{
+      //color_effect1.effect(1)
+    }
+
+    if ( document.getElementById('btn_effects_b_2').classList.contains('active') ) { // add "blinking?"
+      //var calc = Math.ceil( this.value * 3 ) + 1
+      //console.log("effects_a_control 2 >>", calc)
+      //nega_effect1.effect( calc ) // [2, 3, 4]
+      distortion_effect1.extra(this.value)
+      distortion_effect2.extra(this.value)
+      distortion_effect3.extra(this.value)
+      distortion_effect4.extra(this.value)
+    }else{
+      //nega_effect1.effect(1)
+    }
+
+    if ( document.getElementById('btn_effects_b_3').classList.contains('active') ) { // add "blinking?"
+      //luma_effect1.extra( this.value )
+      // [1,2,3,4] // positions
+      //distortion_effect1.extra(this.value)
+      //distortion_effect2.extra(this.value)
+      //distortion_effect3.extra(this.value)
+      //distortion_effect4.extra(this.value)
+    }else{
+      //nega_effect1.extra(1)
+    }
+
+    if ( document.getElementById('btn_effects_b_4').classList.contains('active') ) { // add "blinking?"
+      // DEPR luma_effect1.extra( this.value )
+      feedback_effect2.extra(  parseFloat(this.value) )
+    }else{
+      // DEPR nega_effect1.extra(1)
+      // feedback_effect2.extra(  parseFloat(this.value) )
+    }
+
   }
 
 
@@ -378,4 +428,4 @@ setTimeout( function() {
   document.getElementById('btn_transform_b').onmousedown = function() { trans_mixer2.pod(0)  }
   document.getElementById('btn_transform_b').onmouseup = function() { trans_mixer2.pod(1) }
 
-}, 200 )
+//}, 200 )

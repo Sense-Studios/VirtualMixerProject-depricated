@@ -46,7 +46,7 @@ var clutter = new VideoSource( renderer, { src: '/video/16MMDUSTproc.mp4' } );
 var testSource5 = new SolidSource( renderer, { color: { r: 0.1, g: 1.0, b: 0.5 } } );
 
 // text
-// var testSource6 = new TextSource( renderer, {} );
+var testSource6 = new TextSource( renderer, {} );
 var testSource6 = new GifSource(   renderer, { src:'/gif/gifshow/5b4cccdec8c97546ca88f2efc589ba58.gif' } );
 
 // ## MODULES ##################################################################
@@ -84,10 +84,10 @@ var analysis1 = new AudioAnalysis( renderer, { audio: '/audio/fear_is_the_mind_k
 // ## CONTROLLERS ##############################################################
 
 // add a controller to mixer and bpm
-var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
-numpad1.addBpm( bpm )
-numpad1.addMixer( mixer1 )
-numpad1.addMixer( mixer4 )
+//var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
+//numpad1.addBpm( bpm )
+//numpad1.addMixer( mixer1 )
+//numpad1.addMixer( mixer4 )
 
 //var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
 
