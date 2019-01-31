@@ -329,4 +329,13 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   _self.bindBpm = function( _func ) {
       currentBpmFunc = _func
   }
+
+  _self.setAutoFade = function( _bool ) {
+    if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
+    if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
+  }
+
+  _self.fade = function( _duration ) {
+    var max = Math.ceil(_self.pod())
+  }
 }

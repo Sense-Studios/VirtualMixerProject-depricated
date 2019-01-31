@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    title= title    
+      
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/compositions/clicktrack.css')
+  
+  body 
+    canvas#glcanvas
+    
+    .timer#currenttime 
+      | 00:00:00
+
+    script(src='/compositions/clicktrack.js')

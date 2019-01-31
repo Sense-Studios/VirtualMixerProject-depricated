@@ -26,3 +26,24 @@ renderer.init();         // init
 renderer.render();       // start update & animation
 
 audioanalysis1.add( mixer1.pod )
+
+var wasSet = false
+var beats = 0
+setInterval(function() {
+  if ( audioanalysis1.render() > 0.99 && !wasSet ) {
+    wasSet = true
+    beats += 1
+    console.log("beat!", beats)
+    if (beats == 2) filemanager.changez()
+    if (beats == 6) filemanager2.changez()
+    if (beats%6 == 0) source1.jump()
+    if (beats%4 == 0) source2.jump()
+    if (beats%16 == 0) filemanager.changez()
+    if (beats%12 == 0) filemanager2.changez()
+  }
+
+  if ( audioanalysis1.render() < 0.01 ) {
+    wasSet = false
+  }
+
+}, 1 )

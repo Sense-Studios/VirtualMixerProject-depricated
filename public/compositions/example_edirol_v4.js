@@ -349,6 +349,7 @@ var renderer = new GlRenderer()
 
   document.getElementById('bpm_slide').oninput = function() {
     main_mixer.bpm(document.getElementById('bpm_slide').value)
+    document.getElementById('bpm_display').textContent = Math.round(document.getElementById('bpm_slide').value)
   }
 
   // -----------------------------------------------------------------------------

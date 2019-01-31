@@ -7,8 +7,15 @@ html
     script(src='/javascripts/build/mixer.js')
     
     link(rel='stylesheet', href='/stylesheets/style.css')
-  
+    link(rel='stylesheet', href='/stylesheets/compositions/notv.css')
+    
   body 
     canvas#glcanvas
+    .blink
+    
+    .payoff
+      | <h3>NoTV Visual Music 2 <small>- The Tarot Deck (Amsterdam, 2004)</small></h3>
+      | Part of the <a href="https://virtualmixproject.com/"> Virtual Mixer Project </a><br>
+      | <small>If you don't hear any music, click somewhere on the screen</small>
 
     script(src='/compositions/notv.js')
