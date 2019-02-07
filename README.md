@@ -5,7 +5,7 @@ There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/).
 There you can find examples and 'channels', which are basically auto-mixed sets of video files.
 or gifs. Or SVG (soon) or ...
 
-<img src="/images/vmp_demo/vmp_logo.png" style="float: left;margin: 20px;width: 100px;">
+<img src="https://virtualmixproject.com/images/vmp_demo/vmp_logo.png" style="float: left;margin: 20px;width: 100px;">
 
 it comes in a package for use on your website or an npm build for use on your local DMZ.
 
