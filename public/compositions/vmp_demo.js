@@ -6,7 +6,7 @@ var renderer = new GlRenderer()
 var source0 = new SolidSource( renderer, {r:0.2, g:0.4, b:0.9})
 var source1 = new VideoSource( renderer, { src: 'https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/FC240_1.mp4?r=9843759843yjkdsfh' } );
 var source2 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
-var source3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
+var source3 = new VideoSource( renderer, { src: '/video/ignore/alaro_carnage_the_underground_gif_remix.mp4' } );
 var source4 = new VideoSource( renderer, { src: '/video/placeholder.mp4' } );
 
 var premixer = new Mixer(renderer, { source1: source0, source2: source1 } )
@@ -55,10 +55,10 @@ document.querySelectorAll('.grid_item').forEach( function(_elm, i) {
         source2.src('https://s3-eu-west-1.amazonaws.com/nabu/veejay/NoTV2/VTS_01_0.mp4')
       }else if (_elm.index == 2) {
         source1.src(source2.currentSrc)
-        source2.src('/video/edirol_v4.mp4')
+        source2.src('/video/ignore/edirol_v4.mp4')
       }else if (_elm.index == 3) {
         source1.src(source2.currentSrc)
-        source2.src('/video/veejays_demoreel.mp4')
+        source2.src('/video/ignore/veejays_demoreel.mp4')
       }else if (_elm.index == 4) {
         source1.src(source2.currentSrc)
         source2.src('https://s3-eu-west-1.amazonaws.com/nabu/veejay/occupy_chaos/protest_signs/set5_w_ppl.mp4')

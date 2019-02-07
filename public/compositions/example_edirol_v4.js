@@ -25,9 +25,9 @@ var renderer = new GlRenderer()
 
   // sources
   var source1 = new VideoSource( renderer, { src: '/video/placeholder_lg.mp4' } );
-  var source2 = new VideoSource( renderer, { src: '/video/veejays_demoreel.mp4' } );
-  var source3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
-  var source4 = new VideoSource( renderer, { src: '/video/composition_12.mp4' } );
+  var source2 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
+  var source3 = new VideoSource( renderer, { src: '/video/ignore/alaro_carnage_the_underground_gif_remix.mp4' } );
+  var source4 = new VideoSource( renderer, { src: '/video/ignore/composition_12.mp4' } );
 
   // distortion effects work on sources directly
   var distortion_effect1 = new DistortionEffect(renderer, { source: source1 } )
