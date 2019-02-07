@@ -1,7 +1,5 @@
 var renderer = new GlRenderer()
 
-
-
 // sources
 var source0 = new SolidSource( renderer, {r:0.2, g:0.4, b:0.9})
 var source1 = new VideoSource( renderer, { src: 'https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/FC240_1.mp4?r=9843759843yjkdsfh' } );
