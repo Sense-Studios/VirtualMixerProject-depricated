@@ -36,11 +36,35 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  * @description
  *   Color effect allows for a series of color effect, mostly
  *   mimicing classic mixers like MX50 and V4
- *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
- *   ```
+ *  ```
+ *  1. Normal (default),
+ *
+ *  //  negatives
+ *  2. Negative 1,
+ *  3. Negative 2,
+ *  4. Negative 3,
+ *  5. Negative 4,
+ *  6. Negative 5,
+ *
+ *  // monocolors
+ *  10. Monocolor red,
+ *  11. Monocolor blue,
+ *  12. Monocolor green,
+ *  13. Monocolor yellow,
+ *  14. Monocolor turqoise,
+ *  15. Monocolor purple,
+ *  16. Sepia,
+ *  17. Sepia,
+ *
+ *  // color swapping
+ *  [20-46], swaps colors like rgb => gbg => rga => etc.
+ *
+ *  // other, use extra(float) for finetuning
+ *  50. Luma key
+ *  51. Green key
+ *  52. Paint
+ *  53. Colorize
+ *  ```
  *
  * @example
  *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
@@ -100,47 +124,59 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                                  // negtive 1
   if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                                      // negtive 2
   if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                                      // negtive 3
+  if ( currentcoloreffect == 5  ) return vec3( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2. );                                           // negtive 4
+  if ( currentcoloreffect == 6  )
+    vec3 orig = src.rgb;
+    vec3 bw = src.rgb = vec3( src.r + src.g + src.b ) / 3.;
+    vec3 nega = ( bw.rgb * -1.) + 1.;
+    return src.rgb = vec3(
+        ( (orig.r/2.) + (nega.r) ),
+        ( (orig.g/2.) + (nega.g) ),
+        ( (orig.b/2.) + (nega.b) )
+    );
+  }
+
 
   // monocolor
-  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
-  if ( currentcoloreffect == 6  ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
-  if ( currentcoloreffect == 7  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
-  if ( currentcoloreffect == 8  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
-  if ( currentcoloreffect == 9  ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
-  if ( currentcoloreffect == 10 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
-  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
-  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                     // sepia
+  if ( currentcoloreffect == 10  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
+  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
+  if ( currentcoloreffect == 12  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
+  if ( currentcoloreffect == 13  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
+  if ( currentcoloreffect == 14 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
+  if ( currentcoloreffect == 15 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
+  if ( currentcoloreffect == 16 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
+  if ( currentcoloreffect == 17 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                     // sepia
 
   // color swapping
-  if ( currentcoloreffect == 13 ) return vec4( src.rrra );
-  if ( currentcoloreffect == 14 ) return vec4( src.rrga );
-  if ( currentcoloreffect == 15 ) return vec4( src.rrba );
-  if ( currentcoloreffect == 16 ) return vec4( src.rgra );
-  if ( currentcoloreffect == 17 ) return vec4( src.rgga );
-  if ( currentcoloreffect == 18 ) return vec4( src.rbra );
-  if ( currentcoloreffect == 19 ) return vec4( src.rbga );
-  if ( currentcoloreffect == 20 ) return vec4( src.rbba );
-  if ( currentcoloreffect == 21 ) return vec4( src.grra );
-  if ( currentcoloreffect == 22 ) return vec4( src.grga );
-  if ( currentcoloreffect == 23 ) return vec4( src.grba );
-  if ( currentcoloreffect == 24 ) return vec4( src.ggra );
-  if ( currentcoloreffect == 25 ) return vec4( src.ggga );
-  if ( currentcoloreffect == 26 ) return vec4( src.ggba );
-  if ( currentcoloreffect == 27 ) return vec4( src.gbra );
-  if ( currentcoloreffect == 28 ) return vec4( src.gbga );
-  if ( currentcoloreffect == 29 ) return vec4( src.gbba );
-  if ( currentcoloreffect == 30 ) return vec4( src.brra );
-  if ( currentcoloreffect == 31 ) return vec4( src.brga );
-  if ( currentcoloreffect == 32 ) return vec4( src.brba );
-  if ( currentcoloreffect == 33 ) return vec4( src.bgra );
-  if ( currentcoloreffect == 34 ) return vec4( src.bgga );
-  if ( currentcoloreffect == 35 ) return vec4( src.bgba );
-  if ( currentcoloreffect == 36 ) return vec4( src.bbra );
-  if ( currentcoloreffect == 37 ) return vec4( src.bbga );
-  if ( currentcoloreffect == 38 ) return vec4( src.bbba );
+  if ( currentcoloreffect == 20 ) return vec4( src.rrra );
+  if ( currentcoloreffect == 21 ) return vec4( src.rrga );
+  if ( currentcoloreffect == 22 ) return vec4( src.rrba );
+  if ( currentcoloreffect == 23 ) return vec4( src.rgra );
+  if ( currentcoloreffect == 24 ) return vec4( src.rgga );
+  if ( currentcoloreffect == 25 ) return vec4( src.rbra );
+  if ( currentcoloreffect == 26 ) return vec4( src.rbga );
+  if ( currentcoloreffect == 27 ) return vec4( src.rbba );
+  if ( currentcoloreffect == 28 ) return vec4( src.grra );
+  if ( currentcoloreffect == 29 ) return vec4( src.grga );
+  if ( currentcoloreffect == 30 ) return vec4( src.grba );
+  if ( currentcoloreffect == 31 ) return vec4( src.ggra );
+  if ( currentcoloreffect == 32 ) return vec4( src.ggga );
+  if ( currentcoloreffect == 33 ) return vec4( src.ggba );
+  if ( currentcoloreffect == 34 ) return vec4( src.gbra );
+  if ( currentcoloreffect == 35 ) return vec4( src.gbga );
+  if ( currentcoloreffect == 36 ) return vec4( src.gbba );
+  if ( currentcoloreffect == 37 ) return vec4( src.brra );
+  if ( currentcoloreffect == 38 ) return vec4( src.brga );
+  if ( currentcoloreffect == 39 ) return vec4( src.brba );
+  if ( currentcoloreffect == 40 ) return vec4( src.bgra );
+  if ( currentcoloreffect == 41 ) return vec4( src.bgga );
+  if ( currentcoloreffect == 42 ) return vec4( src.bgba );
+  if ( currentcoloreffect == 43 ) return vec4( src.bbra );
+  if ( currentcoloreffect == 44 ) return vec4( src.bbga );
+  if ( currentcoloreffect == 45 ) return vec4( src.bbba );
 
   // lum key
-  if ( currentcoloreffect == 39 ) {
+  if ( currentcoloreffect == 50 ) {
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
     float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
     float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
@@ -149,12 +185,12 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // color key; Greenkey
-  if ( currentcoloreffect == 40 ) {
+  if ( currentcoloreffect == 51 ) {
     return vec4( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b, clamp( src.r, extra, 1.) == extra ? .0 : src.a );
   }
 
   // paint
-  if ( currentcoloreffect == 41 ) {
+  if ( currentcoloreffect == 52 ) {
     //return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
     // devide the image up in color bars
     vec4 pnt = vec4(
@@ -168,7 +204,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // colorise
-  if ( currentcoloreffect == 42 ) {
+  if ( currentcoloreffect == 53 ) {
 
     // TODO: mix paint and colorize together?
 
@@ -195,11 +231,11 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // wipes (move these to mixer?)
-  if ( gl_FragCoord.x > 200.0 ) {
-    return vec4(0.0,0.0,0.0,0.0);
-  }else {
-    return src;
-  }
+  //if ( gl_FragCoord.x > 200.0 ) {
+  //  return vec4(0.0,0.0,0.0,0.0);
+  //}else {
+  //  return src;
+  //}
 }
 
 /* custom_helpers */
@@ -219,22 +255,44 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
    * @description
    *  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
    *  ```
-   *  1. BlackAndWhite (default),
+   *  1. Normal (default),
+   *
+   *  //  negatives
    *  2. Negative 1,
    *  3. Negative 2,
    *  4. Negative 3,
-   *  5. Monocolor red,
-   *  6. Monocolor blue,
-   *  7. Monocolor green,
-   *  8. Monocolor yellow,
-   *  9. Monocolor turqoise,
-   *  10. Monocolor purple,
-   *  11. Sepia,
+   *  5. Negative 4,
+   *  6. Negative 5,
+   *
+   *  // monocolors
+   *  10. Monocolor red,
+   *  11. Monocolor blue,
+   *  12. Monocolor green,
+   *  13. Monocolor yellow,
+   *  14. Monocolor turqoise,
+   *  15. Monocolor purple,
+   *  16. Sepia,
+   *  17. Sepia,
+   *
+   *  // color swapping
+   *  [20-46], swaps colors like rgb => gbg => rga => etc.
+   *
+   *  // other, use extra(float) for finetuning
+   *  50. Luma key
+   *  51. Green key
+   *  52. Paint
+   *  53. Colorize
    *  ```
+
    * @function Effect#ColorEffect#effect
    * @param {number} effect index of the effect
    */
 
+   /**
+    * @description currentColoreffect number
+    * @function Effect#ColorEffect#effect
+    * @param {Number} effectnumber currentColoreffect number 1
+    */
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
@@ -246,6 +304,11 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
     return currentEffect
   }
 
+  /**
+   * @description the extra, for several effects
+   * @function Effect#ColorEffect#extra
+   * @param {float} floatValue between 0 and 1
+   */
   _self.extra = function( _num ){
     if ( _num != undefined ) {
       currentExtra = _num
@@ -273,7 +336,7 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 02:01:55 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 07 2019 01:38:54 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

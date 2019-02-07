@@ -106,7 +106,7 @@ var renderer = new GlRenderer()
   // Monocolor
   document.getElementById('btn_effects_a_1').onmousedown = function() {
 
-    var cycle = [ 5, 6 , 7, 8, 9, 10, 11, 12 ];
+    var cycle = [ 10, 11, 12, 13, 14, 15, 16, 17 ];
     if ( color_effect1.effect() != 1 ) {
       color_effect1.effect(1)
       this.classList = 'effect_a round '
@@ -119,7 +119,7 @@ var renderer = new GlRenderer()
 
   // Negative
   document.getElementById('btn_effects_a_2').onmousedown = function() {
-    var cycle = [ 2, 3, 4 ]
+    var cycle = [ 2, 3, 4, 5, 6 ]
     if ( nega_effect1.effect() != 1 ) {
       nega_effect1.effect(1)
       this.classList = 'effect_a round '

@@ -38,7 +38,7 @@ verystrong {
   display: grid;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
-  grid-template-columns: repeat(auto-fill, 0.33fr);
+  grid-template-columns: repeat(auto-fill, 33%);
   grid-template-rows: fit-content(33%) fit-content(33%) fit-content(33%);
   position: absolute;
   left: calc( 50% - 40vw);
@@ -51,14 +51,16 @@ verystrong {
     display: grid;
     grid-template-columns: 30% 20% 50%;
     grid-template-rows: max-content;
-    mix-blend-mode: overlay;
-    filter: contrast(120%) brightness(100%) opacity(50%) saturate(200%);
+    mix-blend-mode: color-dodge;
+    filter: contrast(120%) brightness(120%) opacity(70%) saturate(200%);
     cursor: pointer;
     transition-duration: 0.3s;
     -webkit-tap-highlight-color: transparent;
     outline: none;
     pointer-events: all; }
     .grid_container > div .go_button {
+      display: none; }
+    .grid_container > div .hidden_content {
       display: none; }
     .grid_container > div:hover {
       transform: scale(1.15);
@@ -75,6 +77,8 @@ verystrong {
       filter: contrast(100%) brightness(110%) opacity(100%) saturate(110%);
       box-shadow: 0px 24px 32px rgba(21, 21, 21, 0.72); }
       .grid_container > div.active .go_button {
+        display: inline; }
+      .grid_container > div.active .hidden_content {
         display: inline; }
     .grid_container > div .item_image {
       background-color: black;
@@ -107,11 +111,17 @@ verystrong {
   .grid_container .grid_item:nth-child(2) .item_image {
     background-image: url("/images/vmp_demo/notv.png"); }
   .grid_container .grid_item:nth-child(3) .item_image {
-    background-image: url("/images/vmp_demo/veejays.png"); }
-  .grid_container .grid_item:nth-child(4) .item_image {
-    background-image: url("/images/vmp_demo/occupy.png"); }
-  .grid_container .grid_item:nth-child(5) .item_image {
     background-image: url("/images/vmp_demo/edirol.png"); }
+  .grid_container .grid_item:nth-child(4) .item_image {
+    background-image: url("/images/vmp_demo/veejays.png"); }
+  .grid_container .grid_item:nth-child(5) .item_image {
+    background-image: url("/images/vmp_demo/occupy.png"); }
+  .grid_container .grid_item:nth-child(6) .item_image {
+    background-image: url("/images/vmp_demo/computer_demos.png"); }
+  .grid_container .grid_item:nth-child(7) .item_image {
+    background-image: url("/images/vmp_demo/powerglove.png"); }
+  .grid_container .grid_item:nth-child(8) .item_image {
+    background-image: url("/images/vmp_demo/iwantyou.png"); }
 
 @media only screen and (max-width: 720px) {
   .grid_container {

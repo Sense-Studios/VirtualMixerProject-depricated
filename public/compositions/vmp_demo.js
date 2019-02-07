@@ -1,6 +1,7 @@
 var renderer = new GlRenderer()
 
 
+
 // sources
 var source0 = new SolidSource( renderer, {r:0.2, g:0.4, b:0.9})
 var source1 = new VideoSource( renderer, { src: 'https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/FC240_1.mp4?r=9843759843yjkdsfh' } );
@@ -18,11 +19,11 @@ renderer.render();
 
 // set up file management
 var filemanager1 = new FileManager( source2 )
-filemanager1.load_set("/sets/notv.json")
+//filemanager1.load_set("/sets/notv.json")
 
 // configure the mixer
-trans_mixer1.mixMode = 5
-trans_mixer1.bpm(32)
+trans_mixer1.mixMode = 6
+trans_mixer1.bpm(28)
 trans_mixer1.autoFade = true
 
 //setInterval(function() {
@@ -47,14 +48,23 @@ document.querySelectorAll('.grid_item').forEach( function(_elm, i) {
       console.log(_elm.index)
 
       if (_elm.index == 0) {
+        source1.src(source2.currentSrc)
         source2.src('/video/placeholder.mp4')
       }else if (_elm.index == 1) {
+        source1.src(source2.currentSrc)
         source2.src('https://s3-eu-west-1.amazonaws.com/nabu/veejay/NoTV2/VTS_01_0.mp4')
       }else if (_elm.index == 2) {
-        source2.src('/video/veejays_demoreel.mp4')
+        source1.src(source2.currentSrc)
+        source2.src('/video/edirol_v4.mp4')
       }else if (_elm.index == 3) {
-        //source3.src('/video/veejays_demoreel.mp4')
-        source1.src('https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/FC240_1.mp4?r=9843759843yjkdsfh')
+        source1.src(source2.currentSrc)
+        source2.src('/video/veejays_demoreel.mp4')
+      }else if (_elm.index == 4) {
+        source1.src(source2.currentSrc)
+        source2.src('https://s3-eu-west-1.amazonaws.com/nabu/veejay/occupy_chaos/protest_signs/set5_w_ppl.mp4')
+      }else if (_elm.index == 6) {
+        source1.src(source2.currentSrc)
+        source2.src('https://nabu-dev.s3.amazonaws.com/uploads/video/556b99e86465764bdf1e0000/720p_h264.mp4')
       }
     }
   }

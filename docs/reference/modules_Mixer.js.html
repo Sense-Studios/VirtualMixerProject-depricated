@@ -31,7 +31,68 @@
  *    A mixer mixes two sources together.
  *
  * @description
- *   It can crossfade the sources with different _MixModes_ and _BlendModes_ requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
+ *   ### Mixmode
+ Mixers support a [`Mixmode`](Mixer.html#mixMode).
+ The Mixmode defines the curvature of the crossfade.
+
+ In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is **darker** in the middle of  the crossfade then it is at both ends. This is the default _Mixmode_, the other modes play with these settings
+
+ ```
+   1: NORMAL (default),   regular, linear crossfade
+   2: HARD,               switches with a hard cut at 50%
+   3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+   4: FAM,                fades with a downward curve, forcing a 'overlay' period
+   5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+   6: LEFT,               forces the pod on 0 (locks pod)
+   7: RIGHT,              forces the pod on 1 (locks pod)
+   8: CENTER,             forces both sources at ~66% (locks pod)
+   9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+ ```
+
+ ### Blendmode
+ Mixers also support a [`Blendmode`](Mixer.html#blendMode).
+ Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.
+
+ ```
+   1 ADD (default),
+   2 SUBSTRACT,
+   3 MULTIPLY,
+   4 DARKEN,
+   5 COLOUR BURN,
+   6 LINEAR_BURN,
+   7 LIGHTEN,
+   8 SCREEN,
+   9 COLOUR_DODGE,
+   10 LINEAR_DODGE,
+   11 OVERLAY,
+   12 SOFT_LIGHT,
+   13 HARD_LIGHT,
+   14 VIVID_LIGHT,
+   15 LINEAR_LIGHT,
+   16 PIN_LIGHT,
+   17 DIFFERENCE,
+   18 EXCLUSION
+ ```
+
+ Switch both mixer and blendmode in realtime:
+
+ ```
+ mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
+ mixer1.mixMode(8)      // set MixMode to BOOM
+ mixer1.blendMode(1)    // set blendmode to ADD (default)
+ mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT
+ ```
+
+ Move the pod up and down over time, or fade from source1 to source2 and back
+ again.
+ ```
+ ar c = 0;
+ setInterval( function() {
+   c += 0.01
+   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+ })
+ ```
+
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
  * @constructor Module#Mixer
@@ -83,6 +144,7 @@ function Mixer( renderer, options ) {
   var currentMOD = 1
   var currentBpmFunc = function() { return currentBPM; }
   _self.autoFade = false
+  _self.fading = false
 
 
   var mixmode = 1;
@@ -171,15 +233,48 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
     }
 
-
+  // autofade bpm
   var starttime = (new Date()).getTime()
   var c = 0
+  var cnt = 0
+
+  // fade time
+  var fadeAtTime = 0
+  var fadeTime = 0
+  var fadeTo = "b"
+  var fadeDuration = 0
+
+
   _self.update = function() {
-    if ( _self.autoFade ) {
-        // pod = currentBPM
-        currentBPM = currentBpmFunc()
-        c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+    if ( _self.autoFade ) { // maybe call this bpmFollow?
+      // pod = currentBPM
+      currentBPM = currentBpmFunc()
+      c = ((new Date()).getTime() - starttime) / 1000;
+      _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+    }
+
+    if ( _self.fading ) { // then call this autoFade
+
+      var now = (new Date()).getTime()
+      fadeAtTime = (fadeTime - now);
+      _num = fadeAtTime/fadeDuration
+      if (fadeTo =="b") _num = Math.abs(_num - 1)
+      //console.log("fader...", _num, Math.abs(_num - 1), fadeAtTime, fadeTime, now, fadeDuration, fadeTo)
+      if (_num &lt; 0 ) _num = 0
+      if (_num > 1 ) _num = 1
+
+      _self.pod( _num )
+
+      if ( fadeAtTime &lt; 0 ) {
+        _self.fading = false
+
+        // allstop
+        _num = Math.round(_num)
+        _num = Math.round(_num)
+        _self.pod(_num)
+      }
+
+
     }
   }
 
@@ -189,6 +284,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
   // ---------------------------------------------------------------------------
   // HELPERS
+  // ---------------------------------------------------------------------------
 
   // you shouldnt be able to set these directly
   _self.alpha1 = function() { return alpha1 }
@@ -198,15 +294,15 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @description
    *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
-   *  1: NORMAL (default),
-   *  2: HARD,
-   *  3: NAM,
-   *  4: FAM,
-   *  5: NON-DARK,
-   *  6: LEFT,
-   *  7: RIGHT,
-   *  8: CENTER,
-   *  9: BOOM
+   *  1: NORMAL (default),   regular, linear crossfade
+   *  2: HARD,               switches with a hard cut at 50%
+   *  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+   *  4: FAM,                fades with a downward curve, forcing a 'overlay' period
+   *  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+   *  6: LEFT,               forces the pod on 0 (locks pod)
+   *  7: RIGHT,              forces the pod on 1 (locks pod)
+   *  8: CENTER,             forces both sources at ~66% (locks pod)
+   *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
    *  ```
    *
    * @function Module#Mixer#mixMode
@@ -248,13 +344,16 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
+
+    _self.pod( _self.pod() ) // update pod, precaution
+
     return blendmode
   }
 
   /**
    * @description the position of the handle, fader or pod. 0 is left, 1 is right
    * @function Module#Mixer#pod
-   * @param {float} position - position of the handle
+   * @param {float} position position of the handle
    */
   _self.pod = function( _num ) {
     //console.log("---> POD:", _num)
@@ -324,6 +423,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         alpha2 = 1;
       }
 
+      // DEPRICATED BECAUSE OF actual ALPHA
       // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
       if (mixmode == 10 ) {
         alpha1 = pod
@@ -343,19 +443,71 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     return pod;
   }
 
-
+  /**
+   * @description
+   *  gets or sets the _bpm_ or beats per minutes, locally in this mixer
+   *  defaults to 128
+   * @function Module#Mixer#bpm
+   * @param {number} bpm beats per minute
+   */
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
   }
 
+  /**
+   * @description
+   *  gets or sets the _currentMOD_ or modifyer for the bpm
+   *  this way you can modify the actual tempo, make the beats
+   *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
+   * @function Module#Mixer#bpmMod
+   * @param {number} currentMod beat multiplyer for tempo
+   */
   _self.bpmMod = function( _num ) {
     if ( _num  != undefined ) currentMOD = _num
     return currentMOD
   }
 
+  /**
+   * @description
+   *  binds _currentBpmFunc_ to a function
+   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+   *  it's called on update
+   * @function Module#Mixer#bindBpm
+   * @param {function} binding allows for overriding internal bpm
+   */
   _self.bindBpm = function( _func ) {
       currentBpmFunc = _func
+  }
+
+  /**
+   * @description
+   *  sets setAutoFade true/false
+   * @function Module#Mixer#setAutoFade
+   * @param {boolean} autoFade to do, or do not
+   */
+  _self.setAutoFade = function( _bool ) {
+    if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
+    if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
+  }
+
+  /**
+   * @description
+   *  fades from one channel to the other in _duration_ milliseconds
+   * @function Module#Mixer#fade
+   * @param {number} fadeDuration the duration of the fade
+   */
+  _self.fade = function( _duration ) {
+    var current = _self.pod()
+
+    // starts the loop
+    _self.fading = true
+
+    var now = (new Date()).getTime()
+    fadeTime = ( now + _duration );
+    fadeTo == "a" ? fadeTo = "b" : fadeTo = "a"
+    //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
+    fadeDuration = _duration
   }
 }
 </code></pre>
@@ -374,7 +526,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 30 2019 03:12:52 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 07 2019 01:38:54 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

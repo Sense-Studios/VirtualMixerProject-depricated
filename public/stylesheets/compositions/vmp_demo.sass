@@ -44,7 +44,7 @@ verystrong
   display: grid
   grid-column-gap: 10px
   grid-row-gap: 10px
-  grid-template-columns: repeat(auto-fill, 0.33fr)
+  grid-template-columns: repeat(auto-fill, 33%)
   grid-template-rows: fit-content(33%) fit-content(33%) fit-content(33%)
   position: absolute
   left: calc( 50% - 40vw)
@@ -58,8 +58,8 @@ verystrong
     display: grid
     grid-template-columns: 30% 20% 50%
     grid-template-rows: max-content
-    mix-blend-mode: overlay
-    filter: contrast(120%) brightness(100%) opacity(50%) saturate(200%)
+    mix-blend-mode: color-dodge
+    filter: contrast(120%) brightness(120%) opacity(70%) saturate(200%)
     cursor: pointer
     transition-duration: 0.3s
     -webkit-tap-highlight-color: transparent
@@ -67,6 +67,9 @@ verystrong
     pointer-events: all
 
     .go_button
+      display: none
+
+    .hidden_content
       display: none
 
     &:hover
@@ -87,6 +90,9 @@ verystrong
       box-shadow: 0px 24px 32px rgba( #151515, 0.72)
 
       .go_button
+        display: inline
+
+      .hidden_content
         display: inline
 
     .item_image
@@ -133,16 +139,27 @@ verystrong
 
     &:nth-child(3)
       .item_image
-        background-image: url('/images/vmp_demo/veejays.png')
+        background-image: url('/images/vmp_demo/edirol.png')
 
     &:nth-child(4)
       .item_image
-        background-image: url('/images/vmp_demo/occupy.png')
+        background-image: url('/images/vmp_demo/veejays.png')
 
     &:nth-child(5)
       .item_image
-        background-image: url('/images/vmp_demo/edirol.png')
+        background-image: url('/images/vmp_demo/occupy.png')
 
+    &:nth-child(6)
+      .item_image
+        background-image: url('/images/vmp_demo/computer_demos.png')
+
+    &:nth-child(7)
+      .item_image
+        background-image: url('/images/vmp_demo/powerglove.png')
+
+    &:nth-child(8)
+      .item_image
+        background-image: url('/images/vmp_demo/iwantyou.png')
 
 @media only screen and (max-width: 720px)
   .grid_container

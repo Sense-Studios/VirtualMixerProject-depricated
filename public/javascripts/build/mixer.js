@@ -3009,6 +3009,7 @@ function Mixer( renderer, options ) {
   var currentMOD = 1
   var currentBpmFunc = function() { return currentBPM; }
   _self.autoFade = false
+  _self.fading = false
 
 
   var mixmode = 1;
@@ -3097,15 +3098,48 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
     }
 
-
+  // autofade bpm
   var starttime = (new Date()).getTime()
   var c = 0
+  var cnt = 0
+
+  // fade time
+  var fadeAtTime = 0
+  var fadeTime = 0
+  var fadeTo = "b"
+  var fadeDuration = 0
+
+
   _self.update = function() {
-    if ( _self.autoFade ) {
-        // pod = currentBPM
-        currentBPM = currentBpmFunc()
-        c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+    if ( _self.autoFade ) { // maybe call this bpmFollow?
+      // pod = currentBPM
+      currentBPM = currentBpmFunc()
+      c = ((new Date()).getTime() - starttime) / 1000;
+      _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+    }
+
+    if ( _self.fading ) { // then call this autoFade
+
+      var now = (new Date()).getTime()
+      fadeAtTime = (fadeTime - now);
+      _num = fadeAtTime/fadeDuration
+      if (fadeTo =="b") _num = Math.abs(_num - 1)
+      //console.log("fader...", _num, Math.abs(_num - 1), fadeAtTime, fadeTime, now, fadeDuration, fadeTo)
+      if (_num < 0 ) _num = 0
+      if (_num > 1 ) _num = 1
+
+      _self.pod( _num )
+
+      if ( fadeAtTime < 0 ) {
+        _self.fading = false
+
+        // allstop
+        _num = Math.round(_num)
+        _num = Math.round(_num)
+        _self.pod(_num)
+      }
+
+
     }
   }
 
@@ -3115,6 +3149,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
   // ---------------------------------------------------------------------------
   // HELPERS
+  // ---------------------------------------------------------------------------
 
   // you shouldnt be able to set these directly
   _self.alpha1 = function() { return alpha1 }
@@ -3174,6 +3209,9 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
+
+    _self.pod( _self.pod() ) // update pod, precaution
+
     return blendmode
   }
 
@@ -3269,7 +3307,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     return pod;
   }
 
-
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
@@ -3284,9 +3321,23 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       currentBpmFunc = _func
   }
 
-  _self.setAutoFade = function( _bool ) {    
+  _self.setAutoFade = function( _bool ) {
     if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
     if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
+  }
+
+
+  _self.fade = function( _duration ) {
+    var current = _self.pod()
+
+    // starts the loop
+    _self.fading = true
+
+    var now = (new Date()).getTime()
+    fadeTime = ( now + _duration );
+    fadeTo == "a" ? fadeTo = "b" : fadeTo = "a"
+    //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
+    fadeDuration = _duration
   }
 }
 

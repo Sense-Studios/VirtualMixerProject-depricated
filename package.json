@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "build": "./node_modules/.bin/gulp",
-    "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -R README.md --debug ; open docs/reference/index.html ",
+    "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -R README.md --debug ; cp docs/reference/*.* public/docs/reference/ -r ; open docs/reference/index.html ",
     "test": "node test",
     "help": "echo 'use: $npm run [SCRIPT]\n\nstart\tStarts the application,\nbuild\tbuilds and minifies the application\ndocs\twrites the documentation\ntest\tis sadly empty\nhelp\tthis file'"
   },

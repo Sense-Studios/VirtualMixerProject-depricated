@@ -13,8 +13,13 @@ var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
 var green = new SolidSource( renderer, { color: { r: 0.0, g: 1.0, b: 0.0 } } );
 var blue = new SolidSource( renderer, { color: { r: 0.0, g: 0.0, b: 1.0 } } );
 
+var source1 = new VideoSource( renderer, {  })
+var source2 = new VideoSource( renderer, {  })
+var filemanager1
+var filemanager2
+
 // create a mixer, mix red and green
-var mixer1 = new Mixer( renderer, { source1: red, source2: green });
+var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
 // finally asign that mixer to the output
 var output = new Output( renderer, mixer1 )
@@ -55,6 +60,7 @@ u.get(spreadsheet_data_url, function(v) {
 // add a function that moves the mixer handle from left to right.
 var c = 0;
 var time = 0
+var startTime = (new Date()).getTime();
 var helper = {
   setTime: function( _time ) {
     c = _time/100
@@ -65,11 +71,18 @@ var helper = {
 function startTheShow(_items) {
   console.log("start the show", _items)
   setInterval( function() {
+    var now = (new Date()).getTime();
     c += 0.01
-    time = Math.round(c*10000)/10000
+    // time = Math.round(c*10000)/10000
+    time = (now-startTime)/1000
+
+    //console.log(" >> ", time)
+    // var startTime = (new Date()).getTime();
     //mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+
     document.getElementById("currenttime").innerHTML = time
     _items.forEach(function( val, i ) {
+
       if ( time > parseFloat(val) ) {
         var execute = _items.splice(0,1)[0]
         console.log("execute?: ", i, execute, execute.length)

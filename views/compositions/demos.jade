@@ -1,0 +1,78 @@
+doctype html
+html
+  head
+    title= title
+
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/compositions/vmp_demo.css')
+    
+    meta(name="viewport" content="width=450px, initial-scale=0.7, maximum-scale=0.7")
+
+  body
+        
+    .site
+      a.logo(href='/')
+      .scroll_container
+        .grid_container
+          .grid_item.grid_item_large(tabindex="1")
+            .titel
+              | the <verystrong>Virtual Mixer Project</verystrong><br>
+              | Lets try videomixing in javascript v0.0.1
+            .content
+              | 
+              | <p> This is the <verystrong>DEMOS SECTION</verystrong>
+              | <br>
+              | <hr>  
+              | <a href="https://github.com/Sense-Studios/VirtualMixerProject" target="_blank">Github Repository</a> | 
+              | <a href="https://www.youtube.com/watch?v=jYwPJXsD-mc" target="_blank">Youtube</a> | 
+              | <a href="https://virtualmixproject.com/docs/reference/index.html" target="_blank">Documentation</a>
+              | <br>
+              | <br>
+
+          .grid_item(tabindex="2")
+            .titel
+              | <verystrong>Webcam</verystrong>            
+            .content
+              | Coming soon
+              | <br>
+              | <br>
+
+          .grid_item(tabindex="3")
+            .titel
+              | <verystrong>Gamepad</verystrong>            
+            .content
+              | Coming soon
+              | <br>
+              | <br>
+
+          .grid_item(tabindex="4")
+            .titel
+              | <verystrong>MIDI</verystrong>            
+            .content
+              | Coming soon
+              | <br>
+              | <br>
+
+          .grid_item(tabindex="5")
+            .titel
+              | <verystrong>Sequencer</verystrong>            
+            .content
+              | Coming soon
+              | <br>
+              | <br>
+
+          .grid_item(tabindex="5")
+            .titel
+              | <verystrong>Clicktrack</verystrong>            
+            .content
+              | <a href="https://virtualmixproject.com/mixer/clicktrack">techdemo</a>
+              | <br>
+              | <br>
+
+
+    canvas#glcanvas
+
+    script(src='/compositions/vmp_demo.js')

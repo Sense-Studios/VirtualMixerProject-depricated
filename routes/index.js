@@ -8,11 +8,15 @@ router.get('/', function(req, res, next) {
   console.log('this is index')
   console.log( express.io )
 
+  res.render( 'compositions/vmp_demo', { title: 'VirtualMixProject: ' });
+  /*
   res.render('index', {
     title: 'Express'
     //giphy_key: process.env.GIPHYKEY,
     //marduq_key: process.env.MARDUQKEY
   });
+  */
+
 });
 
 // for testing

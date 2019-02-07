@@ -27,6 +27,7 @@ mixer1.bpm = 128
 mixer1.mixMode(1)
 
 effect1.effect(100)
+effect1.extra(0.5)
 
 //effect1.effect(39)
 //effect1.extra(0.4)

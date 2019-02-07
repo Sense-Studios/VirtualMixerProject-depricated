@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    title Awesome Virtual Mixer
+      
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/compositions/occupy_chaos.css')
+    
+  body 
+    canvas#glcanvas
+    .blink
+    
+    .payoff
+      | <h3>Occupy Chaos</small></h3>
+      | Part of the <a href="https://virtualmixproject.com/"> Virtual Mixer Project </a><br>
+      | <small>If you don't hear any music, click somewhere on the screen</small>
+
+    script(src='/compositions/occupy_chaos.js')
