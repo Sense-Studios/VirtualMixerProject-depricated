@@ -87,12 +87,8 @@ vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra,
   // multi
   if ( currentdistortioneffect == 3 ) {
     vec2 wuv = vec2(0,0);
-<<<<<<< HEAD
     wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
     // wuv = vUv + vec2( extra, extra );
-=======
-    wuv = vUv * vec2( 4., 4. );
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return texture2D( src, wuv ).rgba;
   }
 
@@ -176,30 +172,33 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
     //renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
   }
 
+  /**
+   * @description currentDistortionffect number
+   * @function Effect#DistiotionEffect#effect
+   * @param {Number} effectnumber currentColoreffect number 1
+   */
+
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
-<<<<<<< HEAD
       if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = _num
-=======
-      if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
       // update uniform ?
     }
 
     return currentEffect
   }
-
+  /**
+   * @description the extra, for several effects
+   * @function Effect#DistiotionEffect#extra
+   * @param {float} floatValue between 0 and 1
+   */
   _self.extra = function( _num ){
-<<<<<<< HEAD
+
     if ( _num != undefined ) {
       currentExtra = _num
       if (renderer.customUniforms[_self.uuid+'_extra']) renderer.customUniforms[_self.uuid+'_extra'].value = currentExtra
       // update uniform ?
     }
-
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return _num
   }
 }

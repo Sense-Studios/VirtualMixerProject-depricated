@@ -22,8 +22,6 @@ that serves as some kind of interaction. There is some first-start code
 in place in the sources, but that doesn't work on all platforms.
 Call _firstRun_ on the sources to utilize this behaviour.
 
-
-<<<<<<< HEAD
 * ~~_iOS does not allow for more then one video to play simultaneous (gif is fine though)_~~
 
 ~~Apple has decided, in all their wisdom, that you should not be allowed to play multiple videos on one page. Even though Apple has finally allowed to
@@ -32,15 +30,6 @@ Luckily Apple does allow as many gif sources as you'd like, so when you
 target Apple devices build your mixers with only one videoSource max.~~
 
 Apple has fixed this as of iOS 11.x, mix along on iPhone!
-=======
-* _iOS does not allow for more then one video to play simultaneous (gif is fine though)_
-
-Apple has decided, in all their wisdom, that you should not be allowed to play multiple videos on one page. Even though Apple has finally allowed to
-play inline video on mobile devices, it is still not allowed to play 2 or more videos simultaneously.
-Luckily Apple does allow as many gif sources as you'd like, so when you
-target Apple devices build your mixers with only one videoSource max.
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
-
 
 * _Seeking and loading (remote) video delays the video and results in hiccups_
 

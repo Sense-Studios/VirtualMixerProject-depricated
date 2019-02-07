@@ -3,7 +3,6 @@
  *    A mixer mixes two sources together.
  *
  * @description
-<<<<<<< HEAD
  *   ### Mixmode
  Mixers support a [`Mixmode`](Mixer.html#mixMode).
  The Mixmode defines the curvature of the crossfade.
@@ -66,9 +65,6 @@
  })
  ```
 
-=======
- *   It can crossfade the sources with different _MixModes_ and _BlendModes_ requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
  * @constructor Module#Mixer
@@ -120,11 +116,7 @@ function Mixer( renderer, options ) {
   var currentMOD = 1
   var currentBpmFunc = function() { return currentBPM; }
   _self.autoFade = false
-<<<<<<< HEAD
   _self.fading = false
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
-
 
   var mixmode = 1;
   _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
@@ -212,7 +204,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
     }
 
-<<<<<<< HEAD
   // autofade bpm
   var starttime = (new Date()).getTime()
   var c = 0
@@ -253,19 +244,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         _num = Math.round(_num)
         _self.pod(_num)
       }
-
-
-=======
-
-  var starttime = (new Date()).getTime()
-  var c = 0
-  _self.update = function() {
-    if ( _self.autoFade ) {
-        // pod = currentBPM
-        currentBPM = currentBpmFunc()
-        c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     }
   }
 
@@ -275,10 +253,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
   // ---------------------------------------------------------------------------
   // HELPERS
-<<<<<<< HEAD
   // ---------------------------------------------------------------------------
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
   // you shouldnt be able to set these directly
   _self.alpha1 = function() { return alpha1 }
@@ -288,7 +263,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @description
    *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
-<<<<<<< HEAD
    *  1: NORMAL (default),   regular, linear crossfade
    *  2: HARD,               switches with a hard cut at 50%
    *  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
@@ -298,17 +272,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  7: RIGHT,              forces the pod on 1 (locks pod)
    *  8: CENTER,             forces both sources at ~66% (locks pod)
    *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
-=======
-   *  1: NORMAL (default),
-   *  2: HARD,
-   *  3: NAM,
-   *  4: FAM,
-   *  5: NON-DARK,
-   *  6: LEFT,
-   *  7: RIGHT,
-   *  8: CENTER,
-   *  9: BOOM
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
    *  ```
    *
    * @function Module#Mixer#mixMode
@@ -350,23 +313,16 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
-<<<<<<< HEAD
 
     _self.pod( _self.pod() ) // update pod, precaution
 
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return blendmode
   }
 
   /**
    * @description the position of the handle, fader or pod. 0 is left, 1 is right
    * @function Module#Mixer#pod
-<<<<<<< HEAD
    * @param {float} position position of the handle
-=======
-   * @param {float} position - position of the handle
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
    */
   _self.pod = function( _num ) {
     //console.log("---> POD:", _num)
@@ -436,10 +392,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         alpha2 = 1;
       }
 
-<<<<<<< HEAD
       // DEPRICATED BECAUSE OF actual ALPHA
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
       // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
       if (mixmode == 10 ) {
         alpha1 = pod
@@ -459,23 +412,17 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     return pod;
   }
 
-<<<<<<< HEAD
   /**
    * @description
    *  gets or sets the _bpm_ or beats per minutes, locally in this mixer
    *  defaults to 128
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
-   */
-=======
-
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
   }
 
-<<<<<<< HEAD
   /**
    * @description
    *  gets or sets the _currentMOD_ or modifyer for the bpm
@@ -484,19 +431,22 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bpmMod
    * @param {number} currentMod beat multiplyer for tempo
    */
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   _self.bpmMod = function( _num ) {
     if ( _num  != undefined ) currentMOD = _num
     return currentMOD
   }
 
-<<<<<<< HEAD
   /**
    * @description
    *  binds _currentBpmFunc_ to a function
    *  whatever BPM _currentBpmFunc_ returns will be bpm used.
    *  it's called on update
+   * @example
+   * '''
+   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+   * '''
    * @function Module#Mixer#bindBpm
    * @param {function} binding allows for overriding internal bpm
    */
@@ -533,9 +483,4 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
     fadeDuration = _duration
   }
-=======
-  _self.bindBpm = function( _func ) {
-      currentBpmFunc = _func
-  }
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 }

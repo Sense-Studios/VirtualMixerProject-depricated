@@ -38,11 +38,7 @@ verystrong {
   display: grid;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
-<<<<<<< HEAD
   grid-template-columns: repeat(auto-fill, 33%);
-=======
-  grid-template-columns: repeat(auto-fill, 0.33fr);
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   grid-template-rows: fit-content(33%) fit-content(33%) fit-content(33%);
   position: absolute;
   left: calc( 50% - 40vw);
@@ -55,13 +51,8 @@ verystrong {
     display: grid;
     grid-template-columns: 30% 20% 50%;
     grid-template-rows: max-content;
-<<<<<<< HEAD
     mix-blend-mode: color-dodge;
     filter: contrast(120%) brightness(120%) opacity(70%) saturate(200%);
-=======
-    mix-blend-mode: overlay;
-    filter: contrast(120%) brightness(100%) opacity(50%) saturate(200%);
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     cursor: pointer;
     transition-duration: 0.3s;
     -webkit-tap-highlight-color: transparent;
@@ -69,11 +60,8 @@ verystrong {
     pointer-events: all; }
     .grid_container > div .go_button {
       display: none; }
-<<<<<<< HEAD
     .grid_container > div .hidden_content {
       display: none; }
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     .grid_container > div:hover {
       transform: scale(1.15);
       box-shadow: 0px 24px 32px rgba(21, 21, 21, 0.72);
@@ -90,11 +78,8 @@ verystrong {
       box-shadow: 0px 24px 32px rgba(21, 21, 21, 0.72); }
       .grid_container > div.active .go_button {
         display: inline; }
-<<<<<<< HEAD
       .grid_container > div.active .hidden_content {
         display: inline; }
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     .grid_container > div .item_image {
       background-color: black;
       grid-row-end: span 2;
@@ -126,7 +111,6 @@ verystrong {
   .grid_container .grid_item:nth-child(2) .item_image {
     background-image: url("/images/vmp_demo/notv.png"); }
   .grid_container .grid_item:nth-child(3) .item_image {
-<<<<<<< HEAD
     background-image: url("/images/vmp_demo/edirol.png"); }
   .grid_container .grid_item:nth-child(4) .item_image {
     background-image: url("/images/vmp_demo/veejays.png"); }
@@ -138,13 +122,6 @@ verystrong {
     background-image: url("/images/vmp_demo/powerglove.png"); }
   .grid_container .grid_item:nth-child(8) .item_image {
     background-image: url("/images/vmp_demo/iwantyou.png"); }
-=======
-    background-image: url("/images/vmp_demo/veejays.png"); }
-  .grid_container .grid_item:nth-child(4) .item_image {
-    background-image: url("/images/vmp_demo/occupy.png"); }
-  .grid_container .grid_item:nth-child(5) .item_image {
-    background-image: url("/images/vmp_demo/edirol.png"); }
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
 @media only screen and (max-width: 720px) {
   .grid_container {

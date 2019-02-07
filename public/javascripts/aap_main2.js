@@ -51,7 +51,6 @@ filemanager4.load('/sets/notv_local.json')
 // -----------------------------------------------------------------------------
 // create a bpm addon
 var bpm = new BPM( renderer )
-//<<<<<<< HEAD
 // var audioanalysis1 = new AudioAnalysis(renderer)
 //var audioanalysis1 = new AudioAnalysis(renderer)
 //audioanalysis2.mod = 0.6

@@ -1,7 +1,6 @@
 /**
  * @constructor Effect
  * @interface
-<<<<<<< HEAD
 
  * @summary
  *   The effect class covers a range of input-output nodes in between either sources and mixers
@@ -15,8 +14,6 @@
  *    * ColorEffects, all effects doing with colors, works on mixers as well
  *
  * @author Sense studios
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
  */
 
  function Effect( renderer, options ) {

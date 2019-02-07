@@ -2153,11 +2153,35 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  * @description
  *   Color effect allows for a series of color effect, mostly
  *   mimicing classic mixers like MX50 and V4
- *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
- *   ```
+ *  ```
+ *  1. Normal (default),
+ *
+ *  //  negatives
+ *  2. Negative 1,
+ *  3. Negative 2,
+ *  4. Negative 3,
+ *  5. Negative 4,
+ *  6. Negative 5,
+ *
+ *  // monocolors
+ *  10. Monocolor red,
+ *  11. Monocolor blue,
+ *  12. Monocolor green,
+ *  13. Monocolor yellow,
+ *  14. Monocolor turqoise,
+ *  15. Monocolor purple,
+ *  16. Sepia,
+ *  17. Sepia,
+ *
+ *  // color swapping
+ *  [20-46], swaps colors like rgb => gbg => rga => etc.
+ *
+ *  // other, use extra(float) for finetuning
+ *  50. Luma key
+ *  51. Green key
+ *  52. Paint
+ *  53. Colorize
+ *  ```
  *
  * @example
  *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
@@ -2217,47 +2241,60 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                                  // negtive 1
   if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                                      // negtive 2
   if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                                      // negtive 3
+  if ( currentcoloreffect == 5  ) return vec3( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2. );                                           // negtive 4
+  if ( currentcoloreffect == 6  )
+    vec3 orig = src.rgb;
+    vec3 bw = src.rgb = vec3( src.r + src.g + src.b ) / 3.;
+    vec3 nega = ( bw.rgb * -1.) + 1.;
+    return src.rgb = vec3(
+        ( (orig.r/2.) + (nega.r) ),
+        ( (orig.g/2.) + (nega.g) ),
+        ( (orig.b/2.) + (nega.b) )
+    );
+  }
+
 
   // monocolor
-  if ( currentcoloreffect == 5  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
-  if ( currentcoloreffect == 6  ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
-  if ( currentcoloreffect == 7  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
-  if ( currentcoloreffect == 8  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
-  if ( currentcoloreffect == 9  ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
-  if ( currentcoloreffect == 10 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
-  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
-  if ( currentcoloreffect == 12 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                     // sepia
+  if ( currentcoloreffect == 10  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
+  if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
+  if ( currentcoloreffect == 12  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
+  if ( currentcoloreffect == 13  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
+  if ( currentcoloreffect == 14 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
+  if ( currentcoloreffect == 15 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
+  if ( currentcoloreffect == 16 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
+  if ( currentcoloreffect == 17 ) return vec4( vec3( src.r + src.g + src.b ) / 3. * vec3( 1.2, 1.0, 0.8 ), src.a);                                     // sepia
 
   // color swapping
-  if ( currentcoloreffect == 13 ) return vec4( src.rrra );
-  if ( currentcoloreffect == 14 ) return vec4( src.rrga );
-  if ( currentcoloreffect == 15 ) return vec4( src.rrba );
-  if ( currentcoloreffect == 16 ) return vec4( src.rgra );
-  if ( currentcoloreffect == 17 ) return vec4( src.rgga );
-  if ( currentcoloreffect == 18 ) return vec4( src.rbra );
-  if ( currentcoloreffect == 19 ) return vec4( src.rbga );
-  if ( currentcoloreffect == 20 ) return vec4( src.rbba );
-  if ( currentcoloreffect == 21 ) return vec4( src.grra );
-  if ( currentcoloreffect == 22 ) return vec4( src.grga );
-  if ( currentcoloreffect == 23 ) return vec4( src.grba );
-  if ( currentcoloreffect == 24 ) return vec4( src.ggra );
-  if ( currentcoloreffect == 25 ) return vec4( src.ggga );
-  if ( currentcoloreffect == 26 ) return vec4( src.ggba );
-  if ( currentcoloreffect == 27 ) return vec4( src.gbra );
-  if ( currentcoloreffect == 28 ) return vec4( src.gbga );
-  if ( currentcoloreffect == 29 ) return vec4( src.gbba );
-  if ( currentcoloreffect == 30 ) return vec4( src.brra );
-  if ( currentcoloreffect == 31 ) return vec4( src.brga );
-  if ( currentcoloreffect == 32 ) return vec4( src.brba );
-  if ( currentcoloreffect == 33 ) return vec4( src.bgra );
-  if ( currentcoloreffect == 34 ) return vec4( src.bgga );
-  if ( currentcoloreffect == 35 ) return vec4( src.bgba );
-  if ( currentcoloreffect == 36 ) return vec4( src.bbra );
-  if ( currentcoloreffect == 37 ) return vec4( src.bbga );
-  if ( currentcoloreffect == 38 ) return vec4( src.bbba );
+  if ( currentcoloreffect == 20 ) return vec4( src.rrra );
+  if ( currentcoloreffect == 21 ) return vec4( src.rrga );
+  if ( currentcoloreffect == 22 ) return vec4( src.rrba );
+  if ( currentcoloreffect == 23 ) return vec4( src.rgra );
+  if ( currentcoloreffect == 24 ) return vec4( src.rgga );
+  if ( currentcoloreffect == 25 ) return vec4( src.rbra );
+  if ( currentcoloreffect == 26 ) return vec4( src.rbga );
+  if ( currentcoloreffect == 27 ) return vec4( src.rbba );
+  if ( currentcoloreffect == 28 ) return vec4( src.grra );
+  if ( currentcoloreffect == 29 ) return vec4( src.grga );
+  if ( currentcoloreffect == 30 ) return vec4( src.grba );
+  if ( currentcoloreffect == 31 ) return vec4( src.ggra );
+  if ( currentcoloreffect == 32 ) return vec4( src.ggga );
+  if ( currentcoloreffect == 33 ) return vec4( src.ggba );
+  if ( currentcoloreffect == 34 ) return vec4( src.gbra );
+  if ( currentcoloreffect == 35 ) return vec4( src.gbga );
+  if ( currentcoloreffect == 36 ) return vec4( src.gbba );
+  if ( currentcoloreffect == 37 ) return vec4( src.brra );
+  if ( currentcoloreffect == 38 ) return vec4( src.brga );
+  if ( currentcoloreffect == 39 ) return vec4( src.brba );
+  if ( currentcoloreffect == 40 ) return vec4( src.bgra );
+  if ( currentcoloreffect == 41 ) return vec4( src.bgga );
+  if ( currentcoloreffect == 42 ) return vec4( src.bgba );
+  if ( currentcoloreffect == 43 ) return vec4( src.bbra );
+  if ( currentcoloreffect == 44 ) return vec4( src.bbga );
+  if ( currentcoloreffect == 45 ) return vec4( src.bbba );
 
   // lum key
-  if ( currentcoloreffect == 39 ) {
+  if ( currentcoloreffect == 50 ) {
+
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
     float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
     float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
@@ -2266,12 +2303,12 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // color key; Greenkey
-  if ( currentcoloreffect == 40 ) {
+  if ( currentcoloreffect == 51 ) {
     return vec4( src.r, clamp( src.r, extra, 1.) == extra ? .0 : src.g, src.b, clamp( src.r, extra, 1.) == extra ? .0 : src.a );
   }
 
   // paint
-  if ( currentcoloreffect == 41 ) {
+  if ( currentcoloreffect == 52 ) {
     //return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
     // devide the image up in color bars
     vec4 pnt = vec4(
@@ -2285,7 +2322,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   }
 
   // colorise
-  if ( currentcoloreffect == 42 ) {
+  if ( currentcoloreffect == 53 ) {
 
     // TODO: mix paint and colorize together?
 
@@ -2336,21 +2373,44 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
    * @description
    *  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
    *  ```
-   *  1. BlackAndWhite (default),
+   *  1. Normal (default),
+   *
+   *  //  negatives
    *  2. Negative 1,
    *  3. Negative 2,
    *  4. Negative 3,
-   *  5. Monocolor red,
-   *  6. Monocolor blue,
-   *  7. Monocolor green,
-   *  8. Monocolor yellow,
-   *  9. Monocolor turqoise,
-   *  10. Monocolor purple,
-   *  11. Sepia,
+   *  5. Negative 4,
+   *  6. Negative 5,
+   *
+   *  // monocolors
+   *  10. Monocolor red,
+   *  11. Monocolor blue,
+   *  12. Monocolor green,
+   *  13. Monocolor yellow,
+   *  14. Monocolor turqoise,
+   *  15. Monocolor purple,
+   *  16. Sepia,
+   *  17. Sepia,
+   *
+   *  // color swapping
+   *  [20-46], swaps colors like rgb => gbg => rga => etc.
+   *
+   *  // other, use extra(float) for finetuning
+   *  50. Luma key
+   *  51. Green key
+   *  52. Paint
+   *  53. Colorize
    *  ```
+
    * @function Effect#ColorEffect#effect
    * @param {number} effect index of the effect
    */
+
+   /**
+    * @description currentColoreffect number
+    * @function Effect#ColorEffect#effect
+    * @param {Number} effectnumber currentColoreffect number 1
+    */
 
   _self.effect = function( _num ){
     if ( _num != undefined ) {
@@ -2362,6 +2422,12 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
     console.log("effect set to: ", currentEffect)
     return currentEffect
   }
+
+  /**
+   * @description the extra, for several effects
+   * @function Effect#ColorEffect#extra
+   * @param {float} floatValue between 0 and 1
+   */
 
   _self.extra = function( _num ){
     if ( _num != undefined ) {
@@ -2464,12 +2530,8 @@ vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra,
   // multi
   if ( currentdistortioneffect == 3 ) {
     vec2 wuv = vec2(0,0);
-<<<<<<< HEAD
     wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
     // wuv = vUv + vec2( extra, extra );
-=======
-    wuv = vUv * vec2( 4., 4. );
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return texture2D( src, wuv ).rgba;
   }
 
@@ -2553,30 +2615,33 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
     //renderer.customUniforms[source.uuid+'_uvmap'] = { type: "v2", value: new THREE.Vector2( 1 - Math.random() * .82, 1 - Math.random() * .82 ) }
   }
 
+  /**
+   * @description currentDistortionffect number
+   * @function Effect#DistiotionEffect#effect
+   * @param {Number} effectnumber currentColoreffect number 1
+   */
+
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
-<<<<<<< HEAD
       if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = _num
-=======
-      if (renderer.customUniforms[_self.uuid+'_currentdistortioneffect']) renderer.customUniforms[_self.uuid+'_currentdistortioneffect'].value = currentEffect
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
       // update uniform ?
     }
 
     return currentEffect
   }
-
+  /**
+   * @description the extra, for several effects
+   * @function Effect#DistiotionEffect#extra
+   * @param {float} floatValue between 0 and 1
+   */
   _self.extra = function( _num ){
-<<<<<<< HEAD
+
     if ( _num != undefined ) {
       currentExtra = _num
       if (renderer.customUniforms[_self.uuid+'_extra']) renderer.customUniforms[_self.uuid+'_extra'].value = currentExtra
       // update uniform ?
     }
-
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return _num
   }
 }
@@ -2633,11 +2698,8 @@ function FeedbackEffect( _renderer, _options ) {
   var source = _options.source
   var currentEffect = _options.effect
   var currentEffect = 12
-<<<<<<< HEAD
   var currentExtra = 0.8
 
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
@@ -2658,13 +2720,8 @@ function FeedbackEffect( _renderer, _options ) {
     canvasElement.width = 1024;
     canvasElement.height = 1024;
     canvasElementContext = canvasElement.getContext( '2d' );
-<<<<<<< HEAD
     canvasElementContext.fillStyle = "#000000";
     canvasElementContext.fillRect( 0, 0, 1024,1024)
-=======
-    canvasElementContext.fillStyle = "#FF0000";
-    canvasElementContext.fillRect( 0, 0, 500,500)
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
     console.log("FeedbackEffect inits, with", _renderer)
 
@@ -2674,20 +2731,13 @@ function FeedbackEffect( _renderer, _options ) {
     effectsTexture.repeat.set( 4, 4 );
 
     _renderer.customUniforms[_self.uuid+'_effectsampler'] = { type: "t", value: effectsTexture }
-<<<<<<< HEAD
     _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: currentEffect }
     _renderer.customUniforms[_self.uuid+'_extra'] = { type: "i", value: currentExtra }
-=======
-    _renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'] = { type: "i", value: 100 }
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D  '+_self.uuid+'_effectsampler;\n/* custom_uniforms */')
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int  '+_self.uuid+'_currentfeedbackeffect;\n/* custom_uniforms */')
-<<<<<<< HEAD
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float  '+_self.uuid+'_extra;\n/* custom_uniforms */')
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
 
     if ( renderer.fragmentShader.indexOf('vec4 feedbackeffect ( vec4 src, int currentfeedbackeffect, vec2 vUv )') == -1 ) {
@@ -2704,7 +2754,6 @@ function FeedbackEffect( _renderer, _options ) {
 
       // return vec4(0., 0., 1., 1.);
 
-<<<<<<< HEAD
       vec2 wuv = vec2(0.,0.);
       // wuv = vUv * vec2( 1.0, 1.0 ) - vec2( 0., 0. );
       wuv = vUv; //* vec2( 1.0, 1.0 ) - vec2( 0., 0. );
@@ -2715,20 +2764,13 @@ function FeedbackEffect( _renderer, _options ) {
       return vec4( vec4( ( texture2D( `+_self.uuid+`_effectsampler, wuv ).rgba * 0.9 ) + (src.rgba * .6 ) ).rgb, 1.);
 
       // return ( texture2D( , vUv + vec2( 1., 0.99999999) ).rgba ) + src * 0.3;
-=======
-      return ( texture2D( `+_self.uuid+`_effectsampler, vUv + vec2( 1., 0.99999999) ).rgba ) + src * 0.3;
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
       // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb * 1.4 + src * .8) * 0.5; //* vec3(.5, .5, .5
       // return ( texture2D( src, vUv ).rgb );
       // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb ) * src + src;
 
-<<<<<<< HEAD
       //vec4 wuv = wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
       //vec4 tex = texture2D( `+_self.uuid+`_effectsampler, wuv ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
-=======
-      vec4 tex = texture2D( `+_self.uuid+`_effectsampler, vUv * 2. ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
       // return src.rrr;
       // tex.rgb = vec3(src.r, src.g, src.b);
@@ -2739,11 +2781,7 @@ function FeedbackEffect( _renderer, _options ) {
       // * 0.52 + vec4( src * 0.52, vUv ) *
       // vec4 tex = vec4( src, vUv * .5 );
       // return mix( tex, `+_self.uuid+`_effectsampler, 0.).rgb;
-<<<<<<< HEAD
       // return mix(tex.rgb, src.rgb, 1.);
-=======
-      //return mix(tex.rgb, src.rgb, 1.);
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     }
 
     // uniform float noiseScale;
@@ -2799,7 +2837,6 @@ _self.update = function() {
   // _renderer.copyFramebufferToTexture( vector, dataTexture );
 
   glcanvas = document.getElementById('glcanvas');
-<<<<<<< HEAD
   //glcanvas = renderer.glrenderer.getContext().canvas
   if ( i%4 == 0) {
     //canvasElementContext.drawImage( glcanvas, 128,128, 768, 768 );
@@ -2815,9 +2852,6 @@ _self.update = function() {
     //canvasElementContext.fillStyle = "#000000";
     //canvasElementContext.fillRect( 0, 0, 1024,1024)
   }
-=======
-  canvasElementContext.drawImage( glcanvas, 0,0, glcanvas.width, glcanvas.height );
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   if ( effectsTexture ) effectsTexture.needsUpdate = true;
 }
 
@@ -2827,24 +2861,19 @@ _self.update = function() {
 * @description
 *  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
 *  ```
-*  1. BlackAndWhite (default),
-*  2. Negative 1,
-*  3. Negative 2,
-*  4. Negative 3,
-*  5. Monocolor red,
-*  6. Monocolor blue,
-*  7. Monocolor green,
-*  8. Monocolor yellow,
-*  9. Monocolor turqoise,
-*  10. Monocolor purple,
-*  11. Sepia,
+*  1. Multi
+*  2. Pictrue in Picture
+*  3. --,
 *  ```
 * @function Effect#FeedbackEffect#effect
 * @param {number} effect index of the effect
 */
 
-
-<<<<<<< HEAD
+/**
+ * @description currentFeedbackeffectffect number
+ * @function Effect#FeedbackEffect#effect
+ * @param {Number} effectnumber currentColoreffect number 1
+ */
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
@@ -2854,6 +2883,11 @@ _self.update = function() {
     return currentEffect
   }
 
+  /**
+   * @description currentDistortionffect number
+   * @function Effect#FeedbackEffect#effect
+   * @param {Number} effectnumber currentColoreffect number 1
+   */
   _self.extra = function( _num ){
       if ( _num != undefined ) {
         currentExtra = _num
@@ -2862,23 +2896,11 @@ _self.update = function() {
       }
     return currentExtra
   }
-
-=======
-_self.effect = function( _num ){
-  if ( _num != undefined ) {
-    currentEffect = _num
-    renderer.customUniforms[_self.uuid+'_currentfeedbackeffect'].value = currentEffect
-    // update uniform ?
-  }
-  return currentEffect
-  }
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 }
 
 /**
  * @constructor Effect
  * @interface
-<<<<<<< HEAD
 
  * @summary
  *   The effect class covers a range of input-output nodes in between either sources and mixers
@@ -2892,8 +2914,6 @@ _self.effect = function( _num ){
  *    * ColorEffects, all effects doing with colors, works on mixers as well
  *
  * @author Sense studios
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
  */
 
  function Effect( renderer, options ) {
@@ -3013,7 +3033,68 @@ vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
  *    A mixer mixes two sources together.
  *
  * @description
- *   It can crossfade the sources with different _MixModes_ and _BlendModes_ requires `source1` and `source2` in `options` both with a {@link Source} (or another _Module_ like a {@link Mixer})
+ *   ### Mixmode
+ Mixers support a [`Mixmode`](Mixer.html#mixMode).
+ The Mixmode defines the curvature of the crossfade.
+
+ In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is **darker** in the middle of  the crossfade then it is at both ends. This is the default _Mixmode_, the other modes play with these settings
+
+ ```
+   1: NORMAL (default),   regular, linear crossfade
+   2: HARD,               switches with a hard cut at 50%
+   3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+   4: FAM,                fades with a downward curve, forcing a 'overlay' period
+   5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+   6: LEFT,               forces the pod on 0 (locks pod)
+   7: RIGHT,              forces the pod on 1 (locks pod)
+   8: CENTER,             forces both sources at ~66% (locks pod)
+   9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+ ```
+
+ ### Blendmode
+ Mixers also support a [`Blendmode`](Mixer.html#blendMode).
+ Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.
+
+ ```
+   1 ADD (default),
+   2 SUBSTRACT,
+   3 MULTIPLY,
+   4 DARKEN,
+   5 COLOUR BURN,
+   6 LINEAR_BURN,
+   7 LIGHTEN,
+   8 SCREEN,
+   9 COLOUR_DODGE,
+   10 LINEAR_DODGE,
+   11 OVERLAY,
+   12 SOFT_LIGHT,
+   13 HARD_LIGHT,
+   14 VIVID_LIGHT,
+   15 LINEAR_LIGHT,
+   16 PIN_LIGHT,
+   17 DIFFERENCE,
+   18 EXCLUSION
+ ```
+
+ Switch both mixer and blendmode in realtime:
+
+ ```
+ mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
+ mixer1.mixMode(8)      // set MixMode to BOOM
+ mixer1.blendMode(1)    // set blendmode to ADD (default)
+ mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT
+ ```
+
+ Move the pod up and down over time, or fade from source1 to source2 and back
+ again.
+ ```
+ ar c = 0;
+ setInterval( function() {
+   c += 0.01
+   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+ })
+ ```
+
  *
  * @example let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });
  * @constructor Module#Mixer
@@ -3065,11 +3146,7 @@ function Mixer( renderer, options ) {
   var currentMOD = 1
   var currentBpmFunc = function() { return currentBPM; }
   _self.autoFade = false
-<<<<<<< HEAD
   _self.fading = false
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
-
 
   var mixmode = 1;
   _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
@@ -3157,7 +3234,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
     }
 
-<<<<<<< HEAD
   // autofade bpm
   var starttime = (new Date()).getTime()
   var c = 0
@@ -3198,19 +3274,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         _num = Math.round(_num)
         _self.pod(_num)
       }
-
-
-=======
-
-  var starttime = (new Date()).getTime()
-  var c = 0
-  _self.update = function() {
-    if ( _self.autoFade ) {
-        // pod = currentBPM
-        currentBPM = currentBpmFunc()
-        c = ((new Date()).getTime() - starttime) / 1000;
-        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     }
   }
 
@@ -3220,10 +3283,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
 
   // ---------------------------------------------------------------------------
   // HELPERS
-<<<<<<< HEAD
   // ---------------------------------------------------------------------------
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
   // you shouldnt be able to set these directly
   _self.alpha1 = function() { return alpha1 }
@@ -3233,15 +3293,15 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @description
    *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
-   *  1: NORMAL (default),
-   *  2: HARD,
-   *  3: NAM,
-   *  4: FAM,
-   *  5: NON-DARK,
-   *  6: LEFT,
-   *  7: RIGHT,
-   *  8: CENTER,
-   *  9: BOOM
+   *  1: NORMAL (default),   regular, linear crossfade
+   *  2: HARD,               switches with a hard cut at 50%
+   *  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+   *  4: FAM,                fades with a downward curve, forcing a 'overlay' period
+   *  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+   *  6: LEFT,               forces the pod on 0 (locks pod)
+   *  7: RIGHT,              forces the pod on 1 (locks pod)
+   *  8: CENTER,             forces both sources at ~66% (locks pod)
+   *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
    *  ```
    *
    * @function Module#Mixer#mixMode
@@ -3283,19 +3343,16 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
-<<<<<<< HEAD
 
     _self.pod( _self.pod() ) // update pod, precaution
 
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     return blendmode
   }
 
   /**
    * @description the position of the handle, fader or pod. 0 is left, 1 is right
    * @function Module#Mixer#pod
-   * @param {float} position - position of the handle
+   * @param {float} position position of the handle
    */
   _self.pod = function( _num ) {
     //console.log("---> POD:", _num)
@@ -3365,6 +3422,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
         alpha2 = 1;
       }
 
+      // DEPRICATED BECAUSE OF actual ALPHA
       // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
       if (mixmode == 10 ) {
         alpha1 = pod
@@ -3384,31 +3442,65 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     return pod;
   }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
+  /**
+   * @description
+   *  gets or sets the _bpm_ or beats per minutes, locally in this mixer
+   *  defaults to 128
+   * @function Module#Mixer#bpm
+   * @param {number} bpm beats per minute
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
   }
 
+  /**
+   * @description
+   *  gets or sets the _currentMOD_ or modifyer for the bpm
+   *  this way you can modify the actual tempo, make the beats
+   *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
+   * @function Module#Mixer#bpmMod
+   * @param {number} currentMod beat multiplyer for tempo
+   */
   _self.bpmMod = function( _num ) {
     if ( _num  != undefined ) currentMOD = _num
     return currentMOD
   }
 
+  /**
+   * @description
+   *  binds _currentBpmFunc_ to a function
+   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+   *  it's called on update
+   * @example
+   * '''
+   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+   * '''
+   * @function Module#Mixer#bindBpm
+   * @param {function} binding allows for overriding internal bpm
+   */
   _self.bindBpm = function( _func ) {
       currentBpmFunc = _func
   }
-<<<<<<< HEAD
 
+  /**
+   * @description
+   *  sets setAutoFade true/false
+   * @function Module#Mixer#setAutoFade
+   * @param {boolean} autoFade to do, or do not
+   */
   _self.setAutoFade = function( _bool ) {
     if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
     if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
   }
 
-
+  /**
+   * @description
+   *  fades from one channel to the other in _duration_ milliseconds
+   * @function Module#Mixer#fade
+   * @param {number} fadeDuration the duration of the fade
+   */
   _self.fade = function( _duration ) {
     var current = _self.pod()
 
@@ -3421,8 +3513,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
     fadeDuration = _duration
   }
-=======
->>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 }
 
 /**
