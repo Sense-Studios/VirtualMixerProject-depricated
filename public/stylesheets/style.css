@@ -26,6 +26,7 @@ body {
   border-radius: 6px;
   z-index: 9001; }
 
+<<<<<<< HEAD
 .logo {
   position: fixed;
   bottom: 8px;
@@ -37,4 +38,6 @@ body {
   height: 100px;
   z-index: 1000; }
 
+=======
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 /*# sourceMappingURL=style.css.map */

@@ -43,13 +43,31 @@
 
 
     <section>
-        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.<br>There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>.<br>There you can find examples and 'channels', which are basically auto-mixed sets of video files.<br>or gifs. Or SVG (soon) or ...</p>
+        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.<br>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD<br>There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>.<br>There you can find examples and 'channels', which are basically auto-mixed sets of video files.<br>or gifs. Or SVG (soon) or ...</p>
 <p><img src="/images/vmp_demo/vmp_logo.png" style="float: left;margin: 20px;width: 100px;"></p>
 <p>it comes in a package for use on your website or an npm build for use on your local DMZ.</p>
 <p>With these tools, you can Build your own video mixers in JavaScript. The application takes a number of <em>sources</em> ( video, gif, svg,  whathaveyou ) and allows you to crossfades them.<br>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>.</p>
 <p>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have<br>support for <em>gamepads</em> en <em>midi</em> devices.</p>
 <p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
-<p>Or continue with the Quickstart</p>
+<p>=======<br>A demo can be found here: <a href="http://nabu.sense-studios.com/channel/sense_beta/mixer5">Demo</a>.</p>
+<p><img src="../images/occupy_chaos_screenshot.jpg" alt="Screenshot"><br>This particular mixer is build with Material from my 'Occupy Chaos'-set, that I performed with in 2011.<br>But you can add any video library or setup any mixer configuration you want.</p>
+<p>With these tools, you can Build your own video mixers in JavaScript. The application takes a number of <em>sources</em> ( video, gif, svg,  whathaveyou ) and allows you to crossfades them.<br>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>.<br>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers.</p>
+<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>5ab4aa5834392b90577613624fa7b7b7fc52517b<br>Or continue with the Quickstart</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
 <h2>Installation</h2><p>1) clone the package, defaults to VirtualMixerProject/</p>
 <pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></pre><p>2) run the installer</p>
 <pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install</code></pre><p>3) start the app</p>
@@ -63,8 +81,13 @@
 <pre class="prettyprint source"><code>
 &lt;html>
   &lt;head>
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/vendor-min.js&quot;>&lt;/script>
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/mixer-min.js&quot;>&lt;/script>
+=======
+    &lt;script src=&quot;path/to/vendor-min.js&quot;>&lt;/script>
+    &lt;script src=&quot;path/to/mixer-min.js&quot;>&lt;/script>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   &lt;/head>
   &lt;body>
     &lt;canvas/>
@@ -73,8 +96,13 @@
 </code></pre><p>And some javascript add the end of the <code>body</code></p>
 <pre class="prettyprint source"><code>&lt;html>
   &lt;head>
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/vendor-min.js&quot;>&lt;/script>
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/mixer-min.js&quot;>&lt;/script>  
+=======
+    &lt;script src=&quot;path/to/vendor-min.js&quot;>&lt;/script>
+    &lt;script src=&quot;path/to/mixer-min.js&quot;>&lt;/script>    
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
   &lt;/head>
   &lt;body>
     &lt;canvas/>
@@ -92,7 +120,8 @@
   &lt;/body>
 &lt;/html>
 </code></pre><p>The most basic mixer setup is laid out hereunder in ASCII art:</p>
-<pre class="prettyprint source"><code>    ____________     ____________   &lt;--- src: somefile.mp4
+<pre class="prettyprint source"><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+    ____________     ____________   &lt;--- src: somefile.mp4
     | Source 1 |     | Source 2 |   &lt;--- play(), pause(), currentTime(), etc. (html5 interface)
     ------------     ------------   
                \     /
@@ -107,36 +136,68 @@
             |   Output   |            
             --------------
 
-</code></pre><p>This diagram flows from top to bottom. By defauld the <a href="Mixer.html#pod"><strong><code>pod</code></strong></a> of the <em>mixer</em> is set to 0, so we see <code>Source 1</code> in our <code>Output</code>.<br>Set the <code>pod</code> to 1 to show the <code>Source 2</code>. Or set it to any value in between to mix the two sources together.</p>
-<pre class="prettyprint source"><code>mixer1.pod(0)    // default shows Source 1
-mixer1.pod(1)    // shows Source 2
-mixer1.pod(0.5)  // shows both sources at 50%, not that this is darker as both add to only ~75% opacity
-mixer1.pod(0.75) // shows Source 1 at ~25% opacity and Source 2 at ~75% opacity ( ~90% total opacity )
+</code></pre><h1>This diagram flows from top to bottom. By defauld the <a href="Mixer.html#pod"><strong><code>pod</code></strong></a> of the <em>mixer</em> is set to 0, so we see <code>Source 1</code> in our <code>Output</code>.</h1><pre class="prettyprint source"><code>      ______________
+      |  Renderer  |
+      --------------
+            |
+            |
+        _________   &lt;--- Pod (float)
+        | Mixer |   &lt;--- Mixmode (number)
+        ---------   &lt;--- Blendmode (number)
+           / \
+          /   \
+         /     \            </code></pre><p>  <strong><strong>____</strong></strong>     <strong><strong>____</strong></strong>   &lt;--- somefile.mp4<br>  | Source 1 |     | Source 2 |   &lt;--- play, pause, currentTime, etc. (html5 interface)</p>
+<hr>
+<pre class="prettyprint source"><code>This diagram flows from bottom to top. By defauld the [**`pod`**](Mixer.html#pod) of the _mixer_ is set to 0, so we see `Source 1` in our `renderer`.
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
+Set the `pod` to 1 to show the `Source 2`. Or set it to any value in between to mix the two sources together.
+</code></pre><p>mixer1.pod(0)    // default shows Source 1<br>mixer1.pod(1)    // shows Source 2<br>mixer1.pod(0.5)  // shows both sources at 50%, not that this is darker as both add to only ~75% opacity<br>mixer1.pod(0.75) // shows Source 1 at ~25% opacity and Source 2 at ~75% opacity ( ~90% total opacity )</p>
+<p>// add a function that moves the mixer handle from left to right.<br>var c = 0;<br>setInterval( function() {<br>  c += 0.01<br>  mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );<br>})</p>
+<pre class="prettyprint source"><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 
-// add a function that moves the mixer handle from left to right.
-var c = 0;
-setInterval( function() {
-  c += 0.01
-  mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
-})
-</code></pre><p>See it al wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
-<h2>Further Reading</h2><ul>
-<li>Limitations</li>
-<li>Build instructions</li>
-<li>References</li>
-<li>Roadmap</li>
-</ul>
-<h2>Roadmap</h2><ul>
-<li>Set up a Node editor</li>
-<li><del>Hook up Midi controller</del></li>
-<li>add wipe MixModes</li>
-<li>add configuration for Firebase</li>
-<li>Phase out express for lightweight server/ templating</li>
-<li><del>Phase out jQuery</del></li>
-<li>Phase out ThreeJS</li>
-</ul>
-<h1>But Why?!</h1><pre class="prettyprint source"><code>&quot;Any application that can be written in JavaScript, will eventually be written in JavaScript.&quot;
--- Jeff Atwood</code></pre></article>
+
+## Further Reading
+
+* Limitations
+* Build instructions
+=======
+
+### Mixmode
+Mixers support a [`Mixmode`](Mixer.html#mixMode).
+The Mixmode defines the curvature of the crossfade.
+
+In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is **darker** in the middle of  the crossfade then it is at both ends. This is the default _Mixmode_, the other modes play with these settings
+</code></pre><p>  1: NORMAL (default),   regular, linear crossfade<br>  2: HARD,               switches with a hard cut at 50%<br>  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)<br>  4: FAM,                fades with a downward curve, forcing a 'overlay' period<br>  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36<br>  6: LEFT,               forces the pod on 0 (locks pod)<br>  7: RIGHT,              forces the pod on 1 (locks pod)<br>  8: CENTER,             forces both sources at ~66% (locks pod)<br>  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</p>
+<pre class="prettyprint source"><code>
+### Blendmode
+Mixers also support a [`Blendmode`](Mixer.html#blendMode).
+Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.
+</code></pre><p>  1 ADD (default),<br>  2 SUBSTRACT,<br>  3 MULTIPLY,<br>  4 DARKEN,<br>  5 COLOUR BURN,<br>  6 LINEAR_BURN,<br>  7 LIGHTEN,<br>  8 SCREEN,<br>  9 COLOUR_DODGE,<br>  10 LINEAR_DODGE,<br>  11 OVERLAY,<br>  12 SOFT_LIGHT,<br>  13 HARD_LIGHT,<br>  14 VIVID_LIGHT,<br>  15 LINEAR_LIGHT,<br>  16 PIN_LIGHT,<br>  17 DIFFERENCE,<br>  18 EXCLUSION</p>
+<pre class="prettyprint source"><code>
+Switch both mixer and blendmode in realtime:
+</code></pre><p>mixer1.mixMode()       // shows mixmode (default 1, NORMAL)<br>mixer1.mixMode(8)      // set MixMode to BOOM<br>mixer1.blendMode(1)    // set blendmode to ADD (default)<br>mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT</p>
+<pre class="prettyprint source"><code>
+## Other documentation;
+
+* Limitations
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
+* References
+* Roadmap
+
+## Roadmap
+
+* Set up a Node editor
+* ~~Hook up Midi controller~~
+* add wipe MixModes
+* add configuration for Firebase
+* Phase out express for lightweight server/ templating
+* ~~Phase out jQuery~~
+* Phase out ThreeJS
+
+
+# But Why?!
+</code></pre><p>&quot;Any application that can be written in JavaScript, will eventually be written in JavaScript.&quot;<br>-- Jeff Atwood<br><code>`</code></p></article>
     </section>
 
 
@@ -147,13 +208,13 @@ setInterval( function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="-_______.html"><<<<<<<</a></li><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 07 2019 01:38:54 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 07 2019 12:07:41 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

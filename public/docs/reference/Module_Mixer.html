@@ -52,6 +52,7 @@
 
 
 <div class="description">
+<<<<<<< HEAD
     <h3>Mixmode</h3><p> Mixers support a <a href="Mixer.html#mixMode"><code>Mixmode</code></a>.<br> The Mixmode defines the curvature of the crossfade.</p>
 <p> In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is <strong>darker</strong> in the middle of  the crossfade then it is at both ends. This is the default <em>Mixmode</em>, the other modes play with these settings</p>
 <pre class="prettyprint source"><code>   1: NORMAL (default),   regular, linear crossfade
@@ -90,6 +91,9 @@
    c += 0.01
    mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
  })</code></pre>
+=======
+    <p>It can crossfade the sources with different <em>MixModes</em> and <em>BlendModes</em> requires <code>source1</code> and <code>source2</code> in <code>options</code> both with a <a href="Source.html">Source</a> (or another <em>Module</em> like a Mixer)</p>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 </div>
 
 
@@ -268,6 +272,7 @@
     
 
     
+<<<<<<< HEAD
     <h4 class="name" id="bindBpm"><span class="type-signature"></span>bindBpm<span class="signature">(binding)</span><span class="type-signature"></span></h4>
     
 
@@ -403,6 +408,8 @@
     
 
     
+=======
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     <h4 class="name" id="blendMode"><span class="type-signature"></span>blendMode<span class="signature">(blendmode)</span><span class="type-signature"></span></h4>
     
 
@@ -522,7 +529,11 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
+<<<<<<< HEAD
         <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line288">line 288</a>
+=======
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line192">line 192</a>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     </li></ul></dd>
     
 
@@ -556,7 +567,11 @@
     
 
     
+<<<<<<< HEAD
     <h4 class="name" id="bpm"><span class="type-signature"></span>bpm<span class="signature">(bpm)</span><span class="type-signature"></span></h4>
+=======
+    <h4 class="name" id="mixMode"><span class="type-signature"></span>mixMode<span class="signature">(mixmode)</span><span class="type-signature"></span></h4>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     
 
     
@@ -564,7 +579,20 @@
 
 
 <div class="description">
+<<<<<<< HEAD
     <p>gets or sets the <em>bpm</em> or beats per minutes, locally in this mixer<br> defaults to 128</p>
+=======
+    <p>gets or sets the <em>mixMode</em>, there are 8 MixModes available, numbered 1-9;</p>
+<pre class="prettyprint source"><code> 1: NORMAL (default),
+ 2: HARD,
+ 3: NAM,
+ 4: FAM,
+ 5: NON-DARK,
+ 6: LEFT,
+ 7: RIGHT,
+ 8: CENTER,
+ 9: BOOM</code></pre>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 </div>
 
 
@@ -600,7 +628,11 @@
 
         <tr>
             
+<<<<<<< HEAD
                 <td class="name"><code>bpm</code></td>
+=======
+                <td class="name"><code>mixmode</code></td>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
             
 
             <td class="type">
@@ -616,7 +648,11 @@
 
             
 
+<<<<<<< HEAD
             <td class="description last"><p>beats per minute</p></td>
+=======
+            <td class="description last"><p>index of the Mixmode</p></td>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
         </tr>
 
     
@@ -657,7 +693,11 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
+<<<<<<< HEAD
         <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line418">line 418</a>
+=======
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line169">line 169</a>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     </li></ul></dd>
     
 
@@ -691,7 +731,11 @@
     
 
     
+<<<<<<< HEAD
     <h4 class="name" id="bpmMod"><span class="type-signature"></span>bpmMod<span class="signature">(currentMod)</span><span class="type-signature"></span></h4>
+=======
+    <h4 class="name" id="pod"><span class="type-signature"></span>pod<span class="signature">(position)</span><span class="type-signature"></span></h4>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     
 
     
@@ -699,7 +743,11 @@
 
 
 <div class="description">
+<<<<<<< HEAD
     <p>gets or sets the <em>currentMOD</em> or modifyer for the bpm<br> this way you can modify the actual tempo, make the beats<br> follow on half speed, or dubbel speed or <em>4, </em>2, /2, /4 etc.</p>
+=======
+    <p>the position of the handle, fader or pod. 0 is left, 1 is right</p>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 </div>
 
 
@@ -735,12 +783,17 @@
 
         <tr>
             
+<<<<<<< HEAD
                 <td class="name"><code>currentMod</code></td>
+=======
+                <td class="name"><code>position</code></td>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
             
 
             <td class="type">
             
                 
+<<<<<<< HEAD
 <span class="param-type">number</span>
 
 
@@ -1156,6 +1209,9 @@
             
                 
 <span class="param-type">float</span>
+=======
+<span class="param-type">float</span>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 
 
             
@@ -1206,6 +1262,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
+<<<<<<< HEAD
         <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line325">line 325</a>
     </li></ul></dd>
     
@@ -1342,6 +1399,9 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line455">line 455</a>
+=======
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line226">line 226</a>
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
     </li></ul></dd>
     
 
@@ -1391,7 +1451,11 @@
 <br class="clear">
 
 <footer>
+<<<<<<< HEAD
     Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 07 2019 01:38:54 GMT+0100 (CET)
+=======
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jan 25 2019 01:49:40 GMT+0100 (CET)
+>>>>>>> 5ab4aa5834392b90577613624fa7b7b7fc52517b
 </footer>
 
 <script> prettyPrint(); </script>

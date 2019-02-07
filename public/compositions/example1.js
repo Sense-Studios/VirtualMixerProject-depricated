@@ -32,5 +32,5 @@ var bpm = analysis;
 var c = 0;
 setInterval( function() {
   c += 0.01
-  //mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+  // mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })

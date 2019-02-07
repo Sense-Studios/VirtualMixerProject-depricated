@@ -57,6 +57,7 @@ var renderer = new GlRenderer()
   // main mixer
   var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: feedback_effect2 } );
 
+
   // transformers
   // mix transformer signals (white and black)
   var trans_white = new SolidSource( renderer, { color: { r:1.0, g:1.0, b:1.0 } } );
@@ -243,7 +244,6 @@ var renderer = new GlRenderer()
 
   // Feedback
   document.getElementById('btn_effects_b_4').onmousedown = function() {
-
     // feedback
     if ( feedback_effect2.effect() != 1 ) {
       feedback_effect2.effect(1)

@@ -10,13 +10,12 @@ router.get('/', function(req, res, next) {
 
   res.render( 'compositions/vmp_demo', { title: 'VirtualMixProject: ' });
   /*
-  res.render('index', {
+    res.render('index', {
     title: 'Express'
     //giphy_key: process.env.GIPHYKEY,
     //marduq_key: process.env.MARDUQKEY
   });
   */
-
 });
 
 // for testing
