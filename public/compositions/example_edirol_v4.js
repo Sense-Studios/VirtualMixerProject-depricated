@@ -108,11 +108,13 @@ var renderer = new GlRenderer()
   document.getElementById('btn_effects_a_1').onmousedown = function() {
     if ( color_effect1.effect() != 1 ) {
       color_effect1.effect(1)
-      this.classList = 'effect_a round '
+      this.classList = 'effect_a round'
     }else{
-      var calc = Math.ceil( document.getElementById('effects_a_control').value * 7 ) + 5
-      color_effect1.effect( calc ) // [ 5, 6, 7, 8, 9, 10, 11, 12 ]
-      this.classList = 'effect_a round greenish active';
+      //var calc = Math.round( document.getElementById('effects_a_control').value * 7 ) + 10
+      color_effect1.effect(5) // [ 10,11,12,13,14,15,16,17 ]
+      color_effect1.extra( Number(document.getElementById('effects_a_control').value) )
+      this.classList = 'effect_a round greenish active blinking';
+      clearBlinking( document.getElementById('btn_effects_a_1') )
     }
   }
 
@@ -120,10 +122,12 @@ var renderer = new GlRenderer()
   document.getElementById('btn_effects_a_2').onmousedown = function() {
     if ( nega_effect1.effect() != 1 ) {
       nega_effect1.effect(1)
-      this.classList = 'effect_a round '
+      this.classList = 'effect_a round'
     }else{
       nega_effect1.effect(2)
-      this.classList = 'effect_a round greenish active'
+      color_effect1.extra( Number(document.getElementById('effects_a_control').value) )
+      this.classList = 'effect_a round greenish active blinking'
+      clearBlinking( document.getElementById('btn_effects_a_2') )
     }
   }
 
@@ -131,13 +135,14 @@ var renderer = new GlRenderer()
   document.getElementById('btn_effects_a_3').onmousedown = function() {
     if ( luma_effect1.effect() != 1 ) {
       luma_effect1.effect(1)
-      this.classList = 'effect_a round '
+      this.classList = 'effect_a round'
     }else{
-      original_mixmode = main_mixer.mixMode()
-      luma_effect1.effect(39);
-      luma_effect1.extra(0.5);
+      //original_mixmode = main_mixer.mixMode()
+      luma_effect1.effect(50);
+      color_effect1.extra( Number(document.getElementById('effects_a_control').value) )
       document.getElementById('effects_a_control').value = 0.5
-      this.classList = 'effect_a round greenish active'
+      this.classList = 'effect_a round greenish active blinking'
+      clearBlinking( document.getElementById('btn_effects_a_3') )
     }
   }
 
@@ -145,7 +150,7 @@ var renderer = new GlRenderer()
   document.getElementById('btn_effects_a_4').onmousedown = function() {
     if ( colorize_effect1.effect() != 1 ) {
       colorize_effect1.effect(1)
-      this.classList = 'effect_a round '
+      this.classList = 'effect_a round'
     }else{
       colorize_effect1.effect(42);
       this.classList = 'effect_a round greenish active'
@@ -159,31 +164,42 @@ var renderer = new GlRenderer()
 
   // does this work on mobile?
   document.getElementById('effects_a_control').oninput = function() {
-    console.log("effects_a_control >>", this.value)
+    //console.log("effects_a_control >>", this.value)
 
-    if ( document.getElementById('btn_effects_a_1').classList.contains('active') ) { // add "blinking?"
-      var calc = Math.round( this.value * 10 ) + 7
-      console.log("color effect 1 >>", calc)
+    if ( document.getElementById('btn_effects_a_1').classList.contains('blinking') ) { // add "blinking?"
+      var calc = Math.round( this.value * 7 ) + 10
+      console.log("effects_a_control 1 >>", calc)
       color_effect1.effect( calc ) // [ 5, 6, 7, 8, 9, 10, 11, 12 ]
       //var cycle = [ 10, 11, 12, 13, 14, 15, 16, 17 ];
     }else{
       color_effect1.effect(1)
     }
 
-    if ( document.getElementById('btn_effects_a_2').classList.contains('active') ) { // add "blinking?"
-      var calc = Math.round( this.value * 6 ) + 1
-      // var cycle = [ (1), 2, 3, 4, 5, 6, 7 ]
+    if ( document.getElementById('btn_effects_a_2').classList.contains('blinking') ) { // add "blinking?"
+      var calc = Math.round( this.value * 4 ) + 2
+      // var cycle = [ (1), 2, 3, 4, 5, 6 ]
       console.log("effects_a_control 2 >>", calc)
       nega_effect1.effect( calc ) // [2, 3, 4]
     }else{
       nega_effect1.effect(1)
     }
 
-    if ( document.getElementById('btn_effects_a_3').classList.contains('active') ) { // add "blinking?"
+    if ( document.getElementById('btn_effects_a_3').classList.contains('blinking') ) { // add "blinking?"
+      console.log("effects_a_control 3 >>", this.value)
       luma_effect1.extra( this.value )
     }else{
       //nega_effect1.extra(1)
     }
+  }
+
+  function clearBlinking( _exept_elm ) {
+    document.querySelectorAll('.effect_a').forEach( function( _val ) {
+      if ( _val != _exept_elm) {
+        console.log("clear!", _val)
+        if ( _val.classList.contains('active') ) _val.classList = "effect_a round greenish active"
+        if ( !_val.classList.contains('active') ) _val.classList = "effect_a round"
+      }
+    })
   }
 
   // ---------------------------------------------------------------------------

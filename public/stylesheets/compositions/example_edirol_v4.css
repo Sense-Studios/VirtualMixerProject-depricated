@@ -137,14 +137,18 @@ body {
   #mixer .effects_a_control {
     grid-area: effects_a_control; }
     #mixer .effects_a_control #effects_a_control {
-      transform: rotateZ(90deg); }
+      transform: rotateZ(90deg);
+      width: 100px;
+      position: absolute; }
   #mixer .effects_b {
     grid-area: effects_b;
     flex-direction: column; }
   #mixer .effects_b_control {
     grid-area: effects_b_control; }
     #mixer .effects_b_control #effects_b_control {
-      transform: rotateZ(90deg); }
+      transform: rotateZ(90deg);
+      width: 100px;
+      position: absolute; }
   #mixer .transform_a {
     grid-area: transform_a; }
   #mixer .transform_b {
