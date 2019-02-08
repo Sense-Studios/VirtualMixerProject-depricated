@@ -418,6 +418,8 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  defaults to 128
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
+  */
+  
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM

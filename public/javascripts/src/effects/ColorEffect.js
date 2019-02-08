@@ -96,18 +96,18 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                                  // negtive 1
   if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                                      // negtive 2
   if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                                      // negtive 3
-  if ( currentcoloreffect == 5  ) return vec3( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2. );                                           // negtive 4
-  if ( currentcoloreffect == 6  )
+  if ( currentcoloreffect == 5  ) return vec4( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2., src.a );                                    // negtive 4
+  if ( currentcoloreffect == 6  ) {
     vec3 orig = src.rgb;
     vec3 bw = src.rgb = vec3( src.r + src.g + src.b ) / 3.;
     vec3 nega = ( bw.rgb * -1.) + 1.;
-    return src.rgb = vec3(
+    return vec4(
         ( (orig.r/2.) + (nega.r) ),
         ( (orig.g/2.) + (nega.g) ),
-        ( (orig.b/2.) + (nega.b) )
+        ( (orig.b/2.) + (nega.b) ),
+        src.a
     );
   }
-
 
   // monocolor
   if ( currentcoloreffect == 10  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
@@ -209,6 +209,8 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   //}else {
   //  return src;
   //}
+
+  return src;
 }
 
 /* custom_helpers */

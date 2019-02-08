@@ -2,8 +2,8 @@
 var renderer = new GlRenderer();
 
 // create some solids
-var source1 = new VideoSource(renderer, {})
-var source2 = new VideoSource(renderer, {})
+var source1 = new VideoSource(renderer, { src: "https://s3-eu-west-1.amazonaws.com/nabu/veejay/vjacademy/vjacademy_intro.mp4" } )
+var source2 = new VideoSource(renderer, { src: "https://s3-eu-west-1.amazonaws.com/nabu/veejay/vjacademy/vjacademy_intro.mp4" } )
 
 // create a mixer, mix red and green
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
@@ -27,6 +27,11 @@ renderer.render();       // start update & animation
 
 audioanalysis1.add( mixer1.pod )
 audioanalysis1.mod = 0.5
+
+setTimeout( function() {
+  source1.currentTime(20)
+  source2.currentTime(40)
+}, 500 )
 
 var wasSet = false
 var beats = 0
