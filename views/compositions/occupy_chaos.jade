@@ -10,6 +10,8 @@ html
     link(rel='stylesheet', href='/stylesheets/compositions/occupy_chaos.css')
     
   body 
+    a.logo(href='/')
+    
     canvas#glcanvas
     .blink
     
@@ -19,3 +21,4 @@ html
       | <small>If you don't hear any music, click somewhere on the screen</small>
 
     script(src='/compositions/occupy_chaos.js')
+    include ../partials/analytics

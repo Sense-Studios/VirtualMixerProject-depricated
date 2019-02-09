@@ -3,7 +3,7 @@ var renderer = new GlRenderer();
 
 // create some solids
 var source1 = new VideoSource(renderer, {})
-var source2 = new VideoSource(renderer, {})
+var source2 = new VideoSource(renderer, { src: "http://cdn.marduq.tv/veejay/NoTV2/VTS_01_0.mp4"})
 
 // create a mixer, mix red and green
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
