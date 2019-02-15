@@ -5,18 +5,22 @@ html
       
     script(src='/javascripts/build/vendor.js')
     script(src='/javascripts/build/mixer.js')
+    script 
+      | var clicks = 0;
     
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/compositions/awesome.css')
-    
-  body 
-    a.logo(href='/')
+      
+  body(onclick="clicks++; if(clicks==2) document.getElementById('play_button').style.display = 'none'")
+    a.logo(href='/')    
+    button.play_button#play_button
+    button.mute_button#mute_button
     
     canvas#glcanvas
     .blink
     
     .payoff
-      | <h3>ZIEKs overview of ridiculous cool visuals and sounds</small></h3>      
+      | <h3>ZIEKs overview of ridiculously cool visuals and sounds</small></h3>      
       | His twitter account <a href="https://twitter.com/A_Agrasot">A_Agrasot</a><br>
       | and check him at his label <a href="http://sandiafatal.com/ziek_records/">here</a><br>
       | Mixed with <a href="https://virtualmixproject.com/"> Virtual Mixer Project </a><br>

@@ -37,4 +37,32 @@ body {
   height: 100px;
   z-index: 1000; }
 
+.play_button {
+  position: fixed;
+  top: calc( 50% - 50px);
+  right: calc( 50% - 50px);
+  background-color: transparent;
+  background-image: url("https://image.flaticon.com/icons/svg/49/49669.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100px;
+  height: 100px;
+  z-index: 1000;
+  border: none;
+  pointer-events: none; }
+
+.mute_button {
+  position: fixed;
+  top: 12px;
+  right: 24px;
+  background-color: transparent;
+  background-image: url("https://image.flaticon.com/icons/svg/53/53792.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+  z-index: 1000;
+  border: none;
+  pointer-events: none; }
+
 /*# sourceMappingURL=style.css.map */

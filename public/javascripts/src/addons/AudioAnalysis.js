@@ -89,7 +89,7 @@ function AudioAnalysis( _renderer, _options ) {
   var audio = new Audio()
   _self.audio = audio
 
-  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
+  var context = new(window.AudioContext || window.webkitAudioContext); // AudioContext object instance
   var source //= context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
   var analyser = context.createAnalyser();
@@ -295,6 +295,7 @@ function AudioAnalysis( _renderer, _options ) {
 
       if (tempoData == undefined) {
         console.log("sampler is active, but no beat was found")
+        // return
       }else{
         _self.tempodata_bpm = tempoData.bpm
       }

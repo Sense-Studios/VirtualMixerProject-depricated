@@ -11,9 +11,16 @@ var source3 = new VideoSource(renderer, { src: "https://s3-eu-west-1.amazonaws.c
 // create a mixer, mix red and green
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
-// var analisi
-// var bpm = new BPM( renderer ) tapped beat control
-var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/subfm' } )
+// var analisis
+var userAgent = window.navigator.userAgent;
+if ( userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) )  {
+  var audioanalysis1 = new BPM( renderer ) // tapped beat control
+  var audio = new Audio();
+  //audio.src = '/radio/subfm'
+  audio.play()
+}else{
+  var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/subfm' } )
+}
 
 var filemanager = new FileManager( source1 )
 filemanager.load_set("/sets/ziek.json")
@@ -38,14 +45,22 @@ mixer2.pod(0.6)
 //mixer2.bindBpm( function() { return audioanalysis1.getBpm()/4 } );
 //mixer2.audoFade = true
 
-audioanalysis1.add( mixer1.pod )
-audioanalysis1.mod = 1
+if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i)) {
+   // iPad or iPhone
+}
+else {
+   // Anything else
+   audioanalysis1.add( mixer1.pod )
+   audioanalysis1.mod = 1
+}
+
 
 var wasSet = false
 var beats = 0
 var useBlendmodes = [ 1, 7, 8, 9, 10, 13, 17, 18 ]
 var useMixmodes = [ 1, 2, 6, 3, 4, 5, 9 ] //  6, 7, 8
 var dice = 0
+
 setInterval(function() {
   if ( audioanalysis1.render() > 0.99 && !wasSet ) {
     wasSet = true
