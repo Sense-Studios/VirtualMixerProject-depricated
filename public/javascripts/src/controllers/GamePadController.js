@@ -29,6 +29,7 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
 
   // source.renderer ?
   var nodes = []
+  var binds = []
 
   // counter
   var c = 0
@@ -41,25 +42,42 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     console.log("init GamePadController.")
     //window.addEventListener( 'keydown', keyHandler )
 
-    window.addEventListener("GamePadController connected", connecthandler )
+  }
 
+  _self.connect =  function() {
+    console.log("start gamepads")
 
+    window.addEventListener("gamepadconnected", function(e) {
+      console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        e.gamepad.index, e.gamepad.id,
+        e.gamepad.buttons.length, e.gamepad.axes.length);
+    });
+
+    window.addEventListener("gamepaddisconnected", function(e) {
+      console.log("Gamepad disconnected from index %d: %s",
+        e.gamepad.index, e.gamepad.id);
+    });
+    //window.addEventListener("GamePadController connected", connecthandler )
+    //window.addEventListener("gamepadconnected", connecthandler )
+
+    gamepad.bypass = false
   }
 
   var to1, to2, to3, to4, to5, to6, to7, to8
   var lock
   _self.update = function() {
     // console.log(_self.controllers[0].axes)
-    // console.log( navigator.getGamePadControllers()[0].axes )
-    // console.log( navigator.getGamePadControllers()[0].axes
+    // console.log( navigator.getGamepads()[0].axes )
     // [0.003921627998352051, 0.003921627998352051, 0, 0, 0, 0.003921627998352051, 0.003921627998352051, 0, 0, 3.2857141494750977]
     // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
     //   LP                RP         W
     if ( _self.bypass ) return;
+    if ( navigator.getGamepads()[0] === undefined ) return;
+    console.log( navigator.getGamepads()[0].axes )
 
-    var buttons = navigator.getGamePadControllers()[0].buttons
+    var buttons = navigator.getGamepads()[0].buttons
     //console.log(navigator.getGamePadControllers()[0].buttons)
-    navigator.getGamePadControllers()[0].buttons.forEach(function(b, i){
+    navigator.getGamepads()[0].buttons.forEach(function(b, i){
       if ( b.pressed ) {
         console.log(" i press you ", i, b)
         // HACKITY
@@ -78,7 +96,7 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
       }
     })
 
-    var axes = navigator.getGamePadControllers()[0].axes
+    var axes = navigator.getGamepads()[0].axes
     var leftx = axes[0];
     var lefty = axes[1];
 
@@ -88,23 +106,15 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     var weird = axes[9];
 
     // oringal GANSTA SENSE STYLE
-    _mixer1.pod(leftx/2+0.5)
-    _mixer2.pod(leftx/2+0.5)
-    _mixer3.pod(lefty/2+0.5)
+    _mixer1.pod( leftx / 2+0.5 )
+    _mixer2.pod( leftx / 2+0.5 )
+    _mixer3.pod( lefty / 2+0.5 )
 
     // oringal GANSTA SENSE STYLE
     //_mixer1.pod(Math.abs(leftx))
     //_mixer2.pod(Math.abs(lefty))
     //_mixer3.pod(lefty/2+0.5)
 
-
-  }
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  _self.add = function( _func ) {
-    nodes.push( _func )
   }
 
   _self.render = function() {
@@ -112,8 +122,40 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   }
 
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Helpers
+
+  _self.add = function( _func ) {
+    nodes.push( _func )
+  }
+
+  // ---------------------------------------------------------------------------
+  _self.bind = function( _key, _callback ) {
+    binds.push( { key: _key, callback: _callback } )
+    // check for double binds ?
+  }
+
+  _self.removeBind = function( _key, _num ) {
+    // always remove first ?
+  }
+
+  // [ state, key, velocity ]
+  var checkBindings = function(e) {
+    binds.forEach( function( _obj ) {
+      if ( e[1] == _obj.key ) _obj.callback(e)
+    });
+  }
+
+  _self.addEventListener = function( _callbackName, _target ) {
+    console.log("gamepad add listener: " , _callbackName)
+    //listeners.push( _target )
+    nodes.push({callbackName: _callbackName, target: _target})
+    console.log("gamepad list: ", nodes)
+  }
+
   // "Private"
 
+/*
   var addGamePadController = function( GamePadController ) {
     _self.controllers[GamePadController.index] = GamePadController
     console.log(GamePadController.id, GamePadController.index )
@@ -131,6 +173,7 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     //}
   }
 }
+*/
 
 
 /*
@@ -144,3 +187,5 @@ window.addEventListener("GamePadControllerconnected", function(e) {
       gp.buttons.length, gp.axes.length);
 });
 */
+
+}

@@ -105,6 +105,18 @@ vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra,
   }
 }
 
+
+
+
+  // -------------
+
+  // wipes (move these to mixer?)
+  //if ( gl_FragCoord.x > 200.0 ) {
+  //  return vec4(0.0,0.0,0.0,0.0);
+  //}else {
+  //  return src;
+  //}
+
 /* custom_helpers */
 `
   );

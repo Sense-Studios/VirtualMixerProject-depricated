@@ -31,11 +31,19 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  // color swapping
  *  [20-46], swaps colors like rgb => gbg => rga => etc.
  *
- *  // other, use extra(float) for finetuning
+ *  // keying, use extra(float) for finetuning
  *  50. Luma key
  *  51. Green key
+ *
+ *  // old school, use extra(float) for finetuning
  *  52. Paint
  *  53. Colorize
+ *
+ *  // image processing ( http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/ )
+ *  60 brightness
+ *  61 contrast
+ *  62 saturation
+ *  63 hueshift
  *  ```
  *
  * @example
@@ -70,6 +78,7 @@ function ColorEffect( _renderer, _options ) {
   _renderer.add(_self)
 
   _self.type = "Effect"
+  _self.debug = false
 
   var source = _options.source
   var currentEffect = _options.effect
@@ -197,13 +206,51 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     return pnt;
   }
 
-  // wipes (move these to mixer?)
-  //if ( gl_FragCoord.x > 200.0 ) {
-  //  return vec4(0.0,0.0,0.0,0.0);
-  //}else {
-  //  return src;
-  //}
+  // BRIGHTNESS [ 0 - 1 ]
+  // http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/
+  if ( currentcoloreffect == 60 ) {
+    return vec4( src.rgb + extra, src.a );
+  }
 
+  // CONTRAST [ 0 - 3 ]
+  if ( currentcoloreffect == 61 ) {
+    extra = extra * 3.;
+    float t = 0.5 - extra * 0.5;
+    src.rgb = src.rgb * extra + t;
+    return vec4( src.rgb, src.a );
+  }
+
+  // SATURATION [ 0 - 5 ]
+  if ( currentcoloreffect == 62 ) {
+    extra = extra * 5.;
+    vec3 luminance = vec3( 0.3086, 0.6094, 0.0820 );
+    float oneMinusSat = 1.0 - extra;
+    vec3 red = vec3( luminance.x * oneMinusSat );
+    red.r += extra;
+
+    vec3 green = vec3( luminance.y * oneMinusSat );
+    green.g += extra;
+
+    vec3 blue = vec3( luminance.z * oneMinusSat );
+    blue.b += extra;
+
+    return mat4(
+      red,     0,
+      green,   0,
+      blue,    0,
+      0, 0, 0, 1 ) * src;
+  }
+
+  // SHIFT HUE
+  if ( currentcoloreffect == 63 ) {
+    vec3 P = vec3(0.55735) * dot( vec3(0.55735), src.rgb );
+    vec3 U = src.rgb - P;
+    vec3 V = cross(vec3(0.55735), U);
+    src.rgb = U * cos( extra * 6.2832) + V * sin( extra * 6.2832) + P;
+    return src;
+  }
+
+  // default
   return src;
 }
 
@@ -287,7 +334,7 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
       // update uniform ?
     }
 
-    console.log("extra set to: ", currentExtra)
+    if (_self.debug) console.log("extra set to: ", currentExtra)
     return currentExtra
   }
 }

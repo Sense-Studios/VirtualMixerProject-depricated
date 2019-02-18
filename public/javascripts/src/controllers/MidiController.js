@@ -236,6 +236,7 @@ function MidiController( _options ) {
 
   // [ state, key, velocity ]
   var checkBindings = function(e) {
+
     binds.forEach( function( _obj ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
@@ -258,8 +259,12 @@ function MidiController( _options ) {
   }
 
   var dispatchMidiEvent = function(e) {
+    //console.log(">>", e.data[1])
     nodes.forEach(function( _obj ){
-      _obj.target[_obj.callbackName](e)
+      //_obj.target[_obj.callbackName](e)
+      if ( _obj.callbackName == e.data[1] ) {
+        _obj.target(e.data)
+      }
     });
   }
 }
