@@ -59,11 +59,19 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  // color swapping
  *  [20-46], swaps colors like rgb => gbg => rga => etc.
  *
- *  // other, use extra(float) for finetuning
+ *  // keying, use extra(float) for finetuning
  *  50. Luma key
  *  51. Green key
+ *
+ *  // old school, use extra(float) for finetuning
  *  52. Paint
  *  53. Colorize
+ *
+ *  // image processing ( http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/ )
+ *  60. Brightness
+ *  61. Contrast
+ *  62. Saturation
+ *  63. Hue
  *  ```
  *
  * @example
@@ -98,6 +106,7 @@ function ColorEffect( _renderer, _options ) {
   _renderer.add(_self)
 
   _self.type = "Effect"
+  _self.debug = false
 
   var source = _options.source
   var currentEffect = _options.effect
@@ -121,27 +130,22 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                                              // normal
 
   // negative
-  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );                                                                  // negtive 1
-  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );                                                      // negtive 2
-  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );                                                      // negtive 3
-  if ( currentcoloreffect == 5  ) return vec3( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2. );                                           // negtive 4
-  if ( currentcoloreffect == 6  )
-    vec3 orig = src.rgb;
-    vec3 bw = src.rgb = vec3( src.r + src.g + src.b ) / 3.;
-    vec3 nega = ( bw.rgb * -1.) + 1.;
-    return src.rgb = vec3(
-        ( (orig.r/2.) + (nega.r) ),
-        ( (orig.g/2.) + (nega.g) ),
-        ( (orig.b/2.) + (nega.b) )
-    );
-  }
-
+  // negative 3 (reversed channel)
+  if ( currentcoloreffect == 2  ) return vec4( 1.-src.r, 1.-src.g, 1.-src.b, src.a );
+  // negative 3 (inverted channel high)
+  if ( currentcoloreffect == 3  ) return vec4( 1./src.r-1.0, 1./src.g-1.0, 1./src.b-1.0, src.a );
+  // negative 3 (inverted channel, low)
+  if ( currentcoloreffect == 4  ) return vec4( 1./src.r-2.0, 1./src.g-2.0, 1./src.b-2.0, src.a );
+  // negative 4 (inverted colors, inverted bw )
+  if ( currentcoloreffect == 5  ) return vec4( src.g + src.b / 2., src.r + src.b / 2., src.r + src.b / 2., src.a );
+  // negative 5 (normal colors, inverted b/w)
+  if ( currentcoloreffect == 6  ) return vec4( ( (src.r/2.) + ( ( ( (vec3( src.r + src.g + src.b ) / 3.) * -1.) + 1. ).r) ), ( (src.g/2.) + (( ( (vec3( src.r + src.g + src.b ) / 3.) * -1.) + 1. ).g) ), ( (src.b/2.) + ( ( ( (vec3( src.r + src.g + src.b ) / 3.) * -1.) + 1. ).b) ), src.a );
 
   // monocolor
-  if ( currentcoloreffect == 10  ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
+  if ( currentcoloreffect == 10 ) return vec4( vec3( src.r + src.g + src.b ) / 3., src.a );                                                            // black and white
   if ( currentcoloreffect == 11 ) return vec4( vec3( (src.r+src.g+src.b) *3.  , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor red
-  if ( currentcoloreffect == 12  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
-  if ( currentcoloreffect == 13  ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
+  if ( currentcoloreffect == 12 ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  *3.  , (src.r+src.g+src.b) /1.7 ) / 3., src.a );  // mopnocolor blue
+  if ( currentcoloreffect == 13 ) return vec4( vec3( (src.r+src.g+src.b) /1.7 , (src.r+src.g+src.b)  /1.7 , (src.r+src.g+src.b) *3.  ) / 3., src.a );  // mopnocolor green
   if ( currentcoloreffect == 14 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) /1.2 ) / 3., src.a );  // mopnocolor yellow
   if ( currentcoloreffect == 15 ) return vec4( vec3( (src.r+src.g+src.b) *1.2 , (src.r+src.g+src.b)  *2.  , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor turqoise
   if ( currentcoloreffect == 16 ) return vec4( vec3( (src.r+src.g+src.b) *2.  , (src.r+src.g+src.b)  /1.2 , (src.r+src.g+src.b) *2.  ) / 3., src.a );  // mopnocolor purple
@@ -177,7 +181,6 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // lum key
   if ( currentcoloreffect == 50 ) {
-
     float red = clamp( src.r, extra, 1.) == extra ? .0 : src.r;
     float green = clamp( src.g, extra, 1.) == extra ? .0 : src.g;
     float blue = clamp( src.b, extra, 1.) == extra ? .0 : src.b;
@@ -192,7 +195,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // paint
   if ( currentcoloreffect == 52 ) {
-    //return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
+    // return vec4( floor( src.r * extra ) / extra, floor( src.g * extra ) / extra, floor( src.b * extra ) / extra, src.a  );
     // devide the image up in color bars
     vec4 pnt = vec4(
       src.x &lt; .1 ? .1 : src.x &lt; .2 ? .2 : src.x &lt; .3 ? .3 : src.x &lt; .4 ? .4 : src.x &lt; .5 ? .5 : src.x &lt; .6 ? .6 : src.x &lt; .7 ? .7 : src.x &lt; .8 ? .8 : src.x &lt; .9 ? .9 : src.x,
@@ -231,12 +234,52 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     return pnt;
   }
 
-  // wipes (move these to mixer?)
-  //if ( gl_FragCoord.x > 200.0 ) {
-  //  return vec4(0.0,0.0,0.0,0.0);
-  //}else {
-  //  return src;
-  //}
+  // BRIGHTNESS [ 0 - 1 ]
+  // http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/
+  if ( currentcoloreffect == 60 ) {
+    return vec4( src.rgb + extra, src.a );
+  }
+
+  // CONTRAST [ 0 - 3 ]
+  if ( currentcoloreffect == 61 ) {
+    extra = extra * 3.;
+    float t = 0.5 - extra * 0.5;
+    src.rgb = src.rgb * extra + t;
+    return vec4( src.rgb, src.a );
+  }
+
+  // SATURATION [ 0 - 5 ]
+  if ( currentcoloreffect == 62 ) {
+    extra = extra * 5.;
+    vec3 luminance = vec3( 0.3086, 0.6094, 0.0820 );
+    float oneMinusSat = 1.0 - extra;
+    vec3 red = vec3( luminance.x * oneMinusSat );
+    red.r += extra;
+
+    vec3 green = vec3( luminance.y * oneMinusSat );
+    green.g += extra;
+
+    vec3 blue = vec3( luminance.z * oneMinusSat );
+    blue.b += extra;
+
+    return mat4(
+      red,     0,
+      green,   0,
+      blue,    0,
+      0, 0, 0, 1 ) * src;
+  }
+
+  // SHIFT HUE
+  if ( currentcoloreffect == 63 ) {
+    vec3 P = vec3(0.55735) * dot( vec3(0.55735), src.rgb );
+    vec3 U = src.rgb - P;
+    vec3 V = cross(vec3(0.55735), U);
+    src.rgb = U * cos( extra * 6.2832) + V * sin( extra * 6.2832) + P;
+    return src;
+  }
+
+  // default
+  return src;
 }
 
 /* custom_helpers */
@@ -319,7 +362,7 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
       // update uniform ?
     }
 
-    console.log("extra set to: ", currentExtra)
+    if (_self.debug) console.log("extra set to: ", currentExtra)
     return currentExtra
   }
 }
@@ -333,13 +376,13 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Feb 08 2019 01:28:01 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Feb 18 2019 16:35:28 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

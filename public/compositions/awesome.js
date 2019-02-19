@@ -24,17 +24,27 @@ filemanager2.load_set("/sets/programs_clutter.json")
 // add noise
 var mixer2 = new Mixer( renderer, { source1: source3, source2: mixer1 });
 
+// add effect
+var contrast = new ColorEffect( renderer, { source: mixer2 } )
+
 // finally asign that mixer to the output
-var output = new Output( renderer, mixer2 )
+var output = new Output( renderer, contrast )
 
 // initialize the renderer and start the renderer
 renderer.init();         // init
 renderer.render();       // start update & animation
 
+/* ----------------------------------------------------------------------------
+   And we are away
+   ---------------------------------------------------------------------------- */
+
 // set noise
 mixer2.mixMode(5)
 mixer2.blendMode(1)
 mixer2.pod(0.6)
+
+contrast.effect(61)
+contrast.extra(0.6)
 //mixer2.bindBpm( function() { return audioanalysis1.getBpm()/4 } );
 //mixer2.audoFade = true
 
@@ -44,7 +54,7 @@ audioanalysis1.mod = 1
 var wasSet = false
 var beats = 0
 var useBlendmodes = [ 1, 7, 8, 9, 10, 13, 17, 18 ]
-var useMixmodes = [ 1, 2, 6, 3, 4, 5, 9 ] //  6, 7, 8
+var useMixmodes = [ 1, 2, 3, 4, 5, 6, 9 ] //  6, 7, 8
 var dice = 0
 setInterval(function() {
   if ( audioanalysis1.render() > 0.99 && !wasSet ) {

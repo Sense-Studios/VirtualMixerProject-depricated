@@ -6,10 +6,20 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @description
+ *  ```
+ *   button_1, down, up, click, longpress, doubleclick
+ *   button_2, ...
+ *   axes_1
+ *   axes_2
+ *   axes_3 ...
+ *  ```
  *  ---
  *
  * @example
- *  ---
+ *  let gamepad = new GamePadController( renderer, {});
+ *  gamepad.addEventListener("button_1", function() { ... })
+ *  gamepad.addEventListener("left_x", function() { ... })
+ *
  *
  * @implements Controller
  * @constructor Controller#GamePadController
@@ -17,7 +27,7 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  * @author Sense Studios
  */
 
-function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
+function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer3
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -25,23 +35,41 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   _self.uuid = "GamePadController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.controllers = {};
+  _self.gamepad = {}
   _self.bypass = true
+  _self.debug = false
+  _self.default_gamepad = 0
 
-  // source.renderer ?
+  if ( _options ) {
+    if ("default" in _options) {}
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  // this is kind of redundand
   var nodes = []
-  var binds = []
+
+  _self.showNodes = function() {
+    return nodes
+  }
 
   // counter
   var c = 0
-
-  // add to renderer
-  renderer.add(_self)
 
   // init with a tap contoller
   _self.init = function() {
     console.log("init GamePadController.")
     //window.addEventListener( 'keydown', keyHandler )
 
+    setTimeout( function() {
+      // try connect
+      try {
+        gamepad.connect()
+      }catch(e){
+        console.log("hope for the button", e)
+      }
+    })
   }
 
   _self.connect =  function() {
@@ -63,8 +91,6 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     gamepad.bypass = false
   }
 
-  var to1, to2, to3, to4, to5, to6, to7, to8
-  var lock
   _self.update = function() {
     // console.log(_self.controllers[0].axes)
     // console.log( navigator.getGamepads()[0].axes )
@@ -72,49 +98,33 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
     //   LP                RP         W
     if ( _self.bypass ) return;
-    if ( navigator.getGamepads()[0] === undefined ) return;
-    console.log( navigator.getGamepads()[0].axes )
+    if ( navigator.getGamepads()[0] === undefined ) {
+      console.log("Gamepad: No gamepad could be found")
+      return;
+    }
+
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    //if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
 
     var buttons = navigator.getGamepads()[0].buttons
     //console.log(navigator.getGamePadControllers()[0].buttons)
+
+    var last_axis = 0
+    navigator.getGamepads()[0].axes.forEach( function(a, i) {
+      if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
+        if (_self.debug) console.log(" i push you ", i + 100, a )
+        dispatchGamePadEvent([i+100, a])
+        last_axis = a
+      }
+    });
+
     navigator.getGamepads()[0].buttons.forEach(function(b, i){
+      //console.log(i, b)
       if ( b.pressed ) {
-        console.log(" i press you ", i, b)
-        // HACKITY
-
-        // if we use thje same timeout it worsk too
-        if ( i == 0 ) { clearTimeout(to1); to1 = setTimeout( function() { filemanager1.change(); } , 200 ) }
-        if ( i == 1 ) { clearTimeout(to2); to2 = setTimeout( function() { filemanager2.change(); } , 200 ) }
-        if ( i == 2 ) { clearTimeout(to3); to3 = setTimeout( function() { filemanager3.change(); } , 200 ) }
-        if ( i == 3 ) { clearTimeout(to4); to4 = setTimeout( function() { filemanager4.change(); } , 200 ) }
-
-        // if ( i == 4 ) { clearTimeout(to1); to1 = setTimeout( function() { VideoSource. } , 200 ) }
-        // if ( i == 5 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-        // if ( i == 6 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-        // if ( i == 7 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-
+        if (_self.debug) console.log(" i press you ", i, b.value, b )
+        dispatchGamePadEvent([i, b.value])
       }
     })
-
-    var axes = navigator.getGamepads()[0].axes
-    var leftx = axes[0];
-    var lefty = axes[1];
-
-    var rightx = axes[5];
-    var righty = axes[6];
-
-    var weird = axes[9];
-
-    // oringal GANSTA SENSE STYLE
-    _mixer1.pod( leftx / 2+0.5 )
-    _mixer2.pod( leftx / 2+0.5 )
-    _mixer3.pod( lefty / 2+0.5 )
-
-    // oringal GANSTA SENSE STYLE
-    //_mixer1.pod(Math.abs(leftx))
-    //_mixer2.pod(Math.abs(lefty))
-    //_mixer3.pod(lefty/2+0.5)
-
   }
 
   _self.render = function() {
@@ -125,33 +135,28 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   // ---------------------------------------------------------------------------
   // Helpers
 
-  _self.add = function( _func ) {
-    nodes.push( _func )
-  }
-
   // ---------------------------------------------------------------------------
-  _self.bind = function( _key, _callback ) {
-    binds.push( { key: _key, callback: _callback } )
-    // check for double binds ?
-  }
-
-  _self.removeBind = function( _key, _num ) {
+  _self.removeEventListener = function( _key, _num ) {
     // always remove first ?
   }
 
-  // [ state, key, velocity ]
-  var checkBindings = function(e) {
-    binds.forEach( function( _obj ) {
-      if ( e[1] == _obj.key ) _obj.callback(e)
-    });
-  }
-
-  _self.addEventListener = function( _callbackName, _target ) {
-    console.log("gamepad add listener: " , _callbackName)
+  _self.addEventListener = function( _target, _callback ) {
+    console.log("gamepad add listener: " , _target, _callback)
     //listeners.push( _target )
-    nodes.push({callbackName: _callbackName, target: _target})
+    nodes.push( { target: _target, callback: _callback } )
     console.log("gamepad list: ", nodes)
   }
+
+  // private? const?
+  var dispatchGamePadEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      //console.log(node, i, _arr[0], node.target)
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr[1] )
+      }
+    })
+  }
+
 
   // "Private"
 

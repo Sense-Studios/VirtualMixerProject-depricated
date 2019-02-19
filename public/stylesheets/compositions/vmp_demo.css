@@ -38,14 +38,14 @@ verystrong {
   display: grid;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
-  grid-template-columns: repeat(auto-fill, 33%);
-  grid-template-rows: fit-content(33%) fit-content(33%) fit-content(33%);
+  grid-template-columns: 3fr 3fr 3fr;
   position: absolute;
   left: calc( 50% - 40vw);
   top: 8%;
-  height: 50vh;
+  height: auto;
   width: 80vw;
-  grid-auto-flow: column; }
+  grid-auto-flow: row;
+  margin-bottom: 120px; }
   .grid_container > div {
     background-color: #231f20;
     display: grid;

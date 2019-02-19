@@ -285,7 +285,7 @@ function AudioAnalysis( _renderer, _options ) {
   var audio = new Audio()
   _self.audio = audio
 
-  var context = new(window.AudioContext || window.webkitAudioContext);; // AudioContext object instance
+  var context = new(window.AudioContext || window.webkitAudioContext); // AudioContext object instance
   var source //= context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
   var analyser = context.createAnalyser();
@@ -491,6 +491,7 @@ function AudioAnalysis( _renderer, _options ) {
 
       if (tempoData == undefined) {
         console.log("sampler is active, but no beat was found")
+        // return
       }else{
         _self.tempodata_bpm = tempoData.bpm
       }
@@ -1708,10 +1709,20 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @description
+ *  ```
+ *   button_1, down, up, click, longpress, doubleclick
+ *   button_2, ...
+ *   axes_1
+ *   axes_2
+ *   axes_3 ...
+ *  ```
  *  ---
  *
  * @example
- *  ---
+ *  let gamepad = new GamePadController( renderer, {});
+ *  gamepad.addEventListener("button_1", function() { ... })
+ *  gamepad.addEventListener("left_x", function() { ... })
+ *
  *
  * @implements Controller
  * @constructor Controller#GamePadController
@@ -1719,7 +1730,7 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  * @author Sense Studios
  */
 
-function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
+function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer3
   // returns a floating point between 1 and 0, in sync with a bpm
   var _self = this
 
@@ -1727,50 +1738,87 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   _self.uuid = "GamePadController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.controllers = {};
+  _self.gamepad = {}
   _self.bypass = true
+  _self.debug = false
+  _self.default_gamepad = 0
 
-  // source.renderer ?
+  if ( _options ) {
+    if ("default" in _options) {}
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  // this is kind of redundand
   var nodes = []
+  var binds = []
+
+  _self.showNodes = function() {
+    return nodes
+  }
 
   // counter
   var c = 0
-
-  // add to renderer
-  renderer.add(_self)
 
   // init with a tap contoller
   _self.init = function() {
     console.log("init GamePadController.")
     //window.addEventListener( 'keydown', keyHandler )
 
-    window.addEventListener("GamePadController connected", connecthandler )
+  }
 
+  _self.connect =  function() {
+    console.log("start gamepads")
 
+    window.addEventListener("gamepadconnected", function(e) {
+      console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        e.gamepad.index, e.gamepad.id,
+        e.gamepad.buttons.length, e.gamepad.axes.length);
+    });
+
+    window.addEventListener("gamepaddisconnected", function(e) {
+      console.log("Gamepad disconnected from index %d: %s",
+        e.gamepad.index, e.gamepad.id);
+    });
+    //window.addEventListener("GamePadController connected", connecthandler )
+    //window.addEventListener("gamepadconnected", connecthandler )
+
+    gamepad.bypass = false
   }
 
   var to1, to2, to3, to4, to5, to6, to7, to8
   var lock
   _self.update = function() {
     // console.log(_self.controllers[0].axes)
-    // console.log( navigator.getGamePadControllers()[0].axes )
-    // console.log( navigator.getGamePadControllers()[0].axes
+    // console.log( navigator.getGamepads()[0].axes )
     // [0.003921627998352051, 0.003921627998352051, 0, 0, 0, 0.003921627998352051, 0.003921627998352051, 0, 0, 3.2857141494750977]
     // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
     //   LP                RP         W
     if ( _self.bypass ) return;
+    if ( navigator.getGamepads()[0] === undefined ) {
+      console.log("Gamepad: No gamepad could be found")
+      return;
+    }
 
-    var buttons = navigator.getGamePadControllers()[0].buttons
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+
+    var buttons = navigator.getGamepads()[0].buttons
     //console.log(navigator.getGamePadControllers()[0].buttons)
-    navigator.getGamePadControllers()[0].buttons.forEach(function(b, i){
+
+
+    navigator.getGamepads()[0].buttons.forEach(function(b, i){
       if ( b.pressed ) {
         console.log(" i press you ", i, b)
+        // send listener
+        // if b in nodes dispatch
         // HACKITY
 
         // if we use thje same timeout it worsk too
-        if ( i == 0 ) { clearTimeout(to1); to1 = setTimeout( function() { filemanager1.change(); } , 200 ) }
-        if ( i == 1 ) { clearTimeout(to2); to2 = setTimeout( function() { filemanager2.change(); } , 200 ) }
-        if ( i == 2 ) { clearTimeout(to3); to3 = setTimeout( function() { filemanager3.change(); } , 200 ) }
-        if ( i == 3 ) { clearTimeout(to4); to4 = setTimeout( function() { filemanager4.change(); } , 200 ) }
+        //if ( i == 0 ) { clearTimeout(to1); to1 = setTimeout( function() { filemanager1.change(); } , 200 ) }
+        //if ( i == 1 ) { clearTimeout(to2); to2 = setTimeout( function() { filemanager2.change(); } , 200 ) }
+        //if ( i == 2 ) { clearTimeout(to3); to3 = setTimeout( function() { filemanager3.change(); } , 200 ) }
+        //if ( i == 3 ) { clearTimeout(to4); to4 = setTimeout( function() { filemanager4.change(); } , 200 ) }
 
         // if ( i == 4 ) { clearTimeout(to1); to1 = setTimeout( function() { VideoSource. } , 200 ) }
         // if ( i == 5 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
@@ -1780,7 +1828,7 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
       }
     })
 
-    var axes = navigator.getGamePadControllers()[0].axes
+    var axes = navigator.getGamepads()[0].axes
     var leftx = axes[0];
     var lefty = axes[1];
 
@@ -1790,23 +1838,15 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     var weird = axes[9];
 
     // oringal GANSTA SENSE STYLE
-    _mixer1.pod(leftx/2+0.5)
-    _mixer2.pod(leftx/2+0.5)
-    _mixer3.pod(lefty/2+0.5)
+    // _mixer1.pod( leftx / 2+0.5 )
+    // _mixer2.pod( leftx / 2+0.5 )
+    // _mixer3.pod( lefty / 2+0.5 )
 
     // oringal GANSTA SENSE STYLE
-    //_mixer1.pod(Math.abs(leftx))
-    //_mixer2.pod(Math.abs(lefty))
-    //_mixer3.pod(lefty/2+0.5)
+    // _mixer1.pod(Math.abs(leftx))
+    // _mixer2.pod(Math.abs(lefty))
+    // _mixer3.pod(lefty/2+0.5)
 
-
-  }
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  _self.add = function( _func ) {
-    nodes.push( _func )
   }
 
   _self.render = function() {
@@ -1814,8 +1854,36 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
   }
 
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Helpers
+
+  // ---------------------------------------------------------------------------
+  _self.bind = function( _key, _callback ) {
+    nodes.push( { key: _key, callback: _callback } )
+    // check for double binds ?
+  }
+
+  _self.removeEventListener = function( _key, _num ) {
+    // always remove first ?
+  }
+
+  // [ state, key, velocity ]
+  var checkNodes = function(e) {
+    binds.forEach( function( _obj ) {
+      if ( e[1] == _obj.key ) _obj.callback(e)
+    });
+  }
+
+  _self.addEventListener = function( _callbackName, _target ) {
+    console.log("gamepad add listener: " , _callbackName)
+    //listeners.push( _target )
+    nodes.push( { callbackName: _callbackName, target: _target} )
+    console.log("gamepad list: ", nodes)
+  }
+
   // "Private"
 
+/*
   var addGamePadController = function( GamePadController ) {
     _self.controllers[GamePadController.index] = GamePadController
     console.log(GamePadController.id, GamePadController.index )
@@ -1833,6 +1901,7 @@ function GamePadController( renderer, _mixer1, _mixer2, _mixer3 ) {
     //}
   }
 }
+*/
 
 
 /*
@@ -1846,6 +1915,8 @@ window.addEventListener("GamePadControllerconnected", function(e) {
       gp.buttons.length, gp.axes.length);
 });
 */
+
+}
 
 
 MidiController.prototype = new Controller();  // assign prototype to marqer
@@ -2086,6 +2157,7 @@ function MidiController( _options ) {
 
   // [ state, key, velocity ]
   var checkBindings = function(e) {
+
     binds.forEach( function( _obj ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
@@ -2108,8 +2180,12 @@ function MidiController( _options ) {
   }
 
   var dispatchMidiEvent = function(e) {
+    //console.log(">>", e.data[1])
     nodes.forEach(function( _obj ){
-      _obj.target[_obj.callbackName](e)
+      //_obj.target[_obj.callbackName](e)
+      if ( _obj.callbackName == e.data[1] ) {
+        _obj.target(e.data)
+      }
     });
   }
 }
@@ -2176,11 +2252,19 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  // color swapping
  *  [20-46], swaps colors like rgb => gbg => rga => etc.
  *
- *  // other, use extra(float) for finetuning
- *  50. Luma key
+ *  // keying, use extra(float) for finetuning
+ *  50. Luma key (black key, white key?)
  *  51. Green key
+ *
+ *  // old school, use extra(float) for finetuning
  *  52. Paint
  *  53. Colorize
+ *
+ *  // image processing ( http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/ )
+ *  60. Brightness
+ *  61. Contrast
+ *  62. Saturation
+ *  63. Hue
  *  ```
  *
  * @example
@@ -2215,6 +2299,7 @@ function ColorEffect( _renderer, _options ) {
   _renderer.add(_self)
 
   _self.type = "Effect"
+  _self.debug = false
 
   var source = _options.source
   var currentEffect = _options.effect
@@ -2342,13 +2427,51 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     return pnt;
   }
 
-  // wipes (move these to mixer?)
-  //if ( gl_FragCoord.x > 200.0 ) {
-  //  return vec4(0.0,0.0,0.0,0.0);
-  //}else {
-  //  return src;
-  //}
+  // BRIGHTNESS [ 0 - 1 ]
+  // http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/
+  if ( currentcoloreffect == 60 ) {
+    return vec4( src.rgb + extra, src.a );
+  }
 
+  // CONTRAST [ 0 - 3 ]
+  if ( currentcoloreffect == 61 ) {
+    extra = extra * 3.;
+    float t = 0.5 - extra * 0.5;
+    src.rgb = src.rgb * extra + t;
+    return vec4( src.rgb, src.a );
+  }
+
+  // SATURATION [ 0 - 5 ]
+  if ( currentcoloreffect == 62 ) {
+    extra = extra * 5.;
+    vec3 luminance = vec3( 0.3086, 0.6094, 0.0820 );
+    float oneMinusSat = 1.0 - extra;
+    vec3 red = vec3( luminance.x * oneMinusSat );
+    red.r += extra;
+
+    vec3 green = vec3( luminance.y * oneMinusSat );
+    green.g += extra;
+
+    vec3 blue = vec3( luminance.z * oneMinusSat );
+    blue.b += extra;
+
+    return mat4(
+      red,     0,
+      green,   0,
+      blue,    0,
+      0, 0, 0, 1 ) * src;
+  }
+
+  // SHIFT HUE
+  if ( currentcoloreffect == 63 ) {
+    vec3 P = vec3(0.55735) * dot( vec3(0.55735), src.rgb );
+    vec3 U = src.rgb - P;
+    vec3 V = cross(vec3(0.55735), U);
+    src.rgb = U * cos( extra * 6.2832) + V * sin( extra * 6.2832) + P;
+    return src;
+  }
+
+  // default
   return src;
 }
 
@@ -2432,7 +2555,7 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
       // update uniform ?
     }
 
-    console.log("extra set to: ", currentExtra)
+    if (_self.debug) console.log("extra set to: ", currentExtra)
     return currentExtra
   }
 }
@@ -2543,6 +2666,18 @@ vec4 distortioneffect ( sampler2D src, int currentdistortioneffect, float extra,
     return texture2D( src, wuv ).rgba * vec4( sil, sil, sil, sil );
   }
 }
+
+
+
+
+  // -------------
+
+  // wipes (move these to mixer?)
+  //if ( gl_FragCoord.x > 200.0 ) {
+  //  return vec4(0.0,0.0,0.0,0.0);
+  //}else {
+  //  return src;
+  //}
 
 /* custom_helpers */
 `
@@ -4470,7 +4605,7 @@ function VideoSource(renderer, options) {
       }
     }, 400 )
 
-    function firstTouch() {      
+    function firstTouch() {
       videoElement.play();
       _self.firstplay = true
       document.body.removeEventListener('click', firstTouch)

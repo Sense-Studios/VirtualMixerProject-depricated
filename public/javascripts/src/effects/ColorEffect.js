@@ -32,7 +32,7 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  [20-46], swaps colors like rgb => gbg => rga => etc.
  *
  *  // keying, use extra(float) for finetuning
- *  50. Luma key
+ *  50. Luma key (black key, white key?)
  *  51. Green key
  *
  *  // old school, use extra(float) for finetuning
@@ -40,10 +40,10 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  53. Colorize
  *
  *  // image processing ( http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/ )
- *  60 brightness
- *  61 contrast
- *  62 saturation
- *  63 hueshift
+ *  60. Brightness
+ *  61. Contrast
+ *  62. Saturation
+ *  63. Hue
  *  ```
  *
  * @example
