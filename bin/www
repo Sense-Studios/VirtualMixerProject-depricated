@@ -28,9 +28,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-/** 
+/**
  * pass the server to socekts.io and pass sockets.io
- * to the app 
+ * to the app
 */
 var io = require('socket.io')(server);
 app.setIo(io)

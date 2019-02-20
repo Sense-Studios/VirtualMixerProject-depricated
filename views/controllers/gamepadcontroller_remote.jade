@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+
+
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(rel='stylesheet', href='/stylesheets/compositions/demo_gamepad.css')
+
+  body
+    | HELLOOOOOO NUHRSE
+    
+    h1.large.info#infobox
+      | INFO
+
+    .test
+      a.button(href="#")
+        | test
+
+    script(src='/remotes/gamepadcontroller_remote.js')
+    include ../partials/analytics

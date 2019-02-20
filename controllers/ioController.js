@@ -22,15 +22,14 @@ exports.setIo = function( _io ) {
 // internal initializer
 init = function(io) {
 	io.on('connection', function(socket){
-   console.log('a user connected') //, socket);
+    console.log('a user connected') //, socket);
 
-   _self.addClient(socket)
+    _self.addClient(socket)
 
-	 socket.on('disconnect', function(socket){
-		 console.log('user disconnected');
-     // remove user
-     _self.removeClient(socket)
-
+	  socket.on('disconnect', function(socket){
+		    console.log('user disconnected');
+        // remove user
+        _self.removeClient(socket)
 	 	});
 
 		// Depricated
@@ -45,6 +44,7 @@ init = function(io) {
 
   		if ( msg.command != "beats"        ) {
         console.log('command: ', msg);
+        io.emit('command', msg )
       }else{
         io.emit('command', {"command":"beats", "payload": msg.payload});
       }
@@ -53,6 +53,12 @@ init = function(io) {
       if ( msg.command == "dibs"         )  _self.dibs( msg, socket );
       if ( msg.command == "identify"     )  _self.addClient( socket );
 		});
+
+    socket.on('controller', function(msg) {
+      // find client get its socket
+      console.log('controller: ', msg);
+      io.emit('controller', msg );
+    })
 	})
 }
 

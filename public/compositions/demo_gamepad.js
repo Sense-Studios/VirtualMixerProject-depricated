@@ -110,7 +110,8 @@ button_5 = function() {
 }
 
 var lock_6 = false
-button_6 = function(_val) {
+button_6 = function(_arr) {
+  var _val = _arr[1]
   if (lock_6) return
   console.log("button 6", _val * 2)
   //source1.jump( source1.currentTime() - _val * 4)
@@ -123,7 +124,8 @@ button_6 = function(_val) {
 }
 
 var lock_7 = false
-button_7 = function(_val) {
+button_7 = function(_arr) {
+  var _val = _arr[1]
   if (lock_7) return
   console.log("button 7", _val * 5)
   //source1.jump( source1.currentTime() + _val * 4)
@@ -153,7 +155,8 @@ button_11 = function(_val) {
 }
 
 // Axis
-left_x = function(_val) {
+left_x = function(_arr) {
+  var _val = _arr[1]
   if (lock_left) return;
   var setx = ( _val + 1 ) / 2
   if (setx >= 0.9 ) setx = 1
@@ -163,7 +166,8 @@ left_x = function(_val) {
   mixer2.pod( setx )
 }
 
-left_y = function(_val) {
+left_y = function(_arr) {
+  var _val = _arr[1]
   if (lock_left) return;
   var sety = ( _val + 1 ) / 2
   if (sety >= 0.9 ) sety = 1
@@ -172,10 +176,12 @@ left_y = function(_val) {
   mixer3.pod( sety )
 }
 
-right_x = function(_val) {
+right_x = function(_arr) {
+  var _val = _arr[1]
   if (!lock_right) saturation.extra( _val)
 }
-right_y = function( _val ) {
+right_y = function( _arr ) {
+  var _val = _arr[1]
   if (!lock_right) hue.extra(_val )
 }
 
