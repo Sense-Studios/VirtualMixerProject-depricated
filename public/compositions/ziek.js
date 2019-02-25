@@ -1,17 +1,12 @@
 // create a renderer
 var renderer = new GlRenderer();
 
-// create some solids
 var source1 = new VideoSource(renderer, {})
 var source2 = new VideoSource(renderer, {})
 var source3 = new VideoSource(renderer, { src: "https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/vhs_noise3.mp4" } );
-//var source3 = new VideoSource(renderer, { src: "http://nabu-dev.s3.amazonaws.com/uploads/video/53e2a3ad6465761455190000/720p_5000kbps_h264.mp4?r=737324588185" } );
 
-
-// create a mixer, mix red and green
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
-// var analisis
 var userAgent = window.navigator.userAgent;
 if ( userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) )  {
   var audioanalysis1 = new BPM( renderer ) // tapped beat control
@@ -31,22 +26,36 @@ filemanager2.load_set("/sets/ziek.json")
 // add noise
 var mixer2 = new Mixer( renderer, { source1: source3, source2: mixer1 });
 
-// finally asign that mixer to the output
-var output = new Output( renderer, mixer2 )
+// add contrast
+var contrast = new ColorEffect( renderer, { source: mixer2 });
+
+
+// finally asign it all to the output
+var output = new Output( renderer, contrast )
 
 // initialize the renderer and start the renderer
 renderer.init();         // init
 renderer.render();       // start update & animation
 
-// set noise
-mixer2.mixMode(5)
-mixer2.blendMode(1)
-mixer2.pod(0.6)
-//mixer2.bindBpm( function() { return audioanalysis1.getBpm()/4 } );
-//mixer2.audoFade = true
+// -----------------------------------------------------------------------------
+contrast.effect(61)      // select contrast from coloreffect
+contrast.extra(0.4)      // set contrast to 0.4
+mixer2.mixMode(5)        // add noise, mixer 5 is a 50/50 mix (on top of mixer 1)
+mixer2.blendMode(1)      // mix noise as normal
+mixer2.pod(0.6)          // mix noise 60%
+
+// not using binds, today
+// mixer2.bindBpm( function() { return audioanalysis1.getBpm()/4 } );
+// mixer2.audoFade = true
 
 if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i)) {
    // iPad or iPhone
+   try {
+     audioanalysis1.add( mixer1.pod )
+     audioanalysis1.mod = 1
+   }catch(e){
+     alert('Apple device detected!')
+   }
 }
 else {
    // Anything else

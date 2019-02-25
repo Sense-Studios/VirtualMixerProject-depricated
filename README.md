@@ -19,35 +19,9 @@ Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMi
 
 Or continue with the Quickstart
 
-## Installation
-
-1) clone the package, defaults to VirtualMixerProject/
-
-```
-  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git
-```
-
-2) run the installer
-
-```
-  $ VirtualMixerProject/ npm install
-```
-
-3) start the app
-
-```
-  $ VirtualMixerProject/  npm start
-```
-
-4) Go to 127.0.0.1:3000 and enjoy the show!
-
-Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs
-
-Or continue with the Quick start
-
 ## Quickstart
 
-Make sure you include the build files. (and in this order) from the `/build` directory:
+Make sure you include the build files. (and in this order)
 
 ```    
   https://virtualmixproject.com/javascripts/build/vendor-min.js
@@ -83,8 +57,9 @@ Write a little of Webpage:
 </html>
 
 ```
+See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 
-The most basic mixer setup is laid out hereunder in ASCII art:
+So here is what happens; the most basic mixer setup is laid out hereunder in ASCII art:
 
 ```
     ____________     ____________   <--- src: somefile.mp4
@@ -123,12 +98,39 @@ setInterval( function() {
 ```
 See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 
+## Installation
+
+You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!
+_if_ you store your videos locally.
+
+1) clone the package, defaults to VirtualMixerProject/
+
+```
+  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git
+```
+
+2) run the installer
+
+```
+  $ VirtualMixerProject/ npm install
+```
+
+3) start the app
+
+```
+  $ VirtualMixerProject/  npm start
+```
+
+4) Go to 127.0.0.1:3000 and enjoy the show!
+
+Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs
+
 
 ## Further Reading
 
+* References
 * Limitations
 * Build instructions
-* References
 * Roadmap
 
 ## Roadmap
@@ -136,8 +138,8 @@ See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 * Set up a Node editor
 * ~~Hook up Midi controller~~
 * add wipe MixModes
-* add configuration for Firebase
-* Phase out express for lightweight server/ templating
+* ~~add configuration for Firebase~~ => Wire up a socket.io implementation
+* Phase out express for lightweight server/ templating. alternative?
 * ~~Phase out jQuery~~
 * Phase out ThreeJS
 

@@ -125,8 +125,8 @@ function Mixer( renderer, options ) {
   _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
 
   var source1, source2;
-  source1 = options.source1;   // Mandatory
-  source2 = options.source2;   // Mandatory
+  source1 = options.source1 //|| options.src1;   // Mandatory
+  source2 = options.source2 //|| options.src2;   // Mandatory
 
 
   _self.init = function() {
@@ -419,7 +419,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
   */
-  
+
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM

@@ -38,7 +38,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.gamepad = {}
   _self.bypass = true
   _self.debug = false
-  _self.default_gamepad = 0
+  _self.gamepad_index = 0
 
   if ( _options ) {
     if ("default" in _options) {}
@@ -86,24 +86,24 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     //if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
     //if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
 
-    if ( navigator.getGamepads()[0] === undefined || navigator.getGamepads()[0] === null ) {
+    if ( navigator.getGamepads()[_self.gamepad_index] === undefined || navigator.getGamepads()[0] === null ) {
       console.log("Gamepad: No gamepad could be found")
       _self.bypass = true
       return;
     }
 
     var last_axis = 0
-    navigator.getGamepads()[0].axes.forEach( function(a, i) {
+    navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
       if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
-        if (_self.debug) console.log(" Button: ", i + 100, a )
+        if (_self.debug) console.log(" Axis: ", i + 100, a )
         dispatchGamePadEvent([i+100, a])
         last_axis = a
       }
     });
 
-    navigator.getGamepads()[0].buttons.forEach(function(b, i){
+    navigator.getGamepads()[_self.gamepad_index].buttons.forEach(function(b, i){
       if ( b.pressed ) {
-        if (_self.debug) console.log(" Axis: ", i, b.value, b )
+        if (_self.debug) console.log(" Button: ", i, b.value, b )
         dispatchGamePadEvent([i, b.value])
       }
     })
@@ -123,10 +123,10 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   }
 
   _self.addEventListener = function( _target, _callback ) {
-    console.log("gamepad add listener: " , _target, _callback)
+    //console.log("gamepad add listener: " , _target, _callback)
     //listeners.push( _target )
     nodes.push( { target: _target, callback: _callback } )
-    console.log("gamepad list: ", nodes)
+    console.log("gamepad listeners: ", nodes)
   }
 
   // private? const?
@@ -137,7 +137,6 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
       }
     })
   }
-
   _self.getNodes = function() {
     return nodes
   }

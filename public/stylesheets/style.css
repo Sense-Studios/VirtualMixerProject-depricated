@@ -65,4 +65,9 @@ body {
   border: none;
   pointer-events: none; }
 
+img.text-icon {
+  margin: 2px 4px;
+  height: 16px;
+  vertical-align: middle; }
+
 /*# sourceMappingURL=style.css.map */

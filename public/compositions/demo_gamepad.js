@@ -30,6 +30,7 @@ var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 });
 
 // set up a game pad
 var gamepad = new GamePadController( renderer ) // , mixer1, mixer2, mixer3
+var socketcontroller = new SocketController()
 
 // set a temp video source to test with
 // var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
@@ -55,7 +56,8 @@ renderer.render();       // start update & animation
 
 // ------------------------------------------------------------------------------
 
-gamepad.debug = false
+gamepad.debug = true
+gamepad.gamepad_index = 1
 
 function mycallback( _value ) {
   console.log("called back:", _value)
@@ -165,7 +167,6 @@ left_x = function(_arr) {
   mixer1.pod( setx )
   mixer2.pod( setx )
 }
-
 left_y = function(_arr) {
   var _val = _arr[1]
   if (lock_left) return;
@@ -193,6 +194,8 @@ gamepad.addEventListener( 4, button_4 )
 gamepad.addEventListener( 5, button_5 )
 gamepad.addEventListener( 6, button_6 )
 gamepad.addEventListener( 7, button_7 )
+// gamepad.addEventListener( 8, button_8 )
+// gamepad.addEventListener( 9, button_9 )
 gamepad.addEventListener( 10, button_10 )
 gamepad.addEventListener( 11, button_11 )
 gamepad.addEventListener( 100, left_x )
@@ -210,14 +213,17 @@ saturation.debug = false
 hue.debug =true
 // var bpm = analysis;
 
-// add a function that moves the mixer handle from left to right.
-var c = 0;
-setInterval( function() {
-  c += 0.01
-  // mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
-  //contrast.extra( ( ( Math.sin( c ) * 0.5 ) + 0.5 ) + 0.1 )  ;
-  //hue.extra( ( ( Math.cos( c ) * 0.5 ) + 0.5 ) ) ;
+setTimeout( function() {
+  console.log("got local socket id: ", socketcontroller.target)
+}, 200 )
+
+document.querySelectorAll('.button')[0].onclick = function() { gamepad.connect() }
+
+socketcontroller.addEventListener( 666, function( msg ) {
+  console.log( "got test ", msg )
 })
 
 
-document.querySelectorAll('.button')[0].onclick = function() { gamepad.connect() }
+
+
+// ---
