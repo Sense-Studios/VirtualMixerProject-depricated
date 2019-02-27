@@ -3,7 +3,7 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The color effect has a series of color effects, ie. implements a series of operations on rgba
  *
  * @description
  *   Color effect allows for a series of color effect, mostly

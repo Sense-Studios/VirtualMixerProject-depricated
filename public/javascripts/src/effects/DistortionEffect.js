@@ -3,15 +3,17 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The Distortion effect has a series of simple distortion effects, ie. it manipulates, broadly, the UV mapping and pixel placements
  *
  * @description
- *   Color effect allows for a series of color effect, mostly
+ *   Distortion  effect allows for a series of color Distortion, mostly
  *   mimicing classic mixers like MX50 and V4
  *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *    1. normal
+ *    2. phasing sides
+ *    3. multi
+ *    4. PiP (Picture in picture)
+ *
  *   ```
  *
  * @example

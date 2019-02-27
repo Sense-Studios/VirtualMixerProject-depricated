@@ -3,10 +3,10 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *
  * @description
- *   Color effect allows for a series of color effect, mostly
+ *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *   mimicing classic mixers like MX50 and V4
  *   ```
  *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3

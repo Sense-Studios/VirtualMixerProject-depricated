@@ -110,6 +110,19 @@ init = function(io) {
       io.emit('controller', msg );
     });
     */
+
+    socket.on('controller', function( _msg ) {
+      //console.log("got your test ", _msg )
+      //console.log("got your clients")
+      io.emit("controller", _msg) // broadcast to all
+      clients.map(function(c) {
+        //console.log( c.uuid, _msg.target, c.uuid == _msg.target )
+        if ( c.uuid == _msg.target) {
+          console.log("send ", c.uuid)
+          c.emit("controller", _msg)
+        }
+      })
+    })
 	})
 }
 

@@ -31,6 +31,7 @@ function SocketController( _options  ) {
   _self.io = io.connect(); // 'http://83.137.150.207:3001'
   _self.target = ""
 
+  nodes = []
   if ( _options ) {}
 
   // I don't think we need this
@@ -47,7 +48,13 @@ function SocketController( _options  ) {
   })
 
   _self.io.on('controller', function(_arr) {
-    console.log( 'got controller', _arr )
+    if ( _self.debug ) console.log( 'got controller', _arr )
+
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr[1] )
+      }
+    })
   })
 
   _self.io.on('test', function( msg ) {
@@ -63,7 +70,7 @@ function SocketController( _options  ) {
   }
 
   _self.addEventListener = function( _target, _callback ) {
-
+    nodes.push( [ _target, _callback ] )
   }
 
   _self.dispatchEvent = function( _command, _target, _payload ) {

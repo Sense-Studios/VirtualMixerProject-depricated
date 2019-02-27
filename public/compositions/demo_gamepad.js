@@ -223,6 +223,10 @@ socketcontroller.addEventListener( 666, function( msg ) {
   console.log( "got test ", msg )
 })
 
+socketcontroller.addEventListener( "controller", function( msg ) {
+  console.log( "got controller ", msg )
+})
+
 
 
 

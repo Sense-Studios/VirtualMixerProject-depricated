@@ -4,9 +4,9 @@ socket.on('chat message', function(msg){
   console.log(msg)
 });
 
-socket.on('controller', function(msg){
-  document.getElementById( 'infobox' ).innerHTML = msg //+ "<br>" + document.getElementById( 'infobox' ).innerHTML
-})
+// socket.on('controller', function(msg){
+//  document.getElementById( 'controller' ).innerHTML = msg //+ "<br>" + document.getElementById( 'infobox' ).innerHTML
+//})
 
 socket.emit('ping', {});
 socket.emit('chat message', {});
@@ -23,19 +23,20 @@ gamepad.debug = false
 //var left_x
 //var left_y
 function left_x(_arr) {
-  console.log("euhr", _arr)
+  //console.log("euhr", _arr)
   socket.emit('controller', _arr );
+  document.getElementById( 'left_x' ).innerHTML = _arr
 }
 
 function left_y(_arr) {
-  console.log("euhr", _arr)
+  //console.log("euhr", _arr)
   socket.emit('controller', _arr );
-  document.getElementById( 'infobox' ).innerHTML = _arr
+  document.getElementById( 'left_y' ).innerHTML = _arr
 }
 
 
-gamepad.addEventListener( 1, function() { test("Client_617adaf7") } )
-gamepad.addEventListener( 2, function() { test("Client_a7ff3e7")  } )
+//gamepad.addEventListener( 1, function() { test("Client_617adaf7") } )
+//gamepad.addEventListener( 2, function() { test("Client_a7ff3e7")  } )
 gamepad.addEventListener( 100, left_x )
 gamepad.addEventListener( 101, left_y )
 

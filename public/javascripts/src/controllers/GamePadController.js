@@ -69,6 +69,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
       console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
         e.gamepad.index, e.gamepad.id,
         e.gamepad.buttons.length, e.gamepad.axes.length);
+      _self.init()
     });
 
     window.addEventListener("gamepaddisconnected", function(e) {
@@ -94,11 +95,19 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
 
     var last_axis = 0
     navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
+      dispatchGamePadEvent([i+100, a])
+      /*
       if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
         if (_self.debug) console.log(" Axis: ", i + 100, a )
         dispatchGamePadEvent([i+100, a])
         last_axis = a
+      }else{
+        if (last_axis != 0 ) {
+          dispatchGamePadEvent([i+100, 0])
+        }
+        last_axis = 0
       }
+      */
     });
 
     navigator.getGamepads()[_self.gamepad_index].buttons.forEach(function(b, i){
