@@ -27,7 +27,7 @@ function MidiController( _options ) {
   _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "MidiController"
   _self.bypass = true
-  _self.verbose = false
+  _self.debug = false
   _self.ready = false
   _self.controllers = {};
 
@@ -60,8 +60,9 @@ function MidiController( _options ) {
       initMidi()
   	}
 
-    console.log("Midi READY")
+    console.log("Midi READY? ", output, midi)
     if ( output != undefined ) _self.ready = true
+    if ( output != undefined ) _self.bypass = false
   }
 
   // everything went wrong.
@@ -77,8 +78,8 @@ function MidiController( _options ) {
   }
 
   function initMidi() {
-    if ( _self.verbose ) console.log(" MIDI READY", "ready")
-    dispatchMidiEvent("ready")
+    if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
+    // dispatchMidiEvent("ready")
   }
 
   // some examples, this is the 'onpress' (and on slider) function
@@ -87,8 +88,8 @@ function MidiController( _options ) {
   var doubleclick = false
 
   _self.onMIDIMessage = function(e) {
-    if (_self.verbose) console.log(" MIDIMESSAGE >>", e.data)
-    checkBindings(e.data)
+    if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
+    checkBindings(e.data) // depricated
     dispatchMidiEvent(e)
 
     // hello from midi
@@ -225,6 +226,7 @@ function MidiController( _options ) {
   _self.update = function() {}
 
   // ---------------------------------------------------------------------------
+  // BINDS ARE DEPRICATED
   _self.bind = function( _key, _callback ) {
     binds.push( { key: _key, callback: _callback } )
     // check for double binds ?
@@ -241,6 +243,7 @@ function MidiController( _options ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
   }
+  // ---------------------------------------------------------------------------
 
   _self.send = function( commands ) {
     if (_self.ready) {
@@ -259,7 +262,7 @@ function MidiController( _options ) {
   }
 
   var dispatchMidiEvent = function(e) {
-    //console.log(">>", e.data[1])
+    //console.log(">>", e)
     nodes.forEach(function( _obj ){
       //_obj.target[_obj.callbackName](e)
       if ( _obj.callbackName == e.data[1] ) {

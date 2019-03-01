@@ -44,7 +44,7 @@ mixer2.blendMode(1)
 mixer2.pod(0.6)
 
 contrast.effect(61)
-contrast.extra(0.6)
+contrast.extra(0.4)
 //mixer2.bindBpm( function() { return audioanalysis1.getBpm()/4 } );
 //mixer2.audoFade = true
 

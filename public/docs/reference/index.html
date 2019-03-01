@@ -50,13 +50,7 @@
 <p>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have<br>support for <em>gamepads</em> en <em>midi</em> devices.</p>
 <p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
 <p>Or continue with the Quickstart</p>
-<h2>Installation</h2><p>1) clone the package, defaults to VirtualMixerProject/</p>
-<pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></pre><p>2) run the installer</p>
-<pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install</code></pre><p>3) start the app</p>
-<pre class="prettyprint source"><code>  $ VirtualMixerProject/  npm start</code></pre><p>4) Go to 127.0.0.1:3000 and enjoy the show!</p>
-<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
-<p>Or continue with the Quick start</p>
-<h2>Quickstart</h2><p>Make sure you include the build files. (and in this order) from the <code>/build</code> directory:</p>
+<h2>Quickstart</h2><p>Make sure you include the build files. (and in this order)</p>
 <pre class="prettyprint source"><code>  https://virtualmixproject.com/javascripts/build/vendor-min.js
   https://virtualmixproject.com/javascripts/build/mixer-min.js
 </code></pre><p>Write a little of Webpage:</p>
@@ -83,7 +77,8 @@
     &lt;/script>
   &lt;/body>
 &lt;/html>
-</code></pre><p>The most basic mixer setup is laid out hereunder in ASCII art:</p>
+</code></pre><p>See it al wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
+<p>So here is what happens; the most basic mixer setup is laid out hereunder in ASCII art:</p>
 <pre class="prettyprint source"><code>    ____________     ____________   &lt;--- src: somefile.mp4
     | Source 1 |     | Source 2 |   &lt;--- play(), pause(), currentTime(), etc. (html5 interface)
     ------------     ------------   
@@ -112,18 +107,24 @@ setInterval( function() {
   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })
 </code></pre><p>See it al wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
+<h2>Installation</h2><p>You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!<br>_if_ you store your videos locally.</p>
+<p>1) clone the package, defaults to VirtualMixerProject/</p>
+<pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></pre><p>2) run the installer</p>
+<pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install</code></pre><p>3) start the app</p>
+<pre class="prettyprint source"><code>  $ VirtualMixerProject/  npm start</code></pre><p>4) Go to 127.0.0.1:3000 and enjoy the show!</p>
+<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
 <h2>Further Reading</h2><ul>
+<li>References</li>
 <li>Limitations</li>
 <li>Build instructions</li>
-<li>References</li>
 <li>Roadmap</li>
 </ul>
 <h2>Roadmap</h2><ul>
 <li>Set up a Node editor</li>
 <li><del>Hook up Midi controller</del></li>
 <li>add wipe MixModes</li>
-<li>add configuration for Firebase</li>
-<li>Phase out express for lightweight server/ templating</li>
+<li><del>add configuration for Firebase</del> =&gt; Wire up a socket.io implementation</li>
+<li>Phase out express for lightweight server/ templating. alternative?</li>
 <li><del>Phase out jQuery</del></li>
 <li>Phase out ThreeJS</li>
 </ul>
@@ -139,13 +140,13 @@ setInterval( function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Controller_ComputerKeyboard.html">ComputerKeyboard</a></li><li><a href="Controller_Gamepad.html">Gamepad</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Feb 18 2019 16:35:28 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Feb 27 2019 01:51:39 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

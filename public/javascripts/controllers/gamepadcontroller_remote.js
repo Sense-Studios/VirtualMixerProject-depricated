@@ -42,6 +42,10 @@ gamepad.addEventListener( 101, left_y )
 
 var socketcontroller = new SocketController()
 
+socketcontroller.addEventListener('mass', function(_payload) {
+  console.log(">>> got mass",_payload )
+})
+
 // target, pin
 // Client_1364a3d4
 var test = function( _target ) {

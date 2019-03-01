@@ -188,8 +188,8 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
 
   /**
    * @description currentDistortionffect number
-   * @function Effect#DistiotionEffect#effect
-   * @param {Number} effectnumber currentColoreffect number 1
+   * @function Effect#DistortionEffect#effect
+   * @param {Number} effectnumber CurrentDistortionEffect number 1
    */
 
   _self.effect = function( _num ){
@@ -202,8 +202,8 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
     return currentEffect
   }
   /**
-   * @description the extra, for several effects
-   * @function Effect#DistiotionEffect#extra
+   * @description the extra, for several effects, usually between 0 and 1, but go grazy
+   * @function Effect#DistortionEffect#extra
    * @param {float} floatValue between 0 and 1
    */
   _self.extra = function( _num ){

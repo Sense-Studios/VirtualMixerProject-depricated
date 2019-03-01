@@ -38,21 +38,24 @@ function SocketController( _options  ) {
   //_renderer.add( _self )
 
   // ---
-  _self.io.on('msg', function(_arr) {
-    console.log( 'got msg', _arr )
+  _self.io.on('msg', function( _msg ) {
+    console.log( 'got msg', _msg )
   })
 
-  _self.io.on('command', function( msg ) {
-    console.log( 'got msg', msg )
-    if ( msg.command == "welcome") _self.target = msg.payload
+  _self.io.on('command', function( _command ) {
+    console.log( 'got command', _command )
+    if ( _command.command == "welcome") _self.target = _command.payload
   })
 
   _self.io.on('controller', function(_arr) {
     if ( _self.debug ) console.log( 'got controller', _arr )
 
     nodes.forEach( function( node, i ) {
-      if ( _arr[0] == node.target ) {
-        node.callback( _arr[1] )
+      if ( _arr[0] == node[0] ) {
+        node[1]( _arr[1] )
+
+        // dispatchEvent( client, 1, )
+        // _obj.target(e.data) [ x, y, z ]
       }
     })
   })
@@ -69,14 +72,16 @@ function SocketController( _options  ) {
 
   }
 
+  // nodes = [ [ 1, func() ] ]
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( [ _target, _callback ] )
-  }
+    // nodes.push( { target: _target, callback: _callback } )
+    _self.io.on(_target, function( _msg, _target ) {
+      console.log( 'got custom target msg', _msg, _target )
+    })
 
-  _self.dispatchEvent = function( _command, _target, _payload ) {
-    //target
-    console.log("going to send " + JSON.stringify(_payload) + " to: ", _command, " by ", _command )
-    _self.io.emit(_command, {target:_target, command:_command, payload:_payload});
+    console.log("socketcontroller got listener", _target, _callback)
+    console.log(">>> ", nodes )
   }
 
   // depricated
@@ -89,6 +94,12 @@ function SocketController( _options  ) {
         _self.io.emit( _arr )
       }
     })
+  }
+
+  _self.dispatchEvent = function( _command, _target, _payload ) {
+    //target
+    console.log("going to send " + JSON.stringify(_payload) + " to: ", _target, " by ", _command )
+    _self.io.emit(_command, {target:_target, command:_command, payload:_payload});
   }
 
   _self.bind = function( _num, _arr ) {

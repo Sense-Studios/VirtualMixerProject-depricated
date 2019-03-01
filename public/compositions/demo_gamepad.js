@@ -30,6 +30,7 @@ var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 });
 
 // set up a game pad
 var gamepad = new GamePadController( renderer ) // , mixer1, mixer2, mixer3
+var midicontroller = new MidiController( renderer )
 var socketcontroller = new SocketController()
 
 // set a temp video source to test with
@@ -213,15 +214,29 @@ saturation.debug = false
 hue.debug =true
 // var bpm = analysis;
 
+var  midislider = function(e) {
+  console.log("data slider 48", e[0], e[1], e[2] )
+}
+var midibutton = function(e) {
+  console.log("data! button 1", e[0], e[1], e[2] )
+}
+midicontroller.addEventListener( 1, midibutton )
+midicontroller.addEventListener( 48, midislider )
+
+
 setTimeout( function() {
   console.log("got local socket id: ", socketcontroller.target)
 }, 200 )
 
 document.querySelectorAll('.button')[0].onclick = function() { gamepad.connect() }
 
+
 socketcontroller.addEventListener( 666, function( msg ) {
   console.log( "got test ", msg )
 })
+
+socketcontroller.addEventListener( 0, button_0 )
+socketcontroller.addEventListener( 1, button_1 )
 
 socketcontroller.addEventListener( "controller", function( msg ) {
   console.log( "got controller ", msg )

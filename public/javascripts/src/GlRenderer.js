@@ -39,7 +39,6 @@ var GlRenderer = function( _options ) {
     _self.options = _options
   }
 
-  /** This is a description of the foo function. */
   // set up threejs scene
   _self.element = _self.options.element
   _self.scene = new THREE.Scene();

@@ -6,19 +6,39 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @description
+ *
  *  ```
- *   button_1, down, up, click, longpress, doubleclick
- *   button_2, ...
- *   axes_1
- *   axes_2
- *   axes_3 ...
+ *   1. button 1
+ *   2. button 2
+ *   3. button 3
+ *   4. button 4
+ *   5. button 5
+ *   6. button 6
+ *   7. button 7
+ *   8. button 8
+ *   9. button 9
+ *   10. button 10
+ *   11. button 11
+ *   12. button 12
+ *   ...
+ *   n. button n
+ *
+ *   100. axis1 x
+ *   101. axis1 y
+ *   102. axis2 x
+ *   103. axis2 y
+ *   ...
+ *   10n. axisn y
+ *   10n. axisn y
  *  ```
  *  ---
  *
  * @example
  *  let gamepad = new GamePadController( renderer, {});
- *  gamepad.addEventListener("button_1", function() { ... })
- *  gamepad.addEventListener("left_x", function() { ... })
+ *  gamepad.init
+ *  gamepad.render
+ *  gamepad.addEventListener( 1, function() { ... })   // button 1
+ *  gamepad.addEventListener( 100, function() { ... }) // axis
  *
  *
  * @implements Controller
@@ -50,6 +70,12 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   var nodes = [] // for storing the listener objects
   var c = 0      // counter
 
+  /**
+   * @description
+   *  init, should be automatic, but you can always call my_gamepad.init()
+   * @member Controller#GamePadController.init
+   *
+  */
   // init with a tap contoller
   _self.init = function() {
     console.log("init GamePadController.")
@@ -126,14 +152,32 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // Helpers
   // ---------------------------------------------------------------------------
 
+  ////* @member Controller#GamePadController~init (inner)
+  ////* @function GlRenderer.init (static)
+  ////* @member Addon#AudioAnalysis#audio_src  (normal?)
+
+  /**
+   * @description
+   *  removeEventListener
+   * @member Controller#GamePadController#removeEventListener
+   *
+  */
   _self.removeEventListener = function( _key, _num ) {
     // TODO
     // always remove first ?
   }
 
+  /**
+   * @description
+   *  addEventListener
+   * @function Controller#GamePadController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
   _self.addEventListener = function( _target, _callback ) {
-    //console.log("gamepad add listener: " , _target, _callback)
-    //listeners.push( _target )
+    // console.log("gamepad add listener: " , _target, _callback)
+    // listeners.push( _target )
     nodes.push( { target: _target, callback: _callback } )
     console.log("gamepad listeners: ", nodes)
   }
@@ -146,6 +190,12 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
       }
     })
   }
+
+  /**
+   * @description
+   *  getNodes -- helper, shows current nodes
+   * @function Controller#GamePadController#getNodes
+  */
   _self.getNodes = function() {
     return nodes
   }

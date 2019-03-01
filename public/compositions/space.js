@@ -31,6 +31,10 @@ var mixer2 = new Mixer( renderer, {source1: testSource2, source2: mixer1} )
 var mixer3 = new Mixer( renderer, {source1: testSource3, source2: mixer2} )
 var mixer4 = new Mixer( renderer, {source1: testSource4, source2: mixer3} )
 
+//var mixer1 = new Mixer( renderer, {source1: blacksource, source2: testSource1} )
+//var mixer2 = new Mixer( renderer, {source1: mixer1, source2: testSource2 } )
+//var mixer3 = new Mixer( renderer, {source1: mixer2, source2: testSource3 } )
+//var mixer4 = new Mixer( renderer, {source1: mixer3, source2: testSource4 } )
 
 // create 2 mixers, A/B and mixer/B
 //var mixer1 = new Mixer( renderer, { source1: testSource6, source2: testSource3 } );
@@ -59,46 +63,77 @@ filemanager3.load_set("/sets/space.json")
 filemanager4.load_set("/sets/space.json")
 
 // create a bpm addon
-var bpm = new BPM( renderer )
 
 // add the bpm to the mixer (-pod)
-//bpm.add( mixer4.pod )
-//bpm.add( mixer1.pod )
+// bpm.add( mixer4.pod )
+// bpm.add( mixer1.pod )
+
+var bpm = new BPM( renderer )
+
+// create midi controller
+var midi1 = new MidiController(renderer, {})
+
+// effect
+var saturation = new ColorEffect( renderer, { source: mixer4 } )
+var hue = new ColorEffect( renderer, { source: saturation } )
+var contrast = new ColorEffect( renderer, { source: hue } )
 
 // ## OUTPUT ###################################################################
 
 // set the output node (needs to be last!)
-var output = new Output( renderer, mixer4 )
+var output = new Output( renderer, contrast )
 //var output = new Output( renderer, testSource6 )
 
 // ## CONTROLLERS ##############################################################
 
-var midi1 = new MidiController(renderer, {})
 
-midi1.addEventListener( 48, function(e) {
-  //console.log("data!", e[1], e[2] )
-  //chain1.setChainLink(0, e[2]/127 )
-  mixer1.pod( ( e[2]/127 )  )
-})
 
-midi1.addEventListener( 49, function(e) {
-  //console.log("data!", e[1], e[2] )
-  //chain1.setChainLink(1, e[2]/127 )
-  mixer2.pod( e[2]/127 )
-})
 
-midi1.addEventListener( 50, function(e) {
-  //console.log("data!", e[1], e[2] )
-  //chain1.setChainLink(2, e[2]/127 )
-  mixer3.pod( e[2]/127 )
-})
 
-midi1.addEventListener( 51, function(e) {
-  //console.log("data!", e[1], e[2] )
-  //chain1.setChainLink(3, e[2]/127 )
-  mixer4.pod( e[2]/127 )
-})
 
+// -----------------------------------------------------------------------------
+
+// add a controller to mixer and bpm
+//var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
+//numpad1.addBpm( bpm )
+//numpad1.addMixer( mixer1 )
+//numpad1.addMixer( mixer4 )
+
+//var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
+
+// var gamepad = new GamePad( renderer, mixer1, mixer2, mixer3 )
+// var gamepad1 = new GamePadDiagonalControl( renderer, mixer1, mixer2, mixer3 )
+// var gamepad2 = new GamePadVerticalControl( renderer, mixer1, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7 )
+// var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
+// firebase1.addMixer( mixer1 ) ?
+// firebase1.addMixer( mixer2 ) ?
+// firebase1.addMixer( mixer3 ) ?
+// firebase1.addFileManager( filemanager1) ?
+
+// ## RENDER ###################################################################
+
+// -----------------------------------------------------------------------------
+renderer.init();         // init
+renderer.render();       // start update & animation
+
+// --------------------------------------------------------------------------------
+
+saturation.effect(62)
+saturation.extra(2.0)
+hue.effect(63)
+hue.extra(0.1)
+contrast.effect(61)
+contrast.extra(0.5)
+
+var mod = 64
+midi1.addEventListener( 48, function(e) { mixer1.pod( e[2]/mod ) } )
+midi1.addEventListener( 49, function(e) { mixer2.pod( e[2]/mod ) } )
+midi1.addEventListener( 50, function(e) { mixer3.pod( e[2]/mod ) } )
+midi1.addEventListener( 51, function(e) { mixer4.pod( e[2]/mod ) } )
+
+midi1.addEventListener( 52, function(e) { saturation.extra(e[2]/127) } )
+midi1.addEventListener( 53, function(e) { hue.extra(e[2]/127) } )
+midi1.addEventListener( 54, function(e) { contrast.extra(e[2]/127) } )
 
 midi1.addEventListener( 52, function(e) {
   console.log("data!", e[1], e[2] )
@@ -132,7 +167,7 @@ function dotest(_option ) {
 //midi1.addEventListener( 10, function() { mixer3.blendmodes.unshift( mixer3.blendmodes.pop() ); mixer3.blendMode(mixer3.blendmodes[0]) })
 //midi1.addEventListener( 11, function() { mixer4.blendmodes.unshift( mixer4.blendmodes.pop() ); mixer4.blendMode(mixer4.blendmodes[0]) })
 
-function switchBlendmode( _mixer, doubleclick, evt ) {
+function switchBlendmode( _mixer, doubleclick, evt, button ) {
   if ( evt[0] == 128 && !doubleclick) return
   if (doubleclick) {
     _mixer.blendMode(1);
@@ -143,9 +178,17 @@ function switchBlendmode( _mixer, doubleclick, evt ) {
     console.log("blend", _mixer.blendmodes[0])
     _mixer.blendMode(_mixer.blendmodes[0])
   }
+
+  if (_mixer.blendMode() == 1 ) {
+    midi1.send([ 0x90, button, 1]);
+  } else if (_mixer.blendMode() == 18 ) {
+    midi1.send([ 0x90, button, 5]);
+  } else{
+    midi1.send([ 0x90, button, 3]);
+  }
 }
 
-function switchMixmode( _mixer, doubleclick, evt ) {
+function switchMixmode( _mixer, doubleclick, evt, button ) {
   if ( evt[0] == 128 && !doubleclick ) return
   if (doubleclick) {
     _mixer.mixMode(1);
@@ -156,42 +199,65 @@ function switchMixmode( _mixer, doubleclick, evt ) {
     console.log("swtich", _mixer.mixmodes[0] )
     _mixer.mixMode(_mixer.mixmodes[0])
   }
+
+  if (_mixer.mixMode() == 1 ) {
+    midi1.send([ 0x90, button, 1]);
+  } else if (_mixer.mixMode() == 18 ) {
+    midi1.send([ 0x90, button, 5]);
+  } else{
+    midi1.send([ 0x90, button, 3]);
+  }
 }
 
-midi1.addEventListener( 8, function(evt, doubleclick) { switchBlendmode( mixer1, doubleclick, evt ) })
-midi1.addEventListener( 9, function(evt, doubleclick) { switchBlendmode( mixer2, doubleclick, evt ) })
-midi1.addEventListener( 10, function(evt, doubleclick) { switchBlendmode( mixer3, doubleclick, evt ) })
-midi1.addEventListener( 11, function(evt, doubleclick) { switchBlendmode( mixer4, doubleclick, evt ) })
+function reset( _mixer, doubleclick, evt, button ) {
+  _mixer.blendMode(1);
+  _mixer.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
+  _mixer.mixMode(1);
+  _mixer.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+  _mixer.pod(_mixer.pod())
+  midi1.send([ 0x90, button-48, 1, 0x90, button-56, 1]);
+}
 
-midi1.addEventListener( 16, function(evt, doubleclick) { switchMixmode( mixer1, doubleclick, evt ) })
-midi1.addEventListener( 17, function(evt, doubleclick) { switchMixmode( mixer2, doubleclick, evt ) })
-midi1.addEventListener( 18, function(evt, doubleclick) { switchMixmode( mixer3, doubleclick, evt ) })
-midi1.addEventListener( 19, function(evt, doubleclick) { switchMixmode( mixer4, doubleclick, evt ) })
 
-// -----------------------------------------------------------------------------
+midi1.addEventListener( 8, function(evt, doubleclick) { switchBlendmode( mixer1, doubleclick, evt, 8 ) })
+midi1.addEventListener( 9, function(evt, doubleclick) { switchBlendmode( mixer2, doubleclick, evt, 9 ) })
+midi1.addEventListener( 10, function(evt, doubleclick) { switchBlendmode( mixer3, doubleclick, evt, 10 ) })
+midi1.addEventListener( 11, function(evt, doubleclick) { switchBlendmode( mixer4, doubleclick, evt, 11 ) })
 
-// add a controller to mixer and bpm
-//var numpad1 = new NumpadBpmMixerControl( renderer, mixer1, bpm )
-//numpad1.addBpm( bpm )
-//numpad1.addMixer( mixer1 )
-//numpad1.addMixer( mixer4 )
+midi1.addEventListener( 16, function(evt, doubleclick) { switchMixmode( mixer1, doubleclick, evt, 16 ) })
+midi1.addEventListener( 17, function(evt, doubleclick) { switchMixmode( mixer2, doubleclick, evt, 17 ) })
+midi1.addEventListener( 18, function(evt, doubleclick) { switchMixmode( mixer3, doubleclick, evt, 18 ) })
+midi1.addEventListener( 19, function(evt, doubleclick) { switchMixmode( mixer4, doubleclick, evt, 19 ) })
 
-//var keyboard1 = new KeyboardMixerControl( renderer, mixer1, bpm )
+midi1.addEventListener( 24, testSource1.jump )
+midi1.addEventListener( 25, testSource2.jump )
+midi1.addEventListener( 26, testSource3.jump )
+midi1.addEventListener( 27, testSource4.jump )
 
-// var gamepad = new GamePad( renderer, mixer1, mixer2, mixer3 )
-// var gamepad1 = new GamePadDiagonalControl( renderer, mixer1, mixer2, mixer3 )
-// var gamepad2 = new GamePadVerticalControl( renderer, mixer1, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7 )
-// var firebase1 = new FireBaseControl( renderer, mixer1, mixer2, mixer3 )
-// firebase1.addMixer( mixer1 ) ?
-// firebase1.addMixer( mixer2 ) ?
-// firebase1.addMixer( mixer3 ) ?
-// firebase1.addFileManager( filemanager1) ?
+midi1.addEventListener( 64, function(evt, doubleclick) { reset( mixer1, doubleclick, evt, 64 ) })
+midi1.addEventListener( 65, function(evt, doubleclick) { reset( mixer2, doubleclick, evt, 65 ) })
+midi1.addEventListener( 66, function(evt, doubleclick) { reset( mixer3, doubleclick, evt, 66 ) })
+midi1.addEventListener( 67, function(evt, doubleclick) { reset( mixer4, doubleclick, evt, 67 ) })
 
-// ## RENDER ###################################################################
+testSource1.video.addEventListener('seeking', function() { midi1.send([ 0x90, 0, 6] );} )
+testSource2.video.addEventListener('seeking', function() { midi1.send([ 0x90, 1, 6] );} )
+testSource3.video.addEventListener('seeking', function() { midi1.send([ 0x90, 2, 6] );} )
+testSource4.video.addEventListener('seeking', function() { midi1.send([ 0x90, 3, 6] );} )
 
-// -----------------------------------------------------------------------------
-renderer.init();         // init
-renderer.render();       // start update & animation
+testSource1.video.addEventListener('seeked', function() { midi1.send([ 0x90, 0, 5] );} )
+testSource2.video.addEventListener('seeked', function() { midi1.send([ 0x90, 1, 5] );} )
+testSource3.video.addEventListener('seeked', function() { midi1.send([ 0x90, 2, 5] );} )
+testSource4.video.addEventListener('seeked', function() { midi1.send([ 0x90, 3, 5] );} )
+
+testSource1.video.addEventListener('stalled', function() { midi1.send([ 0x90, 0, 4] );} )
+testSource2.video.addEventListener('stalled', function() { midi1.send([ 0x90, 1, 4] );} )
+testSource3.video.addEventListener('stalled', function() { midi1.send([ 0x90, 2, 4] );} )
+testSource4.video.addEventListener('stalled', function() { midi1.send([ 0x90, 3, 4] );} )
+
+testSource1.video.addEventListener('playing', function() { midi1.send([ 0x90, 0, 1] );} )
+testSource2.video.addEventListener('playing', function() { midi1.send([ 0x90, 1, 1] );} )
+testSource3.video.addEventListener('playing', function() { midi1.send([ 0x90, 2, 1] );} )
+testSource4.video.addEventListener('playing', function() { midi1.send([ 0x90, 3, 1] );} )
 
 // ## DELAYED START ############################################################
 
@@ -207,4 +273,5 @@ setTimeout( function() {
   //mixer3.pod(0)
   //filemanager2.change()
   //filemanager3.change()
+  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
 }, 3200)

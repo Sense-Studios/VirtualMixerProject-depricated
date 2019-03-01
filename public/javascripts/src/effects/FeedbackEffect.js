@@ -9,9 +9,8 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *   mimicing classic mixers like MX50 and V4
  *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   100. you got to see for yourself
+ *   101. they should have sent a poet
  *   ```
  *
  * @example
@@ -210,21 +209,9 @@ _self.update = function() {
 /* ------------------------------------------------------------------------ */
 
 /**
-* @description
-*  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
-*  ```
-*  1. Multi
-*  2. Pictrue in Picture
-*  3. --,
-*  ```
-* @function Effect#FeedbackEffect#effect
-* @param {number} effect index of the effect
-*/
-
-/**
  * @description currentFeedbackeffectffect number
  * @function Effect#FeedbackEffect#effect
- * @param {Number} effectnumber currentColoreffect number 1
+ * @param {Number} effectnumber currentColoreffect number
  */
   _self.effect = function( _num ){
     if ( _num != undefined ) {
@@ -236,9 +223,9 @@ _self.update = function() {
   }
 
   /**
-   * @description currentDistortionffect number
-   * @function Effect#FeedbackEffect#effect
-   * @param {Number} effectnumber currentColoreffect number 1
+   * @description currenFeedbackEffect extra try gently between 0-1, preferably around 0.5
+   * @function Effect#FeedbackEffect#extra
+   * @param {float} float currenFeedbackEffect extra
    */
   _self.extra = function( _num ){
       if ( _num != undefined ) {
