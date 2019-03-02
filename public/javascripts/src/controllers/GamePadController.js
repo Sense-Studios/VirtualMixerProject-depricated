@@ -67,7 +67,6 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // add to renderer
   _renderer.add(_self)
 
-  var nodes = [] // for storing the listener objects
   var c = 0      // counter
 
   /**
@@ -152,34 +151,36 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // Helpers
   // ---------------------------------------------------------------------------
 
-  ////* @member Controller#GamePadController~init (inner)
-  ////* @function GlRenderer.init (static)
-  ////* @member Addon#AudioAnalysis#audio_src  (normal?)
+  var nodes = []
 
   /**
    * @description
    *  removeEventListener
-   * @member Controller#GamePadController#removeEventListener
+   * @example
+   *  gamepad.removeEventListener(1)
+   * @function Controller#GamePadController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
    *
   */
-  _self.removeEventListener = function( _key, _num ) {
-    // TODO
-    // always remove first ?
-  }
+  self.removeEventListener = function() {}
 
   /**
    * @description
    *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  gamepad.addEventListener(1, function() )
+   *
    * @function Controller#GamePadController#addEventListener
    * @param {string} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */
   _self.addEventListener = function( _target, _callback ) {
-    // console.log("gamepad add listener: " , _target, _callback)
-    // listeners.push( _target )
     nodes.push( { target: _target, callback: _callback } )
-    console.log("gamepad listeners: ", nodes)
+    console.log("listeners: ", nodes)
   }
 
   // private? const?

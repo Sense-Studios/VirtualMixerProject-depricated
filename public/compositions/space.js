@@ -218,7 +218,6 @@ function reset( _mixer, doubleclick, evt, button ) {
   midi1.send([ 0x90, button-48, 1, 0x90, button-56, 1]);
 }
 
-
 midi1.addEventListener( 8, function(evt, doubleclick) { switchBlendmode( mixer1, doubleclick, evt, 8 ) })
 midi1.addEventListener( 9, function(evt, doubleclick) { switchBlendmode( mixer2, doubleclick, evt, 9 ) })
 midi1.addEventListener( 10, function(evt, doubleclick) { switchBlendmode( mixer3, doubleclick, evt, 10 ) })

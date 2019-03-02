@@ -3,13 +3,22 @@ MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
  * @summary
- *  ---
- *
+ *  Connects a midicontroller with a range of listeners. Can also send commands
+ *  Back to change and blink lights and what not
  * @description
- *  ---
+ *  Connects a midicontroller with a range of listeners. Can also send commands
+ *  Back to change and blink lights and what not
+ *
+ *  for more info and ideas https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+ *
  *
  * @example
- *  ---
+ *  var midi1 = new MidiController();
+ *  midi1.addEventListener( 0, function(_arr) { console.log( " Midi received", _arr ) } ) ;
+ *  // button 0, returns [ 144, 0, 1 ]
+ *
+ *  // use debug for more information
+ *  midi.debug = true;
  *
  * @implements Controller
  * @constructor Controller#MidiController
@@ -32,7 +41,6 @@ function MidiController( _options ) {
   _self.controllers = {};
 
   // source.renderer ?
-  var nodes = []
   var binds = []
 
   // counter
@@ -243,7 +251,39 @@ function MidiController( _options ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
   }
+
   // ---------------------------------------------------------------------------
+
+  /**
+   * @description
+   *  send midi data back to the controller. To switch a light on, or to make it
+   *  change color. Theorettically you should be able to control motorized faders
+   *  too, but I haven't tested that. Lights is nice though.
+   *
+   *  try to send evertything in one blob and try not to do all kinds of little
+   *  updates, it'll crash your midi controller (it crashed mine)
+   *
+   *
+   * @example
+   *  // make button 0 yellow, if a video reports 'seeking'
+   *  testSource1.video.addEventListener('seeking', function() { midi1.send([ 0x90, 0, 6] );} )
+   *
+   *  // don't forget to switch it off again
+   *  testSource1.video.addEventListener('seeked', function() { midi1.send([ 0x90, 0, 5] );} )
+   *
+   *  // make button 8-11 and button 16-19 green (tested with an Akai APC Mini)
+   *
+   *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
+   *
+   *
+   *
+   *
+   *
+   * @function Controller#MidiController#send
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
 
   _self.send = function( commands ) {
     if (_self.ready) {
@@ -254,19 +294,53 @@ function MidiController( _options ) {
     }
   }
 
-  _self.addEventListener = function( _callbackName, _target ) {
-    console.log("midi add listener: " , _callbackName)
-    //listeners.push( _target )
-    nodes.push({callbackName: _callbackName, target: _target})
-    console.log("midi list: ", nodes)
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  _self.clear = function() {
+    var commands = []
+    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );    
+    output.send(commands)
+  }
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  midi.removeEventListener(1)
+   * @function Controller#MidiController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function( _target ) {}
+
+  /**
+   * @description
+   *  addEventListener, expect an array of three values, representing the state and value of your controller
+   *
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr) // [ 144, 0, 1 ]
+   *  }
+   *  midicontroller.addEventListener(1, function() )
+   *
+   * @function Controller#MidiController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback,  ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
   }
 
   var dispatchMidiEvent = function(e) {
-    //console.log(">>", e)
     nodes.forEach(function( _obj ){
-      //_obj.target[_obj.callbackName](e)
-      if ( _obj.callbackName == e.data[1] ) {
-        _obj.target(e.data)
+      if ( _obj.target == e.data[1] ) {
+        _obj.callback(e.data)
       }
     });
   }

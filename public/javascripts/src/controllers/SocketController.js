@@ -30,10 +30,11 @@ function SocketController( _options  ) {
   _self.socket_pairing_id = "123456"
   _self.io = io.connect(); // 'http://83.137.150.207:3001'
   _self.target = ""
+  _self.title = ""
 
-  nodes = []
-  if ( _options ) {}
-
+  if ( _options ) {
+    if ( "title" in _options ) _self.title = _options.title
+  }
   // I don't think we need this
   //_renderer.add( _self )
 
@@ -45,14 +46,24 @@ function SocketController( _options  ) {
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
     if ( _command.command == "welcome") _self.target = _command.payload
+    if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
-  _self.io.on('controller', function(_arr) {
-    if ( _self.debug ) console.log( 'got controller', _arr )
+  _self.io.on('controller', function(_msg) {
+    if ( _self.debug ) console.log( 'got controller', _msg )
+
+    // { client: _client, trigger: _trigger, commands: _commands }
 
     nodes.forEach( function( node, i ) {
-      if ( _arr[0] == node[0] ) {
-        node[1]( _arr[1] )
+      if ( _self.debug ) console.log("find node", i, node, _msg, _self.target)
+      if (_msg.client == _self.target && node.target == _msg.trigger ) {
+      //if ( _arr[0] == node[0] ) {
+        if ( _self.debug ) console.log("execute callback!")
+        //node[1]( _arr[1] )
+
+        // { client: _client, trigger: _trigger, commands: _commands }
+        // if _trigger == node[1]
+        node.callback(_msg.commands)
 
         // dispatchEvent( client, 1, )
         // _obj.target(e.data) [ x, y, z ]
@@ -66,8 +77,81 @@ function SocketController( _options  ) {
   })
 
   // ---
+  // ---------------------------------------------------------------------------
 
+  /**
+   * @description
+   *  send info to a client for a trigger
+   * @example
+   *  socketcontroller.send( "client_123456", 0, [ 1, 2, 3, 4 ] )
+   *
+   * @function Controller#SocketController#send
+   * @param {string} _client - the number of controller being pressed
+   * @param {integer} _trigger - the number of controller being pressed
+   * @param {array} _commands - the number of controller being pressed
+   *
+  */
+  _self.send = function( _client, _trigger, _commands ) {
+    if ( _self.debug ) console.log("Socket send to: ", _client, ", trigger:", _trigger, " commands ", _commands )
+    _self.io.emit("controller", { client: _client, trigger: _trigger, commands: _commands } )
+  }
+
+  // ---------------------------------------------------------------------------
   // Helpers
+  // ---------------------------------------------------------------------------
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener -- Not Implemented
+   * @example
+   *  socketcontroller.removeEventListener(1)
+   * @function Controller#SocketController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function( _target ) {}
+
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  socketcontroller.addEventListener(1, function() )
+   *
+   * @function Controller#SocketController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback,  ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
+  }
+
+  // private? const?
+  var dispatchSocketEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
+  }
+}
+
+  /*
+  var dispatchMidiEvent = function(e) {
+    nodes.forEach(function( _obj ){
+      if ( _obj.target == e.data[1] ) {
+        _obj.callback(e.data)
+      }
+    });
+  }
+
+
   _self.removeEventListener = function( _target, _callback ) {
 
   }

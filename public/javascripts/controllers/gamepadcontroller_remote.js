@@ -24,14 +24,18 @@ gamepad.debug = false
 //var left_y
 function left_x(_arr) {
   //console.log("euhr", _arr)
-  socket.emit('controller', _arr );
+  //socket.emit('controller', _arr );
   document.getElementById( 'left_x' ).innerHTML = _arr
+  if ( document.getElementById('gamepad_id').value != "" ) socketcontroller.send( document.getElementById('gamepad_id').value, _arr[0], _arr)
 }
 
 function left_y(_arr) {
   //console.log("euhr", _arr)
-  socket.emit('controller', _arr );
+  //socket.emit('controller', _arr );
   document.getElementById( 'left_y' ).innerHTML = _arr
+  //socketcontroller.send('Client_bd65fa9', _arr )  // gamepad
+  if ( document.getElementById('gamepad_id').value != "" )  socketcontroller.send( document.getElementById('gamepad_id').value, _arr[0], _arr)
+  //socketcontroller.send("Client_62c5ed63", 1, [176, 1, 0])
 }
 
 
@@ -45,6 +49,9 @@ var socketcontroller = new SocketController()
 socketcontroller.addEventListener('mass', function(_payload) {
   console.log(">>> got mass",_payload )
 })
+
+//socketcontroller.send('Client_bd65fa9', [ 1, 2, 3 ] )  // midi
+//socketcontroller.send('Client_bd65fa9', [ 1, 2, 3 ] )  // gamepad
 
 // target, pin
 // Client_1364a3d4

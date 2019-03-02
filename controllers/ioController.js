@@ -27,6 +27,10 @@ init = function(io) {
 
     _self.addClient(socket)
 
+    socket.on('ping', function(socket){
+      socket.emit('pong', {time:(new Date()).getTime()});
+    })
+
 	  socket.on('disconnect', function(socket){
 		    console.log('user disconnected', socket, socket.uuid);
         // remove user
@@ -56,17 +60,15 @@ init = function(io) {
 		});
 
 
-    // either midi or gamepad? -- now for gamepad
-    socket.on('initiate_controller', function( _controller ){
-      // O hi, I haz the controller!
-      // kind of a has_and_belongs_to_many in Rails
+    socket.on('controller', function( _msg ) {
+      clients.map( function( client ) {
+        if ( client.uuid == _msg.client) {
+          client.emit("controller", _msg)
+        }
+      })
+    })
 
-      //controllers.push( _controller )
-      //uuid
-      //clients
-
-    });
-
+    /*
     socket.on('test', function( _msg ) {
       console.log("got your test ", _msg )
       console.log("got your clients")
@@ -77,6 +79,20 @@ init = function(io) {
         }
       })
     })
+    */
+
+    /*
+    // either midi or gamepad? -- now for gamepad
+    socket.on('initiate_controller', function( _controller ){
+      // O hi, I haz the controller!
+      // kind of a has_and_belongs_to_many in Rails
+
+      //controllers.push( _controller )
+      //uuid
+      //clients
+
+    });
+    */
 
     /*
     socket.on('ping', function( _msg ) {
@@ -111,18 +127,6 @@ init = function(io) {
     });
     */
 
-    socket.on('controller', function( _msg ) {
-      //console.log("got your test ", _msg )
-      //console.log("got your clients")
-      io.emit("controller", _msg) // broadcast to all
-      clients.map(function(c) {
-        //console.log( c.uuid, _msg.target, c.uuid == _msg.target )
-        if ( c.uuid == _msg.target) {
-          console.log("send ", c.uuid)
-          c.emit("controller", _msg)
-        }
-      })
-    })
 	})
 }
 
@@ -147,7 +151,8 @@ exports.updateTracks = function (req, res, next) {
 
 // post client/ [ send back id ]
 exports.addClient = function(_socket) {
-	var uuid = "Client_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+	//var uuid = "Client_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  var uuid = (((1+Math.random())*0x10000)|0).toString(16).substring(1);
   _socket.uuid = uuid
   console.log(" IO add client: ", uuid)
 	clients.push(_socket)
@@ -168,6 +173,7 @@ exports.removeClient = function(_socket) {
   }
 }
 
+// depricated ?
 exports.submitToClient = function( _uuid ) {
   console.log(" -- get socket -- ")
   var _s = findSocketByUuid( _uuid )

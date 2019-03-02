@@ -15,7 +15,7 @@ var blue = new SolidSource( renderer, { color: { r: 0.0, g: 0.0, b: 1.0 } } );
 var yellow = new SolidSource( renderer, { color: { r: 1.0, g: 1.0, b: 0.0 } } );
 
 var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
-var source2 = new VideoSource( renderer, { src: '/video/ignore/example_edirol_v4.mp4' } );
+var source2 = new VideoSource( renderer, { src: '/video/ignore/edirol_v4.mp4' } );
 var source3 = new VideoSource( renderer, { src: '/video/ignore/1UP_Graffiti_olympic.mp4' } );
 var source4 = new VideoSource( renderer, { src: '/video/ignore/composition_12.mp4' } );
 
@@ -31,7 +31,12 @@ var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 });
 // set up a game pad
 var gamepad = new GamePadController( renderer ) // , mixer1, mixer2, mixer3
 var midicontroller = new MidiController( renderer )
-var socketcontroller = new SocketController()
+
+// gamepad socket
+var gamepad_socket_controller = new SocketController({title: "gamepad"})
+
+// midi socket controller
+var midi_socket_controller = new SocketController({title: "midi"})
 
 // set a temp video source to test with
 // var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
@@ -116,11 +121,7 @@ var lock_6 = false
 button_6 = function(_arr) {
   var _val = _arr[1]
   if (lock_6) return
-  console.log("button 6", _val * 2)
-  //source1.jump( source1.currentTime() - _val * 4)
-  //source2.jump( source1.currentTime() - _val * 4)
   if (!source1.video.seeking) source3.video.currentTime = source1.currentTime() - _val * 2
-  //source4.jump( source1.currentTime() - _val * 4)
   setTimeout( function() {
     lock_6 = false
   }, 200 )
@@ -130,31 +131,28 @@ var lock_7 = false
 button_7 = function(_arr) {
   var _val = _arr[1]
   if (lock_7) return
-  console.log("button 7", _val * 5)
-  //source1.jump( source1.currentTime() + _val * 4)
-  //source2.jump( source1.currentTime() + _val * 4)
-  // if (!source1.video.seeking) source3.video.currentTime = source1.currentTime() + _val * 2
   source3.video.playbackRate = _val * 5
-  //source4.jump( source1.currentTime() + _val * 4)
   setTimeout( function() {
     lock_7 = false
   }, 50 )
 }
 
 var lock_left = false
+var lock_left_button = false
 button_10 = function(_val) {
-  if (lock_left) return
-  console.log("I lock you, film")
-  lock_left = true
-  setTimeout( function() {lock_left = false}, 1000)
+  if (lock_left_button) return
+  lock_left_button = true
+  lock_left = !lock_left
+  setTimeout( function() { lock_left_button = false }, 350 )
 }
 
 var lock_right = false
+var lock_right_button = false
 button_11 = function(_val) {
-  if (lock_right) return
-  console.log("I lock you, color")
-  lock_right = true
-  setTimeout( function() {lock_right = false}, 1000)
+  if (lock_right_button) return
+  lock_right_button = true
+  lock_right = !lock_right
+  setTimeout( function() { lock_right_button = false }, 350 )
 }
 
 // Axis
@@ -187,6 +185,10 @@ right_y = function( _arr ) {
   if (!lock_right) hue.extra(_val )
 }
 
+button_8 = function( e ) {
+  console.log("data, button 8, ", e)
+}
+
 gamepad.addEventListener( 0, button_0 )
 gamepad.addEventListener( 1, button_1 )
 gamepad.addEventListener( 2, button_2 )
@@ -195,10 +197,11 @@ gamepad.addEventListener( 4, button_4 )
 gamepad.addEventListener( 5, button_5 )
 gamepad.addEventListener( 6, button_6 )
 gamepad.addEventListener( 7, button_7 )
-// gamepad.addEventListener( 8, button_8 )
+gamepad.addEventListener( 8, button_8 )
 // gamepad.addEventListener( 9, button_9 )
 gamepad.addEventListener( 10, button_10 )
 gamepad.addEventListener( 11, button_11 )
+
 gamepad.addEventListener( 100, left_x )
 gamepad.addEventListener( 101, left_y )
 gamepad.addEventListener( 102, right_x )
@@ -211,19 +214,32 @@ hue.extra(0.1)
 contrast.effect(61)
 contrast.extra(0.5)
 saturation.debug = false
-hue.debug =true
+hue.debug =false
 // var bpm = analysis;
 
 var  midislider = function(e) {
-  console.log("data slider 48", e[0], e[1], e[2] )
+  console.log("data slider 48", e )
 }
 var midibutton = function(e) {
-  console.log("data! button 1", e[0], e[1], e[2] )
+  console.log("data! button 1", e )
 }
+
 midicontroller.addEventListener( 1, midibutton )
 midicontroller.addEventListener( 48, midislider )
 
+// -----------------------------------------------------------------------------
+// SOCKETS
+// -----------------------------------------------------------------------------
 
+
+gamepad_socket_controller.addEventListener( 100, left_x )
+gamepad_socket_controller.addEventListener( 101, left_y )
+gamepad_socket_controller.addEventListener( 102, right_x )
+gamepad_socket_controller.addEventListener( 103, right_y )
+
+midi_socket_controller.addEventListener( 1, midibutton )
+midi_socket_controller.addEventListener( 48, midislider )
+/*
 setTimeout( function() {
   console.log("got local socket id: ", socketcontroller.target)
 }, 200 )
@@ -241,7 +257,7 @@ socketcontroller.addEventListener( 1, button_1 )
 socketcontroller.addEventListener( "controller", function( msg ) {
   console.log( "got controller ", msg )
 })
-
+*/
 
 
 
