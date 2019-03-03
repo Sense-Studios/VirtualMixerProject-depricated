@@ -39,7 +39,6 @@ var GlRenderer = function( _options ) {
     _self.options = _options
   }
 
-  /** This is a description of the foo function. */
   // set up threejs scene
   _self.element = _self.options.element
   _self.scene = new THREE.Scene();
@@ -1192,30 +1191,6 @@ function GiphyManager( _source ) {
 
 function Addon() {}
 
-ComputerKeyboard.prototype = new Controller();  // assign prototype to marqer
-ComputerKeyboard.constructor = ComputerKeyboard;  // re-assign constructor
-
-/**
- * @implements Controller
- * @constructor Controller#ComputerKeyboard
- * @interface
- */
-
-function ComputerKeyboard() {
-}
-
-Gamepad.prototype = new Controller();  // assign prototype to marqer
-Gamepad.constructor = Gamepad;  // re-assign constructor
-
-/**
- * @implements Controller
- * @constructor Controller#Gamepad
- * @interface
- */
-
-function Gamepad() {
-}
-
 /*
 
 1 ______________________________________________________________________________
@@ -1709,19 +1684,39 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @description
+ *
  *  ```
- *   button_1, down, up, click, longpress, doubleclick
- *   button_2, ...
- *   axes_1
- *   axes_2
- *   axes_3 ...
+ *   1. button 1
+ *   2. button 2
+ *   3. button 3
+ *   4. button 4
+ *   5. button 5
+ *   6. button 6
+ *   7. button 7
+ *   8. button 8
+ *   9. button 9
+ *   10. button 10
+ *   11. button 11
+ *   12. button 12
+ *   ...
+ *   n. button n
+ *
+ *   100. axis1 x
+ *   101. axis1 y
+ *   102. axis2 x
+ *   103. axis2 y
+ *   ...
+ *   10n. axisn y
+ *   10n. axisn y
  *  ```
  *  ---
  *
  * @example
  *  let gamepad = new GamePadController( renderer, {});
- *  gamepad.addEventListener("button_1", function() { ... })
- *  gamepad.addEventListener("left_x", function() { ... })
+ *  gamepad.init
+ *  gamepad.render
+ *  gamepad.addEventListener( 1, function() { ... })   // button 1
+ *  gamepad.addEventListener( 100, function() { ... }) // axis
  *
  *
  * @implements Controller
@@ -1741,7 +1736,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.gamepad = {}
   _self.bypass = true
   _self.debug = false
-  _self.default_gamepad = 0
+  _self.gamepad_index = 0
 
   if ( _options ) {
     if ("default" in _options) {}
@@ -1750,22 +1745,24 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // add to renderer
   _renderer.add(_self)
 
-  // this is kind of redundand
-  var nodes = []
-  var binds = []
+  var c = 0      // counter
 
-  _self.showNodes = function() {
-    return nodes
-  }
-
-  // counter
-  var c = 0
-
+  /**
+   * @description
+   *  init, should be automatic, but you can always call my_gamepad.init()
+   * @member Controller#GamePadController.init
+   *
+  */
   // init with a tap contoller
   _self.init = function() {
     console.log("init GamePadController.")
-    //window.addEventListener( 'keydown', keyHandler )
-
+    setTimeout( function() {
+      try { // try connect
+        gamepad.connect()
+      }catch(e){
+        console.log("Initial connect failed, hope somebody presses the button", e)
+      }
+    }, 500 )
   }
 
   _self.connect =  function() {
@@ -1775,77 +1772,186 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
       console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
         e.gamepad.index, e.gamepad.id,
         e.gamepad.buttons.length, e.gamepad.axes.length);
+      _self.init()
     });
 
     window.addEventListener("gamepaddisconnected", function(e) {
       console.log("Gamepad disconnected from index %d: %s",
         e.gamepad.index, e.gamepad.id);
     });
-    //window.addEventListener("GamePadController connected", connecthandler )
-    //window.addEventListener("gamepadconnected", connecthandler )
 
     gamepad.bypass = false
   }
 
-  var to1, to2, to3, to4, to5, to6, to7, to8
-  var lock
   _self.update = function() {
-    // console.log(_self.controllers[0].axes)
-    // console.log( navigator.getGamepads()[0].axes )
-    // [0.003921627998352051, 0.003921627998352051, 0, 0, 0, 0.003921627998352051, 0.003921627998352051, 0, 0, 3.2857141494750977]
-    // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
-    //   LP                RP         W
     if ( _self.bypass ) return;
-    if ( navigator.getGamepads()[0] === undefined ) {
+
+    // too much info
+    //if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    //if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
+
+    if ( navigator.getGamepads()[_self.gamepad_index] === undefined || navigator.getGamepads()[0] === null ) {
       console.log("Gamepad: No gamepad could be found")
+      _self.bypass = true
       return;
     }
 
-    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    var last_axis = 0
+    navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
+      dispatchGamePadEvent([i+100, a])
+      /*
+      if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
+        if (_self.debug) console.log(" Axis: ", i + 100, a )
+        dispatchGamePadEvent([i+100, a])
+        last_axis = a
+      }else{
+        if (last_axis != 0 ) {
+          dispatchGamePadEvent([i+100, 0])
+        }
+        last_axis = 0
+      }
+      */
+    });
 
-    var buttons = navigator.getGamepads()[0].buttons
-    //console.log(navigator.getGamePadControllers()[0].buttons)
-
-
-    navigator.getGamepads()[0].buttons.forEach(function(b, i){
+    navigator.getGamepads()[_self.gamepad_index].buttons.forEach(function(b, i){
       if ( b.pressed ) {
-        console.log(" i press you ", i, b)
-        // send listener
-        // if b in nodes dispatch
-        // HACKITY
-
-        // if we use thje same timeout it worsk too
-        //if ( i == 0 ) { clearTimeout(to1); to1 = setTimeout( function() { filemanager1.change(); } , 200 ) }
-        //if ( i == 1 ) { clearTimeout(to2); to2 = setTimeout( function() { filemanager2.change(); } , 200 ) }
-        //if ( i == 2 ) { clearTimeout(to3); to3 = setTimeout( function() { filemanager3.change(); } , 200 ) }
-        //if ( i == 3 ) { clearTimeout(to4); to4 = setTimeout( function() { filemanager4.change(); } , 200 ) }
-
-        // if ( i == 4 ) { clearTimeout(to1); to1 = setTimeout( function() { VideoSource. } , 200 ) }
-        // if ( i == 5 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-        // if ( i == 6 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-        // if ( i == 7 ) { clearTimeout(to1); to1 = setTimeout( function() { } , 200 ) }
-
+        if (_self.debug) console.log(" Button: ", i, b.value, b )
+        dispatchGamePadEvent([i, b.value])
       }
     })
+  }
 
-    var axes = navigator.getGamepads()[0].axes
-    var leftx = axes[0];
-    var lefty = axes[1];
+  _self.render = function() {
+    return _self.controllers
+  }
 
-    var rightx = axes[5];
-    var righty = axes[6];
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
 
-    var weird = axes[9];
+  var nodes = []
 
-    // oringal GANSTA SENSE STYLE
-    // _mixer1.pod( leftx / 2+0.5 )
-    // _mixer2.pod( leftx / 2+0.5 )
-    // _mixer3.pod( lefty / 2+0.5 )
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  gamepad.removeEventListener(1)
+   * @function Controller#GamePadController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function() {}
 
-    // oringal GANSTA SENSE STYLE
-    // _mixer1.pod(Math.abs(leftx))
-    // _mixer2.pod(Math.abs(lefty))
-    // _mixer3.pod(lefty/2+0.5)
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  gamepad.addEventListener(1, function() )
+   *
+   * @function Controller#GamePadController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
+  }
+
+  // private? const?
+  var dispatchGamePadEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
+  }
+
+  /**
+   * @description
+   *  getNodes -- helper, shows current nodes
+   * @function Controller#GamePadController#getNodes
+  */
+  _self.getNodes = function() {
+    return nodes
+  }
+}
+
+KeyboardController.prototype = new Controller();  // assign prototype to marqer
+KeyboardController.constructor = KeyboardController;  // re-assign constructor
+
+/**
+ * @summary
+ *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @description
+ *
+ *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @example
+ *  let keyboard = new KeyboardController( renderer, {});
+ *  keyboard.init
+ *  keyboard.render
+ *  keyboard.addEventListener( 1, function() { ... })   // button 1
+ *  keyboard.addEventListener( 100, function() { ... }) // axis
+ *
+ *
+ * @implements Controller
+ * @constructor Controller#KeyboardController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+function KeyboardController( _renderer, _options  ) {
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "KeyboardController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Control"
+  _self.controllers = {};
+  _self.keyboard = {}
+  _self.bypass = true
+  _self.debug = false
+  _self.keyboard_index = 0
+
+  if ( _options ) {
+    if ("default" in _options) {}
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  var c = 0      // counter
+
+  /**
+   * @description
+   *  init, should be automatic, but you can always call my_keyboard.init()
+   * @member Controller#KeyboardController.init
+   *
+  */
+  // init with a tap contoller
+  _self.init = function() {
+    console.log("init KeyboardController.")
+
+    window.document.addEventListener('keydown', function(event) { console.log(event.keyCode) })
+    document.addEventListener('keydown', (event) => {
+      // const keyName = event.key;
+      console.log( " >>> ", event )
+    })
+    // window.keyboard.on.keypress whatever
+  }
+
+
+  _self.update = function() {
+    if ( _self.bypass ) return;
 
   }
 
@@ -1854,83 +1960,81 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   }
 
   // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
   // Helpers
-
   // ---------------------------------------------------------------------------
-  _self.bind = function( _key, _callback ) {
-    nodes.push( { key: _key, callback: _callback } )
-    // check for double binds ?
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  keyboard.removeEventListener(1)
+   * @function Controller#KeyboardController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function() {}
+
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  keyboard.addEventListener(1, function() )
+   *
+   * @function Controller#KeyboardController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
   }
 
-  _self.removeEventListener = function( _key, _num ) {
-    // always remove first ?
+  // private? const?
+  var dispatchkeyboardEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
   }
 
-  // [ state, key, velocity ]
-  var checkNodes = function(e) {
-    binds.forEach( function( _obj ) {
-      if ( e[1] == _obj.key ) _obj.callback(e)
-    });
-  }
-
-  _self.addEventListener = function( _callbackName, _target ) {
-    console.log("gamepad add listener: " , _callbackName)
-    //listeners.push( _target )
-    nodes.push( { callbackName: _callbackName, target: _target} )
-    console.log("gamepad list: ", nodes)
-  }
-
-  // "Private"
-
-/*
-  var addGamePadController = function( GamePadController ) {
-    _self.controllers[GamePadController.index] = GamePadController
-    console.log(GamePadController.id, GamePadController.index )
-  }
-
-  var connecthandler = function( e ) {
-    console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.", e.GamePadController.index, e.GamePadController.id);
-    addGamePadController(e.GamePadController)
-    _self.bypass = false
-  }
-
-  var keyHandler = function( _event ) {
-    // should be some way to check focus of this BPM instance
-    // if _self.hasFocus
-    //}
+  /**
+   * @description
+   *  getNodes -- helper, shows current nodes
+   * @function Controller#KeyboardController#getNodes
+  */
+  _self.getNodes = function() {
+    return nodes
   }
 }
-*/
-
-
-/*
-window.addEventListener("GamePadControllerconnected", function(e) {
-  console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.",
-    e.GamePadController.index, e.GamePadController.id,
-    e.GamePadController.buttons.length, e.GamePadController.axes.length);
-    var gp = navigator.getGamePadControllers()[e.GamePadController.index];
-    console.log("GamePadController connected at index %d: %s. %d buttons, %d axes.",
-      gp.index, gp.id,
-      gp.buttons.length, gp.axes.length);
-});
-*/
-
-}
-
 
 MidiController.prototype = new Controller();  // assign prototype to marqer
 MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
  * @summary
- *  ---
- *
+ *  Connects a midicontroller with a range of listeners. Can also send commands
+ *  Back to change and blink lights and what not
  * @description
- *  ---
+ *  Connects a midicontroller with a range of listeners. Can also send commands
+ *  Back to change and blink lights and what not
+ *
+ *  for more info and ideas https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+ *
  *
  * @example
- *  ---
+ *  var midi1 = new MidiController();
+ *  midi1.addEventListener( 0, function(_arr) { console.log( " Midi received", _arr ) } ) ;
+ *  // button 0, returns [ 144, 0, 1 ]
+ *
+ *  // use debug for more information
+ *  midi.debug = true;
  *
  * @implements Controller
  * @constructor Controller#MidiController
@@ -1948,12 +2052,11 @@ function MidiController( _options ) {
   _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "MidiController"
   _self.bypass = true
-  _self.verbose = false
+  _self.debug = false
   _self.ready = false
   _self.controllers = {};
 
   // source.renderer ?
-  var nodes = []
   var binds = []
 
   // counter
@@ -1981,8 +2084,9 @@ function MidiController( _options ) {
       initMidi()
   	}
 
-    console.log("Midi READY")
+    console.log("Midi READY? ", output, midi)
     if ( output != undefined ) _self.ready = true
+    if ( output != undefined ) _self.bypass = false
   }
 
   // everything went wrong.
@@ -1998,8 +2102,8 @@ function MidiController( _options ) {
   }
 
   function initMidi() {
-    if ( _self.verbose ) console.log(" MIDI READY", "ready")
-    dispatchMidiEvent("ready")
+    if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
+    // dispatchMidiEvent("ready")
   }
 
   // some examples, this is the 'onpress' (and on slider) function
@@ -2008,8 +2112,8 @@ function MidiController( _options ) {
   var doubleclick = false
 
   _self.onMIDIMessage = function(e) {
-    if (_self.verbose) console.log(" MIDIMESSAGE >>", e.data)
-    checkBindings(e.data)
+    if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
+    checkBindings(e.data) // depricated
     dispatchMidiEvent(e)
 
     // hello from midi
@@ -2146,6 +2250,7 @@ function MidiController( _options ) {
   _self.update = function() {}
 
   // ---------------------------------------------------------------------------
+  // BINDS ARE DEPRICATED
   _self.bind = function( _key, _callback ) {
     binds.push( { key: _key, callback: _callback } )
     // check for double binds ?
@@ -2163,6 +2268,39 @@ function MidiController( _options ) {
     });
   }
 
+  // ---------------------------------------------------------------------------
+
+  /**
+   * @description
+   *  send midi data back to the controller. To switch a light on, or to make it
+   *  change color. Theorettically you should be able to control motorized faders
+   *  too, but I haven't tested that. Lights is nice though.
+   *
+   *  try to send evertything in one blob and try not to do all kinds of little
+   *  updates, it'll crash your midi controller (it crashed mine)
+   *
+   *
+   * @example
+   *  // make button 0 yellow, if a video reports 'seeking'
+   *  testSource1.video.addEventListener('seeking', function() { midi1.send([ 0x90, 0, 6] );} )
+   *
+   *  // don't forget to switch it off again
+   *  testSource1.video.addEventListener('seeked', function() { midi1.send([ 0x90, 0, 5] );} )
+   *
+   *  // make button 8-11 and button 16-19 green (tested with an Akai APC Mini)
+   *
+   *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
+   *
+   *
+   *
+   *
+   *
+   * @function Controller#MidiController#send
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+
   _self.send = function( commands ) {
     if (_self.ready) {
       console.log("Midi send ", commands, "to", output)
@@ -2172,23 +2310,280 @@ function MidiController( _options ) {
     }
   }
 
-  _self.addEventListener = function( _callbackName, _target ) {
-    console.log("midi add listener: " , _callbackName)
-    //listeners.push( _target )
-    nodes.push({callbackName: _callbackName, target: _target})
-    console.log("midi list: ", nodes)
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  _self.clear = function() {
+    var commands = []
+    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );    
+    output.send(commands)
+  }
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  midi.removeEventListener(1)
+   * @function Controller#MidiController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function( _target ) {}
+
+  /**
+   * @description
+   *  addEventListener, expect an array of three values, representing the state and value of your controller
+   *
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr) // [ 144, 0, 1 ]
+   *  }
+   *  midicontroller.addEventListener(1, function() )
+   *
+   * @function Controller#MidiController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback,  ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
   }
 
   var dispatchMidiEvent = function(e) {
-    //console.log(">>", e.data[1])
     nodes.forEach(function( _obj ){
-      //_obj.target[_obj.callbackName](e)
-      if ( _obj.callbackName == e.data[1] ) {
-        _obj.target(e.data)
+      if ( _obj.target == e.data[1] ) {
+        _obj.callback(e.data)
       }
     });
   }
 }
+
+SocketController.prototype = new Controller();  // assign prototype to marqer
+SocketController.constructor = SocketController;  // re-assign constructor
+
+/**
+ * @summary
+ *  So the idea is that this component is build into the controller
+ *  contacts the 'display', and sends all controller data from here to there.
+ *  So it servers as an intermediary of the real controller
+ *
+ * @description
+ *  ---
+ *
+ * @example
+ *  ---
+ *
+ * @implements Controller
+ * @constructor Controller#SocketController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+function SocketController( _options  ) {
+  var _self = this;
+
+  // exposed variables.
+  _self.uuid = "SocketController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Control"
+  _self.bypass = true
+  _self.debug = false
+  _self.socket_pairing_id = "123456"
+  _self.io = io.connect(); // 'http://83.137.150.207:3001'
+  _self.target = ""
+  _self.title = ""
+
+  if ( _options ) {
+    if ( "title" in _options ) _self.title = _options.title
+  }
+  // I don't think we need this
+  //_renderer.add( _self )
+
+  // ---
+  _self.io.on('msg', function( _msg ) {
+    console.log( 'got msg', _msg )
+  })
+
+  _self.io.on('command', function( _command ) {
+    console.log( 'got command', _command )
+    if ( _command.command == "welcome") _self.target = _command.payload
+    if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
+  })
+
+  /*
+  _self.io.on('sync', function( _command ) ) {
+   // got time
+   // find attached source
+   // (if video?) set time to source
+  }
+  */
+
+  _self.io.on('controller', function(_msg) {
+    if ( _self.debug ) console.log( 'got controller', _msg )
+
+    // { client: _client, trigger: _trigger, commands: _commands }
+
+    nodes.forEach( function( node, i ) {
+      if ( _self.debug ) console.log("find node", i, node, _msg, _self.target)
+      if (_msg.client == _self.target && node.target == _msg.trigger ) {
+      //if ( _arr[0] == node[0] ) {
+        if ( _self.debug ) console.log("execute callback!")
+        //node[1]( _arr[1] )
+
+        // { client: _client, trigger: _trigger, commands: _commands }
+        // if _trigger == node[1]
+        node.callback(_msg.commands)
+
+        // dispatchEvent( client, 1, )
+        // _obj.target(e.data) [ x, y, z ]
+      }
+    })
+  })
+
+  _self.io.on('test', function( msg ) {
+    console.log( 'get test', msg )
+    // emit to findsocket(uuid)
+  })
+
+  // ---
+  // ---------------------------------------------------------------------------
+
+  /**
+   * @description
+   *  send info to a client for a trigger
+   * @example
+   *  socketcontroller.send( "client_123456", 0, [ 1, 2, 3, 4 ] )
+   *
+   * @function Controller#SocketController#send
+   * @param {string} _client - the number of controller being pressed
+   * @param {integer} _trigger - the number of controller being pressed
+   * @param {array} _commands - the number of controller being pressed
+   *
+  */
+  _self.send = function( _client, _trigger, _commands ) {
+    if ( _self.debug ) console.log("Socket send to: ", _client, ", trigger:", _trigger, " commands ", _commands )
+    _self.io.emit("controller", { client: _client, trigger: _trigger, commands: _commands } )
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener -- Not Implemented
+   * @example
+   *  socketcontroller.removeEventListener(1)
+   * @function Controller#SocketController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function( _target ) {}
+
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  socketcontroller.addEventListener(1, function() )
+   *
+   * @function Controller#SocketController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback,  ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("listeners: ", nodes)
+  }
+
+  // private? const?
+  var dispatchSocketEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
+  }
+}
+
+  /*
+  var dispatchMidiEvent = function(e) {
+    nodes.forEach(function( _obj ){
+      if ( _obj.target == e.data[1] ) {
+        _obj.callback(e.data)
+      }
+    });
+  }
+
+
+  _self.removeEventListener = function( _target, _callback ) {
+
+  }
+
+  // nodes = [ [ 1, func() ] ]
+  _self.addEventListener = function( _target, _callback ) {
+    nodes.push( [ _target, _callback ] )
+    // nodes.push( { target: _target, callback: _callback } )
+    _self.io.on(_target, function( _msg, _target ) {
+      console.log( 'got custom target msg', _msg, _target )
+    })
+
+    console.log("socketcontroller got listener", _target, _callback)
+    console.log(">>> ", nodes )
+  }
+
+  // depricated
+  var dispatchSocketEvent = function( _arr ) {
+    console.log("socket dispatching")
+    nodes.forEach( function( node, i ) {
+      //console.log(node, i, _arr[0], node.target)
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr[1] )
+        _self.io.emit( _arr )
+      }
+    })
+  }
+
+  _self.dispatchEvent = function( _command, _target, _payload ) {
+    //target
+    console.log("going to send " + JSON.stringify(_payload) + " to: ", _target, " by ", _command )
+    _self.io.emit(_command, {target:_target, command:_command, payload:_payload});
+  }
+
+  _self.bind = function( _num, _arr ) {
+    // bind an event ?
+  }
+}
+
+/*
+    // -------------------------------------------------------------------------
+    // sending side
+    var gamepad = new GamePadController( renderer, {} )
+
+    // creates the sockets
+    var socket = new SocketController( renderer, { uuid: '123', controller: gamepad } );
+
+    // -------------------------------------------------------------------------
+    // receiving side
+    var socket = new SocketController( renderer, { uuid: '123', controller: ''})
+    socket.addEventListener( 1, function )
+    socket.addEventListener( 1, function )
+    socket.addEventListener( 1, function )
+
+*/
+
+/*
+ * Not sure what I meant by this
+ *
+*/
 
 function SourceControl( renderer, source ) {
   // source.renderer ?
@@ -2207,6 +2602,8 @@ function Controller( options ) {
   var _options;
   if ( options != undefined ) _options = options;
 
+  //var nodes = []
+
   _self.type = "Controller"
   _self.testControllerVar = "test"
 
@@ -2214,8 +2611,14 @@ function Controller( options ) {
   _self.init =         function() {}
   _self.update =       function() {}
   _self.render =       function() {}
-  _self.add =          function() {}
+  // _self.add =          function() {}
   //_self.start =        function() {}
+
+  // _self.removeEventListener
+  // _self.addEventListener
+  // _self.dispatchControllerEvent
+
+
 
 }
 
@@ -2224,7 +2627,7 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The color effect has a series of color effects, ie. implements a series of operations on rgba
  *
  * @description
  *   Color effect allows for a series of color effect, mostly
@@ -2565,15 +2968,17 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The Distortion effect has a series of simple distortion effects, ie. it manipulates, broadly, the UV mapping and pixel placements
  *
  * @description
- *   Color effect allows for a series of color effect, mostly
+ *   Distortion  effect allows for a series of color Distortion, mostly
  *   mimicing classic mixers like MX50 and V4
  *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *    1. normal
+ *    2. phasing sides
+ *    3. multi
+ *    4. PiP (Picture in picture)
+ *
  *   ```
  *
  * @example
@@ -2748,8 +3153,8 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
 
   /**
    * @description currentDistortionffect number
-   * @function Effect#DistiotionEffect#effect
-   * @param {Number} effectnumber currentColoreffect number 1
+   * @function Effect#DistortionEffect#effect
+   * @param {Number} effectnumber CurrentDistortionEffect number 1
    */
 
   _self.effect = function( _num ){
@@ -2762,8 +3167,8 @@ vec4 '+_self.uuid+'_output = distortioneffect( '+source.uuid+', ' + _self.uuid+'
     return currentEffect
   }
   /**
-   * @description the extra, for several effects
-   * @function Effect#DistiotionEffect#extra
+   * @description the extra, for several effects, usually between 0 and 1, but go grazy
+   * @function Effect#DistortionEffect#extra
    * @param {float} floatValue between 0 and 1
    */
   _self.extra = function( _num ){
@@ -2782,15 +3187,14 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The color effect has a series of simple color effects
+ *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *
  * @description
- *   Color effect allows for a series of color effect, mostly
+ *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *   mimicing classic mixers like MX50 and V4
  *   ```
- *    1. black and white, 2. negative 1, 3. negative 2, 4. negative 3
- *    5. monocolor red, 6. monocolor blue 7. monocolor green, 8. monocolor yellow,
- *    9. monocolor turqoise, 10. monocolor purple, 11. sepia
+ *   100. you got to see for yourself
+ *   101. they should have sent a poet
  *   ```
  *
  * @example
@@ -2989,21 +3393,9 @@ _self.update = function() {
 /* ------------------------------------------------------------------------ */
 
 /**
-* @description
-*  gets or sets the _effect_, there are 11 color EFFECTS available, numbered 1-11;
-*  ```
-*  1. Multi
-*  2. Pictrue in Picture
-*  3. --,
-*  ```
-* @function Effect#FeedbackEffect#effect
-* @param {number} effect index of the effect
-*/
-
-/**
  * @description currentFeedbackeffectffect number
  * @function Effect#FeedbackEffect#effect
- * @param {Number} effectnumber currentColoreffect number 1
+ * @param {Number} effectnumber currentColoreffect number
  */
   _self.effect = function( _num ){
     if ( _num != undefined ) {
@@ -3015,9 +3407,9 @@ _self.update = function() {
   }
 
   /**
-   * @description currentDistortionffect number
-   * @function Effect#FeedbackEffect#effect
-   * @param {Number} effectnumber currentColoreffect number 1
+   * @description currenFeedbackEffect extra try gently between 0-1, preferably around 0.5
+   * @function Effect#FeedbackEffect#extra
+   * @param {float} float currenFeedbackEffect extra
    */
   _self.extra = function( _num ){
       if ( _num != undefined ) {
@@ -3286,8 +3678,8 @@ function Mixer( renderer, options ) {
   _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
 
   var source1, source2;
-  source1 = options.source1;   // Mandatory
-  source2 = options.source2;   // Mandatory
+  source1 = options.source1 //|| options.src1;   // Mandatory
+  source2 = options.source2 //|| options.src2;   // Mandatory
 
 
   _self.init = function() {
@@ -3580,7 +3972,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
   */
-  
+
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
@@ -4200,6 +4592,62 @@ SVGSource.constructor = SVGSource;  // re-assign constructor
 // hook Lottie up
 
 function SVGSource(renderer, options) {}
+
+SocketSource.prototype = new Source(); // assign prototype to marqer
+SocketSource.constructor = SocketSource;  // re-assign constructor
+
+/**
+ * @summary
+ *  This will serve as a 'receiver' or a send/receiver module for remote video
+ *  viewing; ie. you should be able to send a stream, or part theirof to another machine
+ *
+ *
+ * @description
+ *
+ *  This will serve as a 'receiver' or a send/receiver module for remote video
+ *  viewing; ie. you should be able to send a stream, or part theirof to another machine
+ *
+ *
+ * @example
+ *  ...
+ *
+ *
+ * @implements Soutce
+ * @constructor Soutce#SocketSource
+ * @author Sense Studios
+ */
+
+ function SocketSource(renderer, options) {
+  var _self = this
+
+
+   /*
+    http://www.coding4developers.com/node-js/video-stream-with-node-js-socket-io-stream-data-in-node-js-using-socket-io/
+    function viewVideo(video,context){
+      context.drawImage(video,0,0,context.width,context.height);
+      socket.emit('stream',canvas.toDataURL('image/webp'));
+     }
+
+     var socket = new WebSocket('ws://localhost');
+     socket.binaryType = 'arraybuffer';
+    socket.send(new ArrayBuffer);
+
+    var theDataURL = canvas.toDataURL('image/jpeg',jpgQuality);
+
+    // deserialize
+    var img=new Image();
+img.onload=start;
+img.src=theBase64URL;
+function start(){
+    document.body.appendChild(img);
+    // or
+    context.drawImage(img,0,0);
+
+  _self.addStream()
+  _self.sendStream()
+  _self.addListener()
+  */
+ }
 
 //function SolidSource
 // https://github.com/mrdoob/three.js/wiki/Uniforms-types

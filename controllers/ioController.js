@@ -46,7 +46,6 @@ init = function(io) {
   	socket.on('command', function(msg){
 
       // Command list
-
   		if ( msg.command != "beats"        ) {
         console.log('command: ', msg);
         io.emit('command', msg )
@@ -67,6 +66,10 @@ init = function(io) {
         }
       })
     })
+
+    socket.on('status', function(msg){
+      // should get data from client
+    }
 
     /*
     socket.on('test', function( _msg ) {

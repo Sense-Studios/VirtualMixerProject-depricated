@@ -49,6 +49,14 @@ function SocketController( _options  ) {
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
+  /*
+  _self.io.on('sync', function( _command ) ) {
+   // got time
+   // find attached source
+   // (if video?) set time to source
+  }
+  */
+
   _self.io.on('controller', function(_msg) {
     if ( _self.debug ) console.log( 'got controller', _msg )
 

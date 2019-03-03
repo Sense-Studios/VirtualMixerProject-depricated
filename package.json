@@ -5,8 +5,12 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./bin/www",
-    "build": "./node_modules/.bin/gulp",
+    "build": "./node_modules/.bin/gulp build",
     "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -R README.md --debug ; cp docs/reference/*.* public/docs/reference/ -r ; open docs/reference/index.html ",
+    "generate_mixer": "./node_modules/.bin/gulp create_mixer_scaffold --name",
+    "generate_controller": "./node_modules/.bin/gulp controller_scaffold --name",
+    "remove_mixer": "./node_modules/.bin/gulp remove_mixer_scaffold --name",
+    "remove_controller": "./node_modules/.bin/gulp remove_controller_scaffold --name",
     "test": "node test",
     "help": "echo 'use: $npm run [SCRIPT]\n\nstart\tStarts the application,\nbuild\tbuilds and minifies the application\ndocs\twrites the documentation\ntest\tis sadly empty\nhelp\tthis file'"
   },
@@ -28,6 +32,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "del": "^3.0.0",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
@@ -40,10 +45,11 @@
   },
   "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme",
   "devDependencies": {
-    "glob": "^3.1.10",
     "gulp": "^3.9.1",
+    "glob": "^3.1.10",
     "gulp-concat": "^2.6.1",
     "gulp-minify": "^3.1.0",
+    "del":"4.2.0",
     "jsdoc": "^3.5.5"
   }
 }

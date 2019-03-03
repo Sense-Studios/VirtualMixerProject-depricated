@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "test_mixer.css",
+	"sources": [
+		"test_mixer.sass"
+	],
+	"names": [],
+	"mappings": "AAAA,AAAA,IAAI,CAAC;EACH,MAAM,EAAE,CAAC;EACT,OAAO,EAAE,CAAC,GAAG"
+}
