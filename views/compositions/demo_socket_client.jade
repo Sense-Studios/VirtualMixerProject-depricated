@@ -1,0 +1,23 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/demo_socket_client.css')
+	body 
+		a.logo(href='/')
+		canvas#glcanvas
+		.blink
+
+		.info 
+			#sockets 
+
+		.payoff
+			| <h3>demo_socket_client</small></h3>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+
+		script(src='/compositions/demo_socket_client.js')
+		include ../partials/analytics

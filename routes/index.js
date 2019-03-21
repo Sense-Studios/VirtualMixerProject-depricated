@@ -1,6 +1,7 @@
 var express = require('express');
 var io = require('socket.io');
 var router = express.Router();
+var path = require('path')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -40,12 +41,24 @@ router.get('/controllers/*', function(req, res, next) {
   res.render(repl_url, { title: 'Controllers: ' });
 });
 
+
+
 // for composiions see /views
 router.get('/mixer/*', function(req, res, next) {
   //console.log(req, res, next)
   var repl_url = req.originalUrl.replace('/mixer', 'compositions')
   var title = req.originalUrl.replace('/mixer/', '')
   res.render(repl_url, { title: 'Composition: ' + title });
+});
+
+router.get('/nocorsaudio/*', function( req, res, next ) {
+  var repl_url = req.originalUrl.replace('/nocorsaudio', '/audio')
+  res.header('Access-Control-Allow-Origin', '*');
+              // Access-Control-Allow-Origin: <origin> | *
+              // Origin
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendFile( path.join(__dirname, '../public', repl_url));
 });
 
 var socketConnection = function socketConnection(socket){

@@ -60,9 +60,9 @@ function SocketController( _options  ) {
   _self.target = ""
   _self.title = ""
 
-  if ( _options ) {}
-  if ( "title" in _options ) _self.title = _options.title
-
+  if ( _options ) {
+    if ( "title" in _options ) _self.title = _options.title
+  }
   // I don't think we need this
   //_renderer.add( _self )
 
@@ -74,19 +74,32 @@ function SocketController( _options  ) {
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
     if ( _command.command == "welcome") _self.target = _command.payload
-    document.getElementById('sockets').innerHTML += "&lt;div>" + _self.title  + " Socket: " + _self.target + "&lt;/div>"
+    if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "&lt;div>" + _self.title  + " Socket: " + _self.target + "&lt;/div>"
   })
 
-  _self.io.on('controller', function(_arr) {
-    if ( _self.debug ) console.log( 'got controller', _arr )
+  /*
+  _self.io.on('sync', function( _command ) ) {
+   // got time
+   // find attached source
+   // (if video?) set time to source
+  }
+  */
+
+  _self.io.on('controller', function(_msg) {
+    if ( _self.debug ) console.log( 'got controller', _msg )
 
     // { client: _client, trigger: _trigger, commands: _commands }
 
     nodes.forEach( function( node, i ) {
-      if ( _arr[0] == node[0] ) {
-        node[1]( _arr[1] )
+      if ( _self.debug ) console.log("find node", i, node, _msg, _self.target)
+      if (_msg.client == _self.target &amp;&amp; node.target == _msg.trigger ) {
+      //if ( _arr[0] == node[0] ) {
+        if ( _self.debug ) console.log("execute callback!")
+        //node[1]( _arr[1] )
 
         // { client: _client, trigger: _trigger, commands: _commands }
+        // if _trigger == node[1]
+        node.callback(_msg.commands)
 
         // dispatchEvent( client, 1, )
         // _obj.target(e.data) [ x, y, z ]
@@ -115,8 +128,8 @@ function SocketController( _options  ) {
    *
   */
   _self.send = function( _client, _trigger, _commands ) {
-    console.log("Socket send to: ", _client, ", trigger:", _trigger, " commands ", _commands )
-    socket.emit("controller", { client: _client, trigger: _trigger, commands: _commands } )
+    if ( _self.debug ) console.log("Socket send to: ", _client, ", trigger:", _trigger, " commands ", _commands )
+    _self.io.emit("controller", { client: _client, trigger: _trigger, commands: _commands } )
   }
 
   // ---------------------------------------------------------------------------
@@ -152,7 +165,7 @@ function SocketController( _options  ) {
   */
   _self.addEventListener = function( _target, _callback,  ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Socket listeners: ", nodes)
   }
 
   // private? const?
@@ -240,13 +253,13 @@ function SocketController( _options  ) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 01 2019 23:53:58 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 01:57:17 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

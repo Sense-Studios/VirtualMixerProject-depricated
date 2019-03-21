@@ -69,7 +69,7 @@ init = function(io) {
 
     socket.on('status', function(msg){
       // should get data from client
-    }
+    })
 
     /*
     socket.on('test', function( _msg ) {

@@ -14,7 +14,7 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
  *   ```
  *
  * @example
- *   let myEffect = new FeedbackEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new FeedbackEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#FeedbackEffect
  * @implements Effect

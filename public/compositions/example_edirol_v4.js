@@ -152,7 +152,7 @@ var renderer = new GlRenderer()
       colorize_effect1.effect(1)
       this.classList = 'effect_a round'
     }else{
-      colorize_effect1.effect(42);
+      colorize_effect1.effect(53);
       this.classList = 'effect_a round greenish active'
     }
   }
@@ -213,7 +213,7 @@ var renderer = new GlRenderer()
       paint_effect2.effect(1)
       this.classList = 'effect_b round '
     }else{
-      paint_effect2.effect(41);
+      paint_effect2.effect(52);
       //feedback_effect2.effect(41);
       this.classList = 'effect_b round greenish active'
     }

@@ -75,17 +75,6 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
    * @member Controller#GamePadController.init
    *
   */
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init GamePadController.")
-    setTimeout( function() {
-      try { // try connect
-        gamepad.connect()
-      }catch(e){
-        console.log("Initial connect failed, hope somebody presses the button", e)
-      }
-    }, 500 )
-  }
 
   _self.connect =  function() {
     console.log("start gamepads")
@@ -102,7 +91,19 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
         e.gamepad.index, e.gamepad.id);
     });
 
-    gamepad.bypass = false
+    _self.bypass = false
+  }
+
+  // init a connection
+  _self.init = function() {
+    console.log("init GamePadController.")
+    setTimeout( function() {
+      try { // try connect
+        _self.connect()
+      }catch(e){
+        console.log("Initial connect failed, hope somebody presses the button v14 ", _self, e)
+      }
+    }, 1200 )
   }
 
   _self.update = function() {
@@ -180,7 +181,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   */
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Gamepad listeners: ", nodes)
   }
 
   // private? const?

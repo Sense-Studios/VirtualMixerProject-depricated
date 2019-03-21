@@ -17,7 +17,7 @@ html
       a.logo(href='/')
       .scroll_container
         .grid_container
-          .grid_item.grid_item_large(tabindex="1")
+          .grid_item.grid_item_large(tabindex='1', data-video-src='some source', )
             .titel
               | the <verystrong>Virtual Mixer Project</verystrong><br>
               | Lets try videomixing in javascript v0.0.1
@@ -25,59 +25,145 @@ html
               | 
               | <p> This is the <verystrong>DEMOS SECTION</verystrong>
               | <br>
-              | <hr>  
-              | <a href="https://github.com/Sense-Studios/VirtualMixerProject" target="_blank">Github Repository</a> | 
-              | <a href="https://www.youtube.com/watch?v=jYwPJXsD-mc" target="_blank">Youtube</a> | 
-              | <a href="https://virtualmixproject.com/docs/reference/index.html" target="_blank">Documentation</a>
               | <br>
+              | To help you on your way, and to show of the possibilities of the virtual mixer this demo page 
+              | was added to the site. Some of these are tested and solid features of the project, others
+              | are feeble technical demos or early prototypes.
+              | Where possible code examples and references were added.
               | <br>
+              | </p>                
+              | <br>
+              | <hr>
+              | <a href="https://github.com/Sense-Studios/VirtualMixerProject" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"/> Github Repository</a> | 
+              | <a href="https://www.youtube.com/watch?v=jYwPJXsD-mc" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/YouTube_play_buttom_dark_icon_%282013-2017%29.svg"/> Youtube</a> | 
+              | <a href="https://virtualmixproject.com/docs/reference/index.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
 
-          .grid_item(tabindex="2")
-            .item_image
+          .grid_item(tabindex="2", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/tapped_beat.png")
+            .titel
+              | <verystrong>Tapped BPM</verystrong>            
+            .content
+              | Easy interface for tapped bpm. Tap along with any song pressing ENTER this Addon will give you your BPM back. Integrates easily with the mixer. 
+              | 
+              | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/drqzPr" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Addon_BPM.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
+
+          .grid_item(tabindex="2", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/analysis.png")
+            .titel
+              | <verystrong>BPM DETECTION</verystrong>            
+            .content
+              | Yes, realtime bpm detection! Tries and detects the BPM of any mp3 or shoutcast stream.
+              | Demo with a number of songs and metronomes.
+              | 
+              | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/VRGzdY" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Addon_AudioAnalysis.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
+
+
+          .grid_item(tabindex="2", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/webcam.png")
             .titel
               | <verystrong>Webcam</verystrong>            
             .content
-              | Coming soon -- Etiam accumsan molestie nisl sit amet aliquet. Vestibulum tristique magna a nibh euismod porttitor. 
+              | A wrapper around GetUserMedia(). Requires https. Should give you easy access to a Webcam as a source.
+              | 
               | <br>
-              | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/moLayR" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Source_WebcamSource.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
 
-          .grid_item(tabindex="3")
-            .item_image
+          .grid_item(tabindex="2", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/effects.png")
+            .titel
+              | <verystrong>effects and blendmodes</verystrong>            
+            .content
+              | A growing range of color-, distortion and feedback effects. Here is a small demo showing off all effects and mixer blendmodes!
+              | 
+              | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Effect.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
+
+          .grid_item(tabindex="3", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/keyboard.png")
+            .titel
+              | <verystrong>Keyboard</verystrong>            
+            .content
+              | I've been using gamepads for live mixing since 2004. Of course it needed to be in here.              
+              | <br>
+              | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/NJzxNy" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen </a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Controller_KeyboardController.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
+
+
+          .grid_item(tabindex="4", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/gamepad.png")
             .titel
               | <verystrong>Gamepad</verystrong>            
             .content
-              | Coming soon -- Etiam accumsan molestie nisl sit amet aliquet. Vestibulum tristique magna a nibh euismod porttitor. 
+              | I've been using gamepads for live mixing since 2004. Of course it needed to be in here.              
               | <br>
               | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/gEzZgx" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a>               
+              | <a href="https://virtualmixproject.com/docs/reference/Controller_GamePadController.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
 
-          .grid_item(tabindex="4")
-            .item_image
+          .grid_item(tabindex="5", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/midi.png")
             .titel
               | <verystrong>MIDI</verystrong>            
             .content
-              | Coming soon -- Etiam accumsan molestie nisl sit amet aliquet. Vestibulum tristique magna a nibh euismod porttitor. 
+              | Complete wrapper around MIDI(). Includes sending back of signals for blinking lights and such. Tested on Akai APC mini and Akai MPK mini
               | <br>
               | <br>
+              | <hr>
+              | <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank"><img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/>Codepen</a>
+              | <a href="https://virtualmixproject.com/docs/reference/Controller_MidiController.html" target="_blank"><img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/>Documentation</a>
 
-          .grid_item(tabindex="5")
-            .item_image
+          .grid_item(tabindex="6", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/sockets.png")
+            .titel
+              | <verystrong>Sockets</verystrong>            
+            .content
+              | Working with Sockets can be confusing. So here is a wrapper for sockets.io that
+              | allows you to easily connect different browsers together. It tries to assign a pin code, not unlike a Chromecast.
+              | when connected events can easily be sent. Be it from a mobile phone or any other device.
+              | <br>
+              | <br>
+              | <hr>
+              | <a href="https://virtualmixproject.com/mixer/demo_socket_client" target="_blank">Client</a> |
+              | <a href="https://virtualmixproject.com/controllers/demo_socketcontroller_remote" target="_blank">Remote</a>
+              | <br>
+              | <a href="https://virtualmixproject.com/docs/reference/Controller_SocketController.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
+
+
+          .grid_item(tabindex="7", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/trackeditor.png")
             .titel
               | <verystrong>Sequencer</verystrong>            
             .content
-              | Coming soon -- Etiam accumsan molestie nisl sit amet aliquet. Vestibulum tristique magna a nibh euismod porttitor. 
+              | Still an early techdemo. Tracker-like interface to configure mixer controls.
               | <br>
               | <br>
+              | <hr>              
+              | <a href="https://virtualmixproject.com/editors/TrackEditor">techdemo</a>
 
-          .grid_item(tabindex="5")
-            .item_image
+          .grid_item(tabindex="8", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/clock.png")
             .titel
-              | <verystrong>Clicktrack</verystrong>            
+              | <verystrong>Clicktrack</verystrong>                        
             .content
-              | Etiam accumsan molestie nisl sit amet aliquet. Vestibulum tristique magna a nibh euismod porttitor. 
+              | Early demo of a clicktrack script, that lets you script a set of mixers and effects.
+              | now works through Google Spreadsheets.
+              | <br>
+              | <br>
+              | <hr>
               | <a href="https://virtualmixproject.com/mixer/clicktrack">techdemo</a>
-              | <br>
-              | <br>
-
 
     canvas#glcanvas
 

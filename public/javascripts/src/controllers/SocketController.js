@@ -137,7 +137,7 @@ function SocketController( _options  ) {
   */
   _self.addEventListener = function( _target, _callback,  ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Socket listeners: ", nodes)
   }
 
   // private? const?

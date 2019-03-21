@@ -17,7 +17,7 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
  *   ```
  *
  * @example
- *   let myEffect = new DistortionEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new DistortionEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#DistortionEffect
  * @implements Effect

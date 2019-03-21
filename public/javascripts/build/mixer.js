@@ -306,6 +306,8 @@ function AudioAnalysis( _renderer, _options ) {
   audio.controls = true;
   audio.loop = true;
   audio.autoplay = true;
+  audio.crossOrigin = "anonymous"
+  audio.crossorigin = "anonymous"
 
   // or as argument(settings.passFreq ? settings.passFreq : 350);
   bandpassFilter.type = "lowpass";
@@ -1753,17 +1755,6 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
    * @member Controller#GamePadController.init
    *
   */
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init GamePadController.")
-    setTimeout( function() {
-      try { // try connect
-        gamepad.connect()
-      }catch(e){
-        console.log("Initial connect failed, hope somebody presses the button", e)
-      }
-    }, 500 )
-  }
 
   _self.connect =  function() {
     console.log("start gamepads")
@@ -1780,7 +1771,19 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
         e.gamepad.index, e.gamepad.id);
     });
 
-    gamepad.bypass = false
+    _self.bypass = false
+  }
+
+  // init a connection
+  _self.init = function() {
+    console.log("init GamePadController.")
+    setTimeout( function() {
+      try { // try connect
+        _self.connect()
+      }catch(e){
+        console.log("Initial connect failed, hope somebody presses the button v14 ", _self, e)
+      }
+    }, 1200 )
   }
 
   _self.update = function() {
@@ -1858,7 +1861,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   */
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Gamepad listeners: ", nodes)
   }
 
   // private? const?
@@ -1941,12 +1944,21 @@ function KeyboardController( _renderer, _options  ) {
   _self.init = function() {
     console.log("init KeyboardController.")
 
-    window.document.addEventListener('keydown', function(event) { console.log(event.keyCode) })
+    //window.document.addEventListener('keydown', (event) => { console.log(event.keyCode) })
     document.addEventListener('keydown', (event) => {
       // const keyName = event.key;
-      console.log( " >>> ", event )
+      if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 1 ] )
     })
     // window.keyboard.on.keypress whatever
+
+    //window.document.addEventListener('keyup', (event) => { console.log(event.keyCode) })
+    document.addEventListener('keyup', (event) => {
+      // const keyName = event.key;
+      if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 0 ] )
+    })
+
   }
 
 
@@ -1992,7 +2004,7 @@ function KeyboardController( _renderer, _options  ) {
   */
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Keyboard listeners: ", nodes)
   }
 
   // private? const?
@@ -2316,7 +2328,7 @@ function MidiController( _options ) {
 
   _self.clear = function() {
     var commands = []
-    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );    
+    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );
     output.send(commands)
   }
 
@@ -2350,7 +2362,7 @@ function MidiController( _options ) {
   */
   _self.addEventListener = function( _target, _callback,  ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("MIDI listeners: ", nodes)
   }
 
   var dispatchMidiEvent = function(e) {
@@ -2501,7 +2513,7 @@ function SocketController( _options  ) {
   */
   _self.addEventListener = function( _target, _callback,  ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Socket listeners: ", nodes)
   }
 
   // private? const?

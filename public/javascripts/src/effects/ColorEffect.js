@@ -47,7 +47,7 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  ```
  *
  * @example
- *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new ColorEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#ColorEffect
  * @implements Effect

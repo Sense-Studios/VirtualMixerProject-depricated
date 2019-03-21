@@ -111,6 +111,8 @@ function AudioAnalysis( _renderer, _options ) {
   audio.controls = true;
   audio.loop = true;
   audio.autoplay = true;
+  audio.crossOrigin = "anonymous"
+  audio.crossorigin = "anonymous"
 
   // or as argument(settings.passFreq ? settings.passFreq : 350);
   bandpassFilter.type = "lowpass";
@@ -122,7 +124,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *  firstload for mobile, forces all control to the site on click
-   * @member Addon#AudioAnalysis~disconnectOutput
+   * @member Addon#AudioAnalysis~forceFullscreen
    *
   */
   var forceFullscreen = function() {
@@ -131,7 +133,7 @@ function AudioAnalysis( _renderer, _options ) {
       audio.play();
       console.log('Playback resumed successfully');
     });
-    document.body.webkitRequestFullScreen()
+    document.body.webkitRequestFullScreen()  // REMOVE!! FIXME FIX ME !!
     document.body.removeEventListener('click', forceFullscreen);
   }
   document.body.addEventListener('click', forceFullscreen)

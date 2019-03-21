@@ -59,12 +59,21 @@ function KeyboardController( _renderer, _options  ) {
   _self.init = function() {
     console.log("init KeyboardController.")
 
-    window.document.addEventListener('keydown', function(event) { console.log(event.keyCode) })
+    //window.document.addEventListener('keydown', (event) => { console.log(event.keyCode) })
     document.addEventListener('keydown', (event) => {
       // const keyName = event.key;
-      console.log( " >>> ", event )
+      if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 1 ] )
     })
     // window.keyboard.on.keypress whatever
+
+    //window.document.addEventListener('keyup', (event) => { console.log(event.keyCode) })
+    document.addEventListener('keyup', (event) => {
+      // const keyName = event.key;
+      if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 0 ] )
+    })
+
   }
 
 
@@ -110,7 +119,7 @@ function KeyboardController( _renderer, _options  ) {
   */
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("Keyboard listeners: ", nodes)
   }
 
   // private? const?

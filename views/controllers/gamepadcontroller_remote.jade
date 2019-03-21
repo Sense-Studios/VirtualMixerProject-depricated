@@ -1,15 +1,16 @@
-extends ../layout
-
-block content
-
-
-  link(rel='stylesheet', href='/stylesheets/style.css')
-  link(rel='stylesheet', href='/stylesheets/compositions/demo_gamepad.css')
+doctype html
+html
+  head
+    title= title
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/controllers/gamepadcontroller_remote.css')
 
   body
-    | HELLOOOOOO NUHRSE
+    | Give your socket id to connect
     
-    h1.large SADSADSADSADSAD
+    h1.large Gamepad remote
     
     h1.large.info#infobox
       #left_x

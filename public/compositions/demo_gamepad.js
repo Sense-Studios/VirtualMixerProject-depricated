@@ -38,6 +38,8 @@ var gamepad_socket_controller = new SocketController({title: "gamepad"})
 // midi socket controller
 var midi_socket_controller = new SocketController({title: "midi"})
 
+var keyboard1 = new KeyboardController( renderer )
+
 // set a temp video source to test with
 // var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
 
@@ -259,6 +261,7 @@ socketcontroller.addEventListener( "controller", function( msg ) {
 })
 */
 
+keyboard1.addEventListener( 87, function(arr) { console.log(arr)} )
 
 
 // ---

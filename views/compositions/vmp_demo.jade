@@ -17,7 +17,7 @@ html
       a.logo(href='/')
       .scroll_container
         .grid_container
-          .grid_item.grid_item_large.active(tabindex="1")
+          .grid_item.grid_item_large.active(tabindex="1", data-video-src="/video/placeholder.mp4")
             .titel
               | the <verystrong>Virtual Mixer Project</verystrong><br>
               | Lets try videomixing in javascript v0.0.1
@@ -34,7 +34,8 @@ html
               
               | <p> You may also dive deeper and go to <a href="https://github.com/Sense-Studios/VirtualMixerProject" target="_blank">Github Repository</a>
               | and fork the code. An attempt was made and <a href="https://virtualmixproject.com/docs/reference/index.html" target="_blank">Documentation</a> was set up.
-              | You'll find a lot of <strong>GLSL graziness</strong> going around in there. You can see it al wired up on <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">CodePen</a>
+              | You'll find a lot of <strong>GLSL graziness</strong> going around in there. You can see it al wired up on 
+              | <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Feather-logos-codepen.svg"/> Codepen</a> 
               | Which should get you started </p>
               
               | <p> In the 
@@ -45,13 +46,13 @@ html
               | <p> But first, <strong>Enjoy</strong> this page for a while ! <small>notice how the background visuals change when you select the rectangles</small></p>
               | <br>
               | <br>
-              | <hr>  
+              | <hr>
               | <a href="https://github.com/Sense-Studios/VirtualMixerProject" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"/> Github Repository</a> | 
               | <a href="https://www.youtube.com/watch?v=jYwPJXsD-mc" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/YouTube_play_buttom_dark_icon_%282013-2017%29.svg"/> Youtube</a> | 
               | <a href="https://virtualmixproject.com/docs/reference/index.html" target="_blank"> <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"/> Documentation</a>
 
-          .grid_item(tabindex="2")
-            .item_image
+          .grid_item(tabindex="2", data-video-src="https://s3-eu-west-1.amazonaws.com/nabu/veejay/NoTV2/VTS_01_0.mp4")
+            img.item_image(src="/images/vmp_demo/notv.png")
             .titel
               | <strong>NOTV</strong> Videomixes by early '00 Amsterdam Veejays
             .content
@@ -60,8 +61,8 @@ html
               | <p class=hidden_content><strong><a href="https://virtualmixproject.com/mixer/notv" class="go_button">go experience it!! >></a></strong>
               | <br><br> <small>NOTICE: There will be loud music!</small></p>
               
-          .grid_item(tabindex="5")
-            .item_image
+          .grid_item(tabindex="3", data-video-src="/video/ignore/edirol_v4.mp4")
+            img.item_image(src="/images/vmp_demo/edirol.png")
             .titel
               | <verystrong>EDIROL V4</verystrong> a simulation of the legendary <strong>v4 video mixer</strong>
             .content
@@ -70,8 +71,8 @@ html
               | <br><verystrong><a href="/mixer/example_edirol_v4" class="go_button">go play with it now >></a></verystrong>
               | <br><br><p class=hidden_content><small>NOTICE: put on some house music for more fun!</small></p>
 
-          .grid_item(tabindex="3")
-            .item_image
+          .grid_item(tabindex="4", data-video-src="/video/ignore/veejays_demoreel.mp4")
+            img.item_image(src="/images/vmp_demo/veejays.png")
             .titel
               | <verystrong>VJAcademy.nl videoreels</verystrong> 2010-2018
             .content
@@ -83,8 +84,8 @@ html
               | <p class=hidden_content> -- <a href="https://vjacademy.nl">VJAcademy.nl</a> -- <small>NOTICE: There will be loud music!</small></p>
               | <br>              
 
-          .grid_item(tabindex="4")
-            .item_image
+          .grid_item(tabindex="5", data-video-src="some source")
+            img.item_image(src="/images/vmp_demo/occupy.png")
             .titel
               | <strong>OCCUPY CHAOS</strong> a remixed look at the 2011 movement
             .content
@@ -94,8 +95,8 @@ html
               | <p class=hidden_content><small>NOTICE: There will be loud music!</small></p>
               | <br>            
 
-          .grid_item(tabindex="6")
-            .item_image
+          .grid_item(tabindex="6", data-video-src="https://s3-eu-west-1.amazonaws.com/nabu/veejay/occupy_chaos/protest_signs/set5_w_ppl.mp4")
+            img.item_image(src="/images/vmp_demo/computer_demos.png")
             .titel
               | the <verystrong>DEMOS</verystrong> weird demos and <strong>experiments</strong> with video
             .content
@@ -104,8 +105,8 @@ html
               | <verystrong><a href="https://virtualmixproject.com/mixer/demos" class="go_button">Explore how deep this rabbit hole goes !!</a></verystrong>
               | <br/>
               
-          .grid_item(tabindex="7")
-            .item_image
+          .grid_item(tabindex="7", data-video-src="https://nabu-dev.s3.amazonaws.com/uploads/video/556b99e86465764bdf1e0000/720p_h264.mp4")
+            img.item_image(src="/images/vmp_demo/powerglove.png")
             .titel
               | <strong>AWESOME</strong><small> weird video </small> <strong>HARVEST</strong> from 2016 onwared. 
             .content
@@ -116,9 +117,19 @@ html
               | <p class=hidden_content><br><br>This is actually the best mix on here, <small>you lucky bastard</small></p>              
               | <p class=hidden_content><small> -- NOTICE: There will be loud music!</small><br>
               | </p>
+              
+          .grid_item(tabindex="8", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/ziek_records_gif.gif")
+            .titel
+              | ZiEK -- Zombies and Monochrome Horror <<< 
+            .content
+              | His twitter account twitter <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/fr/c/c8/Twitter_Bird.svg"/></span> @A_Agrasot
+              | and check him at his label at <a href="http://sandiafatal.com/ziek_records/">ziek records</a>
+              | ZiEK records is a label that focuses on bass music and art.
+              | <br><br><verystrong><a href="https://virtualmixproject.com/mixer/ziek" class="go_button">go experience it!! >></a></verystrong>
 
-          .grid_item(tabindex="8")
-            .item_image
+          .grid_item(tabindex="8", data-video-src="/video/placeholder.mp4")
+            img.item_image(src="/images/vmp_demo/iwantyou.png")
             .titel
               | YOUR CONTENT HERE join in and load up now
             .content
@@ -127,6 +138,8 @@ html
               | reach out at <a href="http://sense-studios.com"> Sense Studios </a>
               | <br> or through twitter <img class="text-icon" src="https://upload.wikimedia.org/wikipedia/fr/c/c8/Twitter_Bird.svg"/></span>; @xangadix or @sensestudios
               
+
+                            
     canvas#glcanvas
 
     script(src='/compositions/vmp_demo.js')

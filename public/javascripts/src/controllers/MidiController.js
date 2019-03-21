@@ -300,7 +300,7 @@ function MidiController( _options ) {
 
   _self.clear = function() {
     var commands = []
-    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );    
+    for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );
     output.send(commands)
   }
 
@@ -334,7 +334,7 @@ function MidiController( _options ) {
   */
   _self.addEventListener = function( _target, _callback,  ) {
     nodes.push( { target: _target, callback: _callback } )
-    console.log("listeners: ", nodes)
+    console.log("MIDI listeners: ", nodes)
   }
 
   var dispatchMidiEvent = function(e) {

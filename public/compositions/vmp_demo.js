@@ -43,8 +43,12 @@ document.querySelectorAll('.grid_item').forEach( function(_elm, i) {
       this.classList = this.classList + " active"
 
       // if grid item index
-      console.log(_elm.index)
+      console.log( _elm.index, _elm.getAttribute('data-video-src') )
+      // document.querySelectorAll('.grid_item')[0].getAttribute('data-video-src')
+      source1.src(source2.currentSrc)
+      source2.src( _elm.getAttribute('data-video-src' ) )
 
+      /*
       if (_elm.index == 0) {
         source1.src(source2.currentSrc)
         source2.src('/video/placeholder.mp4')
@@ -64,6 +68,7 @@ document.querySelectorAll('.grid_item').forEach( function(_elm, i) {
         source1.src(source2.currentSrc)
         source2.src('https://nabu-dev.s3.amazonaws.com/uploads/video/556b99e86465764bdf1e0000/720p_h264.mp4')
       }
+      */
     }
   }
   console.log(_elm)

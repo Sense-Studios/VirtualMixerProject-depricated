@@ -1,0 +1,23 @@
+.test {
+  bottom: 24px;
+  right: 24px;
+  position: absolute;
+  color: white;
+  font-family: arial, sans-serif;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.42);
+  width: 40px;
+  text-align: left; }
+
+.info {
+  top: 140px;
+  left: 24px;
+  position: absolute;
+  color: white;
+  font-family: arial, sans-serif;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.42);
+  width: 250px;
+  text-align: left; }
+
+/*# sourceMappingURL=gamepadcontroller_remote.css.map */

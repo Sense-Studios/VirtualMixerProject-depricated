@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "demo_socketcontroller.css",
+	"sources": [
+		"demo_socketcontroller.sass"
+	],
+	"names": [],
+	"mappings": "AAAA,AAAA,UAAU,CAAC;EACT,QAAQ,EAAE,QAAQ;EAClB,IAAI,EAAE,IAAI;EACV,GAAG,EAAE,IAAI;EACT,KAAK,EAAE,KAAK,GAAG;;AAEjB,AAAA,MAAM,CAAC;EACL,WAAW,EAAE,IAAI,GAAG"
+}

@@ -108,20 +108,10 @@ verystrong {
     .grid_container .grid_item_large .content {
       grid-column-end: span 3;
       margin-left: 8px; }
-  .grid_container .grid_item:nth-child(2) .item_image {
-    background-image: url("/images/vmp_demo/notv.png"); }
-  .grid_container .grid_item:nth-child(3) .item_image {
-    background-image: url("/images/vmp_demo/edirol.png"); }
-  .grid_container .grid_item:nth-child(4) .item_image {
-    background-image: url("/images/vmp_demo/veejays.png"); }
-  .grid_container .grid_item:nth-child(5) .item_image {
-    background-image: url("/images/vmp_demo/occupy.png"); }
-  .grid_container .grid_item:nth-child(6) .item_image {
-    background-image: url("/images/vmp_demo/computer_demos.png"); }
-  .grid_container .grid_item:nth-child(7) .item_image {
-    background-image: url("/images/vmp_demo/powerglove.png"); }
-  .grid_container .grid_item:nth-child(8) .item_image {
-    background-image: url("/images/vmp_demo/iwantyou.png"); }
+  .grid_container .grid_item img.item_image {
+    background-image: url("") !important;
+    height: auto;
+    width: 90%; }
 
 @media only screen and (max-width: 720px) {
   .grid_container {
