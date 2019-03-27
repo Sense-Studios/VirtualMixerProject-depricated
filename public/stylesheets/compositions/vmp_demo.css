@@ -113,6 +113,20 @@ verystrong {
     height: auto;
     width: 90%; }
 
+@media only screen and (max-width: 1100px) {
+  .grid_container {
+    display: grid;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    grid-template-columns: 2fr 2fr;
+    position: absolute;
+    left: calc( 50% - 40vw);
+    top: 8%;
+    height: auto;
+    width: 80vw;
+    grid-auto-flow: row;
+    margin-bottom: 120px; } }
+
 @media only screen and (max-width: 720px) {
   .grid_container {
     display: grid;

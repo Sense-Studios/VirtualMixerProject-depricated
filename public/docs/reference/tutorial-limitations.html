@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: limitations</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">limitations</h1>
+
+    <section>
+
+<header>
+    
+
+    <h2>limitations</h2>
+</header>
+
+<article>
+    <p>There are several limitations to the Mixer. Most have to do with the limitation of the browser, or limitations with interpretation of browser code.</p>
+<ul>
+<li><em>Use Chrome, The mixer relies heavily on WebGL and a number of control interfaces.</em></li>
+</ul>
+<p>Although WebGL is available in most browsers, I've found that only Chrome, and to a certain degree Firefox support all the functions neccesary to run the mixer.<br>particularly controlling the mixer with MIDI or a Gamepad are features that rely on (sometimes experimental) support by the Chrome browser.</p>
+<ul>
+<li><em>Autoplay, Webcam, Microphone, Gamepad and Midi-controllers require https:// .</em></li>
+</ul>
+<p>If you run the mixer in your website, make sure that you have a certificate installed.<br>A number of functions will only work when https is available and enabled. These include the webcam (and subsequently the microphone!), Gamepad control, Midi Control and Autoplay functionality.</p>
+<ul>
+<li><em>Mobile browsers require interaction to start</em></li>
+</ul>
+<p>Due to loading concerns it is not possible to autoplay video on a mobile<br>device. Make sure that you have some kind of 'play'-functionality in place<br>that serves as some kind of interaction. There is some first-start code<br>in place in the sources, but that doesn't work on all platforms.<br>Call <em>firstRun</em> on the sources to utilize this behaviour.</p>
+<ul>
+<li><del><em>iOS does not allow for more then one video to play simultaneous (gif is fine though)</em></del></li>
+</ul>
+<p><del>Apple has decided, in all their wisdom, that you should not be allowed to play multiple videos on one page. Even though Apple has finally allowed to<br>play inline video on mobile devices, it is still not allowed to play 2 or more videos simultaneously.<br>Luckily Apple does allow as many gif sources as you'd like, so when you<br>target Apple devices build your mixers with only one videoSource max.</del></p>
+<p>Apple has fixed this as of iOS 11.x, mix along on iPhone!</p>
+<ul>
+<li><em>Seeking and loading (remote) video delays the video and results in hiccups</em></li>
+</ul>
+<p>Loading Video or seeking in a Video over the internet is usually fast enough for most purposes, however doing so in realtime leads to noticable delays in your mix. Especially when you want to jump around in a video the 400ms delays really get annoying.</p>
+<p>I've tried a number of settings and options through Amazon S3 and Cloudflare but I haven't been able to get the delay(s) down to an acceptable level. Which leads me to start working on a 'MultipleVideoSource', that works around this problem, by loading a video into multiple HTMLMediaElements which are exchanged with each other when jumping through the video. It works, but has other concerns, like memory bloat.</p>
+<ul>
+<li><em>Shaders allow up to 16 sources.</em></li>
+</ul>
+<p>On most systems the Shader-buffer allows for a maximum of 16 textures. As all<br>sources require a texture-slot to operate, that means that within the mixer<br>there is a maximum of 16 slots available.</p>
+<p>Note that the FeedbackEffect also uses a samplers, and counts against your<br>maximum number of shaders.</p>
+<ul>
+<li><em>AudioAnalysis is too resource intensive for most Mobile devices</em></li>
+</ul>
+<p>I've notices a significant delay in performance when using the Audio-Analysis Add-on in my mixers on Mobile. Now truth be told, I've tested this only with 3-year-old mobile devices, but still performance on those devices is underwhelming. Try to use the BPM Addon instead if you target mobile devices or work with a set BPM.</p>
+</article>
+
+</section>
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-build.html">build</a></li><li><a href="tutorial-limitations.html">limitations</a></li><li><a href="tutorial-main.html">main</a></li><li><a href="tutorial-roadmap.html">roadmap</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Mar 25 2019 03:08:24 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

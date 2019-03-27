@@ -55,13 +55,6 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  * @param options:Object
  * @author Sense Studios
  */
-
-// fragment
-// vec3 b_w = ( source.x + source.y + source.z) / 3
-// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
-// col = vec3(col.r+col.g+col.b)/3.0;
-// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
-
 function ColorEffect( _renderer, _options ) {
 
   // create and instance

@@ -3,22 +3,23 @@ KeyboardController.constructor = KeyboardController;  // re-assign constructor
 
 /**
  * @summary
- *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
  *  as controllerevents (allows for sockets)
  *
  *
  * @description
  *
- *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
  *  as controllerevents (allows for sockets)
  *
  *
  * @example
- *  let keyboard = new KeyboardController( renderer, {});
- *  keyboard.init
- *  keyboard.render
- *  keyboard.addEventListener( 1, function() { ... })   // button 1
- *  keyboard.addEventListener( 100, function() { ... }) // axis
+ *  var keyboard = new KeyboardController( renderer, {});
+ *  keyboard.init();
+ *  keyboard.render();
+ *
+ *  // enter button, should return [13, 1] on keydown and [13,0] on keyup
+ *  keyboard.addEventListener( 13, function(_arr) { console.log(_arr) })
  *
  *
  * @implements Controller
@@ -37,7 +38,10 @@ function KeyboardController( _renderer, _options  ) {
   _self.controllers = {};
   _self.keyboard = {}
   _self.bypass = true
+  /** @member {boolean} Controller#KeyboardController#debug */
   _self.debug = false
+
+  /** @member {integer} Controller#KeyboardController#keyboard_index */
   _self.keyboard_index = 0
 
   if ( _options ) {
@@ -52,22 +56,17 @@ function KeyboardController( _renderer, _options  ) {
   /**
    * @description
    *  init, should be automatic, but you can always call my_keyboard.init()
-   * @member Controller#KeyboardController.init
+   * @function Controller#KeyboardController~init
    *
   */
-  // init with a tap contoller
   _self.init = function() {
     console.log("init KeyboardController.")
 
-    //window.document.addEventListener('keydown', (event) => { console.log(event.keyCode) })
     document.addEventListener('keydown', (event) => {
-      // const keyName = event.key;
       if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
       dispatchkeyboardEvent( [ event.keyCode, 1 ] )
     })
-    // window.keyboard.on.keypress whatever
 
-    //window.document.addEventListener('keyup', (event) => { console.log(event.keyCode) })
     document.addEventListener('keyup', (event) => {
       // const keyName = event.key;
       if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
@@ -76,12 +75,23 @@ function KeyboardController( _renderer, _options  ) {
 
   }
 
-
+  /**
+   * @description
+   *  update, should be automatic, but you can always call my_keyboard.update()
+   * @function Controller#KeyboardController~update
+   *
+  */
   _self.update = function() {
     if ( _self.bypass ) return;
 
   }
 
+  /**
+   * @description
+   *  render, should be automatic, but you can always call my_keyboard.render()
+   * @function Controller#KeyboardController~render
+   *
+  */
   _self.render = function() {
     return _self.controllers
   }
@@ -107,10 +117,10 @@ function KeyboardController( _renderer, _options  ) {
    * @description
    *  addEventListener
    * @example
-   *  function doSomething(_arr ) {
-   *    console.log('pressed1', arr)
+   *  function doSomething( _arr ) {
+   *    console.log('pressed1', arr);
    *  }
-   *  keyboard.addEventListener(1, function() )
+   *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
    *
    * @function Controller#KeyboardController#addEventListener
    * @param {string} _target - the number of controller being pressed
@@ -133,7 +143,7 @@ function KeyboardController( _renderer, _options  ) {
 
   /**
    * @description
-   *  getNodes -- helper, shows current nodes
+   *  getNodes, helper, shows current nodes
    * @function Controller#KeyboardController#getNodes
   */
   _self.getNodes = function() {

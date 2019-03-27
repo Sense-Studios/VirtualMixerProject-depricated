@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "build": "./node_modules/.bin/gulp build",
-    "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -R README.md --debug ; cp docs/reference/*.* public/docs/reference/ -r ; open docs/reference/index.html ",
+    "docs": "node node_modules/jsdoc/jsdoc public/javascripts/src/* -c config/jsdoc.config.json -u docs/ -R README.md --debug ; cp docs/reference/* public/docs/reference/ -R ",
     "generate_mixer": "./node_modules/.bin/gulp create_mixer_scaffold --name",
     "generate_controller": "./node_modules/.bin/gulp controller_scaffold --name",
     "remove_mixer": "./node_modules/.bin/gulp remove_mixer_scaffold --name",

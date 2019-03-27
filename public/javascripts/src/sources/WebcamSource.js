@@ -2,8 +2,12 @@ WebcamSource.prototype = new Source(); // assign prototype to marqer
 WebcamSource.constructor = WebcamSource;  // re-assign constructor
 
 /**
+ *
+ * @summary
+ *  The WebcamSource allows for playback of webcams in the Mixer project
+ *
  * @description
- *  The WebcamSource allows for playback of video files in the Mixer project
+ *  The WebcamSource allows for playback of webcams in the Mixer project
  *
  * @implements Source
  * @constructor Source#WebcamSource

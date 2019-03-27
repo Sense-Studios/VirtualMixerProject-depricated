@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/KeyboardController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/KeyboardController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>KeyboardController.prototype = new Controller();  // assign prototype to marqer
+KeyboardController.constructor = KeyboardController;  // re-assign constructor
+
+/**
+ * @summary
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @description
+ *
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @example
+ *  var keyboard = new KeyboardController( renderer, {});
+ *  keyboard.init();
+ *  keyboard.render();
+ *
+ *  // enter button, should return [13, 1] on keydown and [13,0] on keyup
+ *  keyboard.addEventListener( 13, function(_arr) { console.log(_arr) })
+ *
+ *
+ * @implements Controller
+ * @constructor Controller#KeyboardController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+function KeyboardController( _renderer, _options  ) {
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "KeyboardController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Control"
+  _self.controllers = {};
+  _self.keyboard = {}
+  _self.bypass = true
+  /** @member {boolean} Controller#KeyboardController#debug */
+  _self.debug = false
+
+  /** @member {integer} Controller#KeyboardController#keyboard_index */
+  _self.keyboard_index = 0
+
+  if ( _options ) {
+    if ("default" in _options) {}
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  var c = 0      // counter
+
+  /**
+   * @description
+   *  init, should be automatic, but you can always call my_keyboard.init()
+   * @function Controller#KeyboardController~init
+   *
+  */
+  _self.init = function() {
+    console.log("init KeyboardController.")
+
+    document.addEventListener('keydown', (event) => {
+      if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 1 ] )
+    })
+
+    document.addEventListener('keyup', (event) => {
+      // const keyName = event.key;
+      if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 0 ] )
+    })
+
+  }
+
+  /**
+   * @description
+   *  update, should be automatic, but you can always call my_keyboard.update()
+   * @function Controller#KeyboardController~update
+   *
+  */
+  _self.update = function() {
+    if ( _self.bypass ) return;
+
+  }
+
+  /**
+   * @description
+   *  render, should be automatic, but you can always call my_keyboard.render()
+   * @function Controller#KeyboardController~render
+   *
+  */
+  _self.render = function() {
+    return _self.controllers
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  keyboard.removeEventListener(1)
+   * @function Controller#KeyboardController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function() {}
+
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething( _arr ) {
+   *    console.log('pressed1', arr);
+   *  }
+   *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
+   *
+   * @function Controller#KeyboardController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("Keyboard listeners: ", nodes)
+  }
+
+  // private? const?
+  var dispatchkeyboardEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
+  }
+
+  /**
+   * @description
+   *  getNodes, helper, shows current nodes
+   * @function Controller#KeyboardController#getNodes
+  */
+  _self.getNodes = function() {
+    return nodes
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Mar 24 2019 15:33:54 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

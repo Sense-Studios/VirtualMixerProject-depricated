@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: Mixer</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: Mixer</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="Module.html">Module</a>#</span>Mixer<span class="signature">(renderer:GlRenderer, options:Object)</span><span class="type-signature"></span></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    
+    <h4 class="name" id="Mixer"><span class="type-signature"></span>new Mixer<span class="signature">(renderer:GlRenderer, options:Object)</span><span class="type-signature"></span></h4>
+    
+
+    
+    <p class="summary"><p>A mixer mixes two sources together.</p></p>
+    
+
+
+
+<div class="description">
+    <h3>Mixmode</h3><p> Mixers support a <a href="Mixer.html#mixMode"><code>Mixmode</code></a>.<br> The Mixmode defines the curvature of the crossfade.</p>
+<p> In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is <strong>darker</strong> in the middle of  the crossfade then it is at both ends. This is the default <em>Mixmode</em>, the other modes play with these settings</p>
+<pre class="prettyprint source"><code>   1: NORMAL (default),   regular, linear crossfade
+   2: HARD,               switches with a hard cut at 50%
+   3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+   4: FAM,                fades with a downward curve, forcing a 'overlay' period
+   5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+   6: LEFT,               forces the pod on 0 (locks pod)
+   7: RIGHT,              forces the pod on 1 (locks pod)
+   8: CENTER,             forces both sources at ~66% (locks pod)
+   9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</code></pre><h3>Blendmode</h3><p> Mixers also support a <a href="Mixer.html#blendMode"><code>Blendmode</code></a>.<br> Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.</p>
+<pre class="prettyprint source"><code>   1 ADD (default),
+   2 SUBSTRACT,
+   3 MULTIPLY,
+   4 DARKEN,
+   5 COLOUR BURN,
+   6 LINEAR_BURN,
+   7 LIGHTEN,
+   8 SCREEN,
+   9 COLOUR_DODGE,
+   10 LINEAR_DODGE,
+   11 OVERLAY,
+   12 SOFT_LIGHT,
+   13 HARD_LIGHT,
+   14 VIVID_LIGHT,
+   15 LINEAR_LIGHT,
+   16 PIN_LIGHT,
+   17 DIFFERENCE,
+   18 EXCLUSION</code></pre><p> Switch both mixer and blendmode in realtime:</p>
+<pre class="prettyprint source"><code> mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
+ mixer1.mixMode(8)      // set MixMode to BOOM
+ mixer1.blendMode(1)    // set blendmode to ADD (default)
+ mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT</code></pre><p> Move the pod up and down over time, or fade from source1 to source2 and back<br> again.</p>
+<pre class="prettyprint source"><code> ar c = 0;
+ setInterval( function() {
+   c += 0.01
+   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+ })</code></pre>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>renderer:GlRenderer</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options:Object</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="implements">Implements:</dt>
+    <dd class="implements"><ul>
+        
+            <li><a href="Module.html">Module</a></li>
+        
+    </ul></dd>
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Sense Studios</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });</code></pre>
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="bindBpm"><span class="type-signature"></span>bindBpm<span class="signature">(binding)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>binds <em>currentBpmFunc</em> to a function<br> whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br> it's called on update</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>binding</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>allows for overriding internal bpm</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line441">line 441</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>'''
+  var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+  var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+  audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+'''</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="blendMode"><span class="type-signature"></span>blendMode<span class="signature">(blendmode)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>gets or sets the <em>blendMode</em>, there are 18 Blendmodes available, numbered 1-18;</p>
+<pre class="prettyprint source"><code> 1 ADD (default),
+ 2 SUBSTRACT,
+ 3 MULTIPLY,
+ 4 DARKEN,
+ 5 COLOUR BURN,
+ 6 LINEAR_BURN,
+ 7 LIGHTEN,
+ 8 SCREEN,
+ 9 COLOUR_DODGE,
+ 10 LINEAR_DODGE,
+ 11 OVERLAY,
+ 12 SOFT_LIGHT,
+ 13 HARD_LIGHT,
+ 14 VIVID_LIGHT,
+ 15 LINEAR_LIGHT,
+ 16 PIN_LIGHT,
+ 17 DIFFERENCE,
+ 18 EXCLUSION</code></pre>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>blendmode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>index of the Blendmode</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line285">line 285</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="bpm"><span class="type-signature"></span>bpm<span class="signature">(bpm)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>gets or sets the <em>bpm</em> or beats per minutes, locally in this mixer<br> defaults to 128</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bpm</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>beats per minute</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line415">line 415</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="bpmMod"><span class="type-signature"></span>bpmMod<span class="signature">(currentMod)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>gets or sets the <em>currentMOD</em> or modifyer for the bpm<br> this way you can modify the actual tempo, make the beats<br> follow on half speed, or dubbel speed or <em>4, </em>2, /2, /4 etc.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentMod</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>beat multiplyer for tempo</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line428">line 428</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fade"><span class="type-signature"></span>fade<span class="signature">(fadeDuration)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>fades from one channel to the other in <em>duration</em> milliseconds</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fadeDuration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the duration of the fade</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line470">line 470</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="mixMode"><span class="type-signature"></span>mixMode<span class="signature">(mixmode)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>gets or sets the <em>mixMode</em>, there are 8 MixModes available, numbered 1-9;</p>
+<pre class="prettyprint source"><code> 1: NORMAL (default),   regular, linear crossfade
+ 2: HARD,               switches with a hard cut at 50%
+ 3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+ 4: FAM,                fades with a downward curve, forcing a 'overlay' period
+ 5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+ 6: LEFT,               forces the pod on 0 (locks pod)
+ 7: RIGHT,              forces the pod on 1 (locks pod)
+ 8: CENTER,             forces both sources at ~66% (locks pod)
+ 9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</code></pre>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mixmode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>index of the Mixmode</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line262">line 262</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pod"><span class="type-signature"></span>pod<span class="signature">(position)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>the position of the handle, fader or pod. 0 is left, 1 is right</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">float</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>position of the handle</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line322">line 322</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setAutoFade"><span class="type-signature"></span>setAutoFade<span class="signature">(autoFade)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>sets setAutoFade true/false</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>autoFade</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>to do, or do not</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line459">line 459</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Mar 24 2019 15:33:54 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

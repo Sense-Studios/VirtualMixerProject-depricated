@@ -43,17 +43,24 @@
 
 
     <section>
-        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.<br>There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>.<br>There you can find examples and 'channels', which are basically auto-mixed sets of video files.<br>or gifs. Or SVG (soon) or ...</p>
-<p><img src="https://virtualmixproject.com/images/vmp_demo/vmp_logo.png" style="float: left;margin: 20px;width: 100px;"></p>
+        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.<br>There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>.<br>There you can find examples and 'channels', which are basically auto-mixed sets of video files.<br>or gifs. Or images. Or solid colors or ...</p>
+<p><img src="https://virtualmixproject.com/images/vmp_demo/vmp_logo.png" alt="logo"></p>
 <p>it comes in a package for use on your website or an npm build for use on your local DMZ.</p>
-<p>With these tools, you can Build your own video mixers in JavaScript. The application takes a number of <em>sources</em> ( video, gif, svg,  whathaveyou ) and allows you to crossfades them.<br>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>.</p>
-<p>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have<br>support for <em>gamepads</em> en <em>midi</em> devices.</p>
-<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
-<p>Or continue with the Quickstart</p>
-<h2>Quickstart</h2><p>Make sure you include the build files. (and in this order)</p>
+<p>With these tools, you can Bbuild your own video mixer in JavaScript. The application takes a number of <em>sources</em> ( video, gif, whathaveyou ) and allows you to crossfade and mix them.</p>
+<p>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>.<br>In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for <em>gamepads</em> en <em>midi</em> devices.</p>
+<ul>
+<li><p>Check more detailed info the documentation at: https://virtualmixproject.com/docs/reference/index.html</p>
+</li>
+<li><p>Check out <a href="https://codepen.io/xangadix/pen/zewydR">this</a> basic example on Codepen: or any from <a href="https://codepen.io/collection/nZyjvW/">our other examples and demos</a> on Codepen</p>
+</li>
+<li><p>Be sure to check out our <a href="https://virtualmixproject.com/mixer/demos">Demos</a>.</p>
+</li>
+</ul>
+<p>Or go ahead and continue with the Quickstart below</p>
+<h2>Quickstart</h2><p>So, if you want to use this on your website.<br>Make sure you include the build files. (and in this order)</p>
 <pre class="prettyprint source"><code>  https://virtualmixproject.com/javascripts/build/vendor-min.js
   https://virtualmixproject.com/javascripts/build/mixer-min.js
-</code></pre><p>Write a little of Webpage:</p>
+</code></pre><p>Write your Webpage:</p>
 <pre class="prettyprint source"><code>&lt;html>
   &lt;head>
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/vendor-min.js&quot;>&lt;/script>
@@ -63,13 +70,16 @@
     &lt;canvas/>
     &lt;script>
 
-      // this is the actual code for the mixer
+      // set up renderer and video
       var renderer = new GlRenderer();
       var testSource1 = new GifSource(   renderer, { src: 'path/to/somefile.gif' } );
       var testSource2 = new VideoSource( renderer, { src: 'path/to/somefile.mp4' } );
+
+      // this is the actual code for the mixer
       var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
       var output = new Output( renderer, mixer1 )
 
+      // start the renderer
       renderer.init();
       renderer.render();
 
@@ -107,17 +117,17 @@ setInterval( function() {
   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })
 </code></pre><p>See it al wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
-<h2>Installation</h2><p>You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!<br>_if_ you store your videos locally.</p>
+<h2>Installation</h2><p>You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!<br><em>if</em> you store your videos locally.</p>
 <p>1) clone the package, defaults to VirtualMixerProject/</p>
 <pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></pre><p>2) run the installer</p>
 <pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install</code></pre><p>3) start the app</p>
 <pre class="prettyprint source"><code>  $ VirtualMixerProject/  npm start</code></pre><p>4) Go to 127.0.0.1:3000 and enjoy the show!</p>
-<p>Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs</p>
+<p>Check more detailed info <a href="https://virtualmixproject.com/docs/reference/index.html">in the docs</a></p>
 <h2>Further Reading</h2><ul>
-<li>References</li>
-<li>Limitations</li>
-<li>Build instructions</li>
-<li>Roadmap</li>
+<li><a href="https://virtualmixproject.com/docs/reference/index.html">References</a></li>
+<li><a href="https://virtualmixproject.com/docs/reference/tutorial-some%20limitations.html">Limitations</a></li>
+<li><a href="https://virtualmixproject.com/docs/reference/tutorial-build.html">Build instructions</a></li>
+<li><a href="https://virtualmixproject.com/docs/reference/tutorial-roadmap.html">Roadmap</a></li>
 </ul>
 <h2>Roadmap</h2><ul>
 <li>Set up a Node editor</li>
@@ -140,13 +150,13 @@ setInterval( function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-build.html">build</a></li><li><a href="tutorial-main.html">main</a></li><li><a href="tutorial-roadmap.html">roadmap</a></li><li><a href="tutorial-some limitations.html">some limitations</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 01:57:17 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 26 2019 00:02:22 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

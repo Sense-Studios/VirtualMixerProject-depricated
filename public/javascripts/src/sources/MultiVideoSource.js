@@ -9,6 +9,11 @@ MultiVideoSource.constructor = MultiVideoSource;  // re-assign constructor
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
 /**
+ *
+ * @summary
+ *  The MultiVideoSource allows for playback of video files in the Mixer project.
+ *  And optimizes video playback in online scenarios
+ *
  * @description
  *  The MultiVideoSource allows for playback of video files in the Mixer project.
  *  It is very similar to the regular videosource, however it used multiple references to the videofile.

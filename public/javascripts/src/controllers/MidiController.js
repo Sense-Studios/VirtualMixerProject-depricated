@@ -3,13 +3,17 @@ MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
  * @summary
- *  Connects a midicontroller with a range of listeners. Can also send commands
- *  Back to change and blink lights and what not
- * @description
- *  Connects a midicontroller with a range of listeners. Can also send commands
- *  Back to change and blink lights and what not
+ *  Connects a midicontroller with a range of listeners. Can also send commands Back
  *
- *  for more info and ideas https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+ * @description
+ *  The Midi class searches and Connects to a midicontroller with a range of listeners.
+ *  You can also send commands _back_. This is especially handy when you can control
+ *  lights or automatic faders on your MIDI Controller.
+ *
+ *  Here is a demo on [Codepen](https://codepen.io/xangadix/pen/BbVogR), which was tested with 2 AKAI midicontrollers
+ *
+ *  The original implementation is on GitHub in a [Gist](https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e).
+ *
  *
  *
  * @example
@@ -38,21 +42,12 @@ function MidiController( _options ) {
   _self.bypass = true
   _self.debug = false
   _self.ready = false
-  _self.controllers = {};
-
-  // source.renderer ?
+  _self.controllers = {}
   var binds = []
-
-  // counter
-  var c = 0
-
-  // add to renderer
-  //_renderer.add(_self)
-
-  // needed for the program
+  var nodes = []
+  var c = 0 // counter
   var midi, input, output
 
-  // we have success!
   var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
@@ -252,8 +247,6 @@ function MidiController( _options ) {
     });
   }
 
-  // ---------------------------------------------------------------------------
-
   /**
    * @description
    *  send midi data back to the controller. To switch a light on, or to make it
@@ -275,10 +268,6 @@ function MidiController( _options ) {
    *
    *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
    *
-   *
-   *
-   *
-   *
    * @function Controller#MidiController#send
    * @param {string} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
@@ -294,17 +283,21 @@ function MidiController( _options ) {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
+  /**
+   * @description
+   *  clears all the buttons (sets them to 0)
+   * @example
+   *  midi.clear()
+   * @function Controller#MidiController#clear
+   *
+  */
   _self.clear = function() {
     var commands = []
     for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );
     output.send(commands)
   }
 
-  var nodes = []
+
 
   /**
    * @description

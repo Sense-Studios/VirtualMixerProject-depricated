@@ -1,6 +1,15 @@
 /**
  * @constructor Source
  * @interface
+ * @summary
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
+ *
+ * @description
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
+ *
+ *
+ *
+ * @author Sense studios
  */
 
 function Source( renderer, options ) {

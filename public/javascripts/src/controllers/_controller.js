@@ -1,7 +1,20 @@
-/**
- * @constructor Controller
- * @interface
- */
+ /**
+  * @constructor Controller
+  * @interface
+
+  * @summary
+  *   The Controller Class covers a range of input-output nodes in between either sources and mixers
+  *
+  * @description
+  *   The Controller Class covers a range of interfaces to popular input devices. Keyoard, Midi, Gamepad and Sockets
+  *
+  *
+  *
+  *
+  *
+  *
+  * @author Sense studios
+  */
 
 function Controller( options ) {
   var _self = this
@@ -10,8 +23,6 @@ function Controller( options ) {
   var _options;
   if ( options != undefined ) _options = options;
 
-  //var nodes = []
-
   _self.type = "Controller"
   _self.testControllerVar = "test"
 
@@ -19,13 +30,4 @@ function Controller( options ) {
   _self.init =         function() {}
   _self.update =       function() {}
   _self.render =       function() {}
-  // _self.add =          function() {}
-  //_self.start =        function() {}
-
-  // _self.removeEventListener
-  // _self.addEventListener
-  // _self.dispatchControllerEvent
-
-
-
 }

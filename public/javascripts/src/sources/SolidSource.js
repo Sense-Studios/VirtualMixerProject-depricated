@@ -5,6 +5,13 @@ SolidSource.prototype = new Source(); // assign prototype to marqer
 SolidSource.constructor = SolidSource;  // re-assign constructor
 
 /**
+ *
+ * @summary
+ *  Allows a solid color to serve as an input element
+ *
+ * @description
+ *  Allows a solid color to serve as an input element
+ *
  * @implements Source
  * @constructor Source#SolidSource
  * @example var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );

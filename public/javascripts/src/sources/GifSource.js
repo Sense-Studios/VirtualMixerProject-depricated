@@ -1,14 +1,19 @@
-
-
 GifSource.prototype = new Source(); // assign prototype to marqer
 GifSource.constructor = GifSource;  // re-assign constructor
 
 /**
+ * @summary
+ *  Allows for an (animated) GIF file to use as input for the mixer
+ *
+ * @description
+ *  Allows for an (animated) GIF file to use as input for the mixer
+ *
  * @implements Source
  * @constructor Source#GifSource
  * @param {GlRenderer} renderer - GlRenderer object
  * @param {Object} options - JSON Object
  */
+
 function GifSource( renderer, options ) {
 
   // create and instance
@@ -19,7 +24,7 @@ function GifSource( renderer, options ) {
     _self.uuid = options.uuid
   }
 
-  var _self = this;
+  // set type
   _self.type = "GifSource"
 
   // allow bypass
@@ -39,33 +44,32 @@ function GifSource( renderer, options ) {
     _self.currentSrc = options.src
   }
 
-
   // create elements (private)
   var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
-
   var alpha = 1;
 
   _self.init = function() {
 
+    // create canvas
     canvasElement = document.createElement('canvas');
     canvasElement.width = 1024;
     canvasElement.height = 1024;
     canvasElementContext = canvasElement.getContext( '2d' );
 
+    // create the texture
     gifTexture = new THREE.Texture( canvasElement );
-
 
     // set the uniforms on the renderer
     renderer.customUniforms[_self.uuid] = { type: "t", value: gifTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
 
     // add uniforms to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */' )
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */' )
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */' )
 
     // add output to main function
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */' )
 
     // expose gif and canvas
     _self.gif = supergifelement
@@ -74,7 +78,7 @@ function GifSource( renderer, options ) {
     // actual gif stuff
     window.image_source = new Image()
 
-    //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
+    // $('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
     gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
@@ -93,7 +97,7 @@ function GifSource( renderer, options ) {
   _self.update = function() {
 
     // FIXME: something evil happened here.
-    //if (_self.bypass == false) return
+    // if (_self.bypass == false) return
     try {
       // modulo is here because gif encoding is insanley expensive
       // TODO: MAKE THE MODULE SETTABLE.
@@ -112,10 +116,7 @@ function GifSource( renderer, options ) {
     return gifTexture
   }
 
-
-  // Interface -----------------------------------------------------------------
-
-  // Helpers
+  // Interface helpers ---------------------------------------------------------
   _self.src = function( _file ) {
     console.log("executed src")
     _self.currentSrc = _file
@@ -134,6 +135,7 @@ function GifSource( renderer, options ) {
       return _num;
     }
 
-  }  // seconds
-  _self.duration =     function() { return supergifelement.get_length() }        // seconds
+  }
+  // seconds
+  _self.duration =     function() { return supergifelement.get_length() }
 };

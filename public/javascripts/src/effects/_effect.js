@@ -3,7 +3,7 @@
  * @interface
 
  * @summary
- *   The effect class covers a range of input-output nodes in between either sources and mixers
+ *   The Effect Class covers a range of input-output-nodes.
  *
  * @description
  *   The effect class covers a range of input-output nodes in between either sources and mixers
@@ -13,15 +13,19 @@
  *    * FeedbackEffects, with an extra canvas all effects that involve layering are here
  *    * ColorEffects, all effects doing with colors, works on mixers as well
  *
+ *   Connection flow:
+ *   ```
+ *     SOURCE ---> EFFECT1 --> MIXER --> EFFECT2 --> ... ---> OUTPUT
+ *   ```
+ *
+ *
+ *
  * @author Sense studios
  */
 
+
  function Effect( renderer, options ) {
    var _self = this
-
-   /*
-     renderer
-   */
 
    _self.type = "Effect"
 

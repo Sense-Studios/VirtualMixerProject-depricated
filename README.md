@@ -3,24 +3,28 @@
 The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.
 There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/).
 There you can find examples and 'channels', which are basically auto-mixed sets of video files.
-or gifs. Or SVG (soon) or ...
+or gifs. Or images. Or solid colors or ...
 
-<img src="https://virtualmixproject.com/images/vmp_demo/vmp_logo.png" style="float: left;margin: 20px;width: 100px;">
+![logo](https://virtualmixproject.com/images/vmp_demo/vmp_logo.png)
 
 it comes in a package for use on your website or an npm build for use on your local DMZ.
 
-With these tools, you can Build your own video mixers in JavaScript. The application takes a number of _sources_ ( video, gif, svg,  whathaveyou ) and allows you to crossfades them.
+With these tools, you can Bbuild your own video mixer in JavaScript. The application takes a number of _sources_ ( video, gif, whathaveyou ) and allows you to crossfade and mix them.
+
 Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve as a _source_ for another _mixer_.
+In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for _gamepads_ en _midi_ devices.
 
-In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have
-support for _gamepads_ en _midi_ devices.
+* Check more detailed info the documentation at: https://virtualmixproject.com/docs/reference/index.html
 
-Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs
+* Check out [this](https://codepen.io/xangadix/pen/zewydR) basic example on Codepen: or any from [our other examples and demos](https://codepen.io/collection/nZyjvW/) on Codepen
 
-Or continue with the Quickstart
+* Be sure to check out our [Demos](https://virtualmixproject.com/mixer/demos).
+
+Or go ahead and continue with the Quickstart below
 
 ## Quickstart
 
+So, if you want to use this on your website.
 Make sure you include the build files. (and in this order)
 
 ```    
@@ -29,7 +33,7 @@ Make sure you include the build files. (and in this order)
 
 ```
 
-Write a little of Webpage:
+Write your Webpage:
 
 ```
 <html>
@@ -41,13 +45,16 @@ Write a little of Webpage:
     <canvas/>
     <script>
 
-      // this is the actual code for the mixer
+      // set up renderer and video
       var renderer = new GlRenderer();
       var testSource1 = new GifSource(   renderer, { src: 'path/to/somefile.gif' } );
       var testSource2 = new VideoSource( renderer, { src: 'path/to/somefile.mp4' } );
+
+      // this is the actual code for the mixer
       var mixer1 = new Mixer( renderer, { source1: testSource1, source2: testSource2 } );
       var output = new Output( renderer, mixer1 )
 
+      // start the renderer
       renderer.init();
       renderer.render();
 
@@ -101,7 +108,7 @@ See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 ## Installation
 
 You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!
-_if_ you store your videos locally.
+*if* you store your videos locally.
 
 1) clone the package, defaults to VirtualMixerProject/
 
@@ -123,15 +130,15 @@ _if_ you store your videos locally.
 
 4) Go to 127.0.0.1:3000 and enjoy the show!
 
-Check more detailed info the docs at: https://github.com/Sense-Studios/VirtualMixerProject/tree/master/docs
+Check more detailed info [in the docs](https://virtualmixproject.com/docs/reference/index.html)
 
 
 ## Further Reading
 
-* References
-* Limitations
-* Build instructions
-* Roadmap
+* [References](https://virtualmixproject.com/docs/reference/index.html)
+* [Limitations](https://virtualmixproject.com/docs/reference/tutorial-some%20limitations.html)
+* [Build instructions](https://virtualmixproject.com/docs/reference/tutorial-build.html)
+* [Roadmap](https://virtualmixproject.com/docs/reference/tutorial-roadmap.html)
 
 ## Roadmap
 

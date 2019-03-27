@@ -1,7 +1,7 @@
 {
     "recurseDepth": 10,
     "source": {
-        "includePattern": ".+\\.js(doc|x)?$",
+        "includePattern": ".+\\.js(doc|x)?$|.+\\.md?$",
         "excludePattern ": ""
     },
     "sourceType": "module",
@@ -10,13 +10,13 @@
         "dictionaries": ["jsdoc","closure"]
     },
     "templates": {
-        "cleverLinks": false,
-        "monospaceLinks": false
+        "cleverLinks": true,
+        "monospaceLinks": true
     },
     "opts": {
-       "destination": "./docs/reference"
+       "destination": "./docs/reference"       
     },
-    "plugins": ["plugins/markdown"],
+    "plugins": ["plugins/markdown", "article_plugin"],
     "markdown": {
       "excludeTags": [],
       "tags": ["markdown"],

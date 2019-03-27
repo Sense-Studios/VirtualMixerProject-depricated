@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sources/GifSource.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sources/GifSource.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+
+GifSource.prototype = new Source(); // assign prototype to marqer
+GifSource.constructor = GifSource;  // re-assign constructor
+
+/**
+ * @implements Source
+ * @constructor Source#GifSource
+ * @param {GlRenderer} renderer - GlRenderer object
+ * @param {Object} options - JSON Object
+ */
+function GifSource( renderer, options ) {
+
+  // create and instance
+  var _self = this;
+  if ( options.uuid == undefined ) {
+    _self.uuid = "GifSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
+
+  var _self = this;
+  _self.type = "GifSource"
+
+  // allow bypass
+  _self.bypass = true;
+
+  // add to renderer
+  renderer.add(_self)
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  // set the source
+  if ( options.src == undefined ) {
+     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+  } else {
+    _self.currentSrc = options.src
+  }
+
+
+  // create elements (private)
+  var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
+
+  var alpha = 1;
+
+  _self.init = function() {
+
+    canvasElement = document.createElement('canvas');
+    canvasElement.width = 1024;
+    canvasElement.height = 1024;
+    canvasElementContext = canvasElement.getContext( '2d' );
+
+    gifTexture = new THREE.Texture( canvasElement );
+
+
+    // set the uniforms on the renderer
+    renderer.customUniforms[_self.uuid] = { type: "t", value: gifTexture }
+    renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
+
+    // add uniforms to shader
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+
+    // add output to main function
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+
+    // expose gif and canvas
+    _self.gif = supergifelement
+    _self.canvas = canvasElement
+
+    // actual gif stuff
+    window.image_source = new Image()
+
+    //$('body').append("&lt;div id='gif_"+_self.uuid+"' rel:auto_play='1'>&lt;/div>");
+    gifElement = document.createElement('img')
+    gifElement.setAttribute('id', 'gif_'+_self.uuid)
+    gifElement.setAttribute('rel:auto_play', '1')
+    supergifelement = new SuperGif( { gif: gifElement, c_w: "1024px", c_h: "576px" } );
+    supergifelement.draw_while_loading = true
+
+    // sup1.load();
+    console.log(_self.uuid, " Load", _self.currentSrc, "..." )
+    //supergifelement.load_url( _self.currentSrc )
+    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
+    console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
+     _self.bypass = false
+  }
+
+  var c = 0;
+  _self.update = function() {
+
+    // FIXME: something evil happened here.
+    //if (_self.bypass == false) return
+    try {
+      // modulo is here because gif encoding is insanley expensive
+      // TODO: MAKE THE MODULE SETTABLE.
+      if (c%6 == 0) {
+        canvasElementContext.clearRect(0, 0, 1024, 1024);
+        canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
+        if ( gifTexture ) gifTexture.needsUpdate = true;
+      }
+      c++;
+    }catch(e){
+      // not yet
+    }
+  }
+
+  _self.render = function() {
+    return gifTexture
+  }
+
+
+  // Interface -----------------------------------------------------------------
+
+  // Helpers
+  _self.src = function( _file ) {
+    console.log("executed src")
+    _self.currentSrc = _file
+    supergifelement.pause()
+    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
+  }
+
+  _self.play =         function() { return supergifelement.play() }
+  _self.pause =        function() { return supergifelement.pause() }
+  _self.paused =       function() { return !supergifelement.get_playing() }
+  _self.currentFrame = function( _num ) {
+    if ( _num === undefined ) {
+      return supergifelement.get_current_frame();
+    } else {
+      supergifelement.move_to(_num);
+      return _num;
+    }
+
+  }  // seconds
+  _self.duration =     function() { return supergifelement.get_length() }        // seconds
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Mar 24 2019 15:33:54 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

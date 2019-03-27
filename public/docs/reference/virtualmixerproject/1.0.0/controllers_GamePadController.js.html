@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/GamePadController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/GamePadController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>GamePadController.prototype = new Controller();  // assign prototype to marqer
+GamePadController.constructor = GamePadController;  // re-assign constructor
+
+/**
+ * @summary
+ *  Search and initialize a Gamepad and make event listeners available.
+ *
+ * @description
+ *   Check for an example this [video on Youtue](https://www.youtube.com/watch?v=N1AOX8m6U04)
+ *   This goes in part with this [Codepen Demo](https://codepen.io/xangadix/pen/gEzZgx)
+ *   Buttons are on 0, 1, 2, 3, 4 ... n, axis are on 100, 101, 102, 103, ... 10n
+ *
+ *  ```
+ *   1. button 1
+ *   2. button 2
+ *   3. button 3
+ *   4. button 4
+ *   ...
+ *   n. button n
+ *
+ *   100. axis1 x
+ *   101. axis1 y
+ *   102. axis2 x
+ *   103. axis2 y
+ *   ...
+ *   10n. axisn y
+ *   10n. axisn y
+ *  ```
+ *  ---
+ *
+ * @example
+ *  var gamepad1 = new GamePadController( renderer, {});
+ *  gamepad1.init()
+ *  gamepad1.render()
+ *
+ *  // do something on button 1, should return [ 1, 1 ] on down and [ 1, 0 ] on keyup
+ *  gamepad1.addEventListener( 1, function( _arr ) { console.log( _arr ) })
+ *
+ *  // do something with left-axis-x, should return [ 100, 0.34295876 ]
+ *  gamepad1.addEventListener( 100, function( _arr ) { console.log( _arr ) })
+ *
+ *
+ * @implements Controller
+ * @constructor Controller#GamePadController
+ * @param options:Object
+ * @author Sense Studios
+ */
+
+function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer3
+  // returns a floating point between 1 and 0, in sync with a bpm
+  var _self = this
+
+  // exposed variables.
+  _self.uuid = "GamePadController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  _self.type = "Control"
+  _self.controllers = {};
+  _self.gamepad = {}
+  _self.bypass = true
+  /**
+   * @member Controller#GamePadController#debug
+   */
+  _self.debug = false
+  /**
+   * @description
+   *  when multiple devices identify as gamepads, use ```gamepad1.gamepad_index = 1``` ie
+   * @member Controller#GamePadController#gamepad_index
+  */
+  _self.gamepad_index = 0
+
+  if ( _options ) {
+    if ("default" in _options) {}
+  }
+
+  // add to renderer
+  _renderer.add(_self)
+
+  // counter
+  var c = 0
+
+  /**
+   * @description
+   *  connect, should be automatic, but you can always call gamepad1.connect()
+   * @function Controller#GamePadController.connect
+   *
+  */
+  _self.connect =  function() {
+    console.log("start gamepads")
+
+    window.addEventListener("gamepadconnected", function(e) {
+      console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        e.gamepad.index, e.gamepad.id,
+        e.gamepad.buttons.length, e.gamepad.axes.length);
+      _self.init()
+    });
+
+    window.addEventListener("gamepaddisconnected", function(e) {
+      console.log("Gamepad disconnected from index %d: %s",
+        e.gamepad.index, e.gamepad.id);
+    });
+
+    _self.bypass = false
+  }
+
+  /**
+   * @description
+   *  init, should be automatic, but you can always call gamepad.init() yourself
+   * @function Controller#GamePadController~init
+   *
+  */
+  _self.init = function() {
+    console.log("init GamePadController.")
+    setTimeout( function() {
+      try { // try connect
+        _self.connect()
+      }catch(e){
+        console.log("Initial connect failed, hope somebody presses the button v14 ", _self, e)
+      }
+    }, 1200 )
+  }
+
+  /**
+   * @description
+   *  update, should be automatic, but you can always call gamepad1.update()
+   * @function Controller#GamePadController~update
+   *
+  */
+  _self.update = function() {
+    if ( _self.bypass ) return;
+
+    // too much info ?
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
+
+    if ( navigator.getGamepads()[_self.gamepad_index] === undefined || navigator.getGamepads()[0] === null ) {
+      console.log("Gamepad: No gamepad could be found")
+      _self.bypass = true
+      return;
+    }
+
+    var last_axis = 0
+    navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
+      dispatchGamePadEvent([i+100, a])
+
+      /*
+      if ( _self.easing ) {
+        if ( ( a >= 0.12 || a &lt;= -0.12 ) &amp;&amp; a != last_axis ) {
+          if (_self.debug) console.log(" Axis: ", i + 100, a )
+          dispatchGamePadEvent([i+100, a])
+          last_axis = a
+        }else{
+          if (last_axis != 0 ) {
+            dispatchGamePadEvent([i+100, 0])
+          }
+          last_axis = 0
+        }
+      }
+      */
+    });
+
+    navigator.getGamepads()[_self.gamepad_index].buttons.forEach(function(b, i){
+      if ( b.pressed ) {
+        if (_self.debug) console.log(" Button: ", i, b.value, b )
+        dispatchGamePadEvent([i, b.value])
+      }
+    })
+  }
+
+  _self.render = function() {
+    return _self.controllers
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  var nodes = []
+
+  /**
+   * @description
+   *  removeEventListener
+   * @example
+   *  gamepad.removeEventListener(1)
+   * @function Controller#GamePadController#removeEventListener
+   * @param {string} _target - the number of controller being pressed
+   *
+  */
+  self.removeEventListener = function() {}
+
+  /**
+   * @description
+   *  addEventListener
+   * @example
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  gamepad.addEventListener(1, function() )
+   *
+   * @function Controller#GamePadController#addEventListener
+   * @param {string} _target - the number of controller being pressed
+   * @param {function} _callback - the callback to be executed
+   *
+  */
+  _self.addEventListener = function( _target, _callback ) {
+    nodes.push( { target: _target, callback: _callback } )
+    console.log("Gamepad listeners: ", nodes)
+  }
+
+  // private? const?
+  var dispatchGamePadEvent = function( _arr ) {
+    nodes.forEach( function( node, i ) {
+      if ( _arr[0] == node.target ) {
+        node.callback( _arr )
+      }
+    })
+  }
+
+  /**
+   * @description
+   *  getNodes -- helper, shows current nodes
+   * @function Controller#GamePadController#getNodes
+  */
+  _self.getNodes = function() {
+    return nodes
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Mar 24 2019 15:33:54 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

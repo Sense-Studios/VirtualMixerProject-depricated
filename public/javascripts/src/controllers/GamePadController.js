@@ -3,23 +3,18 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
 
 /**
  * @summary
- *  ---
+ *  Search and initialize a Gamepad and make event listeners available.
  *
  * @description
+ *   Check for an example this [video on Youtue](https://www.youtube.com/watch?v=N1AOX8m6U04)
+ *   This goes in part with this [Codepen Demo](https://codepen.io/xangadix/pen/gEzZgx)
+ *   Buttons are on 0, 1, 2, 3, 4 ... n, axis are on 100, 101, 102, 103, ... 10n
  *
  *  ```
  *   1. button 1
  *   2. button 2
  *   3. button 3
  *   4. button 4
- *   5. button 5
- *   6. button 6
- *   7. button 7
- *   8. button 8
- *   9. button 9
- *   10. button 10
- *   11. button 11
- *   12. button 12
  *   ...
  *   n. button n
  *
@@ -34,11 +29,15 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @example
- *  let gamepad = new GamePadController( renderer, {});
- *  gamepad.init
- *  gamepad.render
- *  gamepad.addEventListener( 1, function() { ... })   // button 1
- *  gamepad.addEventListener( 100, function() { ... }) // axis
+ *  var gamepad1 = new GamePadController( renderer, {});
+ *  gamepad1.init()
+ *  gamepad1.render()
+ *
+ *  // do something on button 1, should return [ 1, 1 ] on down and [ 1, 0 ] on keyup
+ *  gamepad1.addEventListener( 1, function( _arr ) { console.log( _arr ) })
+ *
+ *  // do something with left-axis-x, should return [ 100, 0.34295876 ]
+ *  gamepad1.addEventListener( 100, function( _arr ) { console.log( _arr ) })
  *
  *
  * @implements Controller
@@ -56,8 +55,18 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.type = "Control"
   _self.controllers = {};
   _self.gamepad = {}
+
+  /**  @member Controller#GamePadController#bypass */
   _self.bypass = true
+
+  /** @member Controller#GamePadController#debug */
   _self.debug = false
+
+  /**
+   * @description
+   *  when multiple devices identify as gamepads, use ```gamepad1.gamepad_index = 1```
+   *  @member Controller#GamePadController#gamepad_index
+  */
   _self.gamepad_index = 0
 
   if ( _options ) {
@@ -67,15 +76,15 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // add to renderer
   _renderer.add(_self)
 
-  var c = 0      // counter
+  // counter
+  var c = 0
 
   /**
    * @description
-   *  init, should be automatic, but you can always call my_gamepad.init()
-   * @member Controller#GamePadController.init
+   *  connect, should be automatic, but you can always call gamepad1.connect()
+   * @function Controller#GamePadController.connect
    *
   */
-
   _self.connect =  function() {
     console.log("start gamepads")
 
@@ -94,7 +103,12 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     _self.bypass = false
   }
 
-  // init a connection
+  /**
+   * @description
+   *  init, should be automatic, but you can always call gamepad.init() yourself
+   * @function Controller#GamePadController~init
+   *
+  */
   _self.init = function() {
     console.log("init GamePadController.")
     setTimeout( function() {
@@ -106,12 +120,18 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     }, 1200 )
   }
 
+  /**
+   * @description
+   *  update, should be automatic, but you can always call gamepad1.update()
+   * @function Controller#GamePadController~update
+   *
+  */
   _self.update = function() {
     if ( _self.bypass ) return;
 
-    // too much info
-    //if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
-    //if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
+    // too much info ?
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
 
     if ( navigator.getGamepads()[_self.gamepad_index] === undefined || navigator.getGamepads()[0] === null ) {
       console.log("Gamepad: No gamepad could be found")
@@ -122,16 +142,19 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     var last_axis = 0
     navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
       dispatchGamePadEvent([i+100, a])
+
       /*
-      if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
-        if (_self.debug) console.log(" Axis: ", i + 100, a )
-        dispatchGamePadEvent([i+100, a])
-        last_axis = a
-      }else{
-        if (last_axis != 0 ) {
-          dispatchGamePadEvent([i+100, 0])
+      if ( _self.easing ) {
+        if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
+          if (_self.debug) console.log(" Axis: ", i + 100, a )
+          dispatchGamePadEvent([i+100, a])
+          last_axis = a
+        }else{
+          if (last_axis != 0 ) {
+            dispatchGamePadEvent([i+100, 0])
+          }
+          last_axis = 0
         }
-        last_axis = 0
       }
       */
     });

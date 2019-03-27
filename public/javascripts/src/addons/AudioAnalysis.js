@@ -38,6 +38,8 @@ function AudioAnalysis( _renderer, _options ) {
   // NOTE: that externally "audio" refers to the audiofile
   // internally it refers to the Audio HTMLMediaElement
   _self.audio = ""
+
+  /**  @member Controller#GamePadController#bypass */
   _self.bypass = false
 
   /**
@@ -77,15 +79,12 @@ function AudioAnalysis( _renderer, _options ) {
 
   // setup ---------------------------------------------------------------------
   /**
-   * @description Audio element
+   * @description
+   *  Audio element
+   *  HTMLMediaElement AUDIO reference
    * @member Addon#AudioAnalysis#audio
    * @param {HTMLMediaElement} - reference to the virtual media element
-   *
-   *  HTMLMediaElement AUDIO reference
-   *
   */
-
-  // create all necc. contexts
   var audio = new Audio()
   _self.audio = audio
 
@@ -124,20 +123,21 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *  firstload for mobile, forces all control to the site on click
-   * @member Addon#AudioAnalysis~forceFullscreen
+   *  tries and forces another play-event after a click
+   * @member Addon#AudioAnalysis~forceAudio
    *
   */
-  var forceFullscreen = function() {
+  var forceAudio = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     context.resume().then(() => {
       audio.play();
       console.log('Playback resumed successfully');
     });
-    document.body.webkitRequestFullScreen()  // REMOVE!! FIXME FIX ME !!
-    document.body.removeEventListener('click', forceFullscreen);
+    document.body.removeEventListener('click', forceAudio);
+    document.body.removeEventListener('touchstart', forceAudio);
   }
-  document.body.addEventListener('click', forceFullscreen)
-  document.body.addEventListener('touchstart', forceFullscreen)
+  document.body.addEventListener('click', forceAudio)
+  document.body.addEventListener('touchstart', forceAudio)
 
   /**
    * @description
@@ -159,11 +159,18 @@ function AudioAnalysis( _renderer, _options ) {
     source.connect(context.destination);
   }
 
+  /**
+   * @description
+   *   helper function, get's the bpm and retursn is, useful for ```mixer.bind( func )```
+   * @member Addon#AudioAnalysis.getBpm
+   *
+  */
   _self.getBpm = function() {
     return _self.bpm
   }
 
   // main ----------------------------------------------------------------------
+  /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
 
@@ -192,6 +199,7 @@ function AudioAnalysis( _renderer, _options ) {
     }
   }
 
+  /** @function Addon#AudioAnalysis~update */
   _self.update = function() {
     if ( _self.bypass ) return
 
@@ -213,12 +221,13 @@ function AudioAnalysis( _renderer, _options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
+  /** @function Addon#AudioAnalysis~render */
   _self.render = function() {
     // returns current bpm 'position' as a value between 0 - 1
     return _self.bpm_float
   }
 
-  // add nodes, implicit
+  /** @function Addon#AudioAnalysis~add */
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -230,7 +239,7 @@ function AudioAnalysis( _renderer, _options ) {
    *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
    *  start the {@link Addon#AudioAnalysis~sampler}
    *
-   * @member Addon#AudioAnalysis.initializeAutoBpm
+   * @function Addon#AudioAnalysis~initializeAutoBpm
    *
   */
   var initializeAutoBpm = function() {
@@ -256,7 +265,7 @@ function AudioAnalysis( _renderer, _options ) {
    *   returns the most occuring bpm
    *
    *
-   * @member Addon#AudioAnalysis~sampler
+   * @function Addon#AudioAnalysis~sampler
    *
   */
   _self.dataSet

@@ -128,7 +128,6 @@ function Mixer( renderer, options ) {
   source1 = options.source1 //|| options.src1;   // Mandatory
   source2 = options.source2 //|| options.src2;   // Mandatory
 
-
   _self.init = function() {
 
     // add uniforms to renderer
@@ -177,14 +176,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-// renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-// vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
-// }
-
     var shadercode = ""
-    //shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
-    //shadercode += "vec4 "+_self.uuid+"_output = "
-    //shadercode += "vec4( blend( "
     shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
     shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
     shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
@@ -195,14 +187,8 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     shadercode += ";\n"
     shadercode += "  /* custom_main */  "
 
-    /* custom_main */
-
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
-// vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
-// `vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
-// vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
-
-    }
+  }
 
   // autofade bpm
   var starttime = (new Date()).getTime()
@@ -215,7 +201,21 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   var fadeTo = "b"
   var fadeDuration = 0
 
+  /** @function Addon#Mixer~update */
 
+  /**
+   * @description
+   *  binds _currentBpmFunc_ to a function
+   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+   *  it's called on update
+   * @example
+   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+   * @function Module#Mixer#bindBpm
+   * @param {function} binding allows for overriding internal bpm
+   */
+   
   _self.update = function() {
     if ( _self.autoFade ) { // maybe call this bpmFollow?
       // pod = currentBPM
@@ -247,6 +247,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     }
   }
 
+  /** @function Addon#Mixer~render */
   _self.render = function() {
     return pod
   }
@@ -260,6 +261,9 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   _self.alpha2 = function() { return alpha2 }
 
   /**
+   * @function Module#Mixer#mixMode
+   * @param {integer} mixmode index of the Mixmode
+   *
    * @description
    *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
@@ -274,9 +278,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
    *  ```
    *
-   * @function Module#Mixer#mixMode
-   * @param {number} mixmode index of the Mixmode
-   */
+  */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
     return mixmode
@@ -306,16 +308,14 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  18 EXCLUSION
    *  ```
    * @function Module#Mixer#blendMode
-   * @param {number} blendmode index of the Blendmode
-   */
+   * @param {integer} blendmode index of the Blendmode
+  */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
-
     _self.pod( _self.pod() ) // update pod, precaution
-
     return blendmode
   }
 
@@ -419,7 +419,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
   */
-
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
@@ -432,7 +431,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
    * @function Module#Mixer#bpmMod
    * @param {number} currentMod beat multiplyer for tempo
-   */
+  */
   _self.bpmMod = function( _num ) {
     if ( _num  != undefined ) currentMOD = _num
     return currentMOD
@@ -444,11 +443,9 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  whatever BPM _currentBpmFunc_ returns will be bpm used.
    *  it's called on update
    * @example
-   * '''
    *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
    *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
    *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-   * '''
    * @function Module#Mixer#bindBpm
    * @param {function} binding allows for overriding internal bpm
    */
@@ -461,7 +458,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  sets setAutoFade true/false
    * @function Module#Mixer#setAutoFade
    * @param {boolean} autoFade to do, or do not
-   */
+  */
   _self.setAutoFade = function( _bool ) {
     if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
     if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
@@ -471,8 +468,8 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @description
    *  fades from one channel to the other in _duration_ milliseconds
    * @function Module#Mixer#fade
-   * @param {number} fadeDuration the duration of the fade
-   */
+   * @param {float} fadeDuration the duration of the fade
+  */
   _self.fade = function( _duration ) {
     var current = _self.pod()
 

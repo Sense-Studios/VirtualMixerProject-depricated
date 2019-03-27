@@ -369,7 +369,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line441">line 441</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line440">line 440</a>
     </li></ul></dd>
     
 
@@ -398,11 +398,151 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>'''
-  var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+    <pre class="prettyprint"><code>var mixer1 = new Mixer( renderer, { source1: file, source2: file})
   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
-  audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-'''</code></pre>
+  audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="bindBpm"><span class="type-signature"></span>bindBpm<span class="signature">(binding)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>binds <em>currentBpmFunc</em> to a function<br> whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br> it's called on update</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>binding</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>allows for overriding internal bpm</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line206">line 206</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+  var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+  audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )</code></pre>
 
 
 
@@ -480,7 +620,7 @@
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">integer</span>
 
 
             
@@ -531,7 +671,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line285">line 285</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line287">line 287</a>
     </li></ul></dd>
     
 
@@ -801,7 +941,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line428">line 428</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line427">line 427</a>
     </li></ul></dd>
     
 
@@ -885,7 +1025,7 @@
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">float</span>
 
 
             
@@ -936,7 +1076,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line470">line 470</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line467">line 467</a>
     </li></ul></dd>
     
 
@@ -1029,7 +1169,7 @@
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">integer</span>
 
 
             
@@ -1080,7 +1220,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line262">line 262</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line263">line 263</a>
     </li></ul></dd>
     
 
@@ -1350,7 +1490,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line459">line 459</a>
+        <a href="modules_Mixer.js.html">modules/Mixer.js</a>, <a href="modules_Mixer.js.html#line456">line 456</a>
     </li></ul></dd>
     
 
@@ -1394,13 +1534,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-build.html">build</a></li><li><a href="tutorial-main.html">main</a></li><li><a href="tutorial-roadmap.html">roadmap</a></li><li><a href="tutorial-some limitations.html">some limitations</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 01:57:17 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 26 2019 00:02:22 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
