@@ -1,6 +1,6 @@
 {
   "name": "virtualmixerproject",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Build your own video mixers in javascript.",
   "main": "app.js",
   "scripts": {
@@ -27,8 +27,8 @@
     "javascript",
     "WebGL"
   ],
-  "author": "XangadiX",
-  "license": "ISC",
+  "author": "Sense Studios",
+  "license": "MIT",
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
@@ -43,7 +43,7 @@
   "bugs": {
     "url": "https://github.com/Sense-Studios/VirtualMixerProject/issues"
   },
-  "homepage": "https://github.com/Sense-Studios/VirtualMixerProject#readme",
+  "homepage": "https://virtualmixproject.com",
   "devDependencies": {
     "gulp": "^3.9.1",
     "glob": "^3.1.10",
