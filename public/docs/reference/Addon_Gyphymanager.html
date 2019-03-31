@@ -29,7 +29,7 @@
 <header>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="Addon.html">Addon</a>#</span>Gyphymanager<span class="signature">(renderer, source)</span><span class="type-signature"></span></h2>
+            <span class="ancestors"><a href="Addon.html">Addon</a>#</span>Gyphymanager<span class="signature">(some)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -42,17 +42,17 @@
     
 
     
-    <h4 class="name" id="Gyphymanager"><span class="type-signature"></span>new Gyphymanager<span class="signature">(renderer, source)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Gyphymanager"><span class="type-signature"></span>new Gyphymanager<span class="signature">(some)</span><span class="type-signature"></span></h4>
     
 
     
-    <p class="summary"><p>Allows for realtime downloading of Gifs from 'Giphy', based on tags</p></p>
+    <p class="summary"><p>Aquires a set of Gif Files <a href="https://giphy.com/">Giphy</a>, based on tags, and allows choosing from that.</p></p>
     
 
 
 
 <div class="description">
-    <p>Allows for realtime downloading of Gifs from 'Giphy', based on tags</p>
+    <p>Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.</p>
 </div>
 
 
@@ -88,30 +88,7 @@
 
         <tr>
             
-                <td class="name"><code>renderer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="GlRenderer.html">GlRenderer</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>source</code></td>
+                <td class="name"><code>some</code></td>
             
 
             <td class="type">
@@ -127,7 +104,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>available gifsource source</p></td>
         </tr>
 
     
@@ -204,9 +181,10 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var gifmanager1 = new Gyphymanager( renderer );
-gifmanager1.search('vj');
-gifmanager1.change();</code></pre>
+    <pre class="prettyprint"><code>var gifsource1 = new GifSource( source1 )
+ var gifmanager1 = new Gyphymanager( gifsource1 );
+ gifmanager1.search('vj'); // loads a set of gifs tagged "vj"
+ gifmanager1.change();     // changes from one giffile to the other in the set</code></pre>
 
 
 
@@ -288,7 +266,7 @@ gifmanager1.change();</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line65">line 65</a>
+        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line71">line 71</a>
     </li></ul></dd>
     
 
@@ -374,7 +352,7 @@ gifmanager1.change();</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line77">line 77</a>
+        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -644,7 +622,142 @@ gifmanager1.change();</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line48">line 48</a>
+        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setSrc"><span class="type-signature"></span>setSrc<span class="signature">(file)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>loads a set of gif files from giphy based on</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>set filename</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="addons_GiphyManager.js.html">addons/GiphyManager.js</a>, <a href="addons_GiphyManager.js.html#line59">line 59</a>
     </li></ul></dd>
     
 
@@ -688,13 +801,13 @@ gifmanager1.change();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-build.html">build</a></li><li><a href="tutorial-main.html">main</a></li><li><a href="tutorial-roadmap.html">roadmap</a></li><li><a href="tutorial-some limitations.html">some limitations</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Automatic mixing.html">Automatic mixing</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this works.html">How does this works</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 26 2019 00:02:22 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 13:15:34 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

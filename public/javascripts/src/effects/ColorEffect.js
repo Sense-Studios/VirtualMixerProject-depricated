@@ -44,7 +44,11 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  61. Contrast
  *  62. Saturation
  *  63. Hue
+ *  64. Hard black edge. black/white.
+
  *  ```
+
+
  *
  * @example
  *   let myEffect = new ColorEffect( renderer, { source: myVideoSource, effect: 1 });
@@ -240,6 +244,12 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     vec3 U = src.rgb - P;
     vec3 V = cross(vec3(0.55735), U);
     src.rgb = U * cos( extra * 6.2832) + V * sin( extra * 6.2832) + P;
+    return src;
+  }
+
+  // hard black edge
+  if ( currentcoloreffect == 64 ) {
+    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 ); 
     return src;
   }
 

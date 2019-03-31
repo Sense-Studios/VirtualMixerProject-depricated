@@ -1,17 +1,32 @@
-FileManager.prototype = new Addon(); // assign prototype to marqer
-FileManager.constructor = FileManager;  // re-assign constructor
+FileManager.prototype = new Addon();
+FileManager.constructor = FileManager; 
 
 /**
 * @summary
-*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*  Allows for fast switching between a prefefined list of files (or 'sets' )
 *
 * @description
-*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*  The filemanager allows you to load up a large number of videofiles and attach them to a VideoSource.
+*
+*  A 'set' is simply a json file, with an array with sources like so:
+*
+*  ```
+*   [
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC205_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC206_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC207_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC240_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC252_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC281_1.mp4"
+*   ]
+*  ```
 *
 * @example
-* var myFilemanager = new FileManager( VideoSource )
-* myFilemanager.load_set( "myset.json")
-* myFilemanager.change()
+*   var source1 = new VideoSource( renderer )
+*   var myFilemanager = new FileManager( source1 )
+*   myFilemanager.load_set( "myset.json")
+*   myFilemanager.change()
+*
 * @constructor Addon#FileManager
 * @implements Addon
 * @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
@@ -21,143 +36,115 @@ function FileManager( _source ) {
 
   var _self = this
 
-  // to be honest, this is kind of stupid; shouldnt it check for source
-  try {
-    renderer
-  } catch(e) {
-    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
-    return
-  }
-
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""
   _self.source = _source
-  _self.set = []
-  //_self.programs = []
-  _self.file
-  _self.renderer = renderer // do we even need this ?!!
 
+  /** @member Addon#Filemanager#debug {boolean} */
+  _self.debug = false
+
+  /** @member Addon#Filemanager.set {array} */
+  _self.set = []
+
+  /**
+   * @description
+   *  select a source based on its number in the set
+   * @function Addon#FileManager#load_set
+   *
+   * @param {object} json encoded array object
+  */
   _self.load_set = function( _set ) {
     var u = new Utils()
     u.get( _set, function(d) {
-      console.log("-->", d)
       _self.set = JSON.parse(d)
     })
   }
 
+  /**
+   * @description
+   *  init, should be automatic, but you can always call gamepad.init() yourself
+   * @function Addon#FileManager#setSrc
+   *
+  */
   _self.setSrc = function( file ) {
-    console.log("set source: ", file)
     _self.source.src(file)
-  }
-
-  _self.getFileById = function( _id ) {
-    var match = null
-  }
-
-  _self.getSrcByTags = function( _tags ) {
-    // _tags = array
-    if ( programs.length == 0 ) return "no programs"
-
-    var matches = []
-    programs.forEach( function( p, i) {
-      //console.log(i, p)
-      _tags.forEach( function( t, j) {
-        //console.log( j, t)
-        if ( p.tags.includes(t) && p.assets != undefined ) {
-          if ( p.assets._type == "Video" ) matches.push(p)
-        }
-      })
-    })
-
-    if ( matches.length == 0 ) return "no matches"
-    var program = matches[ Math.floor( Math.random() * matches.length )]
-    console.log(">> ", matches.length, program.title)
-    _self.setSrc( _self.getSrcByQuality( program ) );
   }
 
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
 
+  /**
+   * @description
+   *  update the current _set_ of files in the filemanager
+   * @function Addon#FileManager#load
+   * @param {string} reference to a json filewith the set
+   *
+  */
   _self.load = function( _file ) {
-    utils.get( _file, function(d) {
-      console.log('got:', JSON.parse(d) )
+    var u = new Utils()
+    u.get( _file, function(d) {
       _self.set = JSON.parse(d)
-    } )
-  }
-
-  _self.changeToNum = function( _num ) {
-    var source = _self.set[_num];
-    //var source = _self.getSrcByQuality( program )
-    _self.setSrc( source );
-  }
-
-  _self.changeToUrl = function( _url ) {
-    //var source = _self.getSrcByQuality( program )
-    _self.setSrc( _url );
-  }
-
-  // load another source from the stack
-  _self.change = function( _tag ) {
-
-    if ( _self.set.length != 0 ) {
-      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
-      console.log("from set:", r )
-      _self.setSrc( r )
-    }
-    return
-
-    if ( programs.length == 0 ) return "no programs"
-    if ( _tag ) {
-      _self.getSrcByTags( [ _tag ] );
-      return;
-    }
-
-    console.log("change video")
-    var program = programs[ Math.floor( Math.random() * programs.length ) ]
-    if ( program.assets._type != "Video" ) {
-      // noit elegible, try again
-      _self.change()
-      return
-    }
-
-    //var notv = null
-    //$.get('/set/notv', function(d) { notv = JSON.parse(d) })
-
-    console.log("SOURCE")
-    //var source = notv[ Math.floor( Math.random() * notv.length) ];
-    //var source = occupy_chaos[ Math.floor( Math.random() * occupy_chaos.length) ];
-
-    if (_self.set.length > 0) {
-      var source = _self.set[ Math.floor( Math.random() * _self.set.length) ];
-
-      //var source = _self.getSrcByQuality( program )
-      _self.setSrc( source );
-    }
-
-
-    /*
-    if (Math.random() > 0.5 ) {
-      _self.getSrcByTags(["awesome"])
-    }else{
-      _self.getSrcByTags(["runner"])
-    }
-    */
-  }
-
-  // for old times sake,
-  _self.changez = function( _tag ){
-    _self.change( _tag )
-  }
-
-  // get the version by it's quality ( marduq asset library )
-  _self.getSrcByQuality = function( _program, _quality ) {
-    if ( _quality == undefined ) _quality = "720p_h264"
-    var match = null
-    _program.assets.versions.forEach( function(version) {
-      if ( version.label == _quality ) match = version
+      if (_self.debug = false) console.log("got set: ",_self.set )
     })
-    return match.url;
   }
+
+  /**
+   * @description
+   *  select a file based on its number in the set
+   * @function Addon#FileManager#changeToNum
+   * @params {integer} number of the file in the set
+   *
+  */
+  _self.changeToNum = function( _num ) {
+    _self.setSrc( _self.set[_num] );
+    if (_self.debug = false) console.log("changed file: ", _num, self.set[_num] )
+  }
+
+  /**
+   * @description
+   *  select a file based on its url, regardless of the current set
+   * @function Addon#FileManager#changeToUrl
+   *
+  */
+  _self.changeToUrl = function( _url ) {
+    _self.setSrc( _url );
+    if (_self.debug = false) console.log("changed file from url: ", _num, self.set[_num] )
+  }
+
+  /**
+   * @description
+   *  selects another file from the set
+   *  if a parameter is given, it will select that file from the set
+   * @function Addon#FileManager#change
+   * @param {integer} (optional) number of the file in the set
+   *
+  */
+  _self.change = function( _num ) {
+    if ( _self.set.length != 0 ) {
+      if ( _num != undefined ) {
+        _Self.changeToNum( _num );
+        return;
+      }
+
+      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
+      _self.setSrc( r );
+      if (_self.debug = false) console.log("changed file: ", r )
+    }
+    return;
+  }
+
+  /**
+   * @description
+   *  Alias for change
+   * @alias Addon#FileManager#changez
+   *
+  */
+  _self.changez = function( _num ){
+    _self.change( _num )
+  }
+
+  /* TODO: would require more complex sets */
+  _self.getSrcByTag = function( _tag ) {}
 }

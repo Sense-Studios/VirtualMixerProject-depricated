@@ -1,21 +1,22 @@
-GiphyManager.prototype = new Addon(); // assign prototype to marqer
-GiphyManager.constructor = GiphyManager;  // re-assign constructor
+GiphyManager.prototype = new Addon();
+GiphyManager.constructor = GiphyManager;
 
 /**
  * @summary
- *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *   Aquires a set of Gif Files [Giphy](https://giphy.com/), based on tags, and allows choosing from that.
  *
  * @description
- *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
  *
  * @example
- * var gifmanager1 = new Gyphymanager( renderer );
- * gifmanager1.search('vj');
- * gifmanager1.change();
- * @implements Addon
+ *  var gifsource1 = new GifSource( source1 )
+ *  var gifmanager1 = new Gyphymanager( gifsource1 );
+ *  gifmanager1.search('vj'); // loads a set of gifs tagged "vj"
+ *  gifmanager1.change();     // changes from one giffile to the other in the set
+ *
  * @constructor Addon#Gyphymanager
- * @param {GlRenderer} renderer
- * @param {GifSource} source
+ * @implements Addon
+ * @param {GifSource} some available gifsource source
  */
 
 function GiphyManager( _source ) {
@@ -27,7 +28,6 @@ function GiphyManager( _source ) {
   _self.file
   _self.programs
   _self.program
-  _self.renderer = renderer // do we even need this ?!!
 
   // set in environment
   // this key is for demo purposes only
@@ -39,7 +39,8 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    utils.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    var u = new Utils()
+    u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })
@@ -55,10 +56,15 @@ function GiphyManager( _source ) {
     _self.needle( _query );
   }
 
-  // alternate
-  _self.setSrc = function( file ) {
-    console.log("set source: ", file)
-    _self.source.src(file)
+  /**
+   * @description
+   *  loads a set of gif files from giphy based on
+   * @function Addon#Gyphymanager#setSrc
+   * @param {string} file - set filename
+   */
+  _self.setSrc = function( _file ) {
+    console.log("set source: ", _file)
+    _self.source.src( _file )
   }
 
   // load another source from the stack
@@ -77,7 +83,7 @@ function GiphyManager( _source ) {
   /**
    * @description
    *  same as [change()]{@link Addon#Gyphymanager#change}
-   * @function Addon#Gyphymanager#changez
+   * @alias Addon#Gyphymanager#changez
    */
   _self.changez = function(){
     _self.change()

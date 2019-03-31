@@ -1,5 +1,5 @@
-SocketController.prototype = new Controller();  // assign prototype to marqer
-SocketController.constructor = SocketController;  // re-assign constructor
+SocketController.prototype = new Controller();
+SocketController.constructor = SocketController;
 
 /**
  * @summary
@@ -20,30 +20,26 @@ SocketController.constructor = SocketController;  // re-assign constructor
  */
 
 function SocketController( _options  ) {
+
   var _self = this;
+
+  /** @member Controller#SocketController#io */
+  _self.io = io.connect();
 
   // exposed variables.
   _self.uuid = "SocketController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.bypass = true
   _self.title = ""
+
   /** * @member Controller#SocketController#debug */
   _self.debug = false
 
-  /**
-   * @member Controller#SocketController#socket_pairing_id
-  */
+  /** @member Controller#SocketController#socket_pairing_id */
   _self.socket_pairing_id = "123456"
-  _self.io = io.connect();
 
-  /**
-   * @member Controller#SocketController#target
-  */
+  /** @member Controller#SocketController#target */
   _self.target = ""
-
-  /**
-   * @member Controller#SocketController#title
-  */
 
   var nodes = []
 
@@ -51,16 +47,24 @@ function SocketController( _options  ) {
     if ( "title" in _options ) _self.title = _options.title
   }
 
+  // test
   _self.io.on('msg', function( _msg ) {
     console.log( 'got msg', _msg )
   })
 
+  // test
+  _self.io.on('test', function( msg ) {
+    console.log( 'get test', msg )
+  })
+
+  // base command
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
     if ( _command.command == "welcome") _self.target = _command.payload
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
+  // controller command
   _self.io.on('controller', function(_msg) {
     if ( _self.debug ) console.log( 'got controller', _msg )
     nodes.forEach( function( node, i ) {
@@ -70,10 +74,6 @@ function SocketController( _options  ) {
         node.callback(_msg.commands)
       }
     })
-  })
-
-  _self.io.on('test', function( msg ) {
-    console.log( 'get test', msg )
   })
 
   // ---
@@ -109,7 +109,14 @@ function SocketController( _options  ) {
    * @param {string} _target - the number of controller being pressed
    *
   */
-  self.removeEventListener = function( _target ) {}
+  self.removeEventListener = function( _target ) {
+    nodes.forEach( function(node, i ) {
+      if ( node.target == _target ) {
+        var removeNode = i
+      }
+    })
+    nodes.splice(i, 1)
+  }
 
   /**
    * @description
@@ -130,7 +137,7 @@ function SocketController( _options  ) {
     console.log("Socket listeners: ", nodes)
   }
 
-  // private? const?
+  /** @function Controller#KeyboardController~dispatchMidiEvent {event}  */
   var dispatchSocketEvent = function( _arr ) {
     nodes.forEach( function( node, i ) {
       if ( _arr[0] == node.target ) {

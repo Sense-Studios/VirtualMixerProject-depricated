@@ -81,16 +81,22 @@ gulp.task('create_mixer_scaffold', function() {
   console.log(" -- Create mixer: " + process.argv[4])
 	var scaffold_name = process.argv[4]
 	require('fs').writeFileSync('./views/compositions/'+scaffold_name+'.jade', generateMixerJade( scaffold_name ) );
+  console.log("writing ", './views/compositions/'+scaffold_name+'.jade')
 	require('fs').writeFileSync('./public/compositions/'+scaffold_name+'.js', generateMixerJs( scaffold_name ) );
+  console.log("writing ", './public/compositions/'+scaffold_name+'.js')
 	require('fs').writeFileSync('./public/stylesheets/compositions/'+scaffold_name+'.sass', generateMixerSass( scaffold_name ) );
+  console.log("writing ", './public/stylesheets/compositions/'+scaffold_name+'.sass')
 })
 
 gulp.task('remove_mixer_scaffold', function() {
   console.log(" -- Removing mixer: " + process.argv[4])
 	var scaffold_name = process.argv[4]
 	del( './views/compositions/'+scaffold_name+'.jade' )
+  console.log("removing ", './views/compositions/'+scaffold_name+'.jade' )
 	del( './public/compositions/'+scaffold_name+'.js' )
+  console.log("removing ", './public/compositions/'+scaffold_name+'.js')
 	del( './public/stylesheets/compositions/'+scaffold_name+'.sass' )
+  console.log("removing ", './public/stylesheets/compositions/'+scaffold_name+'.sass' )
 })
 
 // -----------------------------------------------------------------------------

@@ -233,6 +233,8 @@ function AudioAnalysis( _renderer, _options ) {
   // NOTE: that externally "audio" refers to the audiofile
   // internally it refers to the Audio HTMLMediaElement
   _self.audio = ""
+
+  /**  @member Controller#GamePadController#bypass */
   _self.bypass = false
 
   /**
@@ -272,15 +274,12 @@ function AudioAnalysis( _renderer, _options ) {
 
   // setup ---------------------------------------------------------------------
   /**
-   * @description Audio element
+   * @description
+   *  Audio element
+   *  HTMLMediaElement AUDIO reference
    * @member Addon#AudioAnalysis#audio
    * @param {HTMLMediaElement} - reference to the virtual media element
-   *
-   *  HTMLMediaElement AUDIO reference
-   *
   */
-
-  // create all necc. contexts
   var audio = new Audio()
   _self.audio = audio
 
@@ -319,20 +318,21 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *  firstload for mobile, forces all control to the site on click
-   * @member Addon#AudioAnalysis~disconnectOutput
+   *  tries and forces another play-event after a click
+   * @member Addon#AudioAnalysis~forceAudio
    *
   */
-  var forceFullscreen = function() {
+  var forceAudio = function() {
     console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
     context.resume().then(() => {
       audio.play();
       console.log('Playback resumed successfully');
     });
-    document.body.webkitRequestFullScreen()
-    document.body.removeEventListener('click', forceFullscreen);
+    document.body.removeEventListener('click', forceAudio);
+    document.body.removeEventListener('touchstart', forceAudio);
   }
-  document.body.addEventListener('click', forceFullscreen)
-  document.body.addEventListener('touchstart', forceFullscreen)
+  document.body.addEventListener('click', forceAudio)
+  document.body.addEventListener('touchstart', forceAudio)
 
   /**
    * @description
@@ -354,11 +354,18 @@ function AudioAnalysis( _renderer, _options ) {
     source.connect(context.destination);
   }
 
+  /**
+   * @description
+   *   helper function, get's the bpm and retursn is, useful for ```mixer.bind( func )```
+   * @member Addon#AudioAnalysis.getBpm
+   *
+  */
   _self.getBpm = function() {
     return _self.bpm
   }
 
   // main ----------------------------------------------------------------------
+  /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
 
@@ -387,6 +394,7 @@ function AudioAnalysis( _renderer, _options ) {
     }
   }
 
+  /** @function Addon#AudioAnalysis~update */
   _self.update = function() {
     if ( _self.bypass ) return
 
@@ -408,12 +416,13 @@ function AudioAnalysis( _renderer, _options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
+  /** @function Addon#AudioAnalysis~render */
   _self.render = function() {
     // returns current bpm 'position' as a value between 0 - 1
     return _self.bpm_float
   }
 
-  // add nodes, implicit
+  /** @function Addon#AudioAnalysis~add */
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -425,7 +434,7 @@ function AudioAnalysis( _renderer, _options ) {
    *  initialize autobpm, after {@link Addon#AudioAnalysis.initializeAudio}
    *  start the {@link Addon#AudioAnalysis~sampler}
    *
-   * @member Addon#AudioAnalysis.initializeAutoBpm
+   * @function Addon#AudioAnalysis~initializeAutoBpm
    *
   */
   var initializeAutoBpm = function() {
@@ -451,7 +460,7 @@ function AudioAnalysis( _renderer, _options ) {
    *   returns the most occuring bpm
    *
    *
-   * @member Addon#AudioAnalysis~sampler
+   * @function Addon#AudioAnalysis~sampler
    *
   */
   _self.dataSet
@@ -930,15 +939,30 @@ FileManager.constructor = FileManager;  // re-assign constructor
 
 /**
 * @summary
-*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*  Allows for fast switching between a prefefined list of files (or 'sets' )
 *
 * @description
-*   Allows for fast switching between a prefefined list of files (or 'sets' )
+*  The filemanager allows you to load up a large number of videofiles and attach them to a VideoSource.
+*
+*  A 'set' is simply a json file, with an array with sources like so:
+*
+*  ```
+*   [
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC205_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC206_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC207_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC240_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC252_1.mp4",
+*    "https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC281_1.mp4"
+*   ]
+*  ```
 *
 * @example
-* var myFilemanager = new FileManager( VideoSource )
-* myFilemanager.load_set( "myset.json")
-* myFilemanager.change()
+*   var source1 = new VideoSource( renderer )
+*   var myFilemanager = new FileManager( source1 )
+*   myFilemanager.load_set( "myset.json")
+*   myFilemanager.change()
+*
 * @constructor Addon#FileManager
 * @implements Addon
 * @param source{Source#VideoSource} a reference to a (video) Source, or Gif source. Source needs to work with files
@@ -948,145 +972,117 @@ function FileManager( _source ) {
 
   var _self = this
 
-  // to be honest, this is kind of stupid; shouldnt it check for source
-  try {
-    renderer
-  } catch(e) {
-    _self.function_list = [ ["CHANGE", "method", "changez"], ["POD", "set","pod"] ]
-    return
-  }
-
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""
   _self.source = _source
-  _self.set = []
-  //_self.programs = []
-  _self.file
-  _self.renderer = renderer // do we even need this ?!!
 
+  /** @member Addon#Filemanager#debug {boolean} */
+  _self.debug = false
+
+  /** @member Addon#Filemanager.set {array} */
+  _self.set = []
+
+  /**
+   * @description
+   *  select a source based on its number in the set
+   * @function Addon#FileManager#load_set
+   *
+   * @param {object} json encoded array object
+  */
   _self.load_set = function( _set ) {
     var u = new Utils()
     u.get( _set, function(d) {
-      console.log("-->", d)
       _self.set = JSON.parse(d)
     })
   }
 
+  /**
+   * @description
+   *  init, should be automatic, but you can always call gamepad.init() yourself
+   * @function Addon#FileManager#setSrc
+   *
+  */
   _self.setSrc = function( file ) {
-    console.log("set source: ", file)
     _self.source.src(file)
-  }
-
-  _self.getFileById = function( _id ) {
-    var match = null
-  }
-
-  _self.getSrcByTags = function( _tags ) {
-    // _tags = array
-    if ( programs.length == 0 ) return "no programs"
-
-    var matches = []
-    programs.forEach( function( p, i) {
-      //console.log(i, p)
-      _tags.forEach( function( t, j) {
-        //console.log( j, t)
-        if ( p.tags.includes(t) && p.assets != undefined ) {
-          if ( p.assets._type == "Video" ) matches.push(p)
-        }
-      })
-    })
-
-    if ( matches.length == 0 ) return "no matches"
-    var program = matches[ Math.floor( Math.random() * matches.length )]
-    console.log(">> ", matches.length, program.title)
-    _self.setSrc( _self.getSrcByQuality( program ) );
   }
 
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
 
+  /**
+   * @description
+   *  update the current _set_ of files in the filemanager
+   * @function Addon#FileManager#load
+   * @param {string} reference to a json filewith the set
+   *
+  */
   _self.load = function( _file ) {
-    utils.get( _file, function(d) {
-      console.log('got:', JSON.parse(d) )
+    var u = new Utils()
+    u.get( _file, function(d) {
       _self.set = JSON.parse(d)
-    } )
-  }
-
-  _self.changeToNum = function( _num ) {
-    var source = _self.set[_num];
-    //var source = _self.getSrcByQuality( program )
-    _self.setSrc( source );
-  }
-
-  _self.changeToUrl = function( _url ) {
-    //var source = _self.getSrcByQuality( program )
-    _self.setSrc( _url );
-  }
-
-  // load another source from the stack
-  _self.change = function( _tag ) {
-
-    if ( _self.set.length != 0 ) {
-      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
-      console.log("from set:", r )
-      _self.setSrc( r )
-    }
-    return
-
-    if ( programs.length == 0 ) return "no programs"
-    if ( _tag ) {
-      _self.getSrcByTags( [ _tag ] );
-      return;
-    }
-
-    console.log("change video")
-    var program = programs[ Math.floor( Math.random() * programs.length ) ]
-    if ( program.assets._type != "Video" ) {
-      // noit elegible, try again
-      _self.change()
-      return
-    }
-
-    //var notv = null
-    //$.get('/set/notv', function(d) { notv = JSON.parse(d) })
-
-    console.log("SOURCE")
-    //var source = notv[ Math.floor( Math.random() * notv.length) ];
-    //var source = occupy_chaos[ Math.floor( Math.random() * occupy_chaos.length) ];
-
-    if (_self.set.length > 0) {
-      var source = _self.set[ Math.floor( Math.random() * _self.set.length) ];
-
-      //var source = _self.getSrcByQuality( program )
-      _self.setSrc( source );
-    }
-
-
-    /*
-    if (Math.random() > 0.5 ) {
-      _self.getSrcByTags(["awesome"])
-    }else{
-      _self.getSrcByTags(["runner"])
-    }
-    */
-  }
-
-  // for old times sake,
-  _self.changez = function( _tag ){
-    _self.change( _tag )
-  }
-
-  // get the version by it's quality ( marduq asset library )
-  _self.getSrcByQuality = function( _program, _quality ) {
-    if ( _quality == undefined ) _quality = "720p_h264"
-    var match = null
-    _program.assets.versions.forEach( function(version) {
-      if ( version.label == _quality ) match = version
+      if (_self.debug = false) console.log("got set: ",_self.set )
     })
-    return match.url;
   }
+
+  /**
+   * @description
+   *  select a file based on its number in the set
+   * @function Addon#FileManager#changeToNum
+   * @params {integer} number of the file in the set
+   *
+  */
+  _self.changeToNum = function( _num ) {
+    _self.setSrc( _self.set[_num] );
+    if (_self.debug = false) console.log("changed file: ", _num, self.set[_num] )
+  }
+
+  /**
+   * @description
+   *  select a file based on its url, regardless of the current set
+   * @function Addon#FileManager#changeToUrl
+   *
+  */
+  _self.changeToUrl = function( _url ) {
+    _self.setSrc( _url );
+    if (_self.debug = false) console.log("changed file from url: ", _num, self.set[_num] )
+  }
+
+  /**
+   * @description
+   *  selects another file from the set
+   *  if a parameter is given, it will select that file from the set
+   * @function Addon#FileManager#change
+   * @param {integer} (optional) number of the file in the set
+   *
+  */
+  _self.change = function( _num ) {
+    if ( _self.set.length != 0 ) {
+      if ( _num != undefined ) {
+        _Self.changeToNum( _num );
+        return;
+      }
+
+      var r = _self.set[ Math.floor( Math.random() * _self.set.length ) ];
+      _self.setSrc( r );
+      if (_self.debug = false) console.log("changed file: ", r )
+    }
+    return;
+  }
+
+  /**
+   * @description
+   *  Alias for change
+   * @alias Addon#FileManager#changez
+   *
+  */
+  _self.changez = function( _num ){
+    _self.change( _num )
+  }
+
+  /* TODO: would require more complex sets */
+  _self.getSrcByTag = function( _tag ) {}
 }
 
 GiphyManager.prototype = new Addon(); // assign prototype to marqer
@@ -1094,19 +1090,20 @@ GiphyManager.constructor = GiphyManager;  // re-assign constructor
 
 /**
  * @summary
- *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *   Aquires a set of Gif Files [Giphy](https://giphy.com/), based on tags, and allows choosing from that.
  *
  * @description
- *   Allows for realtime downloading of Gifs from 'Giphy', based on tags
+ *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
  *
  * @example
- * var gifmanager1 = new Gyphymanager( renderer );
- * gifmanager1.search('vj');
- * gifmanager1.change();
- * @implements Addon
+ *  var gifsource1 = new GifSource( source1 )
+ *  var gifmanager1 = new Gyphymanager( gifsource1 );
+ *  gifmanager1.search('vj'); // loads a set of gifs tagged "vj"
+ *  gifmanager1.change();     // changes from one giffile to the other in the set
+ *
  * @constructor Addon#Gyphymanager
- * @param {GlRenderer} renderer
- * @param {GifSource} source
+ * @implements Addon
+ * @param {GifSource} some available gifsource source
  */
 
 function GiphyManager( _source ) {
@@ -1118,7 +1115,6 @@ function GiphyManager( _source ) {
   _self.file
   _self.programs
   _self.program
-  _self.renderer = renderer // do we even need this ?!!
 
   // set in environment
   // this key is for demo purposes only
@@ -1130,7 +1126,8 @@ function GiphyManager( _source ) {
    * @param {string} query - Search term
    */
   _self.needle = function( _needle ) {
-    utils.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
+    var u = new Utils()
+    u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
     })
@@ -1146,10 +1143,15 @@ function GiphyManager( _source ) {
     _self.needle( _query );
   }
 
-  // alternate
-  _self.setSrc = function( file ) {
-    console.log("set source: ", file)
-    _self.source.src(file)
+  /**
+   * @description
+   *  loads a set of gif files from giphy based on
+   * @function Addon#Gyphymanager#setSrc
+   * @param {string} file - set filename
+   */
+  _self.setSrc = function( _file ) {
+    console.log("set source: ", _file)
+    _self.source.src( _file )
   }
 
   // load another source from the stack
@@ -1168,7 +1170,7 @@ function GiphyManager( _source ) {
   /**
    * @description
    *  same as [change()]{@link Addon#Gyphymanager#change}
-   * @function Addon#Gyphymanager#changez
+   * @alias Addon#Gyphymanager#changez
    */
   _self.changez = function(){
     _self.change()
@@ -1184,7 +1186,7 @@ function GiphyManager( _source ) {
 *
 * @description
 *   Helper classes that add on other classes in the mixer.
-*   ```
+*   Addons are elements like filemanagers, bpm, etc.
 *
 * @constructor Addon
 * @interface
@@ -1516,190 +1518,23 @@ function Behaviour( _renderer, options ) {
   */
 }
 
-function FireBaseControl( renderer, _mixer1, _mixer2, _mixer3 ) {
-  // returns a floating point between 1 and 0, in sync with a bpm
-  var _self = this
-
-  // exposed variables.
-  _self.uuid = "FireBaseControl_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  _self.type = "Control"
-  _self.clients = {};
-  _self.bypass = true
-
-  // source.renderer ?
-  var _mixers = []
-  var _filemanagers = []
-
-  // counter
-  var c = 0
-
-  // add to renderer
-  renderer.add(_self)
-
-  // Firebase refs
-  var _dbRef, _clientRef, _client, clients
-  var leftx = 0
-  var lefty = 0
-
-  // init with a tap contoller
-  _self.init = function() {
-    console.log("init FireBase contoller.")
-    // window.addEventListener( 'keydown', keyHandler )
-    // window.addEventListener("gamepadconnected", connecthandler )
-
-    // This is just another firebase, but it should be removed from the
-    // code and added in a tutorial on firebase.
-
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyDgrYfOUDN1QLRDcY4z45WwkcOjkXiImNQ",
-      authDomain: "mixerbase-829c2.firebaseapp.com",
-      databaseURL: "https://mixerbase-829c2.firebaseio.com",
-      storageBucket: "mixerbase-829c2.appspot.com",
-      messagingSenderId: "568387460963"
-    };
-
-    firebase.initializeApp(config);
-
-    _dbRef = firebase.database()
-    _clientRef = "/client_1/"
-    _client = _dbRef.ref(_clientRef)
-    clients = []
-
-    //$.each( clients, function( i, c ) {
-    //  c.dbref.ref('/client/').on('value', function( e ) {
-    //    c.update( e )
-    //  })
-    //})
-
-    _client.on('value', function(e) {
-      //console.log("I update you", e)
-      //console.log( _client.child( "/leftx" ).val() )
-      //console.log( _client.child( "/lefty" ).val() )
-    });
-
-    // a overwritable timer interval to avoid collisions
-    var _to
-
-    _client.child( "gamepad/leftx" ).on('value', function(e) {
-      leftx = e.val()
-      updateMixers( leftx, lefty )
-    })
-
-    _client.child( "gamepad/lefty" ).on('value', function(e) {
-      lefty = e.val()
-      updateMixers( leftx, lefty )
-    })
-
-    _client.child( "gamepad/button_1" ).on('value', function(e) {
-      //clearTimeout(_to); _to = setTimeout( function() { filemanager1.change() } , 200 )
-      clearTimeout(_to); _to = setTimeout( function() { giphymanager1.change() } , 200 )
-    })
-
-    _client.child( "gamepad/button_2" ).on('value', function(e) {
-      clearTimeout(_to); _to = setTimeout( function() { filemanager2.change() } , 200 )
-    })
-
-    _client.child( "gamepad/button_3" ).on('value', function(e) {
-      clearTimeout(_to); _to = setTimeout( function() { filemanager3.change() } , 200 )
-    })
-
-    _client.child( "gamepad/button_4" ).on('value', function(e) {
-      clearTimeout(_to); _to = setTimeout( function() { filemanager4.change() } , 200 )
-    })
-
-    // init firebase
-    var i = 0
-    while(i < 17) {
-      _client.child( "mobilepad/button_" + i ).on('value', function(e) {
-        console.log('i click you', i, e.key)
-      })
-      i++;
-    }
-  }
-
-  _self.update = function() {}
-  _self.render = function() {}
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  _self.addMixer = function( _mixer ) {
-    _mixers.push( _mixer )
-  }
-
-  _self.addFileManager = function( _filemanager ) {
-    _filemanagers.push( _filemanager )
-  }
-
-  // ---------------------------------------------------------------------------
-  // "Private"
-
-  var updateMixers = function( leftx, lefty ) {
-    // might need some more tweaking, to make this more flexible
-    // or, we just add some behaviour and/or configuration
-    // oringal GANSTA SENSE STYLE
-    // _mixers[0].pod( leftx/2+0.5 )
-    // _mixers[1].pod( leftx/2+0.5 )
-    // _mixers[2].pod( lefty/2+0.5 )
-    console.log("update mixers")
-    _mixer1.pod( leftx/2+0.5 )
-    _mixer2.pod( leftx/2+0.5 )
-    _mixer3.pod( lefty/2+0.5 )
-
-  }
-
-  var updateButton = function( _button ) {
-    /*
-    if ( i == 0 ) { clearTimeout(to1); to1 = setTimeout( function() { filemanager1.change(); } , 200 ) }
-    if ( i == 1 ) { clearTimeout(to2); to2 = setTimeout( function() { filemanager2.change(); } , 200 ) }
-    if ( i == 2 ) { clearTimeout(to3); to3 = setTimeout( function() { filemanager3.change(); } , 200 ) }
-    if ( i == 3 ) { clearTimeout(to4); to4 = setTimeout( function() { filemanager4.change(); } , 200 ) }
-    */
-  }
-
-  var keyHandler = function( _event ) {
-    // should be some way to check focus of this BPM instance
-    // if _self.hasFocus
-    //}
-  }
-}
-
-
-/*
-window.addEventListener("gamepadconnected", function(e) {
-  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-    e.gamepad.index, e.gamepad.id,
-    e.gamepad.buttons.length, e.gamepad.axes.length);
-    var gp = navigator.getGamepads()[e.gamepad.index];
-    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-      gp.index, gp.id,
-      gp.buttons.length, gp.axes.length);
-});
-*/
-
 GamePadController.prototype = new Controller();  // assign prototype to marqer
 GamePadController.constructor = GamePadController;  // re-assign constructor
 
 /**
  * @summary
- *  ---
+ *  Search and initialize a Gamepad and make event listeners available.
  *
  * @description
+ *   Check for an example this [video on Youtue](https://www.youtube.com/watch?v=N1AOX8m6U04)
+ *   This goes in part with this [Codepen Demo](https://codepen.io/xangadix/pen/gEzZgx)
+ *   Buttons are on 0, 1, 2, 3, 4 ... n, axis are on 100, 101, 102, 103, ... 10n
  *
  *  ```
  *   1. button 1
  *   2. button 2
  *   3. button 3
  *   4. button 4
- *   5. button 5
- *   6. button 6
- *   7. button 7
- *   8. button 8
- *   9. button 9
- *   10. button 10
- *   11. button 11
- *   12. button 12
  *   ...
  *   n. button n
  *
@@ -1714,11 +1549,15 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @example
- *  let gamepad = new GamePadController( renderer, {});
- *  gamepad.init
- *  gamepad.render
- *  gamepad.addEventListener( 1, function() { ... })   // button 1
- *  gamepad.addEventListener( 100, function() { ... }) // axis
+ *  var gamepad1 = new GamePadController( renderer, {});
+ *  gamepad1.init()
+ *  gamepad1.render()
+ *
+ *  // do something on button 1, should return [ 1, 1 ] on down and [ 1, 0 ] on keyup
+ *  gamepad1.addEventListener( 1, function( _arr ) { console.log( _arr ) })
+ *
+ *  // do something with left-axis-x, should return [ 100, 0.34295876 ]
+ *  gamepad1.addEventListener( 100, function( _arr ) { console.log( _arr ) })
  *
  *
  * @implements Controller
@@ -1736,8 +1575,18 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.type = "Control"
   _self.controllers = {};
   _self.gamepad = {}
+
+  /**  @member Controller#GamePadController#bypass */
   _self.bypass = true
+
+  /** @member Controller#GamePadController#debug */
   _self.debug = false
+
+  /**
+   * @description
+   *  when multiple devices identify as gamepads, use ```gamepad1.gamepad_index = 1```
+   *  @member Controller#GamePadController#gamepad_index
+  */
   _self.gamepad_index = 0
 
   if ( _options ) {
@@ -1747,15 +1596,15 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   // add to renderer
   _renderer.add(_self)
 
-  var c = 0      // counter
+  // counter
+  var c = 0
 
   /**
    * @description
-   *  init, should be automatic, but you can always call my_gamepad.init()
-   * @member Controller#GamePadController.init
+   *  connect, should be automatic, but you can always call gamepad1.connect()
+   * @function Controller#GamePadController.connect
    *
   */
-
   _self.connect =  function() {
     console.log("start gamepads")
 
@@ -1774,7 +1623,12 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     _self.bypass = false
   }
 
-  // init a connection
+  /**
+   * @description
+   *  init, should be automatic, but you can always call gamepad.init() yourself
+   * @function Controller#GamePadController~init
+   *
+  */
   _self.init = function() {
     console.log("init GamePadController.")
     setTimeout( function() {
@@ -1786,12 +1640,18 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     }, 1200 )
   }
 
+  /**
+   * @description
+   *  update, should be automatic, but you can always call gamepad1.update()
+   * @function Controller#GamePadController~update
+   *
+  */
   _self.update = function() {
     if ( _self.bypass ) return;
 
-    // too much info
-    //if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
-    //if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
+    // too much info ?
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].axes )
+    if ( _self.debug ) console.log( navigator.getGamepads()[0].buttons )
 
     if ( navigator.getGamepads()[_self.gamepad_index] === undefined || navigator.getGamepads()[0] === null ) {
       console.log("Gamepad: No gamepad could be found")
@@ -1802,16 +1662,19 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
     var last_axis = 0
     navigator.getGamepads()[_self.gamepad_index].axes.forEach( function(a, i) {
       dispatchGamePadEvent([i+100, a])
+
       /*
-      if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
-        if (_self.debug) console.log(" Axis: ", i + 100, a )
-        dispatchGamePadEvent([i+100, a])
-        last_axis = a
-      }else{
-        if (last_axis != 0 ) {
-          dispatchGamePadEvent([i+100, 0])
+      if ( _self.easing ) {
+        if ( ( a >= 0.12 || a <= -0.12 ) && a != last_axis ) {
+          if (_self.debug) console.log(" Axis: ", i + 100, a )
+          dispatchGamePadEvent([i+100, a])
+          last_axis = a
+        }else{
+          if (last_axis != 0 ) {
+            dispatchGamePadEvent([i+100, 0])
+          }
+          last_axis = 0
         }
-        last_axis = 0
       }
       */
     });
@@ -1888,22 +1751,23 @@ KeyboardController.constructor = KeyboardController;  // re-assign constructor
 
 /**
  * @summary
- *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
  *  as controllerevents (allows for sockets)
  *
  *
  * @description
  *
- *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
  *  as controllerevents (allows for sockets)
  *
  *
  * @example
- *  let keyboard = new KeyboardController( renderer, {});
- *  keyboard.init
- *  keyboard.render
- *  keyboard.addEventListener( 1, function() { ... })   // button 1
- *  keyboard.addEventListener( 100, function() { ... }) // axis
+ *  var keyboard = new KeyboardController( renderer, {});
+ *  keyboard.init();
+ *  keyboard.render();
+ *
+ *  // enter button, should return [13, 1] on keydown and [13,0] on keyup
+ *  keyboard.addEventListener( 13, function(_arr) { console.log(_arr) })
  *
  *
  * @implements Controller
@@ -1922,7 +1786,10 @@ function KeyboardController( _renderer, _options  ) {
   _self.controllers = {};
   _self.keyboard = {}
   _self.bypass = true
+  /** @member {boolean} Controller#KeyboardController#debug */
   _self.debug = false
+
+  /** @member {integer} Controller#KeyboardController#keyboard_index */
   _self.keyboard_index = 0
 
   if ( _options ) {
@@ -1937,22 +1804,17 @@ function KeyboardController( _renderer, _options  ) {
   /**
    * @description
    *  init, should be automatic, but you can always call my_keyboard.init()
-   * @member Controller#KeyboardController.init
+   * @function Controller#KeyboardController~init
    *
   */
-  // init with a tap contoller
   _self.init = function() {
     console.log("init KeyboardController.")
 
-    //window.document.addEventListener('keydown', (event) => { console.log(event.keyCode) })
     document.addEventListener('keydown', (event) => {
-      // const keyName = event.key;
       if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
       dispatchkeyboardEvent( [ event.keyCode, 1 ] )
     })
-    // window.keyboard.on.keypress whatever
 
-    //window.document.addEventListener('keyup', (event) => { console.log(event.keyCode) })
     document.addEventListener('keyup', (event) => {
       // const keyName = event.key;
       if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
@@ -1961,12 +1823,23 @@ function KeyboardController( _renderer, _options  ) {
 
   }
 
-
+  /**
+   * @description
+   *  update, should be automatic, but you can always call my_keyboard.update()
+   * @function Controller#KeyboardController~update
+   *
+  */
   _self.update = function() {
     if ( _self.bypass ) return;
 
   }
 
+  /**
+   * @description
+   *  render, should be automatic, but you can always call my_keyboard.render()
+   * @function Controller#KeyboardController~render
+   *
+  */
   _self.render = function() {
     return _self.controllers
   }
@@ -1992,10 +1865,10 @@ function KeyboardController( _renderer, _options  ) {
    * @description
    *  addEventListener
    * @example
-   *  function doSomething(_arr ) {
-   *    console.log('pressed1', arr)
+   *  function doSomething( _arr ) {
+   *    console.log('pressed1', arr);
    *  }
-   *  keyboard.addEventListener(1, function() )
+   *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
    *
    * @function Controller#KeyboardController#addEventListener
    * @param {string} _target - the number of controller being pressed
@@ -2018,7 +1891,7 @@ function KeyboardController( _renderer, _options  ) {
 
   /**
    * @description
-   *  getNodes -- helper, shows current nodes
+   *  getNodes, helper, shows current nodes
    * @function Controller#KeyboardController#getNodes
   */
   _self.getNodes = function() {
@@ -2031,13 +1904,17 @@ MidiController.constructor = MidiController;  // re-assign constructor
 
 /**
  * @summary
- *  Connects a midicontroller with a range of listeners. Can also send commands
- *  Back to change and blink lights and what not
- * @description
- *  Connects a midicontroller with a range of listeners. Can also send commands
- *  Back to change and blink lights and what not
+ *  Connects a midicontroller with a range of listeners. Can also send commands Back
  *
- *  for more info and ideas https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e
+ * @description
+ *  The Midi class searches and Connects to a midicontroller with a range of listeners.
+ *  You can also send commands _back_. This is especially handy when you can control
+ *  lights or automatic faders on your MIDI Controller.
+ *
+ *  Here is a demo on [Codepen](https://codepen.io/xangadix/pen/BbVogR), which was tested with 2 AKAI midicontrollers
+ *
+ *  The original implementation is on GitHub in a [Gist](https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e).
+ *
  *
  *
  * @example
@@ -2066,21 +1943,12 @@ function MidiController( _options ) {
   _self.bypass = true
   _self.debug = false
   _self.ready = false
-  _self.controllers = {};
-
-  // source.renderer ?
+  _self.controllers = {}
   var binds = []
-
-  // counter
-  var c = 0
-
-  // add to renderer
-  //_renderer.add(_self)
-
-  // needed for the program
+  var nodes = []
+  var c = 0 // counter
   var midi, input, output
 
-  // we have success!
   var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
@@ -2280,8 +2148,6 @@ function MidiController( _options ) {
     });
   }
 
-  // ---------------------------------------------------------------------------
-
   /**
    * @description
    *  send midi data back to the controller. To switch a light on, or to make it
@@ -2303,10 +2169,6 @@ function MidiController( _options ) {
    *
    *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
    *
-   *
-   *
-   *
-   *
    * @function Controller#MidiController#send
    * @param {string} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
@@ -2322,17 +2184,21 @@ function MidiController( _options ) {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
+  /**
+   * @description
+   *  clears all the buttons (sets them to 0)
+   * @example
+   *  midi.clear()
+   * @function Controller#MidiController#clear
+   *
+  */
   _self.clear = function() {
     var commands = []
     for( var i = 0; i++; i < 100 ) commands.push( 0x90, i, 0 );
     output.send(commands)
   }
 
-  var nodes = []
+
 
   /**
    * @description
@@ -2402,19 +2268,31 @@ function SocketController( _options  ) {
   _self.uuid = "SocketController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.bypass = true
-  _self.debug = false
-  _self.socket_pairing_id = "123456"
-  _self.io = io.connect(); // 'http://83.137.150.207:3001'
-  _self.target = ""
   _self.title = ""
+  /** * @member Controller#SocketController#debug */
+  _self.debug = false
+
+  /**
+   * @member Controller#SocketController#socket_pairing_id
+  */
+  _self.socket_pairing_id = "123456"
+  _self.io = io.connect();
+
+  /**
+   * @member Controller#SocketController#target
+  */
+  _self.target = ""
+
+  /**
+   * @member Controller#SocketController#title
+  */
+
+  var nodes = []
 
   if ( _options ) {
     if ( "title" in _options ) _self.title = _options.title
   }
-  // I don't think we need this
-  //_renderer.add( _self )
 
-  // ---
   _self.io.on('msg', function( _msg ) {
     console.log( 'got msg', _msg )
   })
@@ -2425,39 +2303,19 @@ function SocketController( _options  ) {
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
-  /*
-  _self.io.on('sync', function( _command ) ) {
-   // got time
-   // find attached source
-   // (if video?) set time to source
-  }
-  */
-
   _self.io.on('controller', function(_msg) {
     if ( _self.debug ) console.log( 'got controller', _msg )
-
-    // { client: _client, trigger: _trigger, commands: _commands }
-
     nodes.forEach( function( node, i ) {
       if ( _self.debug ) console.log("find node", i, node, _msg, _self.target)
       if (_msg.client == _self.target && node.target == _msg.trigger ) {
-      //if ( _arr[0] == node[0] ) {
         if ( _self.debug ) console.log("execute callback!")
-        //node[1]( _arr[1] )
-
-        // { client: _client, trigger: _trigger, commands: _commands }
-        // if _trigger == node[1]
         node.callback(_msg.commands)
-
-        // dispatchEvent( client, 1, )
-        // _obj.target(e.data) [ x, y, z ]
       }
     })
   })
 
   _self.io.on('test', function( msg ) {
     console.log( 'get test', msg )
-    // emit to findsocket(uuid)
   })
 
   // ---
@@ -2465,9 +2323,9 @@ function SocketController( _options  ) {
 
   /**
    * @description
-   *  send info to a client for a trigger
+   *  send info, an _commands array, to a client
    * @example
-   *  socketcontroller.send( "client_123456", 0, [ 1, 2, 3, 4 ] )
+   *  socketcontroller.send( "a78r", 0, [ 1, 2, 3, 4 ] )
    *
    * @function Controller#SocketController#send
    * @param {string} _client - the number of controller being pressed
@@ -2483,8 +2341,6 @@ function SocketController( _options  ) {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
-
-  var nodes = []
 
   /**
    * @description
@@ -2526,72 +2382,6 @@ function SocketController( _options  ) {
   }
 }
 
-  /*
-  var dispatchMidiEvent = function(e) {
-    nodes.forEach(function( _obj ){
-      if ( _obj.target == e.data[1] ) {
-        _obj.callback(e.data)
-      }
-    });
-  }
-
-
-  _self.removeEventListener = function( _target, _callback ) {
-
-  }
-
-  // nodes = [ [ 1, func() ] ]
-  _self.addEventListener = function( _target, _callback ) {
-    nodes.push( [ _target, _callback ] )
-    // nodes.push( { target: _target, callback: _callback } )
-    _self.io.on(_target, function( _msg, _target ) {
-      console.log( 'got custom target msg', _msg, _target )
-    })
-
-    console.log("socketcontroller got listener", _target, _callback)
-    console.log(">>> ", nodes )
-  }
-
-  // depricated
-  var dispatchSocketEvent = function( _arr ) {
-    console.log("socket dispatching")
-    nodes.forEach( function( node, i ) {
-      //console.log(node, i, _arr[0], node.target)
-      if ( _arr[0] == node.target ) {
-        node.callback( _arr[1] )
-        _self.io.emit( _arr )
-      }
-    })
-  }
-
-  _self.dispatchEvent = function( _command, _target, _payload ) {
-    //target
-    console.log("going to send " + JSON.stringify(_payload) + " to: ", _target, " by ", _command )
-    _self.io.emit(_command, {target:_target, command:_command, payload:_payload});
-  }
-
-  _self.bind = function( _num, _arr ) {
-    // bind an event ?
-  }
-}
-
-/*
-    // -------------------------------------------------------------------------
-    // sending side
-    var gamepad = new GamePadController( renderer, {} )
-
-    // creates the sockets
-    var socket = new SocketController( renderer, { uuid: '123', controller: gamepad } );
-
-    // -------------------------------------------------------------------------
-    // receiving side
-    var socket = new SocketController( renderer, { uuid: '123', controller: ''})
-    socket.addEventListener( 1, function )
-    socket.addEventListener( 1, function )
-    socket.addEventListener( 1, function )
-
-*/
-
 /*
  * Not sure what I meant by this
  *
@@ -2602,10 +2392,23 @@ function SourceControl( renderer, source ) {
 
 }
 
-/**
- * @constructor Controller
- * @interface
- */
+ /**
+  * @constructor Controller
+  * @interface
+
+  * @summary
+  *   The Controller Class covers a range of input-output nodes in between either sources and mixers
+  *
+  * @description
+  *   The Controller Class covers a range of interfaces to popular input devices. Keyoard, Midi, Gamepad and Sockets
+  *
+  *
+  *
+  *
+  *
+  *
+  * @author Sense studios
+  */
 
 function Controller( options ) {
   var _self = this
@@ -2614,8 +2417,6 @@ function Controller( options ) {
   var _options;
   if ( options != undefined ) _options = options;
 
-  //var nodes = []
-
   _self.type = "Controller"
   _self.testControllerVar = "test"
 
@@ -2623,15 +2424,6 @@ function Controller( options ) {
   _self.init =         function() {}
   _self.update =       function() {}
   _self.render =       function() {}
-  // _self.add =          function() {}
-  //_self.start =        function() {}
-
-  // _self.removeEventListener
-  // _self.addEventListener
-  // _self.dispatchControllerEvent
-
-
-
 }
 
 ColorEffect.prototype = new Effect(); // assign prototype to marqer
@@ -2680,10 +2472,14 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  61. Contrast
  *  62. Saturation
  *  63. Hue
+ *  64. Hard black edge. black/white.
+
  *  ```
+
+
  *
  * @example
- *   let myEffect = new ColorEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new ColorEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#ColorEffect
  * @implements Effect
@@ -2691,13 +2487,6 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  * @param options:Object
  * @author Sense Studios
  */
-
-// fragment
-// vec3 b_w = ( source.x + source.y + source.z) / 3
-// vec3 amount = source.xyz + ( b_w.xyx * _alpha )
-// col = vec3(col.r+col.g+col.b)/3.0;
-// col = vec4( vec3(col.r+col.g+col.b)/3.0, _alpha );
-
 function ColorEffect( _renderer, _options ) {
 
   // create and instance
@@ -2886,6 +2675,12 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     return src;
   }
 
+  // hard black edge
+  if ( currentcoloreffect == 64 ) {
+    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 ); 
+    return src;
+  }
+
   // default
   return src;
 }
@@ -2994,7 +2789,7 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
  *   ```
  *
  * @example
- *   let myEffect = new DistortionEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new DistortionEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#DistortionEffect
  * @implements Effect
@@ -3210,7 +3005,7 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
  *   ```
  *
  * @example
- *   let myEffect = new FeedbackEffect( renderer, { source1: myVideoSource, effect: 1 });
+ *   let myEffect = new FeedbackEffect( renderer, { source: myVideoSource, effect: 1 });
  *
  * @constructor Effect#FeedbackEffect
  * @implements Effect
@@ -3438,7 +3233,7 @@ _self.update = function() {
  * @interface
 
  * @summary
- *   The effect class covers a range of input-output nodes in between either sources and mixers
+ *   The Effect Class covers a range of input-output-nodes.
  *
  * @description
  *   The effect class covers a range of input-output nodes in between either sources and mixers
@@ -3448,15 +3243,19 @@ _self.update = function() {
  *    * FeedbackEffects, with an extra canvas all effects that involve layering are here
  *    * ColorEffects, all effects doing with colors, works on mixers as well
  *
+ *   Connection flow:
+ *   ```
+ *     SOURCE ---> EFFECT1 --> MIXER --> EFFECT2 --> ... ---> OUTPUT
+ *   ```
+ *
+ *
+ *
  * @author Sense studios
  */
 
+
  function Effect( renderer, options ) {
    var _self = this
-
-   /*
-     renderer
-   */
 
    _self.type = "Effect"
 
@@ -3693,7 +3492,6 @@ function Mixer( renderer, options ) {
   source1 = options.source1 //|| options.src1;   // Mandatory
   source2 = options.source2 //|| options.src2;   // Mandatory
 
-
   _self.init = function() {
 
     // add uniforms to renderer
@@ -3742,14 +3540,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
       );
     }
 
-// renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', `
-// vec4 '+_self.uuid+'_output = vec4( blend( '+source1.uuid+'_output * '+_self.uuid+'_alpha1, '+source2.uuid+'_output * '+_self.uuid+'_alpha2, '+_self.uuid+'_blendmode ) );\n  /* custom_main */` )
-// }
-
     var shadercode = ""
-    //shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
-    //shadercode += "vec4 "+_self.uuid+"_output = "
-    //shadercode += "vec4( blend( "
     shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
     shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
     shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
@@ -3760,14 +3551,8 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     shadercode += ";\n"
     shadercode += "  /* custom_main */  "
 
-    /* custom_main */
-
     renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
-// vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
-// `vec4 `+_self.uuid+`_output = vec4( blend( `+source1.uuid+`_output * `+_self.uuid+`_alpha1, `+source2.uuid+`_output * `+_self.uuid+`_alpha2, `+_self.uuid+`_blendmode ));\n  /* custom_main */`
-// vec4 `+_self.uuid+`_output = vec4( blend( vec4(`+ source1.uuid+`_output.r, ` + source1.uuid+`_output.g, ` + source1.uuid+`_output.b, ` + source1.uuid+`_output.a * `+ _self.uuid+`_alpha1 ), vec4(`+ source2.uuid+`_output.r, ` + source2.uuid+`_output.g, ` + source2.uuid+`_output.b, ` + source2.uuid+`_output.a * `+ _self.uuid+`_alpha2 ), `+_self.uuid+`_blendmode ) );\n  /* custom_main */`
-
-    }
+  }
 
   // autofade bpm
   var starttime = (new Date()).getTime()
@@ -3780,7 +3565,21 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   var fadeTo = "b"
   var fadeDuration = 0
 
+  /** @function Addon#Mixer~update */
 
+  /**
+   * @description
+   *  binds _currentBpmFunc_ to a function
+   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+   *  it's called on update
+   * @example
+   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+   * @function Module#Mixer#bindBpm
+   * @param {function} binding allows for overriding internal bpm
+   */
+   
   _self.update = function() {
     if ( _self.autoFade ) { // maybe call this bpmFollow?
       // pod = currentBPM
@@ -3812,6 +3611,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
     }
   }
 
+  /** @function Addon#Mixer~render */
   _self.render = function() {
     return pod
   }
@@ -3825,6 +3625,9 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
   _self.alpha2 = function() { return alpha2 }
 
   /**
+   * @function Module#Mixer#mixMode
+   * @param {integer} mixmode index of the Mixmode
+   *
    * @description
    *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
    *  ```
@@ -3839,9 +3642,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
    *  ```
    *
-   * @function Module#Mixer#mixMode
-   * @param {number} mixmode index of the Mixmode
-   */
+  */
   _self.mixMode = function( _num ) {
     if ( _num != undefined ) { mixmode = _num }
     return mixmode
@@ -3871,16 +3672,14 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  18 EXCLUSION
    *  ```
    * @function Module#Mixer#blendMode
-   * @param {number} blendmode index of the Blendmode
-   */
+   * @param {integer} blendmode index of the Blendmode
+  */
   _self.blendMode = function( _num ) {
     if ( _num != undefined ) {
       blendmode = _num
       renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
     }
-
     _self.pod( _self.pod() ) // update pod, precaution
-
     return blendmode
   }
 
@@ -3984,7 +3783,6 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bpm
    * @param {number} bpm beats per minute
   */
-
   _self.bpm = function(_num) {
       if ( _num  != undefined ) currentBPM = _num
       return currentBPM
@@ -3997,7 +3795,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
    * @function Module#Mixer#bpmMod
    * @param {number} currentMod beat multiplyer for tempo
-   */
+  */
   _self.bpmMod = function( _num ) {
     if ( _num  != undefined ) currentMOD = _num
     return currentMOD
@@ -4009,11 +3807,9 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  whatever BPM _currentBpmFunc_ returns will be bpm used.
    *  it's called on update
    * @example
-   * '''
    *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
    *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
    *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-   * '''
    * @function Module#Mixer#bindBpm
    * @param {function} binding allows for overriding internal bpm
    */
@@ -4026,7 +3822,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    *  sets setAutoFade true/false
    * @function Module#Mixer#setAutoFade
    * @param {boolean} autoFade to do, or do not
-   */
+  */
   _self.setAutoFade = function( _bool ) {
     if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
     if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
@@ -4036,8 +3832,8 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @description
    *  fades from one channel to the other in _duration_ milliseconds
    * @function Module#Mixer#fade
-   * @param {number} fadeDuration the duration of the fade
-   */
+   * @param {float} fadeDuration the duration of the fade
+  */
   _self.fade = function( _duration ) {
     var current = _self.pod()
 
@@ -4183,34 +3979,47 @@ vec4 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
 /**
  * @constructor Module
  * @interface
+ * @summary
+ *   Modules collect all the mixer elements
+ *
+ * @description
+ *   Modules collect all the mixer elements
+ *
+ *
+ * @author Sense studios
  */
 
- function Module( renderer, options ) {
-   var _self = this
+function Module( renderer, options ) {
+  var _self = this
 
-   /*
-     renderer
-   */
+  /*
+   renderer
+  */
 
-   _self.type = "Module"
+  _self.type = "Module"
 
-   // program interface
-   _self.init =         function() {}
-   _self.update =       function() {}
-   _self.render =       function() {}
- }
-
-
+  // program interface
+  _self.init =         function() {}
+  _self.update =       function() {}
+  _self.render =       function() {}
+}
 
 GifSource.prototype = new Source(); // assign prototype to marqer
 GifSource.constructor = GifSource;  // re-assign constructor
 
 /**
+ * @summary
+ *  Allows for an (animated) GIF file to use as input for the mixer
+ *
+ * @description
+ *  Allows for an (animated) GIF file to use as input for the mixer
+ *
  * @implements Source
  * @constructor Source#GifSource
  * @param {GlRenderer} renderer - GlRenderer object
  * @param {Object} options - JSON Object
  */
+
 function GifSource( renderer, options ) {
 
   // create and instance
@@ -4221,7 +4030,7 @@ function GifSource( renderer, options ) {
     _self.uuid = options.uuid
   }
 
-  var _self = this;
+  // set type
   _self.type = "GifSource"
 
   // allow bypass
@@ -4241,33 +4050,32 @@ function GifSource( renderer, options ) {
     _self.currentSrc = options.src
   }
 
-
   // create elements (private)
   var canvasElement, gifElement, canvasElementContext, gifTexture, supergifelement; // wrapperElemen
-
   var alpha = 1;
 
   _self.init = function() {
 
+    // create canvas
     canvasElement = document.createElement('canvas');
     canvasElement.width = 1024;
     canvasElement.height = 1024;
     canvasElementContext = canvasElement.getContext( '2d' );
 
+    // create the texture
     gifTexture = new THREE.Texture( canvasElement );
-
 
     // set the uniforms on the renderer
     renderer.customUniforms[_self.uuid] = { type: "t", value: gifTexture }
     renderer.customUniforms[_self.uuid+'_alpha'] = { type: "f", value: alpha }
 
     // add uniforms to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */')
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform sampler2D '+_self.uuid+';\n/* custom_uniforms */' )
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */' )
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha;\n/* custom_uniforms */' )
 
     // add output to main function
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */')
+    renderer.fragmentShader = renderer.fragmentShader.replace( '/* custom_main */', 'vec4 '+_self.uuid+'_output = ( texture2D( '+_self.uuid+', vUv ).rgba * '+_self.uuid+'_alpha );\n  /* custom_main */' )
 
     // expose gif and canvas
     _self.gif = supergifelement
@@ -4276,7 +4084,7 @@ function GifSource( renderer, options ) {
     // actual gif stuff
     window.image_source = new Image()
 
-    //$('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
+    // $('body').append("<div id='gif_"+_self.uuid+"' rel:auto_play='1'></div>");
     gifElement = document.createElement('img')
     gifElement.setAttribute('id', 'gif_'+_self.uuid)
     gifElement.setAttribute('rel:auto_play', '1')
@@ -4295,7 +4103,7 @@ function GifSource( renderer, options ) {
   _self.update = function() {
 
     // FIXME: something evil happened here.
-    //if (_self.bypass == false) return
+    // if (_self.bypass == false) return
     try {
       // modulo is here because gif encoding is insanley expensive
       // TODO: MAKE THE MODULE SETTABLE.
@@ -4314,10 +4122,7 @@ function GifSource( renderer, options ) {
     return gifTexture
   }
 
-
-  // Interface -----------------------------------------------------------------
-
-  // Helpers
+  // Interface helpers ---------------------------------------------------------
   _self.src = function( _file ) {
     console.log("executed src")
     _self.currentSrc = _file
@@ -4336,8 +4141,9 @@ function GifSource( renderer, options ) {
       return _num;
     }
 
-  }  // seconds
-  _self.duration =     function() { return supergifelement.get_length() }        // seconds
+  }
+  // seconds
+  _self.duration =     function() { return supergifelement.get_length() }
 };
 
 MultiVideoSource.prototype = new Source(); // assign prototype to marqer
@@ -4351,6 +4157,11 @@ MultiVideoSource.constructor = MultiVideoSource;  // re-assign constructor
   // var bufferImages =  [];   // bufferImage1, bufferImage2, ...
 
 /**
+ *
+ * @summary
+ *  The MultiVideoSource allows for playback of video files in the Mixer project.
+ *  And optimizes video playback in online scenarios
+ *
  * @description
  *  The MultiVideoSource allows for playback of video files in the Mixer project.
  *  It is very similar to the regular videosource, however it used multiple references to the videofile.
@@ -4668,6 +4479,13 @@ SolidSource.prototype = new Source(); // assign prototype to marqer
 SolidSource.constructor = SolidSource;  // re-assign constructor
 
 /**
+ *
+ * @summary
+ *  Allows a solid color to serve as an input element
+ *
+ * @description
+ *  Allows a solid color to serve as an input element
+ *
  * @implements Source
  * @constructor Source#SolidSource
  * @example var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
@@ -5270,8 +5088,12 @@ WebcamSource.prototype = new Source(); // assign prototype to marqer
 WebcamSource.constructor = WebcamSource;  // re-assign constructor
 
 /**
+ *
+ * @summary
+ *  The WebcamSource allows for playback of webcams in the Mixer project
+ *
  * @description
- *  The WebcamSource allows for playback of video files in the Mixer project
+ *  The WebcamSource allows for playback of webcams in the Mixer project
  *
  * @implements Source
  * @constructor Source#WebcamSource
@@ -5498,6 +5320,15 @@ function WebcamSource(renderer, options) {
 /**
  * @constructor Source
  * @interface
+ * @summary
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
+ *
+ * @description
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
+ *
+ *
+ *
+ * @author Sense studios
  */
 
 function Source( renderer, options ) {

@@ -1,5 +1,5 @@
-AudioAnalysis.prototype = new Addon(); // assign prototype to marqer
-AudioAnalysis.constructor = AudioAnalysis;  // re-assign constructor
+AudioAnalysis.prototype = new Addon();
+AudioAnalysis.constructor = AudioAnalysis; 
 
 /**
 * @summary
@@ -35,27 +35,55 @@ function AudioAnalysis( _renderer, _options ) {
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
 
-  // NOTE: that externally "audio" refers to the audiofile
-  // internally it refers to the Audio HTMLMediaElement
+  /**
+   * @description
+   *  Audio element, HTMLMediaElement AUDIO reference
+   *
+   * @member Addon#AudioAnalysis#audio
+   * @param {HTMLMediaElement} - reference to the virtual media element
+  */
   _self.audio = ""
 
-  /**  @member Controller#GamePadController#bypass */
+  /**  @member Controller#AudioAnalysis#bypass {boolean} */
   _self.bypass = false
 
   /**
-   * @description (calculated)bpm
-   * @member Addon#AudioAnalysis#bpm
+   * @description (calculated) bpm
+   * @member Addon#AudioAnalysis.bpm {number}
   */
   _self.bpm = 128
-  _self.bpm_float = 128
+
+  /**
+   * @description
+   *  the bpm float is a reference to the current beat-edge,
+   *  it represents a float between 0 and 1, with ±1 being given back every beat
+   * @member Addon#AudioAnalysis.bpm {number}
+  */
+  _self.bpm_float = 0
 
   /**
    * @description bpm mod, multiplyer for bpm output, usuall 0.125, 0.25, 0.5, 2, 4 etc.
    * @member Addon#AudioAnalysis#mod
   */
   _self.mod = 1
+
+  /** @member Addon#AudioAnalysis.bps */
   _self.bps = 1
+
+  /** @member Addon#AudioAnalysis.sec */
   _self.sec = 0
+
+  /** @member Addon#AudioAnalysis.dataSet */
+  _self.dataSet
+
+  /**
+   * @description tempodate gives you a peak into the inner workins of the sampler, including bpm and 'calibrating' status
+   * @member Addon#AudioAnalysis.tempoData
+  */
+  _self.tempoData
+
+  /** @member Addon#AudioAnalysis.audio_src */
+  _self.audio_src
 
   // default options
   _self.options = {
@@ -78,13 +106,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-  /**
-   * @description
-   *  Audio element
-   *  HTMLMediaElement AUDIO reference
-   * @member Addon#AudioAnalysis#audio
-   * @param {HTMLMediaElement} - reference to the virtual media element
-  */
   var audio = new Audio()
   _self.audio = audio
 
@@ -124,7 +145,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @description
    *  firstload for mobile, forces all control to the site on click
    *  tries and forces another play-event after a click
-   * @member Addon#AudioAnalysis~forceAudio
+   * @function Addon#AudioAnalysis~forceAudio
    *
   */
   var forceAudio = function() {
@@ -142,7 +163,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *  disconnects audio to output, this will mute the analalyser, but won't stop analysing
-   * @member Addon#AudioAnalysis#disconnectOutput
+   * @function Addon#AudioAnalysis#disconnectOutput
    *
   */
   _self.disconnectOutput = function() {
@@ -152,7 +173,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *   connects the audio source to output, making it audible
-   * @member Addon#AudioAnalysis#connectOutput
+   * @function Addon#AudioAnalysis#connectOutput
    *
   */
   _self.connectOutput = function() {
@@ -162,7 +183,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *   helper function, get's the bpm and retursn is, useful for ```mixer.bind( func )```
-   * @member Addon#AudioAnalysis.getBpm
+   * @function Addon#AudioAnalysis#getBpm
    *
   */
   _self.getBpm = function() {
@@ -170,15 +191,11 @@ function AudioAnalysis( _renderer, _options ) {
   }
 
   // main ----------------------------------------------------------------------
+
   /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
 
-    /**
-     * @description Audio element
-     * @member Addon#AudioAnalysis#audio_src
-     * @param {string} - reference to audiofile
-    */
     // set audio src to optioned value
     if ( !_self.options.microphone ) {
       source = context.createMediaElementSource(audio);
@@ -221,13 +238,13 @@ function AudioAnalysis( _renderer, _options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
-  /** @function Addon#AudioAnalysis~render */
+  /** @function Addon#AudioAnalysis#render */
   _self.render = function() {
     // returns current bpm 'position' as a value between 0 - 1
     return _self.bpm_float
   }
 
-  /** @function Addon#AudioAnalysis~add */
+  /** @function Addon#AudioAnalysis#add */
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -264,12 +281,9 @@ function AudioAnalysis( _renderer, _options ) {
    *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
    *   returns the most occuring bpm
    *
-   *
    * @function Addon#AudioAnalysis~sampler
    *
   */
-  _self.dataSet
-  _self.tempoData
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -338,7 +352,8 @@ function AudioAnalysis( _renderer, _options ) {
    *  returns 'tempodata', a list of found BPMs sorted on occurrence
    *  object includes: bpm (ie. 128), confidence (0-1), calibrating (true/false),
    *  treshold, tempocounts, foundpeaks and peaks
-   * @member Addon#AudioAnalysis~getTempo
+   * @function Addon#AudioAnalysis~getTempo
+   * @params _date {object}
    *
   */
   var getTempo = function( _data ) {
@@ -439,7 +454,7 @@ function AudioAnalysis( _renderer, _options ) {
 
   /**
    * @description Finds peaks in the audiodata and groups them together
-   * @member Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
+   * @function Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
    *
   */
   var countIntervalsBetweenNearbyPeaks = function( _peaks ) {
@@ -467,7 +482,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @description
    *  map found intervals together and returns 'tempocounts', a list of found
    *  tempos and their occurences
-   * @member Addon#AudioAnalysis~groupNeighborsByTempo
+   * @function Addon#AudioAnalysis~groupNeighborsByTempo
    *
   */
   var groupNeighborsByTempo = function( intervalCounts ) {

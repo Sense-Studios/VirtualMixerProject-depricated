@@ -1,5 +1,5 @@
-GamePadController.prototype = new Controller();  // assign prototype to marqer
-GamePadController.constructor = GamePadController;  // re-assign constructor
+GamePadController.prototype = new Controller();
+GamePadController.constructor = GamePadController;
 
 /**
  * @summary
@@ -29,6 +29,7 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @example
+ *
  *  var gamepad1 = new GamePadController( renderer, {});
  *  gamepad1.init()
  *  gamepad1.render()
@@ -46,8 +47,7 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  * @author Sense Studios
  */
 
-function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer3
-  // returns a floating point between 1 and 0, in sync with a bpm
+function GamePadController( _renderer, _options  ) {
   var _self = this
 
   // exposed variables.
@@ -56,15 +56,15 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.controllers = {};
   _self.gamepad = {}
 
-  /**  @member Controller#GamePadController#bypass */
+  /**  @member Controller#GamePadController#bypass {boolean}*/
   _self.bypass = true
 
-  /** @member Controller#GamePadController#debug */
+  /** @member Controller#GamePadController#debug {boolean}*/
   _self.debug = false
 
   /**
    * @description
-   *  when multiple devices identify as gamepads, use ```gamepad1.gamepad_index = 1```
+   *  when multiple devices identify as gamepads, use ie. `gamepad1.gamepad_index = 1` to select the second gamepad [0, 1, 2,  ...]
    *  @member Controller#GamePadController#gamepad_index
   */
   _self.gamepad_index = 0

@@ -1,5 +1,5 @@
-MidiController.prototype = new Controller();  // assign prototype to marqer
-MidiController.constructor = MidiController;  // re-assign constructor
+MidiController.prototype = new Controller();
+MidiController.constructor = MidiController;
 
 /**
  * @summary
@@ -13,8 +13,6 @@ MidiController.constructor = MidiController;  // re-assign constructor
  *  Here is a demo on [Codepen](https://codepen.io/xangadix/pen/BbVogR), which was tested with 2 AKAI midicontrollers
  *
  *  The original implementation is on GitHub in a [Gist](https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e).
- *
- *
  *
  * @example
  *  var midi1 = new MidiController();
@@ -39,15 +37,24 @@ function MidiController( _options ) {
   // exposed variables.
   _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "MidiController"
+
+  /** @member Controller#KeyboardController#debug {boolean} */
   _self.bypass = true
+
+  /** @member Controller#KeyboardController#debug {boolean} */
   _self.debug = false
+
+  /** @member Controller#KeyboardController~debug {boolean} */
   _self.ready = false
+
+  /** @member Controller#KeyboardController~debug {object} */
   _self.controllers = {}
   var binds = []
   var nodes = []
   var c = 0 // counter
   var midi, input, output
 
+  /** @function Controller#KeyboardController~success {object} */
   var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
@@ -60,7 +67,7 @@ function MidiController( _options ) {
 
   	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
   		output = o.value;
-      initMidi()
+      //if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
   	}
 
     console.log("Midi READY? ", output, midi)
@@ -69,8 +76,9 @@ function MidiController( _options ) {
   }
 
   // everything went wrong.
-  var failure = function () {
-  	console.error('No access to your midi devices.');
+  /** @function Controller#KeyboardController~failure {object} */
+  var failure = function (_fail) {
+  	console.error('No access to your midi devices.', _fail);
   }
 
   // request MIDI access
@@ -80,16 +88,12 @@ function MidiController( _options ) {
       .then( success, failure );
   }
 
-  function initMidi() {
-    if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
-    // dispatchMidiEvent("ready")
-  }
-
   // some examples, this is the 'onpress' (and on slider) function
   var doubleclickbuffer = [ 0, 0, 0, 0 ]
   var doubleclickPattern = [ 128, 144, 128, 144 ]
   var doubleclick = false
 
+  /** @function Controller#KeyboardController~onMIDIMessage {event} */
   _self.onMIDIMessage = function(e) {
     if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
     checkBindings(e.data) // depricated
@@ -225,11 +229,15 @@ function MidiController( _options ) {
   }
 
   // ---------------------------------------------------------------------------
+  /** @function Controller#KeyboardController~init  */
   _self.init = function() {}
+
+  /** @function Controller#KeyboardController~update  */
   _self.update = function() {}
 
   // ---------------------------------------------------------------------------
   // BINDS ARE DEPRICATED
+  /*
   _self.bind = function( _key, _callback ) {
     binds.push( { key: _key, callback: _callback } )
     // check for double binds ?
@@ -241,11 +249,11 @@ function MidiController( _options ) {
 
   // [ state, key, velocity ]
   var checkBindings = function(e) {
-
     binds.forEach( function( _obj ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
   }
+  */
 
   /**
    * @description
@@ -269,11 +277,9 @@ function MidiController( _options ) {
    *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
    *
    * @function Controller#MidiController#send
-   * @param {string} _target - the number of controller being pressed
-   * @param {function} _callback - the callback to be executed
+   * @param {array} commands - the sequence that needs execution
    *
   */
-
   _self.send = function( commands ) {
     if (_self.ready) {
       console.log("Midi send ", commands, "to", output)
@@ -297,18 +303,23 @@ function MidiController( _options ) {
     output.send(commands)
   }
 
-
-
   /**
    * @description
    *  removeEventListener
    * @example
    *  midi.removeEventListener(1)
    * @function Controller#MidiController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
-  self.removeEventListener = function( _target ) {}
+  self.removeEventListener = function( _target ) {
+    nodes.forEach( function(node, i ) {
+      if ( node.target == _target ) {
+        var removeNode = i
+      }
+    })
+    nodes.splice(i, 1)
+  }
 
   /**
    * @description
@@ -330,6 +341,7 @@ function MidiController( _options ) {
     console.log("MIDI listeners: ", nodes)
   }
 
+  /** @function Controller#KeyboardController~dispatchMidiEvent {event}  */
   var dispatchMidiEvent = function(e) {
     nodes.forEach(function( _obj ){
       if ( _obj.target == e.data[1] ) {

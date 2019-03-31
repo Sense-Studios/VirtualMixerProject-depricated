@@ -3,7 +3,4 @@
  *
 */
 
-function SourceControl( renderer, source ) {
-  // source.renderer ?
-
-}
+function SourceControl( renderer, source ) {}

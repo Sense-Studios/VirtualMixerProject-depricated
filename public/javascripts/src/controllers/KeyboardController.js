@@ -1,16 +1,13 @@
-KeyboardController.prototype = new Controller();  // assign prototype to marqer
-KeyboardController.constructor = KeyboardController;  // re-assign constructor
+KeyboardController.prototype = new Controller();
+KeyboardController.constructor = KeyboardController;
 
 /**
  * @summary
- *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
- *  as controllerevents (allows for sockets)
- *
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
  *
  * @description
- *
- *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
- *  as controllerevents (allows for sockets)
+ *  This controller converts keyboard listeners to a Controller. Events are triggered through keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
+ *  It's mainly purposed as an identical interface to the other controllers. Nothing stops you from implementing your own keyboardlisteners
  *
  *
  * @example
@@ -37,12 +34,12 @@ function KeyboardController( _renderer, _options  ) {
   _self.type = "Control"
   _self.controllers = {};
   _self.keyboard = {}
-  _self.bypass = true
-  /** @member {boolean} Controller#KeyboardController#debug */
-  _self.debug = false
 
-  /** @member {integer} Controller#KeyboardController#keyboard_index */
-  _self.keyboard_index = 0
+  /** @member Controller#KeyboardController#debug {boolean} */
+  _self.bypass = true
+
+  /** @member Controller#KeyboardController#debug {boolean} */
+  _self.debug = false
 
   if ( _options ) {
     if ("default" in _options) {}
@@ -132,7 +129,9 @@ function KeyboardController( _renderer, _options  ) {
     console.log("Keyboard listeners: ", nodes)
   }
 
-  // private? const?
+  /**
+  * @function Controller#KeyboardController~dispatchkeyboardEvent
+  */
   var dispatchkeyboardEvent = function( _arr ) {
     nodes.forEach( function( node, i ) {
       if ( _arr[0] == node.target ) {

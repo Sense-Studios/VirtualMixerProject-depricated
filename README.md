@@ -1,20 +1,14 @@
 # VirtualMixerProject
 
-The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL.
-There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/).
-There you can find examples and 'channels', which are basically auto-mixed sets of video files.
-or gifs. Or images. Or solid colors or ...
+The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL. There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/). There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...
 
 ![logo](https://virtualmixproject.com/images/vmp_demo/vmp_logo.png)
 
-it comes in a package for use on your website or an npm build for use on your local DMZ.
+it comes in a package for use on your website or an npm build for use on your local DMZ. With these tools, you can Bbuild your own video mixer in JavaScript. The application takes a number of _sources_ ( video, gif, whathaveyou ) and allows you to crossfade and mix them.
 
-With these tools, you can Bbuild your own video mixer in JavaScript. The application takes a number of _sources_ ( video, gif, whathaveyou ) and allows you to crossfade and mix them.
+Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve as a _source_ for another _mixer_. In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for _gamepads_ en _midi_ devices.
 
-Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve as a _source_ for another _mixer_.
-In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for _gamepads_ en _midi_ devices.
-
-* Check more detailed info the documentation at: https://virtualmixproject.com/docs/reference/index.html
+* Check more detailed info in [the Documentation](https://virtualmixproject.com/docs/reference/index.html)
 
 * Check out [this](https://codepen.io/xangadix/pen/zewydR) basic example on Codepen: or any from [our other examples and demos](https://codepen.io/collection/nZyjvW/) on Codepen
 
@@ -24,8 +18,7 @@ Or go ahead and continue with the Quickstart below
 
 ## Quickstart
 
-So, if you want to use this on your website.
-Make sure you include the build files. (and in this order)
+So, if you want to use this on your website. Make sure you include the build files. (and in this order)
 
 ```    
   https://virtualmixproject.com/javascripts/build/vendor-min.js
@@ -86,7 +79,7 @@ So here is what happens; the most basic mixer setup is laid out hereunder in ASC
 
 
 ```
-This diagram flows from top to bottom. By defauld the [**`pod`**](Mixer.html#pod) of the _mixer_ is set to 0, so we see `Source 1` in our `Output`.
+This diagram flows from top to bottom. By defauld the _pod_ (handle) of the _mixer_ is set to 0, so we see `Source 1` in our `Output`.
 Set the `pod` to 1 to show the `Source 2`. Or set it to any value in between to mix the two sources together.
 
 ```
@@ -104,11 +97,11 @@ setInterval( function() {
 
 ```
 See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
+Or check out [how it works](https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html)
 
 ## Installation
 
-You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance!
-*if* you store your videos locally.
+You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance! *if* you store your videos locally.
 
 1) clone the package, defaults to VirtualMixerProject/
 
@@ -135,21 +128,13 @@ Check more detailed info [in the docs](https://virtualmixproject.com/docs/refere
 
 ## Further Reading
 
-* [References](https://virtualmixproject.com/docs/reference/index.html)
+* [How this Works](https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html)
+* [Demo collection on Codepen](https://codepen.io/collection/nZyjvW/)
+* [Documentation and Reference](https://virtualmixproject.com/docs/reference/index.html)
+* [Automatic Mixing](https://virtualmixproject.com/docs/reference/tutorial-automatic%20mixing.html)
 * [Limitations](https://virtualmixproject.com/docs/reference/tutorial-some%20limitations.html)
-* [Build instructions](https://virtualmixproject.com/docs/reference/tutorial-build.html)
+* [Building](https://virtualmixproject.com/docs/reference/tutorial-build%20settings.html)
 * [Roadmap](https://virtualmixproject.com/docs/reference/tutorial-roadmap.html)
-
-## Roadmap
-
-* Set up a Node editor
-* ~~Hook up Midi controller~~
-* add wipe MixModes
-* ~~add configuration for Firebase~~ => Wire up a socket.io implementation
-* Phase out express for lightweight server/ templating. alternative?
-* ~~Phase out jQuery~~
-* Phase out ThreeJS
-
 
 # But Why?!
 

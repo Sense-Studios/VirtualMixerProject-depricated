@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "mixkit_co.css",
+	"sources": [
+		"mixkit_co.sass"
+	],
+	"names": [],
+	"mappings": "AAAA,AAAA,IAAI,CAAC;EACH,MAAM,EAAE,CAAC;EACT,OAAO,EAAE,CAAC,GAAG"
+}
