@@ -14,10 +14,27 @@ var green = new SolidSource( renderer, { color: { r: 0.0, g: 1.0, b: 0.0 } } );
 var blue = new SolidSource( renderer, { color: { r: 0.0, g: 0.0, b: 1.0 } } );
 var yellow = new SolidSource( renderer, { color: { r: 1.0, g: 1.0, b: 0.0 } } );
 
+var webcam1 = new WebcamSource( renderer, {} )
+
+/*
 var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
 var source2 = new VideoSource( renderer, { src: '/video/ignore/edirol_v4.mp4' } );
 var source3 = new VideoSource( renderer, { src: '/video/ignore/1UP_Graffiti_olympic.mp4' } );
 var source4 = new VideoSource( renderer, { src: '/video/ignore/composition_12.mp4' } );
+*/
+
+/*
+var source1 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vanilla_ice/Output/ice_1.mp4' } );  // br
+var source2 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vanilla_ice/Output/ice_4.mp4' } );  // bl
+var source3 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vanilla_ice/Output/ice_2.mp4' } );  // tr
+var source4 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vanilla_ice/Output/ice_3.mp4' } );  // tl
+*/
+var source1 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vogue/Output/vogue_1.mp4' } );  // br
+var source2 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vogue/Output/vogue_2.mp4' } );  // bl
+var source3 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vogue/Output/vogue_3.mp4' } );  // tr
+var source4 = new VideoSource( renderer, { src: '/video/ignore/foursomes/vogue/Output/vogue_4.mp4' } );  // tl
+
+var chain1 = new Chain( renderer, {sources: [ source1, source2, source3, source4 ]});
 
 // create a mixer, mix red and green
 // var mixer1 = new Mixer( renderer, { source1: red, source2: green });
@@ -31,6 +48,7 @@ var mixer3 = new Mixer( renderer, { source1: mixer1, source2: mixer2 });
 // set up a game pad
 var gamepad = new GamePadController( renderer ) // , mixer1, mixer2, mixer3
 var midicontroller = new MidiController( renderer )
+var keyboardcontroller = new KeyboardController( renderer )
 
 // gamepad socket
 var gamepad_socket_controller = new SocketController({title: "gamepad"})
@@ -44,13 +62,15 @@ var keyboard1 = new KeyboardController( renderer )
 // var source1 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
 
 // set up image processing
-var saturation = new ColorEffect( renderer, { source: mixer3 } )
+// var saturation = new ColorEffect( renderer, { source: mixer3 } )
+var saturation = new ColorEffect( renderer, { source: chain1 } )
 var hue = new ColorEffect( renderer, { source: saturation } )
 var contrast = new ColorEffect( renderer, { source: hue } )
+var brightness = new ColorEffect( renderer, { source: contrast } )
 
 // finally asign that mixer to the output
 // var output = new Output( renderer, mixer3 )
-var output = new Output( renderer, mixer3 )
+var output = new Output( renderer, webcam1 )
 
 
 
@@ -66,6 +86,8 @@ renderer.render();       // start update & animation
 
 gamepad.debug = true
 gamepad.gamepad_index = 1
+
+chain1.setAll(0)
 
 function mycallback( _value ) {
   console.log("called back:", _value)
@@ -161,14 +183,25 @@ button_11 = function(_val) {
 left_x = function(_arr) {
   var _val = _arr[1]
   if (lock_left) return;
+  _val > 0 ? chain1.setChainLink(0, curved( _val ) ) : chain1.setChainLink(3, 0 )
+  _val < 0 ? chain1.setChainLink(1, curved( _val * -1 ) ) : chain1.setChainLink(3, 0 )
+  /*
+  var _val = _arr[1]
+  if (lock_left) return;
   var setx = ( _val + 1 ) / 2
   if (setx >= 0.9 ) setx = 1
   if (setx <= 0.12 ) setx = 0
   //console.log( "x: ", setx )
   mixer1.pod( setx )
   mixer2.pod( setx )
+  */
 }
 left_y = function(_arr) {
+  var _val = _arr[1]
+  if (lock_left) return;
+  _val > 0 ? chain1.setChainLink(2, curved( _val ) ) : chain1.setChainLink(3, 0 )
+  _val < 0 ? chain1.setChainLink(3, curved( _val * -1 ) ) : chain1.setChainLink(3, 0 )
+  /*
   var _val = _arr[1]
   if (lock_left) return;
   var sety = ( _val + 1 ) / 2
@@ -176,15 +209,34 @@ left_y = function(_arr) {
   if (sety <= 0.12 ) sety = 0
   //console.log( "y: ", sety )
   mixer3.pod( sety )
+  */
 }
 
+//var saturation = new ColorEffect( renderer, { source: chain1 } )
+//var hue = new ColorEffect( renderer, { source: saturation } )
+//var contrast = new ColorEffect( renderer, { source: hue } )
+
 right_x = function(_arr) {
-  var _val = _arr[1]
-  if (!lock_right) saturation.extra( _val)
+  //var _val = _arr[1]
+  //_val > 0 ? chain1.setChainLink(0, curved( _val ) ) : chain1.setChainLink(3, 0 )
+  //_val < 0 ? chain1.setChainLink(1, curved( _val * -1 ) ) : chain1.setChainLink(3, 0 )
+  //if (!lock_right) saturation.extra( _val)
+  saturation.extra( ( _arr[1] / 2 ) + 0.5  )
 }
 right_y = function( _arr ) {
-  var _val = _arr[1]
-  if (!lock_right) hue.extra(_val )
+  //var _val = _arr[1]
+  //console.log(_val)
+  //chain1.setChainLink(2, _val )
+  //chain1.setChainLink(3, -_val )
+  //if (!lock_right) hue.extra(_val )
+  //_val > 0 ? chain1.setChainLink(2, curved( _val ) ) : chain1.setChainLink(3, 0 )
+  //_val < 0 ? chain1.setChainLink(3, curved( _val * -1 ) ) : chain1.setChainLink(3, 0 )
+  contrast.extra( ( _arr[1] / 2 ) + 0.75 )
+}
+
+curved = function( _num ) {
+  var _result = _num * _num
+  return _result
 }
 
 button_8 = function( e ) {
@@ -215,20 +267,48 @@ hue.effect(63)
 hue.extra(0.1)
 contrast.effect(61)
 contrast.extra(0.5)
+brightness.effect(60)
+brightness.extra(0)
 saturation.debug = false
 hue.debug =false
 // var bpm = analysis;
 
-var  midislider = function(e) {
-  console.log("data slider 48", e )
+var  midislider1 = function(e) {
+  var _val = e[2]
+  source1.video.playbackRate = _val / 127 * 2
+  console.log("data slider 48", e,  _val / 127 * 2  )
 }
+
+var  midislider2 = function(e) {
+  var _val = e[2]
+  source2.video.playbackRate = _val / 127 * 2
+  console.log("data slider 49", e,  _val / 127 * 2  )
+}
+
+var  midislider3 = function(e) {
+  var _val = e[2]
+  source3.video.playbackRate = _val / 127 * 2
+  console.log("data slider 50", e,  _val / 127 * 2 )
+}
+
+var  midislider4 = function(e) {
+  var _val = e[2]
+  source4.video.playbackRate = _val / 127 * 2
+  console.log("data slider 51", e,  _val / 127 * 2 )
+}
+
+
 var midibutton = function(e) {
   console.log("data! button 1", e )
 }
 
 midicontroller.addEventListener( 1, midibutton )
-midicontroller.addEventListener( 48, midislider )
 
+midicontroller.addEventListener( 48, midislider1 )
+midicontroller.addEventListener( 49, midislider2 )
+midicontroller.addEventListener( 50, midislider3 )
+midicontroller.addEventListener( 51, midislider4 )
+midicontroller.debug = true
 // -----------------------------------------------------------------------------
 // SOCKETS
 // -----------------------------------------------------------------------------
@@ -240,7 +320,19 @@ gamepad_socket_controller.addEventListener( 102, right_x )
 gamepad_socket_controller.addEventListener( 103, right_y )
 
 midi_socket_controller.addEventListener( 1, midibutton )
-midi_socket_controller.addEventListener( 48, midislider )
+midi_socket_controller.addEventListener( 48, midislider1 )
+
+
+// -----------------------------------------------------------------------------
+// KEYBOARD
+// -----------------------------------------------------------------------------
+
+function i_click_you(e) {
+  console.log("I CLICK YOU", e)
+}
+
+keyboardcontroller.addEventListener(90, i_click_you )
+
 /*
 setTimeout( function() {
   console.log("got local socket id: ", socketcontroller.target)

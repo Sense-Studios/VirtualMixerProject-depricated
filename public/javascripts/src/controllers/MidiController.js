@@ -98,7 +98,7 @@ function MidiController( _options ) {
     if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
     checkBindings(e.data) // depricated
     dispatchMidiEvent(e)
-
+    
     // hello from midi
     // console.log(e.data)
 

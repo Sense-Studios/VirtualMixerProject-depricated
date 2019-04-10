@@ -26,6 +26,32 @@
     
     <section>
         <article>
+<<<<<<< HEAD
+<<<<<<< HEAD
+            <pre class="prettyprint source linenums"><code>KeyboardController.prototype = new Controller();  // assign prototype to marqer
+KeyboardController.constructor = KeyboardController;  // re-assign constructor
+
+/**
+ * @summary
+ *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @description
+ *
+ *  implements keyboard charcodes https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+ *  as controllerevents (allows for sockets)
+ *
+ *
+ * @example
+ *  let keyboard = new KeyboardController( renderer, {});
+ *  keyboard.init
+ *  keyboard.render
+ *  keyboard.addEventListener( 1, function() { ... })   // button 1
+ *  keyboard.addEventListener( 100, function() { ... }) // axis
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
             <pre class="prettyprint source linenums"><code>KeyboardController.prototype = new Controller();
 KeyboardController.constructor = KeyboardController;
 
@@ -46,6 +72,10 @@ KeyboardController.constructor = KeyboardController;
  *
  *  // enter button, should return [13, 1] on keydown and [13,0] on keyup
  *  keyboard.addEventListener( 13, function(_arr) { console.log(_arr) })
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
  *
  *
  * @implements Controller
@@ -63,12 +93,24 @@ function KeyboardController( _renderer, _options  ) {
   _self.type = "Control"
   _self.controllers = {};
   _self.keyboard = {}
+<<<<<<< HEAD
+<<<<<<< HEAD
+  _self.bypass = true
+  _self.debug = false
+  _self.keyboard_index = 0
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
 
   /** @member Controller#KeyboardController#debug {boolean} */
   _self.bypass = true
 
   /** @member Controller#KeyboardController#debug {boolean} */
   _self.debug = false
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
 
   if ( _options ) {
     if ("default" in _options) {}
@@ -82,6 +124,27 @@ function KeyboardController( _renderer, _options  ) {
   /**
    * @description
    *  init, should be automatic, but you can always call my_keyboard.init()
+<<<<<<< HEAD
+<<<<<<< HEAD
+   * @member Controller#KeyboardController.init
+   *
+  */
+  // init with a tap contoller
+  _self.init = function() {
+    console.log("init KeyboardController.")
+
+    window.document.addEventListener('keydown', function(event) { console.log(event.keyCode) })
+    document.addEventListener('keydown', (event) => {
+      // const keyName = event.key;
+      console.log( " >>> ", event )
+    })
+    // window.keyboard.on.keypress whatever
+  }
+
+
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
    * @function Controller#KeyboardController~init
    *
   */
@@ -107,17 +170,30 @@ function KeyboardController( _renderer, _options  ) {
    * @function Controller#KeyboardController~update
    *
   */
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
   _self.update = function() {
     if ( _self.bypass ) return;
 
   }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
   /**
    * @description
    *  render, should be automatic, but you can always call my_keyboard.render()
    * @function Controller#KeyboardController~render
    *
   */
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
   _self.render = function() {
     return _self.controllers
   }
@@ -143,10 +219,23 @@ function KeyboardController( _renderer, _options  ) {
    * @description
    *  addEventListener
    * @example
+<<<<<<< HEAD
+<<<<<<< HEAD
+   *  function doSomething(_arr ) {
+   *    console.log('pressed1', arr)
+   *  }
+   *  keyboard.addEventListener(1, function() )
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
    *  function doSomething( _arr ) {
    *    console.log('pressed1', arr);
    *  }
    *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
    *
    * @function Controller#KeyboardController#addEventListener
    * @param {string} _target - the number of controller being pressed
@@ -155,12 +244,25 @@ function KeyboardController( _renderer, _options  ) {
   */
   _self.addEventListener = function( _target, _callback ) {
     nodes.push( { target: _target, callback: _callback } )
+<<<<<<< HEAD
+<<<<<<< HEAD
+    console.log("listeners: ", nodes)
+  }
+
+  // private? const?
+=======
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
     console.log("Keyboard listeners: ", nodes)
   }
 
   /**
   * @function Controller#KeyboardController~dispatchkeyboardEvent
   */
+<<<<<<< HEAD
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
   var dispatchkeyboardEvent = function( _arr ) {
     nodes.forEach( function( node, i ) {
       if ( _arr[0] == node.target ) {
@@ -171,7 +273,15 @@ function KeyboardController( _renderer, _options  ) {
 
   /**
    * @description
+<<<<<<< HEAD
+<<<<<<< HEAD
+   *  getNodes -- helper, shows current nodes
+=======
    *  getNodes, helper, shows current nodes
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+   *  getNodes, helper, shows current nodes
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
    * @function Controller#KeyboardController#getNodes
   */
   _self.getNodes = function() {
@@ -188,13 +298,29 @@ function KeyboardController( _renderer, _options  ) {
 </div>
 
 <nav>
+<<<<<<< HEAD
+<<<<<<< HEAD
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Global</h3><ul><li><a href="global.html#considerations">considerations</a></li><li><a href="global.html#limitations">limitations</a></li><li><a href="global.html#roadmap">roadmap</a></li></ul>
+=======
     <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Automatic mixing.html">Automatic mixing</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this works.html">How does this works</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Automatic mixing.html">Automatic mixing</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this works.html">How does this works</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
 </nav>
 
 <br class="clear">
 
 <footer>
+<<<<<<< HEAD
+<<<<<<< HEAD
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 09 2019 22:48:02 GMT+0100 (STD)
+=======
     Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 13:15:34 GMT+0100 (CET)
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 13:15:34 GMT+0100 (CET)
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
 </footer>
 
 <script> prettyPrint(); </script>

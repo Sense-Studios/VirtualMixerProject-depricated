@@ -25,7 +25,7 @@ router.get('/1', function(req, res, next) {
 });
 
 router.get('/nsb', function(req, res, next) { request('http://37.220.36.53:7904').pipe(res); });
-router.get('/electrodancefloor', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
+router.get('/ele', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
 router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
 router.get('/hardstyle', function(req, res, next) { request('http://145.239.10.127:8326/streamTitle1').pipe(res); });
 router.get('/rap', function(req, res, next) { request('http://149.56.157.81:8569/streamTitle1').pipe(res); });
@@ -34,6 +34,7 @@ router.get('/rap', function(req, res, next) { request('http://149.56.157.81:8569
 router.get('/breakbeat', function(req, res, next) { request('http://178.33.115.87:8004/stream').pipe(res); });
 router.get('/trance', function(req, res, next) { request('http://137.74.45.136:80/pulstranceAAC64.mp3').pipe(res); });
 router.get('/subfm', function(req, res, next) { request('http://5.39.71.159:8729/').pipe(res); });
+router.get('/astros', function(req, res, next) { request('http://213.239.206.179:8156/astrosradiocafe').pipe(res); });
 
 
 /*

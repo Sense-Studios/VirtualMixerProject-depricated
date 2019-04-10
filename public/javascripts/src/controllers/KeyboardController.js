@@ -59,6 +59,13 @@ function KeyboardController( _renderer, _options  ) {
   _self.init = function() {
     console.log("init KeyboardController.")
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    // window.document.addEventListener('keydown', function(event) { console.log(event.keyCode) })
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
     document.addEventListener('keydown', (event) => {
       if (_self.debug) console.log( " down ", [ event.keyCode, 1 ] )
       dispatchkeyboardEvent( [ event.keyCode, 1 ] )
@@ -66,9 +73,32 @@ function KeyboardController( _renderer, _options  ) {
 
     document.addEventListener('keyup', (event) => {
       // const keyName = event.key;
+<<<<<<< HEAD
+<<<<<<< HEAD
+      // console.log( " >>> ", event )
+      nodes.forEach( function( node, i ) {
+        //console.log( i, node.target, event.keyCode )
+        if (node.target ==event.keyCode) {
+          node.callback(event);
+        }
+      })
+    })
+    // window.keyboard.on.keypress whatever
+
+    // document.addEventListener('keyup', (event) => {
+    // so we could use 1090 for z-up, as z is keycode 90, we could use that for 'down' and 1090 10-90 for up
+    // so add 10 before it 
+  }
+=======
       if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
       dispatchkeyboardEvent( [ event.keyCode, 0 ] )
     })
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
+=======
+      if (_self.debug) console.log( " up ", [ event.keyCode, 0 ] )
+      dispatchkeyboardEvent( [ event.keyCode, 0 ] )
+    })
+>>>>>>> f2d55856a0391c0ba054f3a51a0d091160e73dec
 
   }
 
