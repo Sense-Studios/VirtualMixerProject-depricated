@@ -144,7 +144,7 @@ Could be written as:
 ## Add a Tapped BPM controller
 So it breaks down to three main components; a _Renderer_ (output), _Modules_ (ie. mixers) and _Sources_ (ie. video or gif) in our demo. As you can see, a mixer is actually **also** a _Source_.
 
-There are also _Addons_ like a BPM counter and _Controllers_, that allows keyboard or midi input. A BPM is created and connected to the Mixer. The BPM Addon will then start moving the handle back and forth in a set tempo. A _Controller_ finally will allow you to **tap** the BPM in sync with the music, and have the mixer mix on the beat.
+There are also _Addons_ like a BPM counter and _Controllers_, that allows keyboard or midi input. A BPM is created and connected to the Mixer. The BPM Addon will then start moving the handle back and forth in a set tempo. A _Controller_ finally will allow you to **tap** the BPM in sync with the music and have the mixer mix on the beat.
 
 ```
       ______________
@@ -196,7 +196,7 @@ Can be written as:
 
 ```
 
-Note that the BPM can control multiple mixers at once, if you dow't want that. Below you'll find a breakdown of all the Modules that are sort or less available.
+Note that the BPM can control multiple mixers at once if you don't want that. Below you'll find a breakdown of all the Modules that are sort or less available.
 
 ### The Renderer
 It loads all components, it builds the shaders and starts rendering them.
@@ -227,7 +227,7 @@ It loads all components, it builds the shaders and starts rendering them.
 
 ```
 
-As you can see, there is a scene, in which there is a plane. On the plane a shader material is rendered and therin is our mixer.
+As you can see, there is a scene, in which there is a plane. On the plane, a shader material is rendered and therein is our mixer.
 
 ### Sources
 
@@ -292,7 +292,7 @@ These are the available _Blendmodes_
 1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE, 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT, 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
 ```
 
-Look them up, there almost like you know them from photoshop; https://photoblogstop.com/photoshop/photoshop-blend-modes-explained
+Look them up, they're almost like you know them from photoshop; https://photoblogstop.com/photoshop/photoshop-blend-modes-explained
 
 
 These are the available _Mixmodes_
@@ -303,7 +303,7 @@ These are the available _Mixmodes_
 **1. NORMAL:** Both sides fadeout in a straight line, if the pod is exactly in the middle both sources will be 50% opaque.
 **2. HARD:** This is "Hard" mix, so there is no fading, the Source switches over the other if the pod touches the middle.
 **3. NAM:** A mix where the curves are parabolic (eased out) and overlayed so that both sides are never under ~75% opaque.
-**4. FAM:** A more extreme version of NAM, where the alpha > 1 is not maxed out; allows for more then ~100% opaque.
+**4. FAM:** A more extreme version of NAM, where the alpha > 1 is not maxed out; allows for more than ~100% opaque.
 **5. NON-DARK:** Boosts the alpha levels of a NAM mix allowing for a NAM with _more light_ so to speak (when you have a lot of dark material)
 
 With the last 4 blend modes, changing the pod() value doesn't affect the mixer.
@@ -317,7 +317,7 @@ With the last 4 blend modes, changing the pod() value doesn't affect the mixer.
 
 
 #### Chain
-WIP. A chain is much like a mixer, but it simply stacks a numer of sources. Still it can used to chain a lot of empty channels together, from which only few are actually _On_.
+WIP. A chain is much like a mixer, but it simply stacks a number of sources. Still, it can be used to chain a lot of empty channels together, from which only a few are actually _On_.
 [Chain Docs](https://virtualmixproject.com/docs/reference/Module_Chain.html)
 
 #### Switch

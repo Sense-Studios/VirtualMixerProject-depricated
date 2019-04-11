@@ -1,14 +1,14 @@
 FileManager.prototype = new Addon();
-FileManager.constructor = FileManager; 
+FileManager.constructor = FileManager;
 
 /**
 * @summary
 *  Allows for fast switching between a prefefined list of files (or 'sets' )
 *
 * @description
-*  The filemanager allows you to load up a large number of videofiles and attach them to a VideoSource.
+*  The filemanager allows you to load up a large number of video files and attach them to a VideoSource.
 *
-*  A 'set' is simply a json file, with an array with sources like so:
+*  A 'set' is simply a .json file, with an array with sources like so:
 *
 *  ```
 *   [
@@ -25,6 +25,8 @@ FileManager.constructor = FileManager;
 *   var source1 = new VideoSource( renderer )
 *   var myFilemanager = new FileManager( source1 )
 *   myFilemanager.load_set( "myset.json")
+*
+*   // randomly choose one from the set.
 *   myFilemanager.change()
 *
 * @constructor Addon#FileManager
@@ -35,7 +37,8 @@ FileManager.constructor = FileManager;
 function FileManager( _source ) {
 
   var _self = this
-
+  _self.function_list = [["CHZ", "method","changez"]]
+  
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""

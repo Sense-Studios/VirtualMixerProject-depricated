@@ -1,5 +1,6 @@
-* More Effects !
+* More Effects!
 * Blur Effect
+* Yes I know, I node editor.
 * wipes through distortion effects
 * extend feedback effects
 * Text-source
@@ -11,9 +12,9 @@
 #### MultipleVideoSource
 
 The MultiVideoSource allows for playback of video files in the Mixer project.
-It is very similar to the regular videosource, however it used multiple references to the videofile.
+It is very similar to the regular video source, however, it used multiple references to the video file.
 In doing so it allows for very fast jumping through the video even when it is loading from a remote server.
-The main features are random jumping and a cue list, allowing for smart referincing in video files.
+The main features are random jumping and a cue list, allowing for smart referencing in video files.
 
 
 #### layout and composition abstraction
@@ -40,3 +41,5 @@ Describe compositions as below. Serves as input for trackers/ sequencers
     }
   }
 ```
+
+#### And yes, a node editor. I know. 

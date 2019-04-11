@@ -105,15 +105,16 @@ function ColorEffect( _renderer, _options ) {
   _self.type = "Effect"
   _self.debug = false
 
-  var source = _options.source
-  var currentEffect = _options.effect
+  var source = _options.source // mandatory
   var currentEffect = 1
+  if ( _options.effect != undefined ) currentEffect = _options.effect
   var currentExtra = 0.8
+  if ( _options.extra != undefined ) currentExtra = _options.currentExtra
 
   _self.init = function() {
     // add uniforms to renderer
-    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
-    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: currentEffect}
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: currentExtra }
 
     // add uniforms to fragmentshader
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
@@ -277,7 +278,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // hard black edge
   if ( currentcoloreffect == 64 ) {
-    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 ); 
+    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
     return src;
   }
 
@@ -379,13 +380,13 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Automatic mixing.html">Automatic mixing</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this works.html">How does this works</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 13:15:34 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 01 2019 02:40:50 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

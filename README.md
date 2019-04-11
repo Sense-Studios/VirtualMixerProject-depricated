@@ -1,12 +1,12 @@
 # VirtualMixerProject
 
-The VirtualMixerProject is a virtual video mixer that can be build through a chainable interface and runs in WebGL. There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/). There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...
+The VirtualMixerProject is a virtual video mixer that can be built through a chainable interface and runs in WebGL. There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/). There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...
 
 ![logo](https://virtualmixproject.com/images/vmp_demo/vmp_logo.png)
 
-it comes in a package for use on your website or an npm build for use on your local DMZ. With these tools, you can Bbuild your own video mixer in JavaScript. The application takes a number of _sources_ ( video, gif, whathaveyou ) and allows you to crossfade and mix them.
+it comes in a package for use on your website or an npm build for use on your local DMZ. With these tools, you can Build your own video mixer in JavaScript. The application takes a number of _sources_ ( video, gif, whathaveyou ) and allows you to crossfade and mix them.
 
-Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve as a _source_ for another _mixer_. In this way a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for _gamepads_ en _midi_ devices.
+Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve as a _source_ for another _mixer_. In this way, a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for _gamepads_ en _midi_ devices.
 
 * Check more detailed info in [the Documentation](https://virtualmixproject.com/docs/reference/index.html)
 
@@ -57,7 +57,7 @@ Write your Webpage:
 </html>
 
 ```
-See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
+See it all wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 
 So here is what happens; the most basic mixer setup is laid out hereunder in ASCII art:
 
@@ -79,7 +79,7 @@ So here is what happens; the most basic mixer setup is laid out hereunder in ASC
 
 
 ```
-This diagram flows from top to bottom. By defauld the _pod_ (handle) of the _mixer_ is set to 0, so we see `Source 1` in our `Output`.
+This diagram flows from top to bottom. By default the _pod_ (handle) of the _mixer_ is set to 0, so we see `Source 1` in our `Output`.
 Set the `pod` to 1 to show the `Source 2`. Or set it to any value in between to mix the two sources together.
 
 ```
@@ -96,7 +96,7 @@ setInterval( function() {
 })
 
 ```
-See it al wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
+See it all wired up on [CodePen](https://codepen.io/xangadix/pen/zewydR).
 Or check out [how it works](https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html)
 
 ## Installation

@@ -332,7 +332,7 @@ function MidiController( _options ) {
    *  midicontroller.addEventListener(1, function() )
    *
    * @function Controller#MidiController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */

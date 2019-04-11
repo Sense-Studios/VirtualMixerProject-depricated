@@ -215,7 +215,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bindBpm
    * @param {function} binding allows for overriding internal bpm
    */
-   
+
   _self.update = function() {
     if ( _self.autoFade ) { // maybe call this bpmFollow?
       // pod = currentBPM

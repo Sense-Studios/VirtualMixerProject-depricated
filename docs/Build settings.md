@@ -1,9 +1,9 @@
 
 ### Start
 
-`$ npm run start`
+`$ npm start`
 
-starts the app. Runs in bin/www
+starts the app on port 3001. Runs in bin/www
 
 
 ### Build
@@ -25,16 +25,14 @@ use it to build your own library
 
 `$ npm run docs`
 
-Should build a whole lot of documents. Then copies it into the public directoy
+Should build a whole lot of documents from the references in the code. Then copies that into the /public/docs/reference/ directory
 
 
 ### Generators
 
-Generator are experimental. Be careful, in some scenarios you might be generating files
-under a different account then the app is running in.
+Generator are experimental. Be careful, in some scenarios you might be generating files under a different account then the app is running in.
 
-With Generators you can bootstrap your mixers and controllers. It creates a
-set of files
+With Generators you can bootstrap your mixers and controllers. It creates a set of files
 
 ```
   $ npm run generate_mixer my_new_mixer
@@ -43,14 +41,11 @@ set of files
   writing  ./public/compositions/my_new_mixer.js
   writing  ./public/stylesheets/compositions/my_new_mixer.sass
 
-
   $ npm run remove_controller my_new_mixer
   [...]
   removing  ./views/compositions/my_new_mixer.jade
   removing  ./public/compositions/my_new_mixer.js
   removing  ./public/stylesheets/compositions/my_new_mixer.sass
-
-
 
   $ npm run remove_mixer my_new_mixer TODO
   $ npm run remove_controller my_new_mixer TODO

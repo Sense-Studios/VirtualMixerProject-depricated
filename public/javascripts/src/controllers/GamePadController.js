@@ -43,6 +43,7 @@ GamePadController.constructor = GamePadController;
  *
  * @implements Controller
  * @constructor Controller#GamePadController
+ * @param {GlRenderer} renderer - GlRenderer object
  * @param options:Object
  * @author Sense Studios
  */
@@ -65,7 +66,7 @@ function GamePadController( _renderer, _options  ) {
   /**
    * @description
    *  when multiple devices identify as gamepads, use ie. `gamepad1.gamepad_index = 1` to select the second gamepad [0, 1, 2,  ...]
-   *  @member Controller#GamePadController#gamepad_index
+   *  @member Controller#GamePadController#gamepad_index {integer}
   */
   _self.gamepad_index = 0
 
@@ -183,7 +184,7 @@ function GamePadController( _renderer, _options  ) {
    * @example
    *  gamepad.removeEventListener(1)
    * @function Controller#GamePadController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
   self.removeEventListener = function() {}
@@ -198,7 +199,7 @@ function GamePadController( _renderer, _options  ) {
    *  gamepad.addEventListener(1, function() )
    *
    * @function Controller#GamePadController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */

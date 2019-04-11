@@ -105,7 +105,7 @@ function KeyboardController( _renderer, _options  ) {
    * @example
    *  keyboard.removeEventListener(1)
    * @function Controller#KeyboardController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
   self.removeEventListener = function() {}
@@ -120,7 +120,7 @@ function KeyboardController( _renderer, _options  ) {
    *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
    *
    * @function Controller#KeyboardController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
    * @param {function} _callback - the callback to be executed
    *
   */

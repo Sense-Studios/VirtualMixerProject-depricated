@@ -193,8 +193,8 @@ var GlRenderer = function( _options ) {
   }
 }
 
-AudioAnalysis.prototype = new Addon(); // assign prototype to marqer
-AudioAnalysis.constructor = AudioAnalysis;  // re-assign constructor
+AudioAnalysis.prototype = new Addon();
+AudioAnalysis.constructor = AudioAnalysis; 
 
 /**
 * @summary
@@ -230,27 +230,55 @@ function AudioAnalysis( _renderer, _options ) {
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
 
-  // NOTE: that externally "audio" refers to the audiofile
-  // internally it refers to the Audio HTMLMediaElement
+  /**
+   * @description
+   *  Audio element, HTMLMediaElement AUDIO reference
+   *
+   * @member Addon#AudioAnalysis#audio
+   * @param {HTMLMediaElement} - reference to the virtual media element
+  */
   _self.audio = ""
 
-  /**  @member Controller#GamePadController#bypass */
+  /**  @member Controller#AudioAnalysis#bypass {boolean} */
   _self.bypass = false
 
   /**
-   * @description (calculated)bpm
-   * @member Addon#AudioAnalysis#bpm
+   * @description (calculated) bpm
+   * @member Addon#AudioAnalysis.bpm {number}
   */
   _self.bpm = 128
-  _self.bpm_float = 128
+
+  /**
+   * @description
+   *  the bpm float is a reference to the current beat-edge,
+   *  it represents a float between 0 and 1, with ±1 being given back every beat
+   * @member Addon#AudioAnalysis.bpm {number}
+  */
+  _self.bpm_float = 0
 
   /**
    * @description bpm mod, multiplyer for bpm output, usuall 0.125, 0.25, 0.5, 2, 4 etc.
    * @member Addon#AudioAnalysis#mod
   */
   _self.mod = 1
+
+  /** @member Addon#AudioAnalysis.bps */
   _self.bps = 1
+
+  /** @member Addon#AudioAnalysis.sec */
   _self.sec = 0
+
+  /** @member Addon#AudioAnalysis.dataSet */
+  _self.dataSet
+
+  /**
+   * @description tempodate gives you a peak into the inner workins of the sampler, including bpm and 'calibrating' status
+   * @member Addon#AudioAnalysis.tempoData
+  */
+  _self.tempoData
+
+  /** @member Addon#AudioAnalysis.audio_src */
+  _self.audio_src
 
   // default options
   _self.options = {
@@ -273,13 +301,6 @@ function AudioAnalysis( _renderer, _options ) {
   _renderer.add(_self)
 
   // setup ---------------------------------------------------------------------
-  /**
-   * @description
-   *  Audio element
-   *  HTMLMediaElement AUDIO reference
-   * @member Addon#AudioAnalysis#audio
-   * @param {HTMLMediaElement} - reference to the virtual media element
-  */
   var audio = new Audio()
   _self.audio = audio
 
@@ -319,7 +340,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @description
    *  firstload for mobile, forces all control to the site on click
    *  tries and forces another play-event after a click
-   * @member Addon#AudioAnalysis~forceAudio
+   * @function Addon#AudioAnalysis~forceAudio
    *
   */
   var forceAudio = function() {
@@ -337,7 +358,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *  disconnects audio to output, this will mute the analalyser, but won't stop analysing
-   * @member Addon#AudioAnalysis#disconnectOutput
+   * @function Addon#AudioAnalysis#disconnectOutput
    *
   */
   _self.disconnectOutput = function() {
@@ -347,7 +368,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *   connects the audio source to output, making it audible
-   * @member Addon#AudioAnalysis#connectOutput
+   * @function Addon#AudioAnalysis#connectOutput
    *
   */
   _self.connectOutput = function() {
@@ -357,7 +378,7 @@ function AudioAnalysis( _renderer, _options ) {
   /**
    * @description
    *   helper function, get's the bpm and retursn is, useful for ```mixer.bind( func )```
-   * @member Addon#AudioAnalysis.getBpm
+   * @function Addon#AudioAnalysis#getBpm
    *
   */
   _self.getBpm = function() {
@@ -365,15 +386,11 @@ function AudioAnalysis( _renderer, _options ) {
   }
 
   // main ----------------------------------------------------------------------
+
   /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
 
-    /**
-     * @description Audio element
-     * @member Addon#AudioAnalysis#audio_src
-     * @param {string} - reference to audiofile
-    */
     // set audio src to optioned value
     if ( !_self.options.microphone ) {
       source = context.createMediaElementSource(audio);
@@ -416,13 +433,13 @@ function AudioAnalysis( _renderer, _options ) {
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
   }
 
-  /** @function Addon#AudioAnalysis~render */
+  /** @function Addon#AudioAnalysis#render */
   _self.render = function() {
     // returns current bpm 'position' as a value between 0 - 1
     return _self.bpm_float
   }
 
-  /** @function Addon#AudioAnalysis~add */
+  /** @function Addon#AudioAnalysis#add */
   _self.add = function( _func ) {
     nodes.push( _func )
   }
@@ -459,12 +476,9 @@ function AudioAnalysis( _renderer, _options ) {
    *   calculates the tempodata every 'slowpoke' (now set at samples 10/s)
    *   returns the most occuring bpm
    *
-   *
    * @function Addon#AudioAnalysis~sampler
    *
   */
-  _self.dataSet
-  _self.tempoData
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -533,7 +547,8 @@ function AudioAnalysis( _renderer, _options ) {
    *  returns 'tempodata', a list of found BPMs sorted on occurrence
    *  object includes: bpm (ie. 128), confidence (0-1), calibrating (true/false),
    *  treshold, tempocounts, foundpeaks and peaks
-   * @member Addon#AudioAnalysis~getTempo
+   * @function Addon#AudioAnalysis~getTempo
+   * @params _date {object}
    *
   */
   var getTempo = function( _data ) {
@@ -634,7 +649,7 @@ function AudioAnalysis( _renderer, _options ) {
 
   /**
    * @description Finds peaks in the audiodata and groups them together
-   * @member Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
+   * @function Addon#AudioAnalysis~countIntervalsBetweenNearbyPeaks
    *
   */
   var countIntervalsBetweenNearbyPeaks = function( _peaks ) {
@@ -662,7 +677,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @description
    *  map found intervals together and returns 'tempocounts', a list of found
    *  tempos and their occurences
-   * @member Addon#AudioAnalysis~groupNeighborsByTempo
+   * @function Addon#AudioAnalysis~groupNeighborsByTempo
    *
   */
   var groupNeighborsByTempo = function( intervalCounts ) {
@@ -934,17 +949,17 @@ function BPM( renderer, options ) {
 
 } // end BPM
 
-FileManager.prototype = new Addon(); // assign prototype to marqer
-FileManager.constructor = FileManager;  // re-assign constructor
+FileManager.prototype = new Addon();
+FileManager.constructor = FileManager;
 
 /**
 * @summary
 *  Allows for fast switching between a prefefined list of files (or 'sets' )
 *
 * @description
-*  The filemanager allows you to load up a large number of videofiles and attach them to a VideoSource.
+*  The filemanager allows you to load up a large number of video files and attach them to a VideoSource.
 *
-*  A 'set' is simply a json file, with an array with sources like so:
+*  A 'set' is simply a .json file, with an array with sources like so:
 *
 *  ```
 *   [
@@ -961,6 +976,8 @@ FileManager.constructor = FileManager;  // re-assign constructor
 *   var source1 = new VideoSource( renderer )
 *   var myFilemanager = new FileManager( source1 )
 *   myFilemanager.load_set( "myset.json")
+*
+*   // randomly choose one from the set.
 *   myFilemanager.change()
 *
 * @constructor Addon#FileManager
@@ -971,7 +988,8 @@ FileManager.constructor = FileManager;  // re-assign constructor
 function FileManager( _source ) {
 
   var _self = this
-
+  _self.function_list = [["CHZ", "method","changez"]]
+  
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""
@@ -1085,8 +1103,8 @@ function FileManager( _source ) {
   _self.getSrcByTag = function( _tag ) {}
 }
 
-GiphyManager.prototype = new Addon(); // assign prototype to marqer
-GiphyManager.constructor = GiphyManager;  // re-assign constructor
+GiphyManager.prototype = new Addon();
+GiphyManager.constructor = GiphyManager;
 
 /**
  * @summary
@@ -1518,8 +1536,8 @@ function Behaviour( _renderer, options ) {
   */
 }
 
-GamePadController.prototype = new Controller();  // assign prototype to marqer
-GamePadController.constructor = GamePadController;  // re-assign constructor
+GamePadController.prototype = new Controller();
+GamePadController.constructor = GamePadController;
 
 /**
  * @summary
@@ -1549,6 +1567,7 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *  ---
  *
  * @example
+ *
  *  var gamepad1 = new GamePadController( renderer, {});
  *  gamepad1.init()
  *  gamepad1.render()
@@ -1562,12 +1581,12 @@ GamePadController.constructor = GamePadController;  // re-assign constructor
  *
  * @implements Controller
  * @constructor Controller#GamePadController
+ * @param {GlRenderer} renderer - GlRenderer object
  * @param options:Object
  * @author Sense Studios
  */
 
-function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer3
-  // returns a floating point between 1 and 0, in sync with a bpm
+function GamePadController( _renderer, _options  ) {
   var _self = this
 
   // exposed variables.
@@ -1576,16 +1595,16 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   _self.controllers = {};
   _self.gamepad = {}
 
-  /**  @member Controller#GamePadController#bypass */
+  /**  @member Controller#GamePadController#bypass {boolean}*/
   _self.bypass = true
 
-  /** @member Controller#GamePadController#debug */
+  /** @member Controller#GamePadController#debug {boolean}*/
   _self.debug = false
 
   /**
    * @description
-   *  when multiple devices identify as gamepads, use ```gamepad1.gamepad_index = 1```
-   *  @member Controller#GamePadController#gamepad_index
+   *  when multiple devices identify as gamepads, use ie. `gamepad1.gamepad_index = 1` to select the second gamepad [0, 1, 2,  ...]
+   *  @member Controller#GamePadController#gamepad_index {integer}
   */
   _self.gamepad_index = 0
 
@@ -1703,7 +1722,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
    * @example
    *  gamepad.removeEventListener(1)
    * @function Controller#GamePadController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
   self.removeEventListener = function() {}
@@ -1718,7 +1737,7 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
    *  gamepad.addEventListener(1, function() )
    *
    * @function Controller#GamePadController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */
@@ -1746,19 +1765,16 @@ function GamePadController( _renderer, _options  ) { // _mixer1, _mixer2, _mixer
   }
 }
 
-KeyboardController.prototype = new Controller();  // assign prototype to marqer
-KeyboardController.constructor = KeyboardController;  // re-assign constructor
+KeyboardController.prototype = new Controller();
+KeyboardController.constructor = KeyboardController;
 
 /**
  * @summary
- *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
- *  as controllerevents (allows for sockets)
- *
+ *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
  *
  * @description
- *
- *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
- *  as controllerevents (allows for sockets)
+ *  This controller converts keyboard listeners to a Controller. Events are triggered through keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
+ *  It's mainly purposed as an identical interface to the other controllers. Nothing stops you from implementing your own keyboardlisteners
  *
  *
  * @example
@@ -1785,12 +1801,12 @@ function KeyboardController( _renderer, _options  ) {
   _self.type = "Control"
   _self.controllers = {};
   _self.keyboard = {}
-  _self.bypass = true
-  /** @member {boolean} Controller#KeyboardController#debug */
-  _self.debug = false
 
-  /** @member {integer} Controller#KeyboardController#keyboard_index */
-  _self.keyboard_index = 0
+  /** @member Controller#KeyboardController#debug {boolean} */
+  _self.bypass = true
+
+  /** @member Controller#KeyboardController#debug {boolean} */
+  _self.debug = false
 
   if ( _options ) {
     if ("default" in _options) {}
@@ -1856,7 +1872,7 @@ function KeyboardController( _renderer, _options  ) {
    * @example
    *  keyboard.removeEventListener(1)
    * @function Controller#KeyboardController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
   self.removeEventListener = function() {}
@@ -1871,7 +1887,7 @@ function KeyboardController( _renderer, _options  ) {
    *  keyboard.addEventListener(1, function( _arr ) { console.log( _arr ) } );
    *
    * @function Controller#KeyboardController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
    * @param {function} _callback - the callback to be executed
    *
   */
@@ -1880,7 +1896,9 @@ function KeyboardController( _renderer, _options  ) {
     console.log("Keyboard listeners: ", nodes)
   }
 
-  // private? const?
+  /**
+  * @function Controller#KeyboardController~dispatchkeyboardEvent
+  */
   var dispatchkeyboardEvent = function( _arr ) {
     nodes.forEach( function( node, i ) {
       if ( _arr[0] == node.target ) {
@@ -1899,8 +1917,8 @@ function KeyboardController( _renderer, _options  ) {
   }
 }
 
-MidiController.prototype = new Controller();  // assign prototype to marqer
-MidiController.constructor = MidiController;  // re-assign constructor
+MidiController.prototype = new Controller();
+MidiController.constructor = MidiController;
 
 /**
  * @summary
@@ -1914,8 +1932,6 @@ MidiController.constructor = MidiController;  // re-assign constructor
  *  Here is a demo on [Codepen](https://codepen.io/xangadix/pen/BbVogR), which was tested with 2 AKAI midicontrollers
  *
  *  The original implementation is on GitHub in a [Gist](https://gist.github.com/xangadix/936ae1925ff690f8eb430014ba5bc65e).
- *
- *
  *
  * @example
  *  var midi1 = new MidiController();
@@ -1940,15 +1956,24 @@ function MidiController( _options ) {
   // exposed variables.
   _self.uuid = "MidiController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "MidiController"
+
+  /** @member Controller#KeyboardController#debug {boolean} */
   _self.bypass = true
+
+  /** @member Controller#KeyboardController#debug {boolean} */
   _self.debug = false
+
+  /** @member Controller#KeyboardController~debug {boolean} */
   _self.ready = false
+
+  /** @member Controller#KeyboardController~debug {object} */
   _self.controllers = {}
   var binds = []
   var nodes = []
   var c = 0 // counter
   var midi, input, output
 
+  /** @function Controller#KeyboardController~success {object} */
   var success = function(_midi) {
   	midi = _midi
   	var inputs = midi.inputs.values();
@@ -1961,7 +1986,7 @@ function MidiController( _options ) {
 
   	for (o = outputs.next(); o && !o.done; o = outputs.next()) {
   		output = o.value;
-      initMidi()
+      //if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
   	}
 
     console.log("Midi READY? ", output, midi)
@@ -1970,8 +1995,9 @@ function MidiController( _options ) {
   }
 
   // everything went wrong.
-  var failure = function () {
-  	console.error('No access to your midi devices.');
+  /** @function Controller#KeyboardController~failure {object} */
+  var failure = function (_fail) {
+  	console.error('No access to your midi devices.', _fail);
   }
 
   // request MIDI access
@@ -1981,16 +2007,12 @@ function MidiController( _options ) {
       .then( success, failure );
   }
 
-  function initMidi() {
-    if ( _self.debug ) console.log(" MIDI INITIALIZED", "ready")
-    // dispatchMidiEvent("ready")
-  }
-
   // some examples, this is the 'onpress' (and on slider) function
   var doubleclickbuffer = [ 0, 0, 0, 0 ]
   var doubleclickPattern = [ 128, 144, 128, 144 ]
   var doubleclick = false
 
+  /** @function Controller#KeyboardController~onMIDIMessage {event} */
   _self.onMIDIMessage = function(e) {
     if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
     checkBindings(e.data) // depricated
@@ -2126,11 +2148,15 @@ function MidiController( _options ) {
   }
 
   // ---------------------------------------------------------------------------
+  /** @function Controller#KeyboardController~init  */
   _self.init = function() {}
+
+  /** @function Controller#KeyboardController~update  */
   _self.update = function() {}
 
   // ---------------------------------------------------------------------------
   // BINDS ARE DEPRICATED
+  /*
   _self.bind = function( _key, _callback ) {
     binds.push( { key: _key, callback: _callback } )
     // check for double binds ?
@@ -2142,11 +2168,11 @@ function MidiController( _options ) {
 
   // [ state, key, velocity ]
   var checkBindings = function(e) {
-
     binds.forEach( function( _obj ) {
       if ( e[1] == _obj.key ) _obj.callback(e)
     });
   }
+  */
 
   /**
    * @description
@@ -2170,11 +2196,9 @@ function MidiController( _options ) {
    *  midi1.send([ 0x90, 8, 1, 0x90, 9, 1, 0x90, 10, 1, 0x90, 11, 1, 0x90, 16, 1, 0x90, 17, 1, 0x90, 18, 1, 0x90, 19, 1])
    *
    * @function Controller#MidiController#send
-   * @param {string} _target - the number of controller being pressed
-   * @param {function} _callback - the callback to be executed
+   * @param {array} commands - the sequence that needs execution
    *
   */
-
   _self.send = function( commands ) {
     if (_self.ready) {
       console.log("Midi send ", commands, "to", output)
@@ -2198,18 +2222,23 @@ function MidiController( _options ) {
     output.send(commands)
   }
 
-
-
   /**
    * @description
    *  removeEventListener
    * @example
    *  midi.removeEventListener(1)
    * @function Controller#MidiController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
-  self.removeEventListener = function( _target ) {}
+  self.removeEventListener = function( _target ) {
+    nodes.forEach( function(node, i ) {
+      if ( node.target == _target ) {
+        var removeNode = i
+      }
+    })
+    nodes.splice(i, 1)
+  }
 
   /**
    * @description
@@ -2222,7 +2251,7 @@ function MidiController( _options ) {
    *  midicontroller.addEventListener(1, function() )
    *
    * @function Controller#MidiController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */
@@ -2231,6 +2260,7 @@ function MidiController( _options ) {
     console.log("MIDI listeners: ", nodes)
   }
 
+  /** @function Controller#KeyboardController~dispatchMidiEvent {event}  */
   var dispatchMidiEvent = function(e) {
     nodes.forEach(function( _obj ){
       if ( _obj.target == e.data[1] ) {
@@ -2240,20 +2270,41 @@ function MidiController( _options ) {
   }
 }
 
-SocketController.prototype = new Controller();  // assign prototype to marqer
-SocketController.constructor = SocketController;  // re-assign constructor
+SocketController.prototype = new Controller();
+SocketController.constructor = SocketController;
 
 /**
  * @summary
- *  So the idea is that this component is build into the controller
- *  contacts the 'display', and sends all controller data from here to there.
- *  So it servers as an intermediary of the real controller
+ *  A Socket controller connects a socket on the client with a sever. This only works if you run the app yourself with a server. And on our website
  *
  * @description
- *  ---
+ *  To connect the controller with a client-mixer, you need to place a controller in both. The client will give you a code like _a7fw_ . Use that code in the client-mixer and receive events.
+ *  If configured correctly you should be able to send events to multiple clients.
  *
  * @example
- *  ---
+ *
+ *  // in your client (mixer)
+ *  var socket1 = new SocketController( renderer )
+ *  // should give you an object:
+ *  // got command {command: "welcome", payload: "8170"}
+ *
+ *  // optionally listen for the ready signal
+ *  socketcontroller.addEventListener("ready", function(d) console.log("client id:", d ));
+ *
+ *  // write the rest of your listeners
+ *  socket1.addEventListener( 1, function( _arr ) {
+ *   // do something with _arr
+ *  })
+ *
+ *  - - -
+ *
+ *  // in your controller
+ *  var socketcontroller = new SocketController()
+ *
+ *  // make a way to enter the client-id: 8170
+ *
+ *  socketcontroller.send( "8170", 1, [1,1] );
+ *  socketcontroller.send( "8170", 1, [1,0] );
  *
  * @implements Controller
  * @constructor Controller#SocketController
@@ -2262,30 +2313,26 @@ SocketController.constructor = SocketController;  // re-assign constructor
  */
 
 function SocketController( _options  ) {
+
   var _self = this;
+
+  /** @member Controller#SocketController#io */
+  _self.io = io.connect();
 
   // exposed variables.
   _self.uuid = "SocketController_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Control"
   _self.bypass = true
   _self.title = ""
+
   /** * @member Controller#SocketController#debug */
   _self.debug = false
 
-  /**
-   * @member Controller#SocketController#socket_pairing_id
-  */
-  _self.socket_pairing_id = "123456"
-  _self.io = io.connect();
+  /** @member Controller#SocketController#socket_pairing_id */
+  _self.socket_pairing_id = "no_paring_id"
 
-  /**
-   * @member Controller#SocketController#target
-  */
+  /** @member Controller#SocketController#target */
   _self.target = ""
-
-  /**
-   * @member Controller#SocketController#title
-  */
 
   var nodes = []
 
@@ -2293,16 +2340,35 @@ function SocketController( _options  ) {
     if ( "title" in _options ) _self.title = _options.title
   }
 
+  // test
   _self.io.on('msg', function( _msg ) {
     console.log( 'got msg', _msg )
   })
 
+  // test
+  _self.io.on('test', function( msg ) {
+    console.log( 'get test', msg )
+  })
+
+  // base command
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
-    if ( _command.command == "welcome") _self.target = _command.payload
+    if ( _command.command == "welcome") {
+      _self.target = _command.payload
+
+      // dispatch it as welcome command
+      nodes.forEach( function( node, i ) {
+        if ( node.target == "welcome" || node.target == "ready" ) {
+          node.callback(_command.payload)
+        }
+      })
+    }
+
+    // Depricated
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
+  // controller command
   _self.io.on('controller', function(_msg) {
     if ( _self.debug ) console.log( 'got controller', _msg )
     nodes.forEach( function( node, i ) {
@@ -2312,10 +2378,6 @@ function SocketController( _options  ) {
         node.callback(_msg.commands)
       }
     })
-  })
-
-  _self.io.on('test', function( msg ) {
-    console.log( 'get test', msg )
   })
 
   // ---
@@ -2348,10 +2410,17 @@ function SocketController( _options  ) {
    * @example
    *  socketcontroller.removeEventListener(1)
    * @function Controller#SocketController#removeEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    *
   */
-  self.removeEventListener = function( _target ) {}
+  self.removeEventListener = function( _target ) {
+    nodes.forEach( function(node, i ) {
+      if ( node.target == _target ) {
+        var removeNode = i
+      }
+    })
+    nodes.splice(i, 1)
+  }
 
   /**
    * @description
@@ -2363,7 +2432,7 @@ function SocketController( _options  ) {
    *  socketcontroller.addEventListener(1, function() )
    *
    * @function Controller#SocketController#addEventListener
-   * @param {string} _target - the number of controller being pressed
+   * @param {integer} _target - the number of controller being pressed
    * @param {function} _callback - the callback to be executed
    *
   */
@@ -2372,7 +2441,7 @@ function SocketController( _options  ) {
     console.log("Socket listeners: ", nodes)
   }
 
-  // private? const?
+  /** @function Controller#KeyboardController~dispatchMidiEvent {event}  */
   var dispatchSocketEvent = function( _arr ) {
     nodes.forEach( function( node, i ) {
       if ( _arr[0] == node.target ) {
@@ -2387,10 +2456,7 @@ function SocketController( _options  ) {
  *
 */
 
-function SourceControl( renderer, source ) {
-  // source.renderer ?
-
-}
+function SourceControl( renderer, source ) {}
 
  /**
   * @constructor Controller
@@ -2505,15 +2571,16 @@ function ColorEffect( _renderer, _options ) {
   _self.type = "Effect"
   _self.debug = false
 
-  var source = _options.source
-  var currentEffect = _options.effect
+  var source = _options.source // mandatory
   var currentEffect = 1
+  if ( _options.effect != undefined ) currentEffect = _options.effect
   var currentExtra = 0.8
+  if ( _options.extra != undefined ) currentExtra = _options.currentExtra
 
   _self.init = function() {
     // add uniforms to renderer
-    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
-    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: currentEffect}
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: currentExtra }
 
     // add uniforms to fragmentshader
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
@@ -2677,7 +2744,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // hard black edge
   if ( currentcoloreffect == 64 ) {
-    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 ); 
+    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
     return src;
   }
 
@@ -3579,7 +3646,7 @@ vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
    * @function Module#Mixer#bindBpm
    * @param {function} binding allows for overriding internal bpm
    */
-   
+
   _self.update = function() {
     if ( _self.autoFade ) { // maybe call this bpmFollow?
       // pod = currentBPM

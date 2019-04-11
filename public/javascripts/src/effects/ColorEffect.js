@@ -77,15 +77,16 @@ function ColorEffect( _renderer, _options ) {
   _self.type = "Effect"
   _self.debug = false
 
-  var source = _options.source
-  var currentEffect = _options.effect
+  var source = _options.source // mandatory
   var currentEffect = 1
+  if ( _options.effect != undefined ) currentEffect = _options.effect
   var currentExtra = 0.8
+  if ( _options.extra != undefined ) currentExtra = _options.currentExtra
 
   _self.init = function() {
     // add uniforms to renderer
-    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: 1 }
-    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: 2.0 }
+    _renderer.customUniforms[_self.uuid+'_currentcoloreffect'] = { type: "i", value: currentEffect}
+    _renderer.customUniforms[_self.uuid+'_extra'] = { type: "f", value: currentExtra }
 
     // add uniforms to fragmentshader
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
@@ -249,7 +250,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
 
   // hard black edge
   if ( currentcoloreffect == 64 ) {
-    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 ); 
+    src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
     return src;
   }
 

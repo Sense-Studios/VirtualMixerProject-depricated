@@ -68,7 +68,6 @@ var TrackEditor = function( _options ) {
 
     for( var i = 0; i < tc.length; i++) {
 
-
       tc[i].tableindex = i
 
       tc[i].setAttribute( "data-index", i )
@@ -138,8 +137,6 @@ var TrackEditor = function( _options ) {
         //console.log("elm change", elm, elm.value, i)
         console.log(tablecell)
 
-
-
         var index = tablecell.getAttribute("data-index")
         var pointer_x = tablecell.getAttribute("data-x")
         var pointer_y = tablecell.getAttribute("data-y")
@@ -180,6 +177,7 @@ var postSheets = function() {
 }
 
 var _beats = 0
+/*
 var socket = io();
 socket.on('chat message', function(msg){
   console.log(msg)
@@ -200,7 +198,11 @@ socket.on('command', function(msg){
   if (msg.command == "updatesheets") { updateSheets( JSON.parse(msg.payload.sheets) ) }
 
 });
-
+*/
+var my_socket = new SocketController()
+my_socket.addEventListener('ready', function(c, d) { console.log("ready: ", c )})
+my_socket.addEventListener('beats', function(c) { setBeats( c ) } )
+//my_socket.addEventListener('beats', function(c, d) { console.log("beats: ", c, d) } )
 
 var setBeats = function( _num ) {
   //console.log("beats!", _num )

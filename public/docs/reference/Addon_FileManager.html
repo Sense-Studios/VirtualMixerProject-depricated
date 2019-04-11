@@ -52,8 +52,8 @@
 
 
 <div class="description">
-    <p>The filemanager allows you to load up a large number of videofiles and attach them to a VideoSource.</p>
-<p> A 'set' is simply a json file, with an array with sources like so:</p>
+    <p>The filemanager allows you to load up a large number of video files and attach them to a VideoSource.</p>
+<p> A 'set' is simply a .json file, with an array with sources like so:</p>
 <pre class="prettyprint source"><code>  [
    &quot;https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC205_1.mp4&quot;,
    &quot;https://s3-eu-west-1.amazonaws.com/nabu/veejay/space/FC206_1.mp4&quot;,
@@ -193,6 +193,8 @@
     <pre class="prettyprint"><code>var source1 = new VideoSource( renderer )
   var myFilemanager = new FileManager( source1 )
   myFilemanager.load_set( "myset.json")
+
+  // randomly choose one from the set.
   myFilemanager.change()</code></pre>
 
 
@@ -324,7 +326,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line116">line 116</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line118">line 118</a>
     </li></ul></dd>
     
 
@@ -410,7 +412,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line93">line 93</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
@@ -496,7 +498,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line105">line 105</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line107">line 107</a>
     </li></ul></dd>
     
 
@@ -582,7 +584,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line144">line 144</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line146">line 146</a>
     </li></ul></dd>
     
 
@@ -717,7 +719,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line78">line 78</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -852,7 +854,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line50">line 50</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -938,7 +940,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line64">line 64</a>
+        <a href="addons_FileManager.js.html">addons/FileManager.js</a>, <a href="addons_FileManager.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -982,13 +984,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Automatic mixing.html">Automatic mixing</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this works.html">How does this works</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 13:15:34 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 01 2019 02:40:50 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

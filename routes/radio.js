@@ -34,6 +34,7 @@ router.get('/rap', function(req, res, next) { request('http://149.56.157.81:8569
 router.get('/breakbeat', function(req, res, next) { request('http://178.33.115.87:8004/stream').pipe(res); });
 router.get('/trance', function(req, res, next) { request('http://137.74.45.136:80/pulstranceAAC64.mp3').pipe(res); });
 router.get('/subfm', function(req, res, next) { request('http://5.39.71.159:8729/').pipe(res); });
+router.get('/lounge', function(req, res, next) { request('http://185.33.21.112:80/chilloutlounge_128').pipe(res); });
 
 
 /*
