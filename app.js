@@ -12,6 +12,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var radioRouter = require('./routes/radio');
 var ioRouter = require('./routes/io');
+var apiRouter = require('./routes/api');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,6 +47,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/radio', radioRouter);
 app.use('/io', ioRouter);
+app.use('/api', apiRouter);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler

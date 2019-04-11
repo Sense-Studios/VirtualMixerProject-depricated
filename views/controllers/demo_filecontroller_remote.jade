@@ -1,0 +1,70 @@
+doctype html
+html
+  head
+    title= title
+    meta(name="viewport" content="width=420px, initial-scale=0.8, user-scalable=no")
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/controllers/demo_socketcontroller.css')
+
+  body
+    .container
+      | Give your socket id to connect
+      
+      h1.Socket FILE remote controller
+      
+      p
+        | open the 
+        | <a href="https://virtualmixproject.com/mixer/demo_socket_client" target="_blank"> client </a><br><br>
+        | type the client id from there ( should be something like 'a4r1' ) -- make sure the you got it all LOWECASE!
+        | (especially on your phone)
+        | <br><br>
+        | press buttons below, client should give you video while pressing.
+      
+      label client id
+      br
+      input#socket_client_id
+      
+      br      
+      br
+      
+    table
+      tr
+        td  
+          button#butt_1 b1
+        td  
+          input#range_1(type='range', value=0)
+        td  
+          input#range_1_select.slider_select(type='radio', name="range_video_select", value="file_video1", checked)
+
+      tr
+        td 
+          button#butt_2 b3
+        td
+          input#range_2(type='range', value=0)
+        td          
+          input#range_2_select.slider_select(type='radio', name="range_video_select", value="file_video2")
+
+      tr
+        td 
+          button#butt_3 b3
+        td
+          input#range_3(type='range', value=0)
+        td
+          input#range_3_select.slider_select(type='radio', name="range_video_select", value="file_video3")        
+
+
+      tr
+        td
+          button#butt_4 b4
+        td
+          input#range_4(type='range', value=0)          
+        td
+          input#range_4_select.slider_select(type='radio', name="range_video_select", value="file_video4")
+      
+    #thumb_container
+      
+      
+    script(src='/remotes/demo_filecontroller_remote.js')
+    include ../partials/analytics

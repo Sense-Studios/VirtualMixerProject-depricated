@@ -30,7 +30,7 @@ var mixer1 = new Mixer( renderer, { source1: premixer1, source2: premixer2 });
 
 // var analisi
 // var bpm = new BPM( renderer ) tapped beat control
-var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/electrodancefloor' } )
+var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
 
 var filemanager = new FileManager( source1 )
 filemanager.load_set("/sets/programs_awesome.json")

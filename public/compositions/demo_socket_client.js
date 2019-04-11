@@ -13,19 +13,15 @@ renderer.init();
 renderer.render();
 
 chain1.setAll(0)
-
-socket1.addEventListener( 1, function(arr) {
-  chain1.setChainLink( 0, arr[1] )
-})
-
-socket1.addEventListener( 2, function(arr) {
-  chain1.setChainLink( 1, arr[1] )
-})
-
-socket1.addEventListener( 3, function(arr) {
-  chain1.setChainLink( 2, arr[1] )
-})
-
-socket1.addEventListener( 4, function(arr) {  
-  chain1.setChainLink( 3, arr[1] )
-})
+socket1.addEventListener( 1,              function(arr)   { chain1.setChainLink( 0, arr[1] ) })
+socket1.addEventListener( 2,              function(arr)   { chain1.setChainLink( 1, arr[1] ) })
+socket1.addEventListener( 3,              function(arr)   { chain1.setChainLink( 2, arr[1] ) })
+socket1.addEventListener( 4,              function(arr)   { chain1.setChainLink( 3, arr[1] ) })
+socket1.addEventListener('alpha_video_1', function(_num)  { chain1.setChainLink( 0, _num ) })
+socket1.addEventListener('alpha_video_2', function(_num)  { chain1.setChainLink( 1, _num ) })
+socket1.addEventListener('alpha_video_3', function(_num)  { chain1.setChainLink( 2, _num ) })
+socket1.addEventListener('alpha_video_4', function(_num)  { chain1.setChainLink( 3, _num ) })
+socket1.addEventListener('file_video1',   function(_file) { video1.src( _file ) })
+socket1.addEventListener('file_video2',   function(_file) { video2.src( _file ) })
+socket1.addEventListener('file_video3',   function(_file) { video3.src( _file ) })
+socket1.addEventListener('file_video4',   function(_file) { video4.src( _file ) })

@@ -50,6 +50,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-minify": "^3.1.0",
     "del":"4.2.0",
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.5.5",
+    "video-thumbnail-generator": "~1.1.3"
   }
 }
