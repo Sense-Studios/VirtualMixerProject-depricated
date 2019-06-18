@@ -139,6 +139,11 @@ var GlRenderer = function( _options ) {
   // update size!
   window.addEventListener('resize', function() {
     _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // resize viewport (write exception for width >>> height, now gives black bars )
+    _self.camera.aspect = window.innerWidth / window.innerHeight;
+    _self.camera.updateProjectionMatrix();
+    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
   })
 
   // ---------------------------------------------------------------------------

@@ -14,7 +14,7 @@ html
   body(onclick="clicks++; if(clicks==2) document.getElementById('play_button').style.display = 'none'")
     a.logo(href='/')    
     button.play_button#play_button
-    button.mute_button#mute_button
+    button.mute_button#mute_button(style="display:none")
     
     canvas#glcanvas
     .blink

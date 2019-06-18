@@ -58,7 +58,15 @@ body
   height: 100px
   z-index: 1000
   border: none
-  pointer-events: none
+  pointer-events: all
+  cursor: pointer
+
+  &:active
+    outline: none
+    border: none
+
+  &:focus
+    outline: 0
 
 .mute_button
   position: fixed

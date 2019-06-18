@@ -36,12 +36,16 @@ router.get('/editors/*', function(req, res, next) {
   res.render(repl_url, { title: 'Editors: ' });
 });
 
+// depricated
 router.get('/controllers/*', function(req, res, next) {
-  var repl_url = req.originalUrl.replace('/controllers', 'controllers')
-  res.render(repl_url, { title: 'Controllers: ' });
+  var repl_url = req.originalUrl.replace('/controllers', 'remotes')
+  res.render(repl_url, { title: 'Remote Controller: ' });
 });
 
-
+router.get('/remotes/*', function(req, res, next) {
+  var repl_url = req.originalUrl.replace('/remotes', 'remotes')
+  res.render(repl_url, { title: 'Remote Controller: ' });
+});
 
 // for composiions see /views
 router.get('/mixer/*', function(req, res, next) {

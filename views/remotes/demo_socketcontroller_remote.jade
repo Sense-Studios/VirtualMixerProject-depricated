@@ -2,10 +2,15 @@ doctype html
 html
   head
     title= title
+    
+    // mobile slider; https://rangeslider.js.org/ 
+    //link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.css')
+    //script(src='https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js')
+    
     script(src='/javascripts/build/vendor.js')
     script(src='/javascripts/build/mixer.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/stylesheets/controllers/demo_socketcontroller.css')
+    link(rel='stylesheet', href='/stylesheets/remotes/demo_socketcontroller.css')
 
   body
     .container
@@ -32,5 +37,5 @@ html
       button#butt_3 b3
       button#butt_4 b4
       
-    script(src='/controllers/demo_socketcontroller_remote.js')
+    script(src='/javascripts/remotes/demo_socketcontroller_remote.js')
     include ../partials/analytics

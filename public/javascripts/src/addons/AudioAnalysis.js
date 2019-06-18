@@ -1,5 +1,5 @@
 AudioAnalysis.prototype = new Addon();
-AudioAnalysis.constructor = AudioAnalysis; 
+AudioAnalysis.constructor = AudioAnalysis;
 
 /**
 * @summary
@@ -204,12 +204,12 @@ function AudioAnalysis( _renderer, _options ) {
       initializeAutoBpm()
 
     } else {
-
+      console.log("Audio analisis using microphone.")
       navigator.mediaDevices.getUserMedia({ audio })
       .then(function(mediaStream) {
         source = context.createMediaStreamSource(mediaStream);
         initializeAutoBpm()
-
+        _self.disconnectOutput()
       }).catch(function(err) {
         console.log(err.name + ": " + err.message);
       }); // always check for errors at the end.
@@ -259,6 +259,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @function Addon#AudioAnalysis~initializeAutoBpm
    *
   */
+
   var initializeAutoBpm = function() {
     // tries and play the audio
     audio.play();
@@ -284,6 +285,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @function Addon#AudioAnalysis~sampler
    *
   */
+  var warningWasSet = false
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -308,7 +310,7 @@ function AudioAnalysis( _renderer, _options ) {
 
     // SLOWPOKE
     // take a snapshot every 1/10 second and calculate beat
-    if ( ( now - start) > 100 ) {
+    if ( ( now - start ) > 100 ) {
 
       var tempoData = getTempo(dataSet)
       _self.tempoData = tempoData
@@ -318,11 +320,14 @@ function AudioAnalysis( _renderer, _options ) {
       // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
-      if (tempoData == undefined) {
-        console.log("sampler is active, but no beat was found")
+      if ( tempoData == undefined ) {
+        if ( !warningWasSet ) console.log(" WARNING: sampler is active, but no audio was detected after 20 seconds -- check your audiofile or your microphone and make sure you've clicked in the window and gave it access! Halting.")
+        warningWasSet = true
+        _self.tempodata_bpm = 128
         // return
       }else{
         _self.tempodata_bpm = tempoData.bpm
+        warningWasSet = false
       }
 
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
@@ -381,7 +386,7 @@ function AudioAnalysis( _renderer, _options ) {
     var tempoCounts = groupNeighborsByTempo( countIntervalsBetweenNearbyPeaks( foundpeaks ) );
     tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
-      tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
+      tempoCounts[0] = { tempo: 128 }; // if no temp is found, return 128
 
     }else{
 
@@ -413,7 +418,7 @@ function AudioAnalysis( _renderer, _options ) {
 
       // race condition
       if (tempoCounts[0] === undefined  || tempoCounts[1] === undefined ) {
-        console.log("holdit")
+        // console.log("holdit")
         return
       }
 

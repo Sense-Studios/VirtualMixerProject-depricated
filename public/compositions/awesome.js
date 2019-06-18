@@ -72,6 +72,9 @@ setInterval(function() {
     if (beats%18 == 0 && dice < 0.4 ) mixer1.mixMode( useMixmodes[Math.floor( Math.random() * useMixmodes.length )] );
     if (beats%32 == 0 && dice < 0.1 ) audioanalysis1.mod = 0.5
     if (beats%32 == 0 && dice > 0.5 ) audioanalysis1.mod = 1
+    if (beats%32 == 0 && dice < 0.1 ) mixer2.pod(0.2)
+    if (beats%32 == 0 && dice > 0.5 ) mixer2.pod(0.4)
+    if (beats%16 == 0 && dice > 0.8  )mixer2.pod(0.6)
   }
 
   if ( audioanalysis1.render() < 0.01 ) {

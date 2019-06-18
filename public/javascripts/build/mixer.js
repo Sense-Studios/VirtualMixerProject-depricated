@@ -139,6 +139,11 @@ var GlRenderer = function( _options ) {
   // update size!
   window.addEventListener('resize', function() {
     _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // resize viewport (write exception for width >>> height, now gives black bars )
+    _self.camera.aspect = window.innerWidth / window.innerHeight;
+    _self.camera.updateProjectionMatrix();
+    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
   })
 
   // ---------------------------------------------------------------------------
@@ -194,7 +199,7 @@ var GlRenderer = function( _options ) {
 }
 
 AudioAnalysis.prototype = new Addon();
-AudioAnalysis.constructor = AudioAnalysis; 
+AudioAnalysis.constructor = AudioAnalysis;
 
 /**
 * @summary
@@ -399,12 +404,12 @@ function AudioAnalysis( _renderer, _options ) {
       initializeAutoBpm()
 
     } else {
-
+      console.log("Audio analisis using microphone.")
       navigator.mediaDevices.getUserMedia({ audio })
       .then(function(mediaStream) {
         source = context.createMediaStreamSource(mediaStream);
         initializeAutoBpm()
-
+        _self.disconnectOutput()
       }).catch(function(err) {
         console.log(err.name + ": " + err.message);
       }); // always check for errors at the end.
@@ -454,6 +459,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @function Addon#AudioAnalysis~initializeAutoBpm
    *
   */
+
   var initializeAutoBpm = function() {
     // tries and play the audio
     audio.play();
@@ -479,6 +485,7 @@ function AudioAnalysis( _renderer, _options ) {
    * @function Addon#AudioAnalysis~sampler
    *
   */
+  var warningWasSet = false
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -503,7 +510,7 @@ function AudioAnalysis( _renderer, _options ) {
 
     // SLOWPOKE
     // take a snapshot every 1/10 second and calculate beat
-    if ( ( now - start) > 100 ) {
+    if ( ( now - start ) > 100 ) {
 
       var tempoData = getTempo(dataSet)
       _self.tempoData = tempoData
@@ -513,11 +520,14 @@ function AudioAnalysis( _renderer, _options ) {
       // getBlackout // TODO -- detects blackout, prolonged, relative silence in sets
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
-      if (tempoData == undefined) {
-        console.log("sampler is active, but no beat was found")
+      if ( tempoData == undefined ) {
+        if ( !warningWasSet ) console.log(" WARNING: sampler is active, but no audio was detected after 20 seconds -- check your audiofile or your microphone and make sure you've clicked in the window and gave it access! Halting.")
+        warningWasSet = true
+        _self.tempodata_bpm = 128
         // return
       }else{
         _self.tempodata_bpm = tempoData.bpm
+        warningWasSet = false
       }
 
       if ( _self.useAutoBPM ) _self.sec = c * Math.PI * (tempoData.bpm * _self.mod) / 60
@@ -576,7 +586,7 @@ function AudioAnalysis( _renderer, _options ) {
     var tempoCounts = groupNeighborsByTempo( countIntervalsBetweenNearbyPeaks( foundpeaks ) );
     tempoCounts.sort( sortHelper );                             // sort tempo's by 'score', or most neighbours
     if ( tempoCounts.length == 0 ) {
-      tempoCounts[0] = { tempo: 0 }; // if no temp is found, return 0
+      tempoCounts[0] = { tempo: 128 }; // if no temp is found, return 128
 
     }else{
 
@@ -608,7 +618,7 @@ function AudioAnalysis( _renderer, _options ) {
 
       // race condition
       if (tempoCounts[0] === undefined  || tempoCounts[1] === undefined ) {
-        console.log("holdit")
+        // console.log("holdit")
         return
       }
 
@@ -4191,6 +4201,8 @@ function GifSource( renderer, options ) {
 
   // Interface helpers ---------------------------------------------------------
   _self.src = function( _file ) {
+    if ( _file == undefined ) return _self.currentSrc
+
     console.log("executed src")
     _self.currentSrc = _file
     supergifelement.pause()
@@ -4609,16 +4621,16 @@ function SolidSource(renderer, options) {
   * @param {float} r - red value
   * @param {float} g - green value
   * @param {float} b - blue value
-  * @param {float} a - alpha value (optional)
+  * @param {float} a - alpha value (optional, will be forced to 1.0)
   * @returns color
   */
   _self.color = function( c ) {
-    if ( c != undefined ) {
-      color = c
-      if (color.a == undefined ) color.a = 1.0 // just to be sore
-      renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector3( color.r, color.g, color.b, color.a ) }
-    }
-    return color
+    if ( c == undefined ) return color
+    color = c
+
+    // just make  sure that alpha is set
+    if (color.a == undefined ) color.a = 1.0
+    renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector3( color.r, color.g, color.b, color.a ) }
   }
 
   _self.jump = function( _num ) {
@@ -4895,7 +4907,7 @@ function VideoSource(renderer, options) {
   var _options = {};
   if ( options != undefined ) _options = options;
 
-  _self.currentSrc = "/video/placeholder.mp4"
+  _self.currentSrc = "https://virtualmixproject.com/video/placeholder.mp4"
   _self.type = "VideoSource"
   _self.bypass = true;
 
@@ -4920,7 +4932,7 @@ function VideoSource(renderer, options) {
     videoElement.playsinline = true
     videoElement.preload = 'auto'
     videoElement.muted= true
-    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
+    videoElement.poster= "https://virtualmixproject.com/gif/telephone-pole-wire-tennis-shoes.jpg"
 
     // set the source
     if ( options.src == undefined ) {
@@ -5046,6 +5058,8 @@ function VideoSource(renderer, options) {
    * @param {file} Videofile - full path to file
    */
   _self.src = function( _file ) {
+    if ( _file == undefined ) return currentSrc
+
     try {
       _self.currentSrc = _file
     }catch(e){
@@ -5055,7 +5069,9 @@ function VideoSource(renderer, options) {
     videoElement.src = _file
     videoElement.play();
 
-    setTimeout( function() { _self.jump() }, 300 )
+    // shouldn't be a defulat
+    // setTimeout( function() { _self.jump() }, 300 )
+
     /*
     videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
@@ -5064,6 +5080,7 @@ function VideoSource(renderer, options) {
       }
     })
     */
+
     //var playInterval = setInterval(
     //    clearInterval(playInterval)
     //  }

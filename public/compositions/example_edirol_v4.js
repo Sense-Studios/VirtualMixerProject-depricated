@@ -20,14 +20,15 @@ document.getElementById('mixer').addEventListener('touchstart', forceFullscreen)
 // renderer
 var renderer = new GlRenderer()
 
-// here we go, delay included so we can see the loader message
-// setTimeout( function() {
 
-  // sources
+  // lets not forget the bpm
+  var bpm_tap = new BPM( renderer )
+
+  // initial sources ( for now only four sources are connected)
   var source1 = new VideoSource( renderer, { src: '/video/placeholder_lg.mp4' } );
-  var source2 = new VideoSource( renderer, { src: '/video/ignore/veejays_demoreel.mp4' } );
+  var source2 = new VideoSource( renderer, { src: '//nabu.s3-eu-west-1.amazonaws.com/veejay/mixkit/182-720.mp4' } );
   var source3 = new VideoSource( renderer, { src: '/video/ignore/alaro_carnage_the_underground_gif_remix.mp4' } );
-  var source4 = new VideoSource( renderer, { src: '/video/ignore/composition_12.mp4' } );
+  var source4 = new VideoSource( renderer, { src: '//s3-eu-west-1.amazonaws.com/nabu/veejay/ziek/ZIEK_roaches_and_ants.mp4' } );
 
   // distortion effects work on sources directly
   var distortion_effect1 = new DistortionEffect(renderer, { source: source1 } )
@@ -36,27 +37,23 @@ var renderer = new GlRenderer()
   var distortion_effect4 = new DistortionEffect(renderer, { source: source4 } )
 
   // source switch
-  // var chain1 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
-  // var chain2 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
-
   var chain1 = new Chain( renderer, { sources: [ source1, source2, source3, source4 ] } );
   var chain2 = new Chain( renderer, { sources: [ distortion_effect1, distortion_effect2, distortion_effect3, distortion_effect4 ] } );
 
-  var color_effect1 = new ColorEffect(renderer, { source: chain1 } ); // mono color effects
-  var paint_effect2 = new ColorEffect(renderer, { source: chain2 } ); // paint
-
-  var nega_effect1 = new ColorEffect(renderer, { source: color_effect1 } ); // negatief
+  // effects left
+  var color_effect1 = new ColorEffect(renderer, { source: chain1 } );        // mono color effects
+  var paint_effect2 = new ColorEffect(renderer, { source: chain2 } );        // paint
+  var nega_effect1 = new ColorEffect(renderer, { source: color_effect1 } );  // negatief
   var multi_effect2 = new ColorEffect(renderer, { source: paint_effect2 } ); // multi ==> DISTORT!, works on source directly
 
-  var luma_effect1 = new ColorEffect(renderer, { source: nega_effect1 } ); // Whitekey
-  var color_effect2 = new ColorEffect(renderer, { source: multi_effect2 } ); // c-key
-
-  var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } ); // Blackkey
+  // effects right
+  var luma_effect1 = new ColorEffect(renderer, { source: nega_effect1 } );         // Whitekey
+  var color_effect2 = new ColorEffect(renderer, { source: multi_effect2 } );       // c-key
+  var colorize_effect1 = new ColorEffect(renderer, { source: luma_effect1 } );     // Blackkey
   var feedback_effect2 = new FeedbackEffect(renderer, { source: color_effect2 } ); // feedback
 
   // main mixer
   var main_mixer = new Mixer( renderer, {source1: colorize_effect1, source2: feedback_effect2 } );
-
 
   // transformers
   // mix transformer signals (white and black)
@@ -72,8 +69,6 @@ var renderer = new GlRenderer()
   // blackout
   // var blackout = new SolidSource( renderer, { r:0.0, g:0.0, b:0.0 } );
   // var blackout_mixer = new Mixer( renderer, { source1: trans_mixer2, source2: blackout })
-
-  var bpm_tap = new BPM( renderer )
 
   // wire the last one to the output
   var output = new Output( renderer, trans_mixer2 )

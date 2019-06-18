@@ -33,16 +33,18 @@ init = function(io) {
 
 	  socket.on('disconnect', function(socket){
 		    console.log('user disconnected', socket, socket.uuid);
-        // remove user
-        _self.removeClient(socket)
+        _self.removeClient(socket) // remove user
 	 	});
 
-		// Depricated
+    // -------------------------------------------------------------------------
+		// Depricated, not implemented
 		socket.on('chat message', function(msg){
   		console.log('message: ', msg);
   	});
 
+    // -------------------------------------------------------------------------
  	 	// exclude beats (!)
+    // Depricated, not used, see addClient
   	socket.on('command', function(msg){
 
       // Command list
@@ -58,78 +60,33 @@ init = function(io) {
       if ( msg.command == "identify"     )  _self.addClient( socket );
 		});
 
-
+    // -------------------------------------------------------------------------
     socket.on('controller', function( _msg ) {
+      var client_uuids = _msg.client.replace(/ /g,'')
+      client_uuids = client_uuids.split(","); // split the data
       clients.map( function( client ) {
-        if ( client.uuid == _msg.client) {
-          client.emit("controller", _msg)
-        }
+        client_uuids.forEach( function( client_uuid ) {
+          if ( client.uuid == client_uuid) {
+            // set the data back to singular, this has 2 advantages
+            // 1) the socket controller can stay single-threaded
+            // 2) the individual clients have no way of knowing the 'others'
+            //    only the remote knows
+            _msg.client = client_uuid
+            client.emit("controller", _msg)
+          }
+        })
       })
     })
 
+    // not implemented
     socket.on('status', function(msg){
       // should get data from client
     })
 
-    /*
-    socket.on('test', function( _msg ) {
-      console.log("got your test ", _msg )
-      console.log("got your clients")
-      clients.map(function(c) {
-        console.log( c.uuid, _msg.target, c.uuid == _msg.target )
-        if ( c.uuid == _msg.target) {
-          c.emit("test", _msg)
-        }
-      })
-    })
-    */
-
-    /*
-    // either midi or gamepad? -- now for gamepad
-    socket.on('initiate_controller', function( _controller ){
-      // O hi, I haz the controller!
-      // kind of a has_and_belongs_to_many in Rails
-
-      //controllers.push( _controller )
-      //uuid
-      //clients
-
-    });
-    */
-
-    /*
-    socket.on('ping', function( _msg ) {
-      if ( c.uuid == _msg.target) {
-        c.emit("ping")
-      }
-    })
-
-    socket.on('ping', function( _msg ) {
-      // client uuid send pong
-      // update status?
-    }
-    */
-
+    // test only
     socket.on('derp', function( _msg ) {
       console.log("got your message wiihoe", _msg )
     })
-
-    /*
-    socket.on('request_controller', function(msg){
-      // get controller for/by id
-    })
-
-    socket.on('controller_status', function(msg) {
-      // show controllers
-    })
-
-    socket.on('controller', function(msg) {
-      // find client get its socket
-      console.log('controller: ', msg);
-      io.emit('controller', msg );
-    });
-    */
-
 	})
 }
 

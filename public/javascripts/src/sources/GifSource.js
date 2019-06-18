@@ -118,6 +118,8 @@ function GifSource( renderer, options ) {
 
   // Interface helpers ---------------------------------------------------------
   _self.src = function( _file ) {
+    if ( _file == undefined ) return _self.currentSrc
+
     console.log("executed src")
     _self.currentSrc = _file
     supergifelement.pause()

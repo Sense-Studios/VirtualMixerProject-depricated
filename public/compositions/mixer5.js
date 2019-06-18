@@ -79,7 +79,7 @@ var output = new Output( renderer, switcher1 )
 
 // create a bpm addon
 var bpm = new BPM( renderer )
-var analysis1 = new AudioAnalysis( renderer, { audio: '/audio/fear_is_the_mind_killer_audio.mp3'} )
+var analysis1 = new AudioAnalysis( renderer, { microphone: true })
 
 // ## CONTROLLERS ##############################################################
 

@@ -31,7 +31,7 @@ function VideoSource(renderer, options) {
   var _options = {};
   if ( options != undefined ) _options = options;
 
-  _self.currentSrc = "/video/placeholder.mp4"
+  _self.currentSrc = "https://virtualmixproject.com/video/placeholder.mp4"
   _self.type = "VideoSource"
   _self.bypass = true;
 
@@ -56,7 +56,7 @@ function VideoSource(renderer, options) {
     videoElement.playsinline = true
     videoElement.preload = 'auto'
     videoElement.muted= true
-    videoElement.poster= "/gif/telephone-pole-wire-tennis-shoes.jpg"
+    videoElement.poster= "https://virtualmixproject.com/gif/telephone-pole-wire-tennis-shoes.jpg"
 
     // set the source
     if ( options.src == undefined ) {
@@ -182,6 +182,8 @@ function VideoSource(renderer, options) {
    * @param {file} Videofile - full path to file
    */
   _self.src = function( _file ) {
+    if ( _file == undefined ) return currentSrc
+
     try {
       _self.currentSrc = _file
     }catch(e){
@@ -191,7 +193,9 @@ function VideoSource(renderer, options) {
     videoElement.src = _file
     videoElement.play();
 
-    setTimeout( function() { _self.jump() }, 300 )
+    // shouldn't be a defulat
+    // setTimeout( function() { _self.jump() }, 300 )
+
     /*
     videoElement.oncanplay( function() {
       if ( videoElement.readyState == 4 ) {
@@ -200,6 +204,7 @@ function VideoSource(renderer, options) {
       }
     })
     */
+
     //var playInterval = setInterval(
     //    clearInterval(playInterval)
     //  }

@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui")
+    title= title
+    
+    // mobile slider; https://rangeslider.js.org/ 
+    // link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.css')
+    // script(src='https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js')
+    
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/remotes/demo_slidercontroller_remote.css')
+
+  body
+    .container
+      .socket-id 
+        | Give your socket id to connect
+        label client id
+        br
+        input#socket_client_id
+      
+      .slider-1
+        input(type="range" min="1" max="100" value="50" class="slider" id="range_1")
+
+      .slider-2
+        input(type="range" min="1" max="100" value="50" class="slider" id="range_2")
+
+      .slider-3
+        input(type="range" min="1" max="100" value="50" class="slider" id="range_1")
+      
+      .buttons-1
+        button#butt_1 b1
+        button#butt_2 b2
+        button#butt_3 b3
+        button#butt_4 b4
+      
+    script(src='/javascripts/remotes/demo_socketcontroller_remote.js')
+      
+    include ../partials/analytics
