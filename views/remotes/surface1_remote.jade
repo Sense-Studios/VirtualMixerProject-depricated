@@ -1,0 +1,274 @@
+doctype html
+html
+  head
+    title= title
+    meta(name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui')
+    
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/remotes/surface1_remote.css')
+
+  svg.defs
+    defs
+      radialGradient#grad-dial-soft-shadow(cx=0.5,cy=0.5,r=0.5)
+        stop(offset='85%',stop-color='#242a2e',stop-opacity=0.4)
+        stop(offset='100%',stop-color='#242a2e',stop-opacity=0)
+      linearGradient#grad-dial-base(x1=0,y1=0,x2=0,y2=1)
+        stop(offset='0%',stop-color='#52595f')
+        stop(offset='100%',stop-color='#2b3238')
+      linearGradient#grad-dial-highlight(x1=0,y1=0,x2=0,y2=1)
+        stop(offset='0%',stop-color='#70777d',stop-opacity=1)
+        stop(offset='40%',stop-color='#70777d',stop-opacity=0)
+        stop(offset='55%',stop-color='#70777d',stop-opacity=0)
+        stop(offset='100%',stop-color='#70777d',stop-opacity=0.3)
+      filter#glow
+        feGaussianBlur(in='SourceGraphic',result='blur',stdDeviation=2)
+        feComposite(in='blur',in2='SourceGraphic',operator='over')
+      
+  body
+          
+  
+    .scroll-container
+      
+      // -----------------------------------------------------------------------
+      //   page 1: file selection
+      // -----------------------------------------------------------------------
+      
+      #movies_container.state_2
+        .bpm_display
+          .display 128
+        
+        .sync
+          button#sync2(onmousedown='sync(this)') sync
+          
+        .tap 
+          button#tap2(onmousedown='tap(this)', ontouchstart='tap(this)') tap
+        
+        .right_butt 
+          button#movies_right »
+          
+        .thumbnails#thumbnails_a
+        .thumbnails#thumbnails_b
+
+        .thumbnails_a__play
+          button#play_a play
+
+        .thumbnails_a__speed
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_a')
+              svg.knob-input__visual(viewBox='0 0 40 40')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')   
+
+        .thumbnails_b__play
+          button#play_b play
+        
+        .thumbnails_b__speed
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_b')
+              svg.knob-input__visual(viewBox='0 0 40 40')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')        
+              
+
+
+      // -----------------------------------------------------------------------
+      //   page 2: mixer 
+      // -----------------------------------------------------------------------
+      
+      #mixer_container.state_2
+        .left_butt 
+          button#mixer_left « 
+          
+        .client_id
+          input#client_id
+        
+        .bpm_adjust
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+              svg.knob-input__visual(viewBox='-10 -10 60 60')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')   
+        
+        .bpm_display
+          .display 128
+        
+        .right_butt         
+          button#mixer_right »
+        
+        .sync 
+          button#sync(onmousedown='sync(this)') sync
+          
+        .tap 
+          button#tap(onmousedown='tap(this)', ontouchstart='tap(this)') tap
+          
+        .mixmode_select
+          select#mixmode_select
+            - var mixModes = [1,2,3,4,5,6,7,8,9]
+            - var mixModesNames = ["normal", "hard", "nam", "fam", "non dark", "left", "right", "center", "boom"]
+            - for(var i=0; i<mixModes.length; i++)
+              option(value=mixModes[i]) 
+                = mixModesNames[i]
+            
+        .blendmode_select
+          select#blendmode_select
+            - var blendModes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+            - var blendModesNames = ["add", "substract", "multiply", "darken", "color burn", "linear burn", "lighten", "screen", "color dodge", "linear dodge", "overlay", "soft light", "hard light", "vivid light", "linear light", "pin light", "difference", "exclusion"]
+            - for(var i=0; i<blendModes.length; i++)
+              option(value=blendModes[i]) 
+                = blendModesNames[i]
+        
+        - var effect_channels = ["effects_a", "effects_b"]
+        - for(var j=0; j < effect_channels.length; j++)
+          .effects_channel(class= effect_channels[j])            
+            - var coloreffects      = [ 1, 2,3,4,5,6, 10,11,12,13,14,15,16,17, 50,51,52,53, 60,61,62,63,64]
+            - var coloreffectsNames = [ 'empty', 'negative 1', 'negative 2', 'negative 3', 'negative 4', 'negative 5', 'black&white', 'monocolor red', 'monocolor blue', 'monocolor green', 'monocolor yellow', 'monocolor turqois', 'monocolor purple', 'monocolor sepia', 'luma key', 'green key', 'paint', 'colorize', 'brightness', 'contrast', 'saturation', 'hue', 'black edge' ]
+            - for(var i=0; i < 4; i++)
+              .knob-input.fl-studio-envelope__knob.envelope-knob(data-id = effect_channels[j] + (i + 1) + "_extra" )
+                svg.knob-input__visual(viewBox='0 0 40 40')
+                  circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                  circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                  path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                  g.dial
+                    circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                    ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                    circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                    circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                    circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')
+                    circle.indicator-dot(cx=20,cy=30,r=1.5,fill='#4eccff')
+
+              select(id = effect_channels[j] + (i+1) )
+                - for(var k=0; k < coloreffects.length; k++)
+                  option(value=coloreffects[k]) 
+                    = coloreffectsNames[k]
+          
+        .main_pod
+          input#main_pod(type="range")
+        
+        .blackout 
+          button#blackout_button black
+          
+        .whiteout
+          button#whiteout_button white
+          
+        // .fullscreen
+        //  button black
+        //  attack black/white out 
+        //  fade left 
+        //  fade right
+        //  trans
+
+
+      // -----------------------------------------------------------------------
+      //   page 3: Sequencer
+      // -----------------------------------------------------------------------
+      
+      #sequencer_container.state_2
+      
+        .left_butt 
+          button#sequencer_left «
+
+        .play_pause
+          button#sequencer_play_pause(data-paused="false", onclick='toggleSequencer(this)').green >||
+        
+        .timecode_adjust
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+              svg.knob-input__visual(viewBox='-10 -10 60 60')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')     
+
+        .bpm_adjust
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+              svg.knob-input__visual(viewBox='-10 -10 60 60')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')     
+        
+        .adjust_display
+          .display 0.0
+          
+        .bpm_display
+          .display 128
+        
+        .sync 
+          button#sync3(onmousedown='sync(this)') sync
+          
+        .tap 
+          button#tap3(onmousedown='tap(this)', ontouchstart='tap(this)') tap
+
+        // sequence control button template
+        template#seq_button_template
+          .seq_butt
+            //.num 0
+            .button(data-timecode="", onmousedown='sequenceButton(this)', ontouchstart='sequenceButton(this)')
+            .light
+            .bank(onmousedown='bankButton(this)')
+
+        .sequence_buttons_a#seq_butts_a
+          
+        .sequence_buttons_b#seq_butts_b
+
+        
+        .sequence_control_a
+            button(onclick='control_button("fbwd_a")') <<
+            button(onclick='control_button("bwd_a")') <
+            button(onclick='control_button("play_pause_a")') >||
+            button(onclick='control_button("ffwd_a")') >
+            button(onclick='control_button("fwd_a")') >>
+
+        .sequence_control_b          
+            button(onclick='control_button("fbwd_b")') <<          
+            button(onclick='control_button("bwd_b")') <
+            button(onclick='control_button("play_pause_b")') >||          
+            button(onclick='control_button("ffwd_b")') >          
+            button(onclick='control_button("fwd_b")') >>
+        
+
+    script(src='/javascripts/remotes/surface1_remote.js')
+    
+  
+    
+    
+  include ../partials/analytics

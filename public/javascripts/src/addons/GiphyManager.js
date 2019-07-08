@@ -25,9 +25,9 @@ function GiphyManager( _source ) {
   _self.uuid = "GiphyManager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.source = _source
-  _self.file
-  _self.programs
-  _self.program
+  _self.file = ""
+  _self.programs = []
+  _self.program = ""
 
   // set in environment
   // this key is for demo purposes only
@@ -38,11 +38,14 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
+   window.myholder = null
   _self.needle = function( _needle ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
-      _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
+      console.log(d)
+      window.myholder = d
+      _self.programs = JSON.parse(d).data
     })
   }
 
@@ -75,8 +78,9 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#change
    */
   _self.change = function() {
-    if ( _self.programs.length == 0 ) return "no programs"
+    if ( _self.programs.length == 0 ) return "no programs found :("
     _self.program = _self.programs[ Math.floor( Math.random() * _self.programs.length ) ]
+    _self.file = _self.program
     _self.setSrc( _self.program.images.original.url );
   }
 

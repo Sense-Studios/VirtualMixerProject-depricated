@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    title Awesome Virtual Mixer
+      
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')
+    script 
+      | var clicks = 0;
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/compositions/surface1.css')
+    
+  body(onclick="clicks++; if(clicks==2) document.getElementById('play_button').style.display = 'none'")
+    a.logo(href='/')
+    button.play_button#play_button
+    button.mute_button#mute_button(style="display:none")
+
+    
+    canvas#glcanvas
+    .blink
+    
+    .payoff
+      | <h3>Midicontroller</h3>
+      | Music from <a href="https://nsbradio.co.uk/">NSB Radio</a><br>
+      | Part of the <a href="https://virtualmixproject.com/"> Virtual Mixer Project </a><br>
+      | <small>If you don't hear any music, click somewhere on the screen</small>
+
+    script(src='/compositions/demo_midi.js')
+    include ../partials/analytics

@@ -61,7 +61,7 @@ init = function(io) {
 		});
 
     // -------------------------------------------------------------------------
-    socket.on('controller', function( _msg ) {
+    socket.on('controller', function( _msg ) {      
       var client_uuids = _msg.client.replace(/ /g,'')
       client_uuids = client_uuids.split(","); // split the data
       clients.map( function( client ) {
@@ -75,6 +75,22 @@ init = function(io) {
             client.emit("controller", _msg)
           }
         })
+      })
+    })
+
+    socket.on('request_uuid', function( _old_uuid, _new_uuid ) {
+      clients.map( function( client ) {
+        if ( client.uuid == _new_uuid ) {
+          console.log(" Denied: ", _new_uuid, " was already assigned! ")
+          return
+        }
+      })
+
+      clients.map( function( client ) {
+        if ( client.uuid == _old_uuid ) {
+          client.uuid = _new_uuid
+          socket.emit('command', {"command":"reset_uuid", "payload":_new_uuid})
+        }
       })
     })
 

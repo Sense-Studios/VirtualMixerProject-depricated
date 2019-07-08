@@ -39,7 +39,7 @@ function GifSource( renderer, options ) {
 
   // set the source
   if ( options.src == undefined ) {
-     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+     _self.currentSrc = 'https://virtualmixerproject.com/gif/a443ae90a963a657e12737c466ddff95.gif'
   } else {
     _self.currentSrc = options.src
   }

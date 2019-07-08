@@ -1,0 +1,850 @@
+* {
+  box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%; }
+
+body {
+  padding: 1px;
+  background: radial-gradient(#1a1d22, #121318); }
+
+button {
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: sans-serif;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3em;
+  padding: .3em 0 .5em 0;
+  margin: 0;
+  border: 1px solid #000;
+  border-radius: .5em;
+  color: #f5f5f5;
+  background-color: #272d31;
+  background-image: url(), linear-gradient(to bottom, #4a5158 0%, #272d31 100%);
+  background-repeat: no-repeat, repeat;
+  background-position: right .7em top 50%, 0 0;
+  background-size: .65em auto, 100%;
+  box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+  -webkit-user-select: none;
+  /* Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+/Edge */
+  user-select: none;
+  /* Standard */
+  width: 100%;
+  height: 80%;
+  top: 10%;
+  position: relative;
+  display: inline-block; }
+  button:active {
+    background-image: url(), linear-gradient(to bottom, #272d31 0%, #4a5158 100%); }
+  button:focus {
+    outline: 0; }
+  button.yellow {
+    background: linear-gradient(#f7d400, #d6990c); }
+    button.yellow:active {
+      background: linear-gradient(#d6990c, #f7d400); }
+  button.green {
+    background: radial-gradient(#008800, #22AA22); }
+    button.green:active {
+      background: linear-gradient(#22AA22, #008800); }
+  button.grey {
+    background: linear-gradient(#656565, #454545); }
+    button.grey:active {
+      background: linear-gradient(#454545, #656565); }
+  button.white {
+    background: linear-gradient(#f5f5f5, #C5C5C5); }
+    button.white:active {
+      background: linear-gradient(#C5C5C5, #f5f5f5); }
+  button.red {
+    background: linear-gradient(#AA2222, #880000); }
+    button.red:active {
+      background: linear-gradient(#880000, #AA2222); }
+  button.blue {
+    background: linear-gradient(#4eccff, #2e8cbf); }
+    button.blue:active {
+      background: linear-gradient(#2e8cbf, #4eccff); }
+  button.blinking {
+    animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535); } }
+
+.display {
+  width: 90%;
+  height: 80%;
+  top: 10%;
+  left: 5%;
+  position: relative;
+  background-color: #272d31;
+  color: #4eccff;
+  font-family: 'Helvetica', sans-serif;
+  font-weight: 700;
+  line-height: 1.8em;
+  padding: .3em 0 .5em 0;
+  text-align: center;
+  box-sizing: border-box;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column; }
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0; }
+
+select {
+  width: 100%;
+  display: inline-block;
+  font-size: 16px;
+  font-family: sans-serif;
+  font-weight: 700;
+  color: #f5f5f5;
+  line-height: 1.3;
+  padding: .6em 1.4em .5em .8em;
+  box-sizing: border-box;
+  margin: 0;
+  border: 1px solid #000;
+  box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+  border-radius: .5em;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  background-image: url(), linear-gradient(to bottom, #272d31 0%, #4a5158 100%);
+  background-repeat: no-repeat, repeat;
+  background-position: right .7em top 50%, 0 0;
+  background-size: .65em auto, 100%;
+  text-indent: 5px; }
+  select::-ms-expand {
+    display: none; }
+  select:hover {
+    border-color: #888; }
+  select:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba(59, 153, 252, 0.7);
+    box-shadow: 0 0 0 3px -moz-mac-focusring;
+    color: #f5f5f;
+    outline: none; }
+  select option {
+    font-weight: normal;
+    color: white;
+    background-color: black; }
+
+.scroll-container {
+  height: 100%;
+  position: fixed;
+  background-color: black;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  width: 100%;
+  margin-left: 0%; }
+
+#movies_container {
+  position: absolute;
+  left: 100vw;
+  top: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 100%;
+  height: calc( 100% - 24px);
+  display: grid;
+  transition-duration: 0.6s;
+  background: radial-gradient(#1a1d22, #121318);
+  grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%;
+  grid-template-rows: 10% 75% 15%;
+  grid-template-areas: ". . . . . bpm_display sync tap right_butt ." ". thumbnails_a thumbnails_a thumbnails_a thumbnails_a thumbnails_b thumbnails_b thumbnails_b thumbnails_b ." ". play_a play_a speed_a speed_a play_b play_b speed_b speed_b ."; }
+  #movies_container .left_butt {
+    grid-area: left_butt; }
+  #movies_container .bpm_display {
+    grid-area: bpm_display; }
+  #movies_container .sync {
+    grid-area: sync; }
+  #movies_container .tap {
+    grid-area: tap; }
+  #movies_container .right_butt {
+    grid-area: right_butt; }
+  #movies_container.state_1 {
+    left: 0; }
+  #movies_container.state_2 {
+    left: -100vw; }
+  #movies_container.state_3 {
+    left: -200vw; }
+  #movies_container .thumbnails_a__play {
+    grid-area: play_a; }
+  #movies_container .thumbnails_a__speed {
+    grid-area: speed_a; }
+  #movies_container .thumbnails_b__play {
+    grid-area: play_b; }
+  #movies_container .thumbnails_b__speed {
+    grid-area: speed_b; }
+  #movies_container .thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    justify-content: space-around; }
+    #movies_container .thumbnails .thumbnail {
+      width: 20vw;
+      height: auto;
+      background-color: #252525;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      border: solid 2px #252525;
+      margin: 2px;
+      transition-duration: 0.6s; }
+      #movies_container .thumbnails .thumbnail.active {
+        background-color: #656565;
+        border: solid 4px orange; }
+        #movies_container .thumbnails .thumbnail.active img {
+          opacity: 0.95;
+          filter: brightness(150%); }
+      #movies_container .thumbnails .thumbnail img {
+        width: 100%;
+        height: auto;
+        opacity: 0.85;
+        filter: brightness(80%); }
+  #movies_container #thumbnails_a {
+    grid-area: thumbnails_a; }
+  #movies_container #thumbnails_b {
+    grid-area: thumbnails_b; }
+
+#sequencer_container {
+  position: absolute;
+  left: 100vw;
+  top: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 100%;
+  height: calc( 100% - 24px);
+  display: grid;
+  transition-duration: 0.6s;
+  background: radial-gradient(#1a1d22, #121318);
+  grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%;
+  grid-template-rows: 10% 75% 15%;
+  grid-template-areas: ". left_butt play_pause timecode_adjust adjust_display bpm_adjust bpm_display sync tap ." ". sequencer_a sequencer_a sequencer_a sequencer_a sequencer_b sequencer_b sequencer_b sequencer_b ." ". sequence_control_a sequence_control_a sequence_control_a sequence_control_a sequence_control_b sequence_control_b sequence_control_b sequence_control_b  ."; }
+  #sequencer_container.active {
+    left: 0; }
+  #sequencer_container.state_1 {
+    left: 200vw; }
+  #sequencer_container.state_2 {
+    left: 100vw; }
+  #sequencer_container.state_3 {
+    left: 0; }
+  #sequencer_container .left_butt {
+    grid-area: left_butt; }
+  #sequencer_container .play_pause {
+    grid-area: play_pause; }
+  #sequencer_container .timecode_adjust {
+    grid-area: timecode_adjust; }
+  #sequencer_container .adjust_display {
+    grid-area: adjust_display; }
+  #sequencer_container .bpm_adjust {
+    grid-area: bpm_adjust; }
+  #sequencer_container .bpm_display {
+    grid-area: bpm_display; }
+  #sequencer_container .sync {
+    grid-area: sync; }
+  #sequencer_container .tap {
+    grid-area: tap; }
+  #sequencer_container .sequence_buttons_a {
+    width: 100%;
+    min-height: 100%;
+    flex-direction: column;
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    grid-area: sequencer_a; }
+    #sequencer_container .sequence_buttons_a .seq_butt {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      min-height: 42px;
+      margin-left: 0.5%;
+      margin-bottom: 0.5%; }
+      #sequencer_container .sequence_buttons_a .seq_butt .num {
+        width: 18px;
+        color: white;
+        text-align: center;
+        font-size: 12px; }
+      #sequencer_container .sequence_buttons_a .seq_butt .button {
+        box-sizing: border-box;
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.3em;
+        padding: .3em 0 .5em 0;
+        margin: 0;
+        border: 1px solid #000;
+        border-radius: .5em;
+        color: #f5f5f5;
+        background-color: #272d31;
+        background-image: url(), linear-gradient(to bottom, #4a5158 0%, #272d31 100%);
+        background-repeat: no-repeat, repeat;
+        background-position: right .7em top 50%, 0 0;
+        background-size: .65em auto, 100%;
+        box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+        -webkit-user-select: none;
+        /* Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+/Edge */
+        user-select: none;
+        /* Standard */
+        width: 100%;
+        height: 80%;
+        top: 10%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: 0;
+        cursor: pointer; }
+        #sequencer_container .sequence_buttons_a .seq_butt .button:active {
+          background-image: url(), linear-gradient(to bottom, #272d31 0%, #4a5158 100%); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button:focus {
+          outline: 0; }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.yellow {
+          background: linear-gradient(#f7d400, #d6990c); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.yellow:active {
+            background: linear-gradient(#d6990c, #f7d400); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.green {
+          background: radial-gradient(#008800, #22AA22); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.green:active {
+            background: linear-gradient(#22AA22, #008800); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.grey {
+          background: linear-gradient(#656565, #454545); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.grey:active {
+            background: linear-gradient(#454545, #656565); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.white {
+          background: linear-gradient(#f5f5f5, #C5C5C5); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.white:active {
+            background: linear-gradient(#C5C5C5, #f5f5f5); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.red {
+          background: linear-gradient(#AA2222, #880000); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.red:active {
+            background: linear-gradient(#880000, #AA2222); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.blue {
+          background: linear-gradient(#4eccff, #2e8cbf); }
+          #sequencer_container .sequence_buttons_a .seq_butt .button.blue:active {
+            background: linear-gradient(#2e8cbf, #4eccff); }
+        #sequencer_container .sequence_buttons_a .seq_butt .button.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535); } }
+      #sequencer_container .sequence_buttons_a .seq_butt .light {
+        width: 20px;
+        height: 80%;
+        top: 10%;
+        border: 1px solid #000;
+        background: radial-gradient(#656565, #353535);
+        border-left: 0;
+        border-top-right-radius: .5em;
+        border-bottom-right-radius: .5em; }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.green {
+          background: radial-gradient(#22AA22, #008800); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.grey {
+          background: radial-gradient(#656565, #454545); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.white {
+          background: radial-gradient(#f5f5f5, #C5C5C5); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.red {
+          background: linear-gradient(#AA2222, #880000); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.yellow {
+          background: linear-gradient(#f7d400, #d6990c); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.blue {
+          background: radial-gradient(#4eccff, #2e8cbf); }
+        #sequencer_container .sequence_buttons_a .seq_butt .light.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535); } }
+      #sequencer_container .sequence_buttons_a .seq_butt .bank {
+        width: 30px;
+        height: 24px;
+        margin-left: 10px;
+        margin-right: 18px;
+        border-radius: 30px;
+        cursor: pointer;
+        background: radial-gradient(#656565, #353535);
+        border-top: solid 2px #858585;
+        border-bottom: solid 4px #151515; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank:active {
+          background: radial-gradient(#353535, #656565);
+          border-top: solid 1px #151515;
+          border-bottom: solid 2px #858585; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.green {
+          background: radial-gradient(#22AA22, #008800);
+          border-top: solid 2px #55CC55;
+          border-bottom: solid 4px #005500; }
+          #sequencer_container .sequence_buttons_a .seq_butt .bank.green:active {
+            background: radial-gradient(#008800, #22AA22);
+            border-top: solid 1px #005500;
+            border-bottom: solid 2px #55CC55; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.white {
+          background: radial-gradient(#f5f5f5, #C5C5C5);
+          border-top: solid 2px #ffffff;
+          border-bottom: solid 4px #A5A5A5; }
+          #sequencer_container .sequence_buttons_a .seq_butt .bank.white:active {
+            background: radial-gradient(#C5C5C5, #f5f5f5);
+            border-top: solid 1px #A5A5A5;
+            border-bottom: solid 2px #ffffff; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.red {
+          background: radial-gradient(#e41e1e, #a91717);
+          border-top: solid 2px #CC4444;
+          border-bottom: solid 4px #660000; }
+          #sequencer_container .sequence_buttons_a .seq_butt .bank.red:active {
+            background: radial-gradient(#a91717, #e41e1e);
+            border-top: solid 1px #660000;
+            border-bottom: solid 2px #CC4444; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.yellow {
+          background: radial-gradient(#f7d400, #d6990c);
+          border-top: solid 2px #ffe444;
+          border-bottom: solid 4px #b67906; }
+          #sequencer_container .sequence_buttons_a .seq_butt .bank.yellow:active {
+            background: radial-gradient(#d6990c, #f7d400);
+            border-top: solid 1px #b67906;
+            border-bottom: solid 2px #ffe444; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.blue {
+          background: radial-gradient(#4eccff, #2e8cbf);
+          border-top: solid 2px #6edcff;
+          border-bottom: solid 4px #1e6c8f; }
+          #sequencer_container .sequence_buttons_a .seq_butt .bank.blue:active {
+            background: radial-gradient(#2e8cbf, #4eccff);
+            border-top: solid 1px #1e6c8f;
+            border-bottom: solid 2px #6edcff; }
+        #sequencer_container .sequence_buttons_a .seq_butt .bank.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535);
+    border-top: solid 2px #858585;
+    border-bottom: solid 4px #151515; } }
+      #sequencer_container .sequence_buttons_a .seq_butt .adjust {
+        width: 30px;
+        height: 24px;
+        margin-left: 20px;
+        margin-right: 15px; }
+  #sequencer_container .sequence_buttons_b {
+    width: 100%;
+    min-height: 100%;
+    flex-direction: column;
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    grid-area: sequencer_b; }
+    #sequencer_container .sequence_buttons_b .seq_butt {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      min-height: 42px;
+      margin-left: 0.5%;
+      margin-bottom: 0.5%; }
+      #sequencer_container .sequence_buttons_b .seq_butt .num {
+        width: 18px;
+        color: white;
+        text-align: center;
+        font-size: 12px; }
+      #sequencer_container .sequence_buttons_b .seq_butt .button {
+        box-sizing: border-box;
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.3em;
+        padding: .3em 0 .5em 0;
+        margin: 0;
+        border: 1px solid #000;
+        border-radius: .5em;
+        color: #f5f5f5;
+        background-color: #272d31;
+        background-image: url(), linear-gradient(to bottom, #4a5158 0%, #272d31 100%);
+        background-repeat: no-repeat, repeat;
+        background-position: right .7em top 50%, 0 0;
+        background-size: .65em auto, 100%;
+        box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+        -webkit-user-select: none;
+        /* Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+/Edge */
+        user-select: none;
+        /* Standard */
+        width: 100%;
+        height: 80%;
+        top: 10%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: 0;
+        cursor: pointer; }
+        #sequencer_container .sequence_buttons_b .seq_butt .button:active {
+          background-image: url(), linear-gradient(to bottom, #272d31 0%, #4a5158 100%); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button:focus {
+          outline: 0; }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.yellow {
+          background: linear-gradient(#f7d400, #d6990c); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.yellow:active {
+            background: linear-gradient(#d6990c, #f7d400); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.green {
+          background: radial-gradient(#008800, #22AA22); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.green:active {
+            background: linear-gradient(#22AA22, #008800); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.grey {
+          background: linear-gradient(#656565, #454545); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.grey:active {
+            background: linear-gradient(#454545, #656565); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.white {
+          background: linear-gradient(#f5f5f5, #C5C5C5); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.white:active {
+            background: linear-gradient(#C5C5C5, #f5f5f5); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.red {
+          background: linear-gradient(#AA2222, #880000); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.red:active {
+            background: linear-gradient(#880000, #AA2222); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.blue {
+          background: linear-gradient(#4eccff, #2e8cbf); }
+          #sequencer_container .sequence_buttons_b .seq_butt .button.blue:active {
+            background: linear-gradient(#2e8cbf, #4eccff); }
+        #sequencer_container .sequence_buttons_b .seq_butt .button.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535); } }
+      #sequencer_container .sequence_buttons_b .seq_butt .light {
+        width: 20px;
+        height: 80%;
+        top: 10%;
+        border: 1px solid #000;
+        background: radial-gradient(#656565, #353535);
+        border-left: 0;
+        border-top-right-radius: .5em;
+        border-bottom-right-radius: .5em; }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.green {
+          background: radial-gradient(#22AA22, #008800); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.grey {
+          background: radial-gradient(#656565, #454545); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.white {
+          background: radial-gradient(#f5f5f5, #C5C5C5); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.red {
+          background: linear-gradient(#AA2222, #880000); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.yellow {
+          background: linear-gradient(#f7d400, #d6990c); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.blue {
+          background: radial-gradient(#4eccff, #2e8cbf); }
+        #sequencer_container .sequence_buttons_b .seq_butt .light.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535); } }
+      #sequencer_container .sequence_buttons_b .seq_butt .bank {
+        width: 30px;
+        height: 24px;
+        margin-left: 10px;
+        margin-right: 18px;
+        border-radius: 30px;
+        cursor: pointer;
+        background: radial-gradient(#656565, #353535);
+        border-top: solid 2px #858585;
+        border-bottom: solid 4px #151515; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank:active {
+          background: radial-gradient(#353535, #656565);
+          border-top: solid 1px #151515;
+          border-bottom: solid 2px #858585; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.green {
+          background: radial-gradient(#22AA22, #008800);
+          border-top: solid 2px #55CC55;
+          border-bottom: solid 4px #005500; }
+          #sequencer_container .sequence_buttons_b .seq_butt .bank.green:active {
+            background: radial-gradient(#008800, #22AA22);
+            border-top: solid 1px #005500;
+            border-bottom: solid 2px #55CC55; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.white {
+          background: radial-gradient(#f5f5f5, #C5C5C5);
+          border-top: solid 2px #ffffff;
+          border-bottom: solid 4px #A5A5A5; }
+          #sequencer_container .sequence_buttons_b .seq_butt .bank.white:active {
+            background: radial-gradient(#C5C5C5, #f5f5f5);
+            border-top: solid 1px #A5A5A5;
+            border-bottom: solid 2px #ffffff; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.red {
+          background: radial-gradient(#e41e1e, #a91717);
+          border-top: solid 2px #CC4444;
+          border-bottom: solid 4px #660000; }
+          #sequencer_container .sequence_buttons_b .seq_butt .bank.red:active {
+            background: radial-gradient(#a91717, #e41e1e);
+            border-top: solid 1px #660000;
+            border-bottom: solid 2px #CC4444; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.yellow {
+          background: radial-gradient(#f7d400, #d6990c);
+          border-top: solid 2px #ffe444;
+          border-bottom: solid 4px #b67906; }
+          #sequencer_container .sequence_buttons_b .seq_butt .bank.yellow:active {
+            background: radial-gradient(#d6990c, #f7d400);
+            border-top: solid 1px #b67906;
+            border-bottom: solid 2px #ffe444; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.blue {
+          background: radial-gradient(#4eccff, #2e8cbf);
+          border-top: solid 2px #6edcff;
+          border-bottom: solid 4px #1e6c8f; }
+          #sequencer_container .sequence_buttons_b .seq_butt .bank.blue:active {
+            background: radial-gradient(#2e8cbf, #4eccff);
+            border-top: solid 1px #1e6c8f;
+            border-bottom: solid 2px #6edcff; }
+        #sequencer_container .sequence_buttons_b .seq_butt .bank.blinking {
+          animation: blinker 1s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    background: radial-gradient(#656565, #353535);
+    border-top: solid 2px #858585;
+    border-bottom: solid 4px #151515; } }
+      #sequencer_container .sequence_buttons_b .seq_butt .adjust {
+        width: 30px;
+        height: 24px;
+        margin-left: 20px;
+        margin-right: 15px; }
+  #sequencer_container .sequence_control_a {
+    grid-area: sequence_control_a;
+    display: flex; }
+    #sequencer_container .sequence_control_a button {
+      width: 20%; }
+  #sequencer_container .sequence_control_b {
+    grid-area: sequence_control_b;
+    display: flex; }
+    #sequencer_container .sequence_control_b button {
+      width: 20%; }
+
+#mixer_container {
+  position: absolute;
+  left: 100vw;
+  top: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 100%;
+  height: calc( 100% - 24px);
+  display: grid;
+  transition-duration: 0.6s;
+  background: radial-gradient(#1a1d22, #121318);
+  grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%;
+  background: radial-gradient(#1a1d22, #121318);
+  grid-template-areas: ". left_butt        client_id        client_id        bpm_adjust             bpm_display    tap   sync   right_butt       ." ". mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   ." ". blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select ." ". effects_a        effects_a        effects_a        effects_a        effects_b        effects_b        effects_b        effects_b        ." ". main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         ." ". blackout         blackout         blackout         blackout         whiteout         whiteout         whiteout         whiteout         .";
+  transition-duration: 0.6s; }
+  #mixer_container.active {
+    left: 0; }
+  #mixer_container.state_1 {
+    left: 100vw; }
+  #mixer_container.state_2 {
+    left: 0; }
+  #mixer_container.state_3 {
+    left: -100vw; }
+  #mixer_container .left_butt {
+    grid-area: left_butt; }
+  #mixer_container .client_id {
+    grid-area: client_id; }
+    #mixer_container .client_id input {
+      width: 90%;
+      margin-left: 5%;
+      margin-right: 5%;
+      height: 80%;
+      top: 10%;
+      position: relative;
+      background-color: #000;
+      background-image: url(), linear-gradient(to bottom, #272d31 0%, #4a5158 100%);
+      background-repeat: no-repeat, repeat;
+      background-position: right .7em top 50%, 0 0;
+      background-size: .65em auto, 100%;
+      border: solid 1px #4a5158;
+      border-radius: 2px;
+      color: #d5d5d5;
+      font-size: 16px;
+      font-family: 'Helvetica', sans-serif;
+      font-weight: 700;
+      line-height: 1.8em;
+      padding: .3em 0 .5em 0;
+      text-align: center;
+      box-sizing: border-box;
+      letter-spacing: 1.2px; }
+  #mixer_container .bpm_adjust {
+    grid-area: bpm_adjust; }
+  #mixer_container .bpm_display {
+    grid-area: bpm_display; }
+  #mixer_container .tap {
+    grid-area: tap; }
+  #mixer_container .sync {
+    grid-area: sync; }
+  #mixer_container .right_butt {
+    grid-area: right_butt; }
+  #mixer_container .mixmode_select {
+    grid-area: mixmode_select; }
+  #mixer_container .blendmode_select {
+    grid-area: blendmode_select; }
+  #mixer_container .effects_channel select {
+    width: calc( 100% - 60px); }
+  #mixer_container .effects_a {
+    grid-area: effects_a; }
+  #mixer_container .effects_b {
+    grid-area: effects_b; }
+  #mixer_container .main_pod {
+    grid-area: main_pod; }
+    #mixer_container .main_pod input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 42px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s; }
+      #mixer_container .main_pod input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 42px;
+        background: #272d31;
+        cursor: pointer; }
+      #mixer_container .main_pod input[type="range"]::-moz-range-thumb {
+        width: 25px;
+        height: 42px;
+        background: #272d31;
+        cursor: pointer; }
+  #mixer_container .blackout {
+    grid-area: blackout; }
+  #mixer_container .whiteout {
+    grid-area: whiteout; }
+
+.fl-studio-envelope {
+  left: 0;
+  top: 0;
+  width: 100%;
+  padding: 20px;
+  overflow: hidden;
+  background: #363c40;
+  border: 2px solid #272d31;
+  box-shadow: 0 10px 70px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%); }
+
+.fl-studio-envelope__visualizer {
+  height: 200px;
+  background: #21272b;
+  border: 2px solid #191f23; }
+  .fl-studio-envelope__visualizer .envelope-visualizer {
+    width: 100%;
+    height: 100%;
+    overflow: visible; }
+
+.fl-studio-effect {
+  display: flex; }
+
+.fl-studio-envelope__controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center; }
+
+.fl-studio-envelope__tension {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center; }
+
+.fl-studio-envelope__controls {
+  padding: 30px 0 0; }
+
+.fl-studio-envelope__control {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+
+.fl-studio-envelope__label {
+  flex: 0 0 auto;
+  display: inline-block;
+  padding: 10px 0;
+  width: 60px;
+  color: #c1c5c5;
+  font-size: 10px;
+  font-family: 'Helvetica', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase; }
+
+.fl-studio-envelope__knob {
+  flex: 0 0 auto; }
+  .fl-studio-envelope__knob.envelope-knob {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    vertical-align: middle; }
+  .fl-studio-envelope__knob.tension-knob {
+    padding: 0px;
+    width: 60px;
+    height: 60px; }
+  .fl-studio-envelope__knob .knob-input__visual {
+    overflow: visible; }
+  .fl-studio-envelope__knob .dial {
+    transform-origin: 20px 20px;
+    transition: all 600ms cubic-bezier(0.39, 0.575, 0.565, 1); }
+  .fl-studio-envelope__knob .dial-highlight {
+    opacity: 0;
+    transition: all 300ms cubic-bezier(0.39, 0.575, 0.565, 1); }
+  .fl-studio-envelope__knob:hover .dial, .fl-studio-envelope__knob.drag-active .dial {
+    transform: scale(0.9);
+    filter: brightness(10.2);
+    transition: all 300ms cubic-bezier(0.39, 0.575, 0.565, 1); }
+  .fl-studio-envelope__knob:hover .dial-highlight, .fl-studio-envelope__knob.drag-active .dial-highlight {
+    opacity: 0.05; }
+  .fl-studio-envelope__knob .focus-indicator {
+    opacity: 0;
+    transition: all 300ms cubic-bezier(0.39, 0.575, 0.565, 1); }
+  .fl-studio-envelope__knob.focus-active .focus-indicator {
+    opacity: 0.8; }
+
+.knob-input {
+  position: relative; }
+
+.knob-input__visual {
+  pointer-events: none;
+  width: 100%;
+  height: 100%; }
+
+.knob-input__input {
+  cursor: grab;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: rotate(-90deg); }
+
+body.knob-input__drag-active, body.knob-input__drag-active * {
+  cursor: grabbing !important; }
+
+/*# sourceMappingURL=surface1_remote.css.map */

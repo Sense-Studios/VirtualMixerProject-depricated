@@ -10,28 +10,28 @@ create a renderer
 create sources
 
 ```
-  // create some solids
+  // create some video sources, 2 for the mixer and a vhs effect
   var source1 = new VideoSource(renderer, {} );
   var source2 = new VideoSource(renderer, {} );
   var source3 = new VideoSource(renderer, { src: "https://s3-eu-west-1.amazonaws.com/nabu/veejay/clutter/vhs_noise3.mp4" } );
-  create sources
 
 ```
-verhaal
+now create your first mixer, this will mix between source1 and source2
 
 ```
-  // create a mixer, mix red and green
+  // create a mixer, mix the two video sources
   var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
 ```
-verhaal
+Crate an audio analyzer and assign it an audiostream. Can be a pls radio stream or an mp3 file providing CORS are allowed
 
 ```
-  // var analisi
+  // var analysis
   var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
 
 ```
-verhaal
+Now setup two FileManager for the sources. FileManagers keep track of which video is currently played.
+Assign it a 'set' file, which is a JSON file, with an array in it with urls of videos. Again CORS must be allowed on all files
 
 ```
   var filemanager = new FileManager( source1 )
@@ -41,21 +41,28 @@ verhaal
   filemanager2.load_set("/sets/programs_clutter.json")
 
 ```
-verhaal
+Now add a second mixer to mix both the first mixer with the VHS noice, that way there can be VHS noise independent
+of where the first mixer is set to.
+Connect the second mixer with the vhs noise source and the first mixer.
 
 ```
   // add noise
   var mixer2 = new Mixer( renderer, { source1: source3, source2: mixer1 });
 
 ```
-verhaal
+Now we have set up our mixer, lets add some effects.
+Contrast is in the CollorEffect (effect 61), let's set it to 0.4
+Connect the effect to your second mixer.
+
+Notice how we are building a Chain of Sources and Modules
 
 ```
   // add effect
   var contrast = new ColorEffect( renderer, { source: mixer2, effect: 61, extra: 0.4 } )
 
 ```
-verhaal
+Finally we connect the Effect to the Output, and we are done here.
+We init the renderer and start the update cycle.
 
 ```
   // finally asign that mixer to the output
@@ -70,7 +77,8 @@ verhaal
      ---------------------------------------------------------------------------- */
 
  ```
- verhaal
+ Now we can start configuring the mixer, let's et the mixmode on 2 () and the blendmode to 1 (normal)
+ The pod is set a little bit to source2 but mostly in the middle
 
  ```
   // set noise
@@ -79,18 +87,23 @@ verhaal
   mixer2.pod(0.6)
 
 ```
-verhaal
+Now we could update the effect here too, but we already set in during initiation.
+The effect library has some 64 effect, contrast is effect 61.
+The 'extra' parameter has en extra setting for each effect, the level of contrast
+in with this particular effect.
+http://virtualmixproject.com/docs/reference/Effect_ColorEffect.html
+
 
 ```
   contrast.effect(61)
   contrast.extra(0.4)
 
-  or
-
-
 
 ```
-verhaal
+Let's add the AudioAnalysisto the mixer.pod. The mixer pod takes a number between
+0 and 1 that reflects the position of the mixer. 0 for source left 1 for source right.
+The audioanalysis1 gives a number between 0 and 1 that reflects the current position
+between beats.
 
 ```
   audioanalysis1.add( mixer1.pod )
@@ -99,8 +112,15 @@ verhaal
 ```
 
 Finally we come to the heart of the mixer, an update function that measures beats and triggers a number of functions.
+This is where we are actual Mixing. Kind of.
 
+'beats' is a variable that counts every beat, dice is simply a random number.
+Every few beats the script checks a random number and executes a function if conditions are met.
+So for example, every 16 beats there is a 38% change the video in source1 will change
+every 32 beats there is a 50% change the bpm will be slowed down or sped up by half
+etc.
 
+This way most events happen on the beat, but are still random enough to provide variation.
 
 
 ```

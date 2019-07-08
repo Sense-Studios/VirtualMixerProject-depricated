@@ -208,6 +208,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   // http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/
   if ( currentcoloreffect == 60 ) {
     return vec4( src.rgb + extra, src.a );
+    //return vec4( src.rgb ^ (extra+1), src.a );
   }
 
   // CONTRAST [ 0 - 3 ]
@@ -317,11 +318,11 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
+      console.log("effect set to: ", currentEffect)
       renderer.customUniforms[_self.uuid+'_currentcoloreffect'].value = currentEffect
       // update uniform ?
     }
 
-    console.log("effect set to: ", currentEffect)
     return currentEffect
   }
 

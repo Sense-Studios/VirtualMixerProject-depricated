@@ -183,25 +183,55 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>// in your client (mixer)
- var socket1 = new SocketController( renderer )
- // should give you an object:
- // got command {command: "welcome", payload: "8170"}
+    <pre class="prettyprint"><code>// in your client (output)
+ // https://virtualmixproject.com/mixer/demo_socket_client
 
- // write your listeners
- socket1.addEventListener( 1, function( _arr ) {
-  // do something with _arr
+ var socket1 = new SocketController( renderer )
+ socket1.debug = true
+
+ // this should log a server welcome object with a uid
+ // got command {command: "welcome", payload: "8170"}
+ console.log(socket1.target)
+ > 8170
+
+ // should give you an string:"8170",
+ // make sure your user sees this string, so he can connects his _remote_ to this _client_
+
+ // optionally listen for the ready signal, which gives you the id too
+ socketcontroller.addEventListener("ready", function(d) console.log("client id:", d ));
+ > client id: 8170
+
+ // write the rest of your listeners
+ socket1.addEventListener( 1, function( _arr1 ) {
+  // do something with _arr1
+ })
+
+ socket1.addEventListener( 2, function( _arr2 ) {
+  // do something with _arr2
+ })
+
+ socket1.addEventListener( 3, function( _arr3 ) {
+  // do something with _arr3
  })
 
  - - -
 
- // in your controller
+ // in your controller (input, 'remote control')
+ // https://virtualmixproject.com/remotes/demo_socketcontroller_remote
+
  var socketcontroller = new SocketController()
 
- // make a way to enter the client-id: 8170
+ // make a way to enter the client-id: ( in this example: 8170 )
+ var get_client_id = ()=> { return document.getElementById('socket_client_id').value }
 
- socketcontroller.send( "8170", 1, [1,1] );
- socketcontroller.send( "8170", 1, [1,0] );</code></pre>
+ // send trigger 1 to socket get_client_id, may send to multiple ids: "8170,af44" always lowecase
+ // _commands are arrays of numbers or strings, to be interpreted on the client.
+ // [ "mixer1", "blend", 6 ]
+ // [ "mixer1", "pod", gamepad1.x-axis ]
+ // etc.
+
+ socketcontroller.send( get_client_id(), 1, [1,1] );
+ socketcontroller.send( get_client_id(), 1, [1,0] );</code></pre>
 
 
 
@@ -265,7 +295,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line53">line 53</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -323,7 +353,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line44">line 44</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line75">line 75</a>
     </li></ul></dd>
     
 
@@ -381,7 +411,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line56">line 56</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -439,7 +469,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line59">line 59</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line90">line 90</a>
     </li></ul></dd>
     
 
@@ -467,7 +497,7 @@
     
 
     
-    <h4 class="name" id="addEventListener"><span class="type-signature"></span>addEventListener<span class="signature">(_target, _callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addEventListener"><span class="type-signature"></span>addEventListener<span class="signature">(_trigger, _callback)</span><span class="type-signature"></span></h4>
     
 
     
@@ -511,7 +541,7 @@
 
         <tr>
             
-                <td class="name"><code>_target</code></td>
+                <td class="name"><code>_trigger</code></td>
             
 
             <td class="type">
@@ -527,7 +557,7 @@
 
             
 
-            <td class="description last"><p>the number of controller being pressed</p></td>
+            <td class="description last"><p>the unique id of the command to be sent</p></td>
         </tr>
 
     
@@ -550,7 +580,7 @@
 
             
 
-            <td class="description last"><p>the callback to be executed</p></td>
+            <td class="description last"><p>a function that executes when the trigger fires</p></td>
         </tr>
 
     
@@ -591,7 +621,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line139">line 139</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line180">line 180</a>
     </li></ul></dd>
     
 
@@ -633,7 +663,7 @@
     
 
     
-    <h4 class="name" id="removeEventListener"><span class="type-signature"></span>removeEventListener<span class="signature">(_target)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="removeEventListener"><span class="type-signature"></span>removeEventListener<span class="signature">(_trigger)</span><span class="type-signature"></span></h4>
     
 
     
@@ -641,7 +671,7 @@
 
 
 <div class="description">
-    <p>removeEventListener -- Not Implemented</p>
+    <p>removeEventListener, removes event listeners.</p>
 </div>
 
 
@@ -677,7 +707,7 @@
 
         <tr>
             
-                <td class="name"><code>_target</code></td>
+                <td class="name"><code>_trigger</code></td>
             
 
             <td class="type">
@@ -693,7 +723,7 @@
 
             
 
-            <td class="description last"><p>the number of controller being pressed</p></td>
+            <td class="description last"><p>the unique id of the command to be sent</p></td>
         </tr>
 
     
@@ -734,7 +764,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line121">line 121</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line162">line 162</a>
     </li></ul></dd>
     
 
@@ -833,7 +863,7 @@
 
             
 
-            <td class="description last"><p>the number of controller being pressed</p></td>
+            <td class="description last"><p>the client uid to be sent to, ie. ad48</p></td>
         </tr>
 
     
@@ -856,7 +886,7 @@
 
             
 
-            <td class="description last"><p>the number of controller being pressed</p></td>
+            <td class="description last"><p>unique id of the command, to be interpreted on the client</p></td>
         </tr>
 
     
@@ -879,7 +909,7 @@
 
             
 
-            <td class="description last"><p>the number of controller being pressed</p></td>
+            <td class="description last"><p>the actual _commands being send</p></td>
         </tr>
 
     
@@ -920,7 +950,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line100">line 100</a>
+        <a href="controllers_SocketController.js.html">controllers/SocketController.js</a>, <a href="controllers_SocketController.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -949,7 +979,9 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>socketcontroller.send( "a78r", 0, [ 1, 2, 3, 4 ] )</code></pre>
+    <pre class="prettyprint"><code>socketcontroller.send( "a78r", 0, [ "mixer1", "blend", 6 ] )
+ socketcontroller.send( "a78r", 112, [ "mixer1", "pod", gamepad1.x-axis ] )
+ socketcontroller.send( "a78r", 15, [ 1, 2, 3, 4 ] )</code></pre>
 
 
 
@@ -975,7 +1007,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 01 2019 02:40:50 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 22 2019 11:50:37 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

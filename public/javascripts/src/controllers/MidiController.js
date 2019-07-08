@@ -96,7 +96,6 @@ function MidiController( _options ) {
   /** @function Controller#KeyboardController~onMIDIMessage {event} */
   _self.onMIDIMessage = function(e) {
     if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
-    checkBindings(e.data) // depricated
     dispatchMidiEvent(e)
 
     // hello from midi
@@ -234,26 +233,6 @@ function MidiController( _options ) {
 
   /** @function Controller#KeyboardController~update  */
   _self.update = function() {}
-
-  // ---------------------------------------------------------------------------
-  // BINDS ARE DEPRICATED
-  /*
-  _self.bind = function( _key, _callback ) {
-    binds.push( { key: _key, callback: _callback } )
-    // check for double binds ?
-  }
-
-  _self.removeBind = function( _key, _num ) {
-    // always remove first ?
-  }
-
-  // [ state, key, velocity ]
-  var checkBindings = function(e) {
-    binds.forEach( function( _obj ) {
-      if ( e[1] == _obj.key ) _obj.callback(e)
-    });
-  }
-  */
 
   /**
    * @description

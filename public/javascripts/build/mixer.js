@@ -1140,9 +1140,9 @@ function GiphyManager( _source ) {
   _self.uuid = "GiphyManager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.source = _source
-  _self.file
-  _self.programs
-  _self.program
+  _self.file = ""
+  _self.programs = []
+  _self.program = ""
 
   // set in environment
   // this key is for demo purposes only
@@ -1153,11 +1153,14 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
+   window.myholder = null
   _self.needle = function( _needle ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
-      _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
+      console.log(d)
+      window.myholder = d
+      _self.programs = JSON.parse(d).data
     })
   }
 
@@ -1190,8 +1193,9 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#change
    */
   _self.change = function() {
-    if ( _self.programs.length == 0 ) return "no programs"
+    if ( _self.programs.length == 0 ) return "no programs found :("
     _self.program = _self.programs[ Math.floor( Math.random() * _self.programs.length ) ]
+    _self.file = _self.program
     _self.setSrc( _self.program.images.original.url );
   }
 
@@ -2025,7 +2029,6 @@ function MidiController( _options ) {
   /** @function Controller#KeyboardController~onMIDIMessage {event} */
   _self.onMIDIMessage = function(e) {
     if (_self.debug) console.log(" MIDIMESSAGE >>", e.data)
-    checkBindings(e.data) // depricated
     dispatchMidiEvent(e)
 
     // hello from midi
@@ -2164,26 +2167,6 @@ function MidiController( _options ) {
   /** @function Controller#KeyboardController~update  */
   _self.update = function() {}
 
-  // ---------------------------------------------------------------------------
-  // BINDS ARE DEPRICATED
-  /*
-  _self.bind = function( _key, _callback ) {
-    binds.push( { key: _key, callback: _callback } )
-    // check for double binds ?
-  }
-
-  _self.removeBind = function( _key, _num ) {
-    // always remove first ?
-  }
-
-  // [ state, key, velocity ]
-  var checkBindings = function(e) {
-    binds.forEach( function( _obj ) {
-      if ( e[1] == _obj.key ) _obj.callback(e)
-    });
-  }
-  */
-
   /**
    * @description
    *  send midi data back to the controller. To switch a light on, or to make it
@@ -2293,28 +2276,56 @@ SocketController.constructor = SocketController;
  *
  * @example
  *
- *  // in your client (mixer)
- *  var socket1 = new SocketController( renderer )
- *  // should give you an object:
- *  // got command {command: "welcome", payload: "8170"}
+ *  // in your client (output)
+ *  // https://virtualmixproject.com/mixer/demo_socket_client
  *
- *  // optionally listen for the ready signal
+ *  var socket1 = new SocketController( renderer )
+ *  socket1.debug = true
+ *
+ *  // this should log a server welcome object with a uid
+ *  // got command {command: "welcome", payload: "8170"}
+
+ *  console.log(socket1.target)
+ *  > 8170
+ *
+ *  // should give you an string:"8170",
+ *  // make sure your user sees this string, so he can connects his _remote_ to this _client_
+ *
+ *  // optionally listen for the ready signal, which gives you the id too
  *  socketcontroller.addEventListener("ready", function(d) console.log("client id:", d ));
+ *  > client id: 8170
  *
  *  // write the rest of your listeners
- *  socket1.addEventListener( 1, function( _arr ) {
- *   // do something with _arr
+ *  socket1.addEventListener( 1, function( _arr1 ) {
+ *   // do something with _arr1
+ *  })
+ *
+ *  socket1.addEventListener( 2, function( _arr2 ) {
+ *   // do something with _arr2
+ *  })
+ *
+ *  socket1.addEventListener( 3, function( _arr3 ) {
+ *   // do something with _arr3
  *  })
  *
  *  - - -
  *
- *  // in your controller
+ *  // in your controller (input, 'remote control')
+ *  // https://virtualmixproject.com/remotes/demo_socketcontroller_remote
+ *
  *  var socketcontroller = new SocketController()
  *
- *  // make a way to enter the client-id: 8170
+ *  // make a way to enter the client-id: ( in this example: 8170 )
+ *  var get_client_id = ()=> { return document.getElementById('socket_client_id').value }
  *
- *  socketcontroller.send( "8170", 1, [1,1] );
- *  socketcontroller.send( "8170", 1, [1,0] );
+ *  // send trigger 1 to socket get_client_id, may send to multiple ids: "8170,af44" always lowecase
+ *  // _commands are arrays of numbers or strings, to be interpreted on the client.
+ *  // [ "mixer1", "blend", 6 ]
+ *  // [ "mixer1", "pod", gamepad1.x-axis ]
+ *  // etc.
+ *
+ *  socketcontroller.send( get_client_id(), 1, [1,1] );
+ *  socketcontroller.send( get_client_id(), 1, [1,0] );
  *
  * @implements Controller
  * @constructor Controller#SocketController
@@ -2351,18 +2362,15 @@ function SocketController( _options  ) {
   }
 
   // test
-  _self.io.on('msg', function( _msg ) {
-    console.log( 'got msg', _msg )
-  })
-
-  // test
   _self.io.on('test', function( msg ) {
-    console.log( 'get test', msg )
+    console.log( 'got test', msg )
   })
 
-  // base command
+  // command
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
+
+    // always send the welcome command, might rename, it can be fired after server resets
     if ( _command.command == "welcome") {
       _self.target = _command.payload
 
@@ -2374,7 +2382,21 @@ function SocketController( _options  ) {
       })
     }
 
-    // Depricated
+    // when a reset of the target is requested
+    if ( _command.command == "reset_uuid") {
+      console.log("reset uuid", _command.payload)
+      _self.target = _command.payload
+
+      // dispatch it as reset  command
+      nodes.forEach( function( node, i ) {
+        if ( node.target == "reset_uuid" || node.target == "reset" ) {
+          node.callback(_command.payload)
+        }
+      })
+
+    }
+
+    // Depricated, write your own html to display
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
@@ -2397,12 +2419,14 @@ function SocketController( _options  ) {
    * @description
    *  send info, an _commands array, to a client
    * @example
-   *  socketcontroller.send( "a78r", 0, [ 1, 2, 3, 4 ] )
+   *  socketcontroller.send( "a78r", 0, [ "mixer1", "blend", 6 ] )
+   *  socketcontroller.send( "a78r", 112, [ "mixer1", "pod", gamepad1.x-axis ] )
+   *  socketcontroller.send( "a78r", 15, [ 1, 2, 3, 4 ] )
    *
    * @function Controller#SocketController#send
-   * @param {string} _client - the number of controller being pressed
-   * @param {integer} _trigger - the number of controller being pressed
-   * @param {array} _commands - the number of controller being pressed
+   * @param {string} _client - the client uid to be sent to, ie. ad48
+   * @param {integer} _trigger - unique id of the command, to be interpreted on the client
+   * @param {array} _commands - the actual _commands being send
    *
   */
   _self.send = function( _client, _trigger, _commands ) {
@@ -2416,16 +2440,16 @@ function SocketController( _options  ) {
 
   /**
    * @description
-   *  removeEventListener -- Not Implemented
+   *  removeEventListener, removes event listeners.
    * @example
    *  socketcontroller.removeEventListener(1)
    * @function Controller#SocketController#removeEventListener
-   * @param {integer} _target - the number of controller being pressed
+   * @param {integer} _trigger - the unique id of the command to be sent
    *
   */
-  self.removeEventListener = function( _target ) {
+  self.removeEventListener = function( _trigger ) {
     nodes.forEach( function(node, i ) {
-      if ( node.target == _target ) {
+      if ( node.target == _trigger ) {
         var removeNode = i
       }
     })
@@ -2442,12 +2466,12 @@ function SocketController( _options  ) {
    *  socketcontroller.addEventListener(1, function() )
    *
    * @function Controller#SocketController#addEventListener
-   * @param {integer} _target - the number of controller being pressed
-   * @param {function} _callback - the callback to be executed
+   * @param {integer} _trigger - the unique id of the command to be sent
+   * @param {function} _callback - a function that executes when the trigger fires
    *
   */
-  _self.addEventListener = function( _target, _callback,  ) {
-    nodes.push( { target: _target, callback: _callback } )
+  _self.addEventListener = function( _trigger, _callback,  ) {
+    nodes.push( { target: _trigger, callback: _callback } )
     console.log("Socket listeners: ", nodes)
   }
 
@@ -2712,6 +2736,7 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   // http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/
   if ( currentcoloreffect == 60 ) {
     return vec4( src.rgb + extra, src.a );
+    //return vec4( src.rgb ^ (extra+1), src.a );
   }
 
   // CONTRAST [ 0 - 3 ]
@@ -2821,11 +2846,11 @@ vec4 '+_self.uuid+'_output = coloreffect( '+source.uuid+'_output, ' + _self.uuid
   _self.effect = function( _num ){
     if ( _num != undefined ) {
       currentEffect = _num
+      console.log("effect set to: ", currentEffect)
       renderer.customUniforms[_self.uuid+'_currentcoloreffect'].value = currentEffect
       // update uniform ?
     }
 
-    console.log("effect set to: ", currentEffect)
     return currentEffect
   }
 
@@ -3522,406 +3547,446 @@ vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
 
  // of 8 1: NORMAL, 2: HARD, 3: NAM, 4: FAM, 5: LEFT, 6: RIGHT, 7: CENTER, 8: BOOM
 
-
-function Mixer( renderer, options ) {
-
-  // create and instance
-  var _self = this;
-  _self.function_list = [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
-  if (renderer == undefined) return
-
-  // set or get uid
-  if ( options.uuid == undefined ) {
-    _self.uuid = "Mixer_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-  } else {
-    _self.uuid = options.uuid
-  }
-
-  // add to renderer
-  renderer.add(_self)
-
-  // set options
-  var _options;
-  if ( options != undefined ) _options = options
-
-  // set type
-  _self.type = "Module";
-
-  // add local variables
-  var alpha1 = 1;
-  var alpha2 = 0;
-  var pod = 0;
-
-  // hoist an own bpm here
-  var currentBPM = 128
-  var currentMOD = 1
-  var currentBpmFunc = function() { return currentBPM; }
-  _self.autoFade = false
-  _self.fading = false
-
-  var mixmode = 1;
-  _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-
-  var blendmode = 1;
-  _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
-
-  var source1, source2;
-  source1 = options.source1 //|| options.src1;   // Mandatory
-  source2 = options.source2 //|| options.src2;   // Mandatory
-
-  _self.init = function() {
-
-    // add uniforms to renderer
-    renderer.customUniforms[_self.uuid+'_mixmode'] = { type: "i", value: 1 }
-    renderer.customUniforms[_self.uuid+'_blendmode'] = { type: "i", value: 1 }
-    //renderer.customUniforms[_self.uuid+'_pod'] = { type: "f", value: 0.5 }
-    renderer.customUniforms[_self.uuid+'_alpha1'] = { type: "f", value: 0.5 }
-    renderer.customUniforms[_self.uuid+'_alpha2'] = { type: "f", value: 0.5 }
-    renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
-
-    // add uniforms to fragmentshader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_blendmode;\n/* custom_uniforms */')
-    //renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_pod;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha1;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha2;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
-
-    // add blendmodes helper, we only need it once
-    if ( renderer.fragmentShader.indexOf('vec4 blend ( vec4 src, vec4 dst, int blendmode )') == -1 ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',
-`
-vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
-  if ( blendmode ==  1 ) return src + dst;
-  if ( blendmode ==  2 ) return src - dst;
-  if ( blendmode ==  3 ) return src * dst;
-  if ( blendmode ==  4 ) return min(src, dst);
-  if ( blendmode ==  5)  return vec4((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)),1.0);
-  if ( blendmode ==  6 ) return (src + dst) - 1.0;
-  if ( blendmode ==  7 ) return max(src, dst);
-  if ( blendmode ==  8 ) return (src + dst) - (src * dst);
-  if ( blendmode ==  9 ) return vec4((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)), 1.0);
-  if ( blendmode == 10 ) return src + dst;
-  if ( blendmode == 11 ) return vec4((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)), 1.0);
-  if ( blendmode == 12 ) return vec4((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))), 1.0);
-  if ( blendmode == 13 ) return vec4((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)), 1.0);
-  if ( blendmode == 14 ) return vec4((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))),1.0);
-  if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
-  if ( blendmode == 16 ) return vec4((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z),1.0);
-  if ( blendmode == 17 ) return abs(dst - src);
-  if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
-  return src + dst;
-}
-/* custom_helpers */
-`
-      );
+/*
+  class Polygon extend Shape {
+    constructor(height, width) {
+      this.x = super.x
+      this.y = super.y
+      this.height = height;
+      this.width = width;
     }
 
-    var shadercode = ""
-    shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
-    shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
-    shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
-    shadercode += _self.uuid+"_blendmode ) "
-    shadercode += ")"
-    shadercode += " + vec4(  "+source1.uuid+"_output.a < 1.0 ? "+source2.uuid+"_output.rgba * ( "+_self.uuid+"_alpha1 - "+source1.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
-    shadercode += " + vec4(  "+source2.uuid+"_output.a < 1.0 ? "+source1.uuid+"_output.rgba * ( "+_self.uuid+"_alpha2 - - "+source2.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
-    shadercode += ";\n"
-    shadercode += "  /* custom_main */  "
-
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
-  }
-
-  // autofade bpm
-  var starttime = (new Date()).getTime()
-  var c = 0
-  var cnt = 0
-
-  // fade time
-  var fadeAtTime = 0
-  var fadeTime = 0
-  var fadeTo = "b"
-  var fadeDuration = 0
-
-  /** @function Addon#Mixer~update */
-
-  /**
-   * @description
-   *  binds _currentBpmFunc_ to a function
-   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
-   *  it's called on update
-   * @example
-   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
-   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
-   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-   * @function Module#Mixer#bindBpm
-   * @param {function} binding allows for overriding internal bpm
-   */
-
-  _self.update = function() {
-    if ( _self.autoFade ) { // maybe call this bpmFollow?
-      // pod = currentBPM
-      currentBPM = currentBpmFunc()
-      c = ((new Date()).getTime() - starttime) / 1000;
-      _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+    get area() {
+      return this.calcArea()
     }
 
-    if ( _self.fading ) { // then call this autoFade
+    // klass.area
+
+    set area(a) {
+   }
+
+    // klass.area = 2
+
+    calcArea() {
+      return this.height * this.width;
+    }
+
+    // klass.calcArea( ... )
+
+    static info() {
+      return "lalalala info"
+    }
+
+    // Class.info()
+  }
+*/
+
+var Mixer = class {
+
+  static function_list() {
+    return [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
+  }
+
+  constructor( renderer, options ) {
+
+    // create and instance
+    var _self = this;
+    if (renderer == undefined) return
+
+    // set or get uid
+    if ( options.uuid == undefined ) {
+      _self.uuid = "Mixer_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+    } else {
+      _self.uuid = options.uuid
+    }
+
+    // add to renderer
+    renderer.add(_self)
+
+    // set options
+    var _options;
+    if ( options != undefined ) _options = options
+
+    // set type
+    _self.type = "Module";
+
+    // add local variables
+    var alpha1 = 1;
+    var alpha2 = 0;
+    var pod = 0;
+
+    // hoist an own bpm here
+    var currentBPM = 128
+    var currentMOD = 1
+    var currentBpmFunc = function() { return currentBPM; }
+    _self.autoFade = false
+    _self.fading = false
+
+    var mixmode = 1;
+    _self.mixmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+
+    var blendmode = 1;
+    _self.blendmodes = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ];
+
+    var source1, source2;
+    source1 = options.source1 //|| options.src1;   // Mandatory
+    source2 = options.source2 //|| options.src2;   // Mandatory
+
+    _self.init = function() {
+
+      // add uniforms to renderer
+      renderer.customUniforms[_self.uuid+'_mixmode'] = { type: "i", value: 1 }
+      renderer.customUniforms[_self.uuid+'_blendmode'] = { type: "i", value: 1 }
+      //renderer.customUniforms[_self.uuid+'_pod'] = { type: "f", value: 0.5 }
+      renderer.customUniforms[_self.uuid+'_alpha1'] = { type: "f", value: 0.5 }
+      renderer.customUniforms[_self.uuid+'_alpha2'] = { type: "f", value: 0.5 }
+      renderer.customUniforms[_self.uuid+'_sampler'] = { type: "t", value: null }
+
+      // add uniforms to fragmentshader
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_mixmode;\n/* custom_uniforms */')
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform int '+_self.uuid+'_blendmode;\n/* custom_uniforms */')
+      //renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_pod;\n/* custom_uniforms */')
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha1;\n/* custom_uniforms */')
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_alpha2;\n/* custom_uniforms */')
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec4 '+_self.uuid+'_output;\n/* custom_uniforms */')
+
+      // add blendmodes helper, we only need it once
+      if ( renderer.fragmentShader.indexOf('vec4 blend ( vec4 src, vec4 dst, int blendmode )') == -1 ) {
+        renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_helpers */',
+  `
+  vec4 blend ( vec4 src, vec4 dst, int blendmode ) {
+    if ( blendmode ==  1 ) return src + dst;
+    if ( blendmode ==  2 ) return src - dst;
+    if ( blendmode ==  3 ) return src * dst;
+    if ( blendmode ==  4 ) return min(src, dst);
+    if ( blendmode ==  5)  return vec4((src.x == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.x) / src.x)), (src.y == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.y) / src.y)), (src.z == 0.0) ? 0.0 : (1.0 - ((1.0 - dst.z) / src.z)),1.0);
+    if ( blendmode ==  6 ) return (src + dst) - 1.0;
+    if ( blendmode ==  7 ) return max(src, dst);
+    if ( blendmode ==  8 ) return (src + dst) - (src * dst);
+    if ( blendmode ==  9 ) return vec4((src.x == 1.0) ? 1.0 : min(1.0, dst.x / (1.0 - src.x)), (src.y == 1.0) ? 1.0 : min(1.0, dst.y / (1.0 - src.y)), (src.z == 1.0) ? 1.0 : min(1.0, dst.z / (1.0 - src.z)), 1.0);
+    if ( blendmode == 10 ) return src + dst;
+    if ( blendmode == 11 ) return vec4((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)), (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)), (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)), 1.0);
+    if ( blendmode == 12 ) return vec4((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))), (src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))), (src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))), 1.0);
+    if ( blendmode == 13 ) return vec4((src.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - src.x) * (1.0 - dst.x)), (src.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - src.y) * (1.0 - dst.y)), (src.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - src.z) * (1.0 - dst.z)), 1.0);
+    if ( blendmode == 14 ) return vec4((src.x <= 0.5) ? (1.0 - (1.0 - dst.x) / (2.0 * src.x)) : (dst.x / (2.0 * (1.0 - src.x))), (src.y <= 0.5) ? (1.0 - (1.0 - dst.y) / (2.0 * src.y)) : (dst.y / (2.0 * (1.0 - src.y))), (src.z <= 0.5) ? (1.0 - (1.0 - dst.z) / (2.0 * src.z)) : (dst.z / (2.0 * (1.0 - src.z))),1.0);
+    if ( blendmode == 15 ) return 2.0 * src + dst - 1.0;
+    if ( blendmode == 16 ) return vec4((src.x > 0.5) ? max(dst.x, 2.0 * (src.x - 0.5)) : min(dst.x, 2.0 * src.x), (src.x > 0.5) ? max(dst.y, 2.0 * (src.y - 0.5)) : min(dst.y, 2.0 * src.y), (src.z > 0.5) ? max(dst.z, 2.0 * (src.z - 0.5)) : min(dst.z, 2.0 * src.z),1.0);
+    if ( blendmode == 17 ) return abs(dst - src);
+    if ( blendmode == 18 ) return src + dst - 2.0 * src * dst;
+    return src + dst;
+  }
+  /* custom_helpers */
+  `
+        );
+      }
+
+      var shadercode = ""
+      shadercode += "vec4 "+_self.uuid+"_output = vec4( blend( "
+      shadercode += source1.uuid+"_output * "+_self.uuid+"_alpha1, "
+      shadercode += source2.uuid+"_output * "+_self.uuid+"_alpha2, "
+      shadercode += _self.uuid+"_blendmode ) "
+      shadercode += ")"
+      shadercode += " + vec4(  "+source1.uuid+"_output.a < 1.0 ? "+source2.uuid+"_output.rgba * ( "+_self.uuid+"_alpha1 - "+source1.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+      shadercode += " + vec4(  "+source2.uuid+"_output.a < 1.0 ? "+source1.uuid+"_output.rgba * ( "+_self.uuid+"_alpha2 - - "+source2.uuid+"_output.a ) : vec4( 0.,0.,0.,0. )  ) "
+      shadercode += ";\n"
+      shadercode += "  /* custom_main */  "
+
+      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', shadercode )
+    }
+
+    // autofade bpm
+    var starttime = (new Date()).getTime()
+    var c = 0
+    var cnt = 0
+
+    // fade time
+    var fadeAtTime = 0
+    var fadeTime = 0
+    var fadeTo = "b"
+    var fadeDuration = 0
+
+    /** @function Addon#Mixer~update */
+
+    /**
+     * @description
+     *  binds _currentBpmFunc_ to a function
+     *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+     *  it's called on update
+     * @example
+     *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+     *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+     *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+     * @function Module#Mixer#bindBpm
+     * @param {function} binding allows for overriding internal bpm
+     */
+
+    _self.update = function() {
+      
+      if ( _self.autoFade ) { // maybe call this bpmFollow?
+        // pod = currentBPM
+        currentBPM = currentBpmFunc()
+        c = ((new Date()).getTime() - starttime) / 1000;
+        _self.pod( ( Math.sin( c * Math.PI * currentBPM * currentMOD / 60 ) / 2 + 0.5 ) )
+      }
+
+      if ( _self.fading ) { // then call this autoFade
+
+        var now = (new Date()).getTime()
+        fadeAtTime = (fadeTime - now);
+        _num = fadeAtTime/fadeDuration
+        if (fadeTo =="b") _num = Math.abs(_num - 1)
+        //console.log("fader...", _num, Math.abs(_num - 1), fadeAtTime, fadeTime, now, fadeDuration, fadeTo)
+        if (_num < 0 ) _num = 0
+        if (_num > 1 ) _num = 1
+
+        _self.pod( _num )
+
+        if ( fadeAtTime < 0 ) {
+          _self.fading = false
+
+          // allstop
+          _num = Math.round(_num)
+          _num = Math.round(_num)
+          _self.pod(_num)
+        }
+      }
+    }
+
+    /** @function Addon#Mixer~render */
+    _self.render = function() {
+      return pod
+    }
+
+    // ---------------------------------------------------------------------------
+    // HELPERS
+    // ---------------------------------------------------------------------------
+
+    // you shouldnt be able to set these directly
+    _self.alpha1 = function() { return alpha1 }
+    _self.alpha2 = function() { return alpha2 }
+
+    /**
+     * @function Module#Mixer#mixMode
+     * @param {integer} mixmode index of the Mixmode
+     *
+     * @description
+     *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
+     *  ```
+     *  1: NORMAL (default),   regular, linear crossfade
+     *  2: HARD,               switches with a hard cut at 50%
+     *  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+     *  4: FAM,                fades with a downward curve, forcing a 'overlay' period
+     *  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+     *  6: LEFT,               forces the pod on 0 (locks pod)
+     *  7: RIGHT,              forces the pod on 1 (locks pod)
+     *  8: CENTER,             forces both sources at ~66% (locks pod)
+     *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+     *  ```
+     *
+    */
+    _self.mixMode = function( _num ) {
+      if ( _num != undefined ) { mixmode = _num }
+      return mixmode
+    }
+
+    /**
+     * @description
+     *  gets or sets the _blendMode_, there are 18 Blendmodes available, numbered 1-18;
+     *  ```
+     *  1 ADD (default),
+     *  2 SUBSTRACT,
+     *  3 MULTIPLY,
+     *  4 DARKEN,
+     *  5 COLOUR BURN,
+     *  6 LINEAR_BURN,
+     *  7 LIGHTEN,
+     *  8 SCREEN,
+     *  9 COLOUR_DODGE,
+     *  10 LINEAR_DODGE,
+     *  11 OVERLAY,
+     *  12 SOFT_LIGHT,
+     *  13 HARD_LIGHT,
+     *  14 VIVID_LIGHT,
+     *  15 LINEAR_LIGHT,
+     *  16 PIN_LIGHT,
+     *  17 DIFFERENCE,
+     *  18 EXCLUSION
+     *  ```
+     * @function Module#Mixer#blendMode
+     * @param {integer} blendmode index of the Blendmode
+    */
+    _self.blendMode = function( _num ) {
+      if ( _num != undefined ) {
+        blendmode = _num
+        renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
+      }
+      _self.pod( _self.pod() ) // update pod, precaution
+      return blendmode
+    }
+
+    /**
+     * @description the position of the handle, fader or pod. 0 is left, 1 is right
+     * @function Module#Mixer#pod
+     * @param {float} position position of the handle
+     */
+    _self.pod = function( _num ) {
+      //console.log("---> POD:", _num)
+      if ( _num != undefined ) {
+
+        // set pod position
+        pod = _num
+
+        // evaluate current mix style
+        // MIXMODE 1 normal mix
+        if (mixmode == 1) {
+          alpha1 = pod
+          alpha2 = 1 - pod
+        }
+
+        // MIXMODE 2 hard mix
+        if (mixmode == 2) {
+          alpha1 = Math.round( pod )
+          alpha2 = Math.round( 1-pod )
+        }
+
+        // MIXMODE 3 NAM mix
+        if (mixmode == 3) {
+          alpha1 = ( pod * 2 );
+          alpha2 = 2 - ( pod * 2 );
+          if ( alpha1 > 1 ) alpha1 = 1;
+          if ( alpha2 > 1 ) alpha2 = 1;
+        }
+
+        // MIXMODE 4 FAM mix
+        if (mixmode == 4) {
+          alpha1 = ( pod * 2 );
+          alpha2 = 2 - ( pod * 2 );
+        }
+
+        // MIXMODE 5 Non Dark mix
+        if (mixmode == 5) {
+          alpha1 = ( pod * 2 );
+          alpha2 = 2 - ( pod * 2 );
+          if ( alpha1 > 1 ) alpha1 = 1;
+          if ( alpha2 > 1 ) alpha2 = 1;
+          alpha1 += 0.36;
+          alpha2 += 0.36;
+        }
+
+        // MIXMODE 6 left
+        if (mixmode == 6) {
+          alpha1 = 1;
+          alpha2 = 0;
+        }
+
+        // MIXMODE 7 right
+        if (mixmode == 7) {
+          alpha1 = 0;
+          alpha2 = 1;
+        }
+
+        // MIXMODE 8 center
+        if (mixmode == 8) {
+          alpha1 = 0.5;
+          alpha2 = 0.5;
+        }
+
+        // MIXMODE 9 BOOM
+        if (mixmode == 9) {
+          alpha1 = 1;
+          alpha2 = 1;
+        }
+
+        // DEPRICATED BECAUSE OF actual ALPHA
+        // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
+        if (mixmode == 10 ) {
+          alpha1 = pod
+          alpha2 = 1;
+        }
+
+        // MIXMODE X ADDITIVE MIX RIGHT (use with lumkey en chromkey)
+        if (mixmode == 11 ) {
+          alpha1 = 1;
+          alpha2 = pod
+        }
+
+        // send alphas to the shader
+        renderer.customUniforms[_self.uuid+'_alpha1'].value = alpha1;
+        renderer.customUniforms[_self.uuid+'_alpha2'].value = alpha2;
+      }
+      return pod;
+    }
+
+    /**
+     * @description
+     *  gets or sets the _bpm_ or beats per minutes, locally in this mixer
+     *  defaults to 128
+     * @function Module#Mixer#bpm
+     * @param {number} bpm beats per minute
+    */
+    _self.bpm = function(_num) {
+        if ( _num  != undefined ) currentBPM = _num
+        return currentBPM
+    }
+
+    /**
+     * @description
+     *  gets or sets the _currentMOD_ or modifyer for the bpm
+     *  this way you can modify the actual tempo, make the beats
+     *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
+     * @function Module#Mixer#bpmMod
+     * @param {number} currentMod beat multiplyer for tempo
+    */
+    _self.bpmMod = function( _num ) {
+      if ( _num  != undefined ) currentMOD = _num
+      return currentMOD
+    }
+
+    /**
+     * @description
+     *  binds _currentBpmFunc_ to a function
+     *  whatever BPM _currentBpmFunc_ returns will be bpm used.
+     *  it's called on update
+     * @example
+     *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
+     *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
+     *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
+     * @function Module#Mixer#bindBpm
+     * @param {function} binding allows for overriding internal bpm
+     */
+    _self.bindBpm = function( _func ) {
+        currentBpmFunc = _func
+    }
+
+    /**
+     * @description
+     *  sets setAutoFade true/false
+     * @function Module#Mixer#setAutoFade
+     * @param {boolean} autoFade to do, or do not
+    */
+    _self.setAutoFade = function( _bool ) {
+      if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
+      if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
+    }
+
+    /**
+     * @description
+     *  fades from one channel to the other in _duration_ milliseconds
+     * @function Module#Mixer#fade
+     * @param {float} fadeDuration the duration of the fade
+    */
+    _self.fade = function( _duration ) {
+      var current = _self.pod()
+
+      // starts the loop
+      _self.fading = true
 
       var now = (new Date()).getTime()
-      fadeAtTime = (fadeTime - now);
-      _num = fadeAtTime/fadeDuration
-      if (fadeTo =="b") _num = Math.abs(_num - 1)
-      //console.log("fader...", _num, Math.abs(_num - 1), fadeAtTime, fadeTime, now, fadeDuration, fadeTo)
-      if (_num < 0 ) _num = 0
-      if (_num > 1 ) _num = 1
-
-      _self.pod( _num )
-
-      if ( fadeAtTime < 0 ) {
-        _self.fading = false
-
-        // allstop
-        _num = Math.round(_num)
-        _num = Math.round(_num)
-        _self.pod(_num)
-      }
+      fadeTime = ( now + _duration );
+      fadeTo == "a" ? fadeTo = "b" : fadeTo = "a"
+      //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
+      fadeDuration = _duration
     }
-  }
-
-  /** @function Addon#Mixer~render */
-  _self.render = function() {
-    return pod
-  }
-
-  // ---------------------------------------------------------------------------
-  // HELPERS
-  // ---------------------------------------------------------------------------
-
-  // you shouldnt be able to set these directly
-  _self.alpha1 = function() { return alpha1 }
-  _self.alpha2 = function() { return alpha2 }
-
-  /**
-   * @function Module#Mixer#mixMode
-   * @param {integer} mixmode index of the Mixmode
-   *
-   * @description
-   *  gets or sets the _mixMode_, there are 8 MixModes available, numbered 1-9;
-   *  ```
-   *  1: NORMAL (default),   regular, linear crossfade
-   *  2: HARD,               switches with a hard cut at 50%
-   *  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
-   *  4: FAM,                fades with a downward curve, forcing a 'overlay' period
-   *  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
-   *  6: LEFT,               forces the pod on 0 (locks pod)
-   *  7: RIGHT,              forces the pod on 1 (locks pod)
-   *  8: CENTER,             forces both sources at ~66% (locks pod)
-   *  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
-   *  ```
-   *
-  */
-  _self.mixMode = function( _num ) {
-    if ( _num != undefined ) { mixmode = _num }
-    return mixmode
-  }
-
-  /**
-   * @description
-   *  gets or sets the _blendMode_, there are 18 Blendmodes available, numbered 1-18;
-   *  ```
-   *  1 ADD (default),
-   *  2 SUBSTRACT,
-   *  3 MULTIPLY,
-   *  4 DARKEN,
-   *  5 COLOUR BURN,
-   *  6 LINEAR_BURN,
-   *  7 LIGHTEN,
-   *  8 SCREEN,
-   *  9 COLOUR_DODGE,
-   *  10 LINEAR_DODGE,
-   *  11 OVERLAY,
-   *  12 SOFT_LIGHT,
-   *  13 HARD_LIGHT,
-   *  14 VIVID_LIGHT,
-   *  15 LINEAR_LIGHT,
-   *  16 PIN_LIGHT,
-   *  17 DIFFERENCE,
-   *  18 EXCLUSION
-   *  ```
-   * @function Module#Mixer#blendMode
-   * @param {integer} blendmode index of the Blendmode
-  */
-  _self.blendMode = function( _num ) {
-    if ( _num != undefined ) {
-      blendmode = _num
-      renderer.customUniforms[_self.uuid+'_blendmode'].value = blendmode
-    }
-    _self.pod( _self.pod() ) // update pod, precaution
-    return blendmode
-  }
-
-  /**
-   * @description the position of the handle, fader or pod. 0 is left, 1 is right
-   * @function Module#Mixer#pod
-   * @param {float} position position of the handle
-   */
-  _self.pod = function( _num ) {
-    //console.log("---> POD:", _num)
-    if ( _num != undefined ) {
-
-      // set pod position
-      pod = _num
-
-      // evaluate current mix style
-      // MIXMODE 1 normal mix
-      if (mixmode == 1) {
-        alpha1 = pod
-        alpha2 = 1 - pod
-      }
-
-      // MIXMODE 2 hard mix
-      if (mixmode == 2) {
-        alpha1 = Math.round( pod )
-        alpha2 = Math.round( 1-pod )
-      }
-
-      // MIXMODE 3 NAM mix
-      if (mixmode == 3) {
-        alpha1 = ( pod * 2 );
-        alpha2 = 2 - ( pod * 2 );
-        if ( alpha1 > 1 ) alpha1 = 1;
-        if ( alpha2 > 1 ) alpha2 = 1;
-      }
-
-      // MIXMODE 4 FAM mix
-      if (mixmode == 4) {
-        alpha1 = ( pod * 2 );
-        alpha2 = 2 - ( pod * 2 );
-      }
-
-      // MIXMODE 5 Non Dark mix
-      if (mixmode == 5) {
-        alpha1 = ( pod * 2 );
-        alpha2 = 2 - ( pod * 2 );
-        if ( alpha1 > 1 ) alpha1 = 1;
-        if ( alpha2 > 1 ) alpha2 = 1;
-        alpha1 += 0.36;
-        alpha2 += 0.36;
-      }
-
-      // MIXMODE 6 left
-      if (mixmode == 6) {
-        alpha1 = 1;
-        alpha2 = 0;
-      }
-
-      // MIXMODE 7 right
-      if (mixmode == 7) {
-        alpha1 = 0;
-        alpha2 = 1;
-      }
-
-      // MIXMODE 8 center
-      if (mixmode == 8) {
-        alpha1 = 0.5;
-        alpha2 = 0.5;
-      }
-
-      // MIXMODE 9 BOOM
-      if (mixmode == 9) {
-        alpha1 = 1;
-        alpha2 = 1;
-      }
-
-      // DEPRICATED BECAUSE OF actual ALPHA
-      // MIXMODE X ADDITIVE MIX LEFT (use with lumkey en chromkey)
-      if (mixmode == 10 ) {
-        alpha1 = pod
-        alpha2 = 1;
-      }
-
-      // MIXMODE X ADDITIVE MIX RIGHT (use with lumkey en chromkey)
-      if (mixmode == 11 ) {
-        alpha1 = 1;
-        alpha2 = pod
-      }
-
-      // send alphas to the shader
-      renderer.customUniforms[_self.uuid+'_alpha1'].value = alpha1;
-      renderer.customUniforms[_self.uuid+'_alpha2'].value = alpha2;
-    }
-    return pod;
-  }
-
-  /**
-   * @description
-   *  gets or sets the _bpm_ or beats per minutes, locally in this mixer
-   *  defaults to 128
-   * @function Module#Mixer#bpm
-   * @param {number} bpm beats per minute
-  */
-  _self.bpm = function(_num) {
-      if ( _num  != undefined ) currentBPM = _num
-      return currentBPM
-  }
-
-  /**
-   * @description
-   *  gets or sets the _currentMOD_ or modifyer for the bpm
-   *  this way you can modify the actual tempo, make the beats
-   *  follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.
-   * @function Module#Mixer#bpmMod
-   * @param {number} currentMod beat multiplyer for tempo
-  */
-  _self.bpmMod = function( _num ) {
-    if ( _num  != undefined ) currentMOD = _num
-    return currentMOD
-  }
-
-  /**
-   * @description
-   *  binds _currentBpmFunc_ to a function
-   *  whatever BPM _currentBpmFunc_ returns will be bpm used.
-   *  it's called on update
-   * @example
-   *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
-   *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
-   *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-   * @function Module#Mixer#bindBpm
-   * @param {function} binding allows for overriding internal bpm
-   */
-  _self.bindBpm = function( _func ) {
-      currentBpmFunc = _func
-  }
-
-  /**
-   * @description
-   *  sets setAutoFade true/false
-   * @function Module#Mixer#setAutoFade
-   * @param {boolean} autoFade to do, or do not
-  */
-  _self.setAutoFade = function( _bool ) {
-    if ( _bool.toLowerCase() == "true" ) _self.autoFade = true
-    if ( _bool.toLowerCase() == "false" ) _self.autoFade = false
-  }
-
-  /**
-   * @description
-   *  fades from one channel to the other in _duration_ milliseconds
-   * @function Module#Mixer#fade
-   * @param {float} fadeDuration the duration of the fade
-  */
-  _self.fade = function( _duration ) {
-    var current = _self.pod()
-
-    // starts the loop
-    _self.fading = true
-
-    var now = (new Date()).getTime()
-    fadeTime = ( now + _duration );
-    fadeTo == "a" ? fadeTo = "b" : fadeTo = "a"
-    //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
-    fadeDuration = _duration
   }
 }
 
@@ -4122,7 +4187,7 @@ function GifSource( renderer, options ) {
 
   // set the source
   if ( options.src == undefined ) {
-     _self.currentSrc = '/gif/a443ae90a963a657e12737c466ddff95.gif'
+     _self.currentSrc = 'https://virtualmixerproject.com/gif/a443ae90a963a657e12737c466ddff95.gif'
   } else {
     _self.currentSrc = options.src
   }

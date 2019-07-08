@@ -11,28 +11,56 @@ SocketController.constructor = SocketController;
  *
  * @example
  *
- *  // in your client (mixer)
- *  var socket1 = new SocketController( renderer )
- *  // should give you an object:
- *  // got command {command: "welcome", payload: "8170"}
+ *  // in your client (output)
+ *  // https://virtualmixproject.com/mixer/demo_socket_client
  *
- *  // optionally listen for the ready signal
+ *  var socket1 = new SocketController( renderer )
+ *  socket1.debug = true
+ *
+ *  // this should log a server welcome object with a uid
+ *  // got command {command: "welcome", payload: "8170"}
+
+ *  console.log(socket1.target)
+ *  > 8170
+ *
+ *  // should give you an string:"8170",
+ *  // make sure your user sees this string, so he can connects his _remote_ to this _client_
+ *
+ *  // optionally listen for the ready signal, which gives you the id too
  *  socketcontroller.addEventListener("ready", function(d) console.log("client id:", d ));
+ *  > client id: 8170
  *
  *  // write the rest of your listeners
- *  socket1.addEventListener( 1, function( _arr ) {
- *   // do something with _arr
+ *  socket1.addEventListener( 1, function( _arr1 ) {
+ *   // do something with _arr1
+ *  })
+ *
+ *  socket1.addEventListener( 2, function( _arr2 ) {
+ *   // do something with _arr2
+ *  })
+ *
+ *  socket1.addEventListener( 3, function( _arr3 ) {
+ *   // do something with _arr3
  *  })
  *
  *  - - -
  *
- *  // in your controller
+ *  // in your controller (input, 'remote control')
+ *  // https://virtualmixproject.com/remotes/demo_socketcontroller_remote
+ *
  *  var socketcontroller = new SocketController()
  *
- *  // make a way to enter the client-id: 8170
+ *  // make a way to enter the client-id: ( in this example: 8170 )
+ *  var get_client_id = ()=> { return document.getElementById('socket_client_id').value }
  *
- *  socketcontroller.send( "8170", 1, [1,1] );
- *  socketcontroller.send( "8170", 1, [1,0] );
+ *  // send trigger 1 to socket get_client_id, may send to multiple ids: "8170,af44" always lowecase
+ *  // _commands are arrays of numbers or strings, to be interpreted on the client.
+ *  // [ "mixer1", "blend", 6 ]
+ *  // [ "mixer1", "pod", gamepad1.x-axis ]
+ *  // etc.
+ *
+ *  socketcontroller.send( get_client_id(), 1, [1,1] );
+ *  socketcontroller.send( get_client_id(), 1, [1,0] );
  *
  * @implements Controller
  * @constructor Controller#SocketController
@@ -69,18 +97,15 @@ function SocketController( _options  ) {
   }
 
   // test
-  _self.io.on('msg', function( _msg ) {
-    console.log( 'got msg', _msg )
-  })
-
-  // test
   _self.io.on('test', function( msg ) {
-    console.log( 'get test', msg )
+    console.log( 'got test', msg )
   })
 
-  // base command
+  // command
   _self.io.on('command', function( _command ) {
     console.log( 'got command', _command )
+
+    // always send the welcome command, might rename, it can be fired after server resets
     if ( _command.command == "welcome") {
       _self.target = _command.payload
 
@@ -92,7 +117,21 @@ function SocketController( _options  ) {
       })
     }
 
-    // Depricated
+    // when a reset of the target is requested
+    if ( _command.command == "reset_uuid") {
+      console.log("reset uuid", _command.payload)
+      _self.target = _command.payload
+
+      // dispatch it as reset  command
+      nodes.forEach( function( node, i ) {
+        if ( node.target == "reset_uuid" || node.target == "reset" ) {
+          node.callback(_command.payload)
+        }
+      })
+
+    }
+
+    // Depricated, write your own html to display
     if ( document.getElementById('sockets')) document.getElementById('sockets').innerHTML += "<div>" + _self.title  + " Socket: " + _self.target + "</div>"
   })
 
@@ -115,12 +154,14 @@ function SocketController( _options  ) {
    * @description
    *  send info, an _commands array, to a client
    * @example
-   *  socketcontroller.send( "a78r", 0, [ 1, 2, 3, 4 ] )
+   *  socketcontroller.send( "a78r", 0, [ "mixer1", "blend", 6 ] )
+   *  socketcontroller.send( "a78r", 112, [ "mixer1", "pod", gamepad1.x-axis ] )
+   *  socketcontroller.send( "a78r", 15, [ 1, 2, 3, 4 ] )
    *
    * @function Controller#SocketController#send
-   * @param {string} _client - the number of controller being pressed
-   * @param {integer} _trigger - the number of controller being pressed
-   * @param {array} _commands - the number of controller being pressed
+   * @param {string} _client - the client uid to be sent to, ie. ad48
+   * @param {integer} _trigger - unique id of the command, to be interpreted on the client
+   * @param {array} _commands - the actual _commands being send
    *
   */
   _self.send = function( _client, _trigger, _commands ) {
@@ -134,16 +175,16 @@ function SocketController( _options  ) {
 
   /**
    * @description
-   *  removeEventListener -- Not Implemented
+   *  removeEventListener, removes event listeners.
    * @example
    *  socketcontroller.removeEventListener(1)
    * @function Controller#SocketController#removeEventListener
-   * @param {integer} _target - the number of controller being pressed
+   * @param {integer} _trigger - the unique id of the command to be sent
    *
   */
-  self.removeEventListener = function( _target ) {
+  self.removeEventListener = function( _trigger ) {
     nodes.forEach( function(node, i ) {
-      if ( node.target == _target ) {
+      if ( node.target == _trigger ) {
         var removeNode = i
       }
     })
@@ -160,12 +201,12 @@ function SocketController( _options  ) {
    *  socketcontroller.addEventListener(1, function() )
    *
    * @function Controller#SocketController#addEventListener
-   * @param {integer} _target - the number of controller being pressed
-   * @param {function} _callback - the callback to be executed
+   * @param {integer} _trigger - the unique id of the command to be sent
+   * @param {function} _callback - a function that executes when the trigger fires
    *
   */
-  _self.addEventListener = function( _target, _callback,  ) {
-    nodes.push( { target: _target, callback: _callback } )
+  _self.addEventListener = function( _trigger, _callback,  ) {
+    nodes.push( { target: _trigger, callback: _callback } )
     console.log("Socket listeners: ", nodes)
   }
 
