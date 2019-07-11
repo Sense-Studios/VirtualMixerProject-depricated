@@ -9,10 +9,13 @@ GiphyManager.constructor = GiphyManager;
  *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
  *
  * @example
- *  var gifsource1 = new GifSource( source1 )
- *  var gifmanager1 = new Gyphymanager( gifsource1 );
- *  gifmanager1.search('vj'); // loads a set of gifs tagged "vj"
- *  gifmanager1.change();     // changes from one giffile to the other in the set
+ *  var gifsource1 = new GifSource( renderer, {} )
+ *  var gifmanager1 = new GiphyManager( gifsource1 )
+ *  gifmanager1.search('vj', function(){ // search giphy and do the callback
+ *    gifmanager1.change();     // changes from one giffile to the other in the set
+ *  })
+ *
+ *  Thee is a working example on codepen: https://codepen.io/xangadix/pen/vqmWzN
  *
  * @constructor Addon#Gyphymanager
  * @implements Addon
@@ -38,14 +41,13 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
-   window.myholder = null
-  _self.needle = function( _needle ) {
+   
+  _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
       console.log(" === GIPHY (re)LOADED === ")
-      console.log(d)
-      window.myholder = d
       _self.programs = JSON.parse(d).data
+      if (_callback != undefined) _callback ()
     })
   }
 
@@ -55,8 +57,8 @@ function GiphyManager( _source ) {
     * @function Addon#Gyphymanager#search
     * @param {string} query - Search term
     */
-  _self.search = function( _query ) {
-    _self.needle( _query );
+  _self.search = function( _query, _callback ) {
+    _self.needle( _query, _callback );
   }
 
   /**
@@ -94,5 +96,5 @@ function GiphyManager( _source ) {
   }
 
   // load it up with defaults
-  _self.needle("vj")
+  //_self.needle("vj")
 }

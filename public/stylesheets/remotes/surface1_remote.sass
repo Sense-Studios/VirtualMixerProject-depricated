@@ -39,10 +39,10 @@ body
   background-position: right .7em top 50%, 0 0
   background-size: .65em auto, 100%
   box-shadow: 0 1px 0 1px rgba(0,0,0,.04)
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+/Edge */
-  user-select: none; /* Standard */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* IE10+/Edge */
+  user-select: none;          /* Standard */
 
   &:active
     background-image: url(), linear-gradient(to bottom, #272d31 0%,#4a5158 100%)
@@ -198,10 +198,13 @@ select
   @include grid_container
   grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%
   grid-template-rows: 10% 75% 15%
-  grid-template-areas: ". . . . . bpm_display sync tap right_butt ." ". thumbnails_a thumbnails_a thumbnails_a thumbnails_a thumbnails_b thumbnails_b thumbnails_b thumbnails_b ." ". play_a play_a speed_a speed_a play_b play_b speed_b speed_b ."
+  grid-template-areas: ". . . . bpm_display bpm_adjust tap sync right_butt ." ". thumbnails_a thumbnails_a thumbnails_a thumbnails_a thumbnails_b thumbnails_b thumbnails_b thumbnails_b ." ". play_a play_a speed_a speed_a play_b play_b speed_b speed_b ."
 
   .left_butt
     grid-area: left_butt
+
+  .bpm_adjust
+    grid-area: bpm_adjust
 
   .bpm_display
     grid-area: bpm_display
@@ -282,7 +285,7 @@ select
   @include grid_container
   grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%
   grid-template-rows: 10% 75% 15%
-  grid-template-areas: ". left_butt play_pause timecode_adjust adjust_display bpm_adjust bpm_display sync tap ." ". sequencer_a sequencer_a sequencer_a sequencer_a sequencer_b sequencer_b sequencer_b sequencer_b ." ". sequence_control_a sequence_control_a sequence_control_a sequence_control_a sequence_control_b sequence_control_b sequence_control_b sequence_control_b  ."
+  grid-template-areas: ". left_butt play_pause adjust_display timecode_adjust bpm_display bpm_adjust tap sync ." ". sequencer_a sequencer_a sequencer_a sequencer_a sequencer_b sequencer_b sequencer_b sequencer_b ." ". sequence_control_a sequence_control_a sequence_control_a sequence_control_a sequence_control_b sequence_control_b sequence_control_b sequence_control_b  ."
 
   &.active
     left: 0
@@ -325,40 +328,29 @@ select
     min-height: 100%
     flex-direction: column
     display: flex
-    overflow-x: hidden
-    overflow-y: scroll
-    scroll-behavior: smooth
+    overflow: hidden
+    // for large lists
+    // overflow-x: hidden
+    // overflow-y: scroll
+    // scroll-behavior: smooth
 
     .seq_butt
       display: flex
       justify-content: flex-start
       align-items: center
       width: 100%
-      min-height: 42px
+      min-height: 12%
       margin-left: 0.5%
       margin-bottom: 0.5%
 
       //&.active
       //&.beat
-
+      // mot used
       .num
         width: 18px
         color: white
         text-align: center
         font-size: 12px
-
-      .button
-        @include default_button
-        width: 100%
-        height: 80%
-        top: 10%
-        display: flex
-        align-items: center
-        justify-content: center
-        border-top-right-radius: 0
-        border-bottom-right-radius: 0
-        border-right: 0
-        cursor: pointer
 
       .light
         width: 20px
@@ -366,9 +358,9 @@ select
         top: 10%
         border: 1px solid #000
         background: radial-gradient(#656565,#353535)
-        border-left: 0
-        border-top-right-radius: .5em
-        border-bottom-right-radius: .5em
+        border-right: 0
+        border-top-left-radius: .5em
+        border-bottom-left-radius: .5em
 
         &.green
           background: radial-gradient(#22AA22,#008800)
@@ -395,7 +387,19 @@ select
           50%
             background: radial-gradient(#656565,#353535)
 
-      // DEPRICATED
+
+      .button
+        @include default_button
+        width: 100%
+        height: 80%
+        top: 10%
+        display: flex
+        align-items: center
+        justify-content: center
+        border-top-left-radius: 0
+        border-bottom-left-radius: 0
+        border-left: 0
+        cursor: pointer
 
       .bank
         width: 30px
@@ -410,7 +414,7 @@ select
         border-top: solid 2px #858585
         border-bottom: solid 4px #151515
 
-        //&:hover
+        // &:hover
         // depricated
         &:active
           background: radial-gradient(#353535,#656565)
@@ -510,7 +514,7 @@ select
   grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%
   //grid-template-rows: 10% 10% 10% 10%
   background: radial-gradient(#1a1d22, #121318)
-  grid-template-areas: ". left_butt        client_id        client_id        bpm_adjust             bpm_display    tap   sync   right_butt       ." ". mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   ." ". blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select ." ". effects_a        effects_a        effects_a        effects_a        effects_b        effects_b        effects_b        effects_b        ." ". main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         ." ". blackout         blackout         blackout         blackout         whiteout         whiteout         whiteout         whiteout         ."
+  grid-template-areas: ". left_butt        client_id        client_id    bpm_display bpm_adjust    tap   sync   right_butt       ." ". mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   ." ". blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select ." ". effects_a        effects_a        effects_a        effects_a        effects_b        effects_b        effects_b        effects_b        ." ". main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         ." ". blackout         blackout         blackout         blackout         whiteout         whiteout         whiteout         whiteout         ."
   transition-duration: 0.6s
 
   &.active
@@ -531,6 +535,7 @@ select
 
   .client_id
     grid-area: client_id
+
     input
       width: 90%
       margin-left: 5%
@@ -588,6 +593,7 @@ select
 
   .main_pod
     grid-area: main_pod
+
     input[type="range"]
       width: 100%
       -webkit-appearance: none
@@ -617,8 +623,6 @@ select
 
   .whiteout
     grid-area: whiteout
-
-
 
 // FL studio knobs - demo styles -----------------------------------------------
 
@@ -684,7 +688,6 @@ $tension-knob-size: 60px
   letter-spacing: 1px
   text-transform: uppercase
 
-
 // FL studio knobs - control styles --------------------------------------------
 
 .fl-studio-envelope__knob
@@ -728,7 +731,6 @@ $tension-knob-size: 60px
   &.focus-active
     .focus-indicator
       opacity: 0.8
-
 
 // Control Knob component styles -----------------------------------------------
 

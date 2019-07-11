@@ -88,7 +88,11 @@ function GifSource( renderer, options ) {
     // sup1.load();
     console.log(_self.uuid, " Load", _self.currentSrc, "..." )
     //supergifelement.load_url( _self.currentSrc )
-    supergifelement.load_url( _self.currentSrc, function() { console.log("play gif"); supergifelement.play(); } )
+    supergifelement.load_url( _self.currentSrc, function() {
+      console.log("play initial source"); 
+      supergifelement.play();
+    } )
+
     console.log('Gifsource Loaded First source!', _self.currentSrc, "!")
      _self.bypass = false
   }
@@ -120,10 +124,13 @@ function GifSource( renderer, options ) {
   _self.src = function( _file ) {
     if ( _file == undefined ) return _self.currentSrc
 
-    console.log("executed src")
+    console.log("load new src: ", _file)
     _self.currentSrc = _file
     supergifelement.pause()
-    supergifelement.load_url( _file, function() { console.log("play gif"); supergifelement.play(); } )
+    supergifelement.load_url( _file, function() {
+      console.log("play gif", _file);
+      supergifelement.play();
+    } )
   }
 
   _self.play =         function() { return supergifelement.play() }

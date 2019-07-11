@@ -75,11 +75,12 @@ socket1.addEventListener('reset_uuid',function(e) {
 socket1.addEventListener('main_pod',        function(e) { mixer1.pod(e[0]/100) } )
 socket1.addEventListener('autofade',        function(e) { mixer1.autoFade = !mixer1.autoFade  } )
 socket1.addEventListener('tap',             function(e) { bpm.tap(); mixer1.bpm(bpm.bpm) } );
+socket1.addEventListener('bpm',             function(e) { bpm.bpm = e; mixer1.bpm(bpm.bpm) } );
 socket1.addEventListener('mixmode',         function(e) { mixer1.mixMode(e[0]); console.log(e[0])    } )
 socket1.addEventListener('blendmode',       function(e) { mixer1.blendMode(e[0]); console.log(e[0])   } )
 
 socket1.addEventListener('effecta_1',       function(e) { effect_a_1.effect(e[0])      } )
-socket1.addEventListener('effecta_1_extra', function(e) {  effect_a_1.extra(e[0]/ 100) } )
+socket1.addEventListener('effecta_1_extra', function(e) { effect_a_1.extra(e[0]/ 100) } )
 socket1.addEventListener('effecta_2',       function(e) { effect_a_2.effect(e[0])      } )
 socket1.addEventListener('effecta_2_extra', function(e) { effect_a_2.extra(e[0]/ 100)  } )
 socket1.addEventListener('effecta_3',       function(e) { effect_a_3.effect(e[0])      } )
@@ -128,7 +129,7 @@ socket1.addEventListener('get_mixer_status',        function(e) {
 
 socket1.addEventListener('sequence_button', function(e) {
   //{ button_id: _id, target_id: socket1.target, timestamp: (new Date).getTime() }
-  console.log("sequence button ... ")
+  console.log("sequence button ... ", e)
   var video_target = video1
   var target_time = (new Date()) - e.timestamp
   var set_time = video_target.video.currentTime - (target_time/1000)

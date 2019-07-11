@@ -27,7 +27,6 @@ html
         feComposite(in='blur',in2='SourceGraphic',operator='over')
       
   body
-          
   
     .scroll-container
       
@@ -36,6 +35,21 @@ html
       // -----------------------------------------------------------------------
       
       #movies_container.state_2
+        .bpm_adjust
+          .fl-studio-envelope__tension
+            //.fl-studio-envelope__label speed
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='bpm_adjust_knob_1', data-min=0.8, data-max=1.2)
+              svg.knob-input__visual(viewBox='-10 -10 60 60')
+                circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
+                circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
+                path.indicator-ring(d='M20,20Z',fill='#4eccff')
+                g.dial
+                  circle(cx=20,cy=20,r=16,fill='url(#grad-dial-soft-shadow)')
+                  ellipse(cx=20,cy=22,rx=14,ry=14.5,fill='#242a2e',opacity=0.15)
+                  circle(cx=20,cy=20,r=14,fill='url(#grad-dial-base)',stroke='#242a2e',stroke-width=1.5)
+                  circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
+                  circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')  
+                
         .bpm_display
           .display 128
         
@@ -57,7 +71,7 @@ html
         .thumbnails_a__speed
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_a')
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_a', data-min=0, data-max=2)
               svg.knob-input__visual(viewBox='0 0 40 40')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
@@ -75,7 +89,7 @@ html
         .thumbnails_b__speed
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_b')
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='speed_b', data-min=0, data-max=2)
               svg.knob-input__visual(viewBox='0 0 40 40')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
@@ -87,8 +101,6 @@ html
                   circle(cx=20,cy=20,r=13,fill='transparent',stroke='url(#grad-dial-highlight)',stroke-width=1.5)
                   circle.dial-highlight(cx=20,cy=20,r=14,fill='#ffffff')        
               
-
-
       // -----------------------------------------------------------------------
       //   page 2: mixer 
       // -----------------------------------------------------------------------
@@ -103,7 +115,7 @@ html
         .bpm_adjust
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='bpm_adjust_knob_2', data-min=0.8, data-max=1.2)
               svg.knob-input__visual(viewBox='-10 -10 60 60')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
@@ -183,7 +195,6 @@ html
         //  fade right
         //  trans
 
-
       // -----------------------------------------------------------------------
       //   page 3: Sequencer
       // -----------------------------------------------------------------------
@@ -199,7 +210,7 @@ html
         .timecode_adjust
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='timecode_adjust_knob', data-min=0, data-max=2)
               svg.knob-input__visual(viewBox='-10 -10 60 60')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
@@ -214,7 +225,7 @@ html
         .bpm_adjust
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='adjust_know_')
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='bpm_adjust_knob_3', data-min=0.8, data-max=1.2)
               svg.knob-input__visual(viewBox='-10 -10 60 60')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
@@ -242,14 +253,15 @@ html
         template#seq_button_template
           .seq_butt
             //.num 0
-            .button(data-timecode="", onmousedown='sequenceButton(this)', ontouchstart='sequenceButton(this)')
             .light
+            .button(data-id=0, data-timecode="", onmousedown='sequenceButton(this)', ontouchstart='sequenceButton(this)')            
             .bank(onmousedown='bankButton(this)')
 
+        // sequence a container attacher
         .sequence_buttons_a#seq_butts_a
           
+        // sequence a container attacher
         .sequence_buttons_b#seq_butts_b
-
         
         .sequence_control_a
             button(onclick='control_button("fbwd_a")') <<
@@ -265,7 +277,7 @@ html
             button(onclick='control_button("ffwd_b")') >          
             button(onclick='control_button("fwd_b")') >>
         
-
+    // add remote javascript
     script(src='/javascripts/remotes/surface1_remote.js')
     
   
