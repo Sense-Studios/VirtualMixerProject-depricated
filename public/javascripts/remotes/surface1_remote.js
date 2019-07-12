@@ -46,6 +46,7 @@ function elm(_elm) {
 
 // tap beat
 function tap(_elm)  {
+  console.log("tap")
   _elm.longpressstart = (new Date).getTime()
   _elm.longpress = setTimeout( longpress, 400, _elm )
   _elm.onmouseup = _elm.ontouchend = function(evt) {
@@ -424,46 +425,44 @@ function bankButton( _elm ) {
   console.log(" bankButton mouse down", _elm)
 
   start_time = (new Date).getTime()
-  _elm.long_press = setTimeout( function() {
-    clearTimeout(_elm.long_press)
-    longPress(_elm)
-  }, 350 )
-
-  _elm.onmouseup = _elm.ontouchend = function() {
-    console.log(" bankButton mouse up")
-    clearInterval(_elm.long_press)
+  _elm.longpressstart = (new Date).getTime()
+  _elm.longpress = setTimeout( longPress, 400, _elm)
+  _elm.onmouseup = _elm.ontouchend = function(evt) {
+    evt.preventDefault()
     normalPress(_elm)
-    _elm.onmouseup = null
+    clearTimeout(_elm.longpress)
   }
 
   // switch on/off active bank
   function longPress(_elm) {
-    _elm.onmouseup = null
     console.log("bankButton long press!")
+    clearTimeout(_elm.longpress )
     if ( active_bank_a[_elm.dataset.sequence_id] == 1 ) {
       active_bank_a[_elm.dataset.sequence_id] = 0
     }else{
       active_bank_a[_elm.dataset.sequence_id] = 1
     }
+    console.log("longpress set select to -1")
+    _elm.onmouseup = _elm.ontouchend = null
+    selected_bank_a = -1
     redraw_sequencer()
   }
 
   function normalPress(_elm) {
-    _elm.onmouseup = null
+    _elm.onmouseup = _elm.ontouchend = null
 
     // select
     var current_sequence = "a"
     if ( _elm.id.indexOf('button_b') ) current_sequence = "b"
     document.querySelectorAll('.sequence_buttons_a .bank').forEach( (_bank, i)=> { if ( _bank != _elm ) _bank.classList.remove('yellow') } )
-    _elm.classList.toggle('yellow')
 
-
-    if (_elm.classList.contains('yellow')) {
+    if ( selected_bank_a != _elm.dataset.sequence_id ) {
       selected_bank_a = _elm.dataset.sequence_id
     } else {
       selected_bank_a = -1
     }
 
+    console.log("normal set select to ", selected_bank_a)
     // redrawwith new selected bank
     redraw_sequencer()
   }
@@ -530,17 +529,27 @@ function redraw_sequencer() {
     if ( selected_bank_a != -1) {
       sequence_a[selected_bank_a].forEach( function(val, i) {
         var _elm = document.querySelectorAll('.seq_butt .button')[i]
-        _elm.dataset.timecode = val
-        _elm.innerText = val
-        if ( val != "" ) _elm.previousElementSibling.classList.add('green')
+        if ( val != "" ) {
+          _elm.dataset.timecode = val
+          _elm.innerText = Math.round(val*100)/100
+          _elm.previousElementSibling.classList.add('green')
+        }else{
+          _elm.dataset.timecode = ""
+          _elm.innerText = ""
+        }
       })
     } else if( bank_c != -1) {
       // console.log("use bank", bank_c)
       sequence_a[bank_c].forEach( function(val, i) {
         var _elm = document.querySelectorAll('.seq_butt .button')[i]
-        _elm.dataset.timecode = val
-        _elm.innerText = val
-        if ( val != "" ) _elm.previousElementSibling.classList.add('green')
+        if ( val != "" ) {
+          _elm.dataset.timecode = val
+          _elm.innerText = Math.round(val*100)/100
+          _elm.previousElementSibling.classList.add('green')
+        }else{
+          _elm.dataset.timecode = ""
+          _elm.innerText = ""
+        }
       })
     }
   })

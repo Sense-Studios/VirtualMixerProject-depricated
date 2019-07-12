@@ -54,7 +54,7 @@ html
           .display 128
         
         .sync
-          button#sync2(onmousedown='sync(this)') sync
+          button#sync2(onmousedown='sync(this)', ontouchstart='sync(this)') sync
           
         .tap 
           button#tap2(onmousedown='tap(this)', ontouchstart='tap(this)') tap
@@ -134,7 +134,7 @@ html
           button#mixer_right »
         
         .sync 
-          button#sync(onmousedown='sync(this)') sync
+          button#sync(onmousedown='sync(this)', ontouchstart='sync(this)') sync
           
         .tap 
           button#tap(onmousedown='tap(this)', ontouchstart='tap(this)') tap
@@ -244,7 +244,7 @@ html
           .display 128
         
         .sync 
-          button#sync3(onmousedown='sync(this)') sync
+          button#sync3(onmousedown='sync(this)', ontouchstart='sync(this)') sync
           
         .tap 
           button#tap3(onmousedown='tap(this)', ontouchstart='tap(this)') tap
@@ -255,7 +255,7 @@ html
             //.num 0
             .light
             .button(data-id=0, data-timecode="", onmousedown='sequenceButton(this)', ontouchstart='sequenceButton(this)')            
-            .bank(onmousedown='bankButton(this)')
+            .bank(onmousedown='bankButton(this)', ontouchstart='bankButton(this)')            
 
         // sequence a container attacher
         .sequence_buttons_a#seq_butts_a
@@ -264,18 +264,18 @@ html
         .sequence_buttons_b#seq_butts_b
         
         .sequence_control_a
-            button(onclick='control_button("fbwd_a")') <<
-            button(onclick='control_button("bwd_a")') <
-            button(onclick='control_button("play_pause_a")') >||
-            button(onclick='control_button("ffwd_a")') >
-            button(onclick='control_button("fwd_a")') >>
+            button(onmousedown='control_button("fbwd_a")') <<
+            button(onmousedown='control_button("bwd_a")') <
+            button(onmousedown='control_button("play_pause_a")') >||
+            button(onmousedown='control_button("ffwd_a")') >
+            button(onmousedown='control_button("fwd_a")') >>
 
         .sequence_control_b          
-            button(onclick='control_button("fbwd_b")') <<          
-            button(onclick='control_button("bwd_b")') <
-            button(onclick='control_button("play_pause_b")') >||          
-            button(onclick='control_button("ffwd_b")') >          
-            button(onclick='control_button("fwd_b")') >>
+            button(onmousedown='control_button("fbwd_b")') <<          
+            button(onmousedown='control_button("bwd_b")') <
+            button(onmousedown='control_button("play_pause_b")') >||          
+            button(onmousedown='control_button("ffwd_b")') >          
+            button(onmousedown='control_button("fwd_b")') >>
         
     // add remote javascript
     script(src='/javascripts/remotes/surface1_remote.js')
