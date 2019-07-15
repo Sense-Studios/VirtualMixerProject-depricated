@@ -5,6 +5,7 @@
 var socket1 = new SocketController();
 var utils = new Utils()
 var bpm = 128
+var orig_bpm = 128
 var client_status = {}
 
 // get welcom
@@ -116,7 +117,6 @@ setTimeout( function() {
   elm('speed_b').onchange = function() {           socket1.send( get_client_id(), "speed_b",         [elm('speed_b').value] ); }
 
   // bpm adjustment knobs
-  var orig_bpm = 128
   document.querySelectorAll('.bpm_adjust').forEach( function(_elm, i) {
     _elm.getElementsByClassName('knob-input__input')[0].onchange = function(evt) {
       bpm = orig_bpm * this.value
@@ -233,28 +233,6 @@ utils.get('/sets/programs_runner.json', function(e) {
         socket1.send(get_client_id(), "change_b", [this.dataset.key])
       }
     }
-
-    /*
-    _elm.ontouchstart = _elm.onmousedown = function() {
-      console.log("down")
-      _elm.longpressstart = (new Date).getTime()
-      _elm.currentduration = 0 // -- send out how much the video should go back?
-      try { clearInterval(_elm.longpress) } catch(e) {}
-      _elm.longpress = setInterval( function() {
-
-      }, 200 )
-    }
-
-    _elm.ontouchend = _elm.onmouseup = function() {
-      console.log("up")
-      if (false){
-        _elm.longpressend = (new Date).getTime()
-      }else{
-        socket1.send(get_client_id(), "jump_b", [])
-      }
-    }
-    */
-
   })
 })
 
@@ -270,55 +248,9 @@ var beat = false
 var starttime = (new Date()).getTime()
 
 var seq_c = 0
-var bank_c = -1
-var bank_c_a = -1
-var bank_c_b = -1
+var bank_c = -1 // depricated
 
-// temp/ test
-var test_bank = 0
-
-// -----------------------------------------------------------------------------
-// This is all for BANK A
-var sequence_a = [
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ]
-]
-
-var active_bank_a = [0,0,0,0,0,0,0]
-
-var sequencer_a_rows = sequence_a.length
-var sequencer_rows = sequence_a.length // depricated
-
-var selected_button_a = -1
-var selected_bank_a = -1
-
-// -----------------------------------------------------------------------------
-// This is all for BANK B
-var sequence_b = [
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ],
-  ["", "", "", "", "", "", "", "", "" ]
-]
-
-var active_bank_b = [0,0,0,0,0,0,0]
-
-var sequencer_b_rows = sequence_a.length
-var sequencer_rows = sequence_a.length // depricated
-
-var selected_button_b = -1
-var selected_bank_b = -1
-// -----------------------------------------------------------------------------
+var sequencer_rows = 8
 
 // play/pause
 function toggleSequencer( _elm ) {
@@ -331,229 +263,248 @@ function toggleSequencer( _elm ) {
   }
 }
 
-function init() {
-  var template = elm('seq_button_template')
-  for (var i=0; i < sequencer_rows; i++) {
+// ---
 
-    var clone_a = document.importNode( template.content, true );
-    // if ( i%4 == 0 ) {seq_butt}
-    // clone_a.querySelectorAll('.num')[0].innerText = i + 1
-    clone_a.querySelectorAll('.button')[0].id = "button_a_"  + i
-    clone_a.querySelectorAll('.button')[0].dataset.sequence = "a"
-    clone_a.querySelectorAll('.button')[0].dataset.sequence_id = i
-    clone_a.querySelectorAll('.light')[0].classList.add('light_a_' + i)
-    clone_a.querySelectorAll('.bank')[0].dataset.sequence_id = i
-    elm('seq_butts_a').appendChild( clone_a )
+function create_sequence( _elm ) {
 
-    var clone_b = document.importNode( template.content, true );
-    //clone_b.querySelectorAll('.num')[0].innerText = i + 1
-    clone_b.querySelectorAll('.button')[0].id = "button_b_"  + i
-    clone_b.querySelectorAll('.button')[0].dataset.sequence = "b"
-    clone_b.querySelectorAll('.button')[0].dataset.sequence_id = i
-    clone_b.querySelectorAll('.light')[0].classList.add('light_b_' + i)
-    clone_b.querySelectorAll('.bank')[0].dataset.sequence_id = i
-    elm('seq_butts_b').appendChild( clone_b )
+  // for lutsers
+  // id element  == string, document.getElementById( _elm )
+
+  // attach date
+  _elm.sequence = [
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ],
+    ["", "", "", "", "", "", "", "" ]
+  ]
+
+  _elm.active_bank = [ 1, 0, 0, 0, 0, 0, 0, 0 ]
+
+  _elm.bank_c = -1            // current bank
+  _elm.seq_c = -1             // current sequence
+  _elm.selected_button = -1   // current selection, if any
+  _elm.selected_bank = -1     // current bank selected, if any
+  _elm.debug = false
+
+  // init
+  var template = elm('seq_button_template') // might be an options, non?
+
+  for (var i=0; i < _elm.sequence.length; i++) {
+    _elm.appendChild( document.importNode( template.content, true ) )
+
+    var button = _elm.children[i].querySelectorAll('.button')[0]
+    var bank = _elm.children[i].querySelectorAll('.bank')[0]
+    button.dataset.id = i
+    bank.dataset.id = i
+
+    // -------------------------------------------------------------------------
+    // BUTTON
+    // -------------------------------------------------------------------------
+
+    // interface
+    button.onmousedown = button.ontouchstart = function( _evt ) {
+      this.start_time = (new Date).getTime()
+      this.long_press = setTimeout( this.button_longpress, 400, this )
+      this.onmouseup = this.ontouchend = function( _evt ) {
+        _evt.preventDefault()
+        this.button_normalpress(this)
+        clearTimeout(this.long_press)
+      }
+    }
+
+    // normalpress
+    button.button_normalpress = function( _button ) {
+      console.log("button_normalpress", _button )
+      var le_bank = null
+      if ( _elm.selected_bank == -1 && elm.bank_c == -1 ) {
+        console.warn("no bank could be determind")
+        return
+      } else if ( _elm.selected_bank != -1 ) {
+        le_bank = _elm.selected_bank
+      } else{
+        le_bank = _elm.bank_c
+      }
+
+      if ( _button.innerText != "" ) {
+        _elm.sequence[le_bank][_button.dataset.id] = ""
+        _elm.redraw()
+      }else{
+        socket1.send( get_client_id(), 'sequence_button', {
+          sequence_id: _elm.id,
+          button_id: _button.dataset.id,
+          target_id: socket1.target,
+          timestamp: _button.start_time - 0.2,
+          sequence: [ le_bank, Number( _button.dataset.id ) ]
+        } )
+      }
+    }
+
+    // longpress
+    button.button_longpress = function( _button ) {
+      console.log("button_longpress", _button)
+      _button.onmouseup = _button.ontouchend = null
+      _elm.selected_button = _button.dataset.id
+    }
+
+    // -------------------------------------------------------------------------
+    // BANK
+    // -------------------------------------------------------------------------
+
+    // interface
+    bank.onmousedown = bank.ontouchstart = function( _evt ) {
+      this.long_press = setTimeout( this.bank_longpress, 400, this )
+      this.onmouseup = this.ontouchend = function( _evt ) {
+        _evt.preventDefault()
+        this.bank_normalpress(this)
+        clearTimeout(this.long_press)
+      }
+    }
+
+    // normalpress
+    bank.bank_normalpress = function( _bank ) {
+      console.log("bank_normalpress", _bank, _elm.querySelector('.bank').dataset.id)
+      // turn bank on and of
+      _elm.active_bank[ _bank.dataset.id ] == 1 ? _elm.active_bank[ _bank.dataset.id ] = 0 : _elm.active_bank[ _bank.dataset.id ] = 1
+      _elm.redraw()
+    }
+
+    // longpress
+    bank.bank_longpress = function( _bank ) {
+      console.log("bank_longpress", _bank, _bank.dataset.id, _elm.selected_bank, _bank.selected_bank == _bank.dataset.id )
+      _bank.onmouseup = _bank.ontouchend = null
+      if ( _elm.selected_bank == _bank.dataset.id ) {
+        _elm.selected_bank = -1
+      }else{
+        _elm.selected_bank = _bank.dataset.id
+      }
+
+      _elm.redraw()
+    }
   }
+
+  // redraw the state
+  _elm.redraw = function() {
+
+    if ( _elm.debug == true ) {
+      console.log("redraw: ", _elm )
+      console.table(_elm.sequence)
+      console.table(_elm.active_bank.join(','))
+      console.log("bank_c", _elm.bank_c )
+      console.log("seq_c",_elm.seq_c )
+      console.log("selected_button",_elm.selected_button )
+      console.log("selected_bank",_elm.selected_bank )
+    }
+
+    // clear all, I'm pretending its a canvas
+    _elm.querySelectorAll('.light').forEach( ( _light)=> _light.classList.remove('yellow','red','blue','green') )
+    _elm.querySelectorAll('.bank').forEach( ( _bank )=> _bank.classList.remove('yellow','red','blue','green') )
+    _elm.querySelectorAll('.button').forEach( ( _button )=> _button.dataset.timecode = '' )
+    _elm.querySelectorAll('.button').forEach( ( _button )=> _button.innerText = '' )
+
+    // check active banks
+    _elm.active_bank.forEach( function( _bank, l ) {
+
+      if ( _bank == 1 ) {
+        _elm.querySelectorAll('.bank')[l].classList.add('green')
+      } else if ( _elm.sequence[l].join('').length > 0 ) {
+        // checks if this inactive bank contains anything
+        // make it red
+        _elm.querySelectorAll('.bank')[l].classList.add('red')
+      } else{
+        // nothing to do, grey
+      }
+    })
+
+    // check selected bank
+    if ( _elm.selected_bank != -1 ) {
+      _elm.querySelectorAll('.bank')[ _elm.selected_bank ].classList.add('yellow') // highlight bank
+      _elm.render_buttons( _elm.selected_bank ) // render current bank
+
+    } else if ( _elm.bank_c != -1 ) {
+      _elm.querySelectorAll('.bank')[_elm.bank_c].classList.add('blue')
+      _elm.render_buttons( _elm.bank_c )
+
+    } else {
+      // nohing to do
+    }
+
+    // check current sequence counter
+    if ( _elm.seq_c != -1 ) {
+      var light = _elm.querySelectorAll('.light')[ _elm.seq_c ]
+      light.classList.add('blue')
+      var button = _elm.querySelectorAll('.button')[ _elm.seq_c ]
+
+      if ( button.dataset.timecode ) {
+        console.log("send: ", get_client_id(), _elm.id, button.dataset.timecode)
+        socket1.send( get_client_id(), _elm.id, button.dataset.timecode  ) // -0.2
+      }
+    }
+  }
+
+  // helper
+  _elm.render_buttons = function( _bank ) {
+    _elm.sequence[ _bank ].forEach( function( val, j ) {
+      var seq_button = _elm.querySelectorAll('.button')[j]
+      if ( val != "" ) {
+        seq_button.previousElementSibling.classList.add('green')
+        seq_button.innerText = Math.round( val * 100 ) / 100
+        seq_button.dataset.timecode = val
+      }else{
+        seq_button.innerText = ""
+        seq_button.dataset.timecode = ""
+      }
+    })
+  }
+
+  // helper, figures out next available bank, if any
+  _elm.do_next_bank = function() {
+    if ( _elm.active_bank.includes(1) ) {
+      _elm.bank_c++
+      if (_elm.bank_c >= _elm.active_bank.length) _elm.bank_c = 0
+      while( _elm.active_bank[_elm.bank_c]  == 0 ) {
+        _elm.bank_c++
+        if (_elm.bank_c >= _elm.active_bank.length) _elm.bank_c = 0
+      }
+
+    }else{
+      _elm.bank_c = -1
+    }
+  }
+
+  // on every beat!
+  _elm.update = function() {
+    _elm.seq_c = (_elm.seq_c + 1 )%_elm.sequence[0].length
+    if ( _elm.seq_c == 0 ) _elm.do_next_bank()
+    _elm.redraw()
+    //requestAnimationFrame(_elm.update)
+  }
+
+  // when all is set and done
+  _elm.redraw()
+  // _elm.update()
+
 }
 
-// start!
-init()
-doNextBank()
-redraw_sequencer()
+
+create_sequence( elm('seq_butts_a') )
+create_sequence( elm('seq_butts_b') )
+
+
 
 // listen for updates of sequence markers and
 // set them in the appropriate button -- AND BANK
-socket1.addEventListener('sequence_set', function(e) {
+socket1.addEventListener('sequence_set', function( e ) {
   console.log('got sequence back?', e)
-  //elm(e.button_id).innerText = Math.round(e.time*1000)/1000
-  //elm(e.button_id).dataset.timecode = e.time
-  //elm(e.button_id).nextElementSibling.classList.add('green')
-  sequence_a[ e.sequence[0] ][ e.sequence[1] ] = e.time
-  console.log(sequence_a)
-  redraw_sequencer()
+  var sequence_elm = elm(e.sequence_id)
+  console.log( ">> ", sequence_elm.sequence[ e.sequence[0] ][ e.sequence[1] ] )
+  sequence_elm.sequence[ e.sequence[0] ][ e.sequence[1] ] = e.time
+  sequence_elm.redraw()
 })
 
-// set sequence:
-function sequenceButton( _elm ) {
-  console.log("Sequence mouse down", _elm)
-
-  start_time = (new Date).getTime()
-  _elm.long_press = setTimeout( function() {
-    clearTimeout(_elm.long_press)
-    longPress(_elm)
-  }, 350 )
-
-  _elm.onmouseup = _elm.ontouchend = function(evt) {
-    evt.preventDefault()
-    console.log("Sequence mouse up")
-    clearInterval(_elm.long_press)
-    normalPress(_elm)
-    _elm.onmouseup = null
-  }
-
-  function longPress(_elm) {
-    console.log("Sequence long press!")
-    _elm.onmouseup = null
-    _elm.previousElementSibling.classList.toggle('yellow')
-
-    // -------------------------------------------------------------------------
-    // THIS NEEDS TO HOOK UP
-    // when selected allow tweaking with knob
-    // -------------------------------------------------------------------------
-  }
-
-  function normalPress(_elm) {
-    console.log("sequence normal press")
-    // reset current bank
-    _elm.onmouseup = null
-    var le_bank = selected_bank_a
-    if ( selected_bank_a == -1 ) le_bank = bank_c
-    if ( le_bank == -1 ) { console.log("could not find bank"); return }
-
-    if ( sequence_a[ le_bank ][ _elm.dataset.sequence_id ] != "" ) {
-      sequence_a[ le_bank ][ _elm.dataset.sequence_id ] = ""
-    } else {
-      socket1.send( get_client_id(), 'sequence_button', { button_id: _elm.id, target_id: socket1.target, timestamp: start_time - 0.2 , sequence: [ le_bank, Number(_elm.dataset.sequence_id) ]  } )
-    }
-
-    redraw_sequencer()
-  }
-}
-
-// switch bank:
-function bankButton( _elm ) {
-  console.log(" bankButton mouse down", _elm)
-
-  start_time = (new Date).getTime()
-  _elm.longpressstart = (new Date).getTime()
-  _elm.longpress = setTimeout( longPress, 400, _elm)
-  _elm.onmouseup = _elm.ontouchend = function(evt) {
-    evt.preventDefault()
-    normalPress(_elm)
-    clearTimeout(_elm.longpress)
-  }
-
-  // switch on/off active bank
-  function longPress(_elm) {
-    console.log("bankButton long press!")
-    clearTimeout(_elm.longpress )
-    if ( active_bank_a[_elm.dataset.sequence_id] == 1 ) {
-      active_bank_a[_elm.dataset.sequence_id] = 0
-    }else{
-      active_bank_a[_elm.dataset.sequence_id] = 1
-    }
-    console.log("longpress set select to -1")
-    _elm.onmouseup = _elm.ontouchend = null
-    selected_bank_a = -1
-    redraw_sequencer()
-  }
-
-  function normalPress(_elm) {
-    _elm.onmouseup = _elm.ontouchend = null
-
-    // select
-    var current_sequence = "a"
-    if ( _elm.id.indexOf('button_b') ) current_sequence = "b"
-    document.querySelectorAll('.sequence_buttons_a .bank').forEach( (_bank, i)=> { if ( _bank != _elm ) _bank.classList.remove('yellow') } )
-
-    if ( selected_bank_a != _elm.dataset.sequence_id ) {
-      selected_bank_a = _elm.dataset.sequence_id
-    } else {
-      selected_bank_a = -1
-    }
-
-    console.log("normal set select to ", selected_bank_a)
-    // redrawwith new selected bank
-    redraw_sequencer()
-  }
-}
-
-// copy sequence after longpress
-// TODO
-
-// helper
-// check active banks, if no bank is active, everythings off
-// only walk through banks that are actve right now
-function doNextBank() {
-  console.log("figure out next bank")
-  if ( active_bank_a.includes(1) ) {
-    bank_c++
-    if (bank_c >= active_bank_a.length) bank_c = 0
-    while( active_bank_a[bank_c]  == 0 ) {
-      bank_c++
-      if (bank_c >= active_bank_a.length) bank_c = 0
-    }
-
-  }else{
-    bank_c = -1
-  }
-}
-
-// resets and redraws the lights based on sequence array and selection
-// ignores walkers (blue) -- note, we don't actually redraw, we just change classes
-function redraw_sequencer() {
-
-  // reset
-  document.querySelectorAll('.seq_butt .light').forEach( (_elm)=> _elm.classList.remove('red','green','yellow','blinking') )
-  document.querySelectorAll('.seq_butt .bank').forEach( (_elm)=> _elm.classList.remove('red','green','yellow','blinking') )
-
-
-
-  // set bank and buttons
-  document.querySelectorAll('.sequence_buttons_a .seq_butt .bank').forEach( function(_elm, i) {
-
-    if ( sequence_a[i].join('').length > 0 ) {
-      // has elements
-      if ( active_bank_a[i] == 1 ) {
-        _elm.classList.add('green')
-      } else {
-        _elm.classList.add('red')
-      }
-    }else{
-      // no elements
-      if ( active_bank_a[i] ) {
-        _elm.classList.add('green')
-      } else {
-        //
-      }
-    }
-
-    if ( i == selected_bank_a ) {
-      _elm.classList.add('yellow')
-    }
-
-    if ( i == selected_bank_a && i == bank_c ) {
-      _elm.classList.add('blinking')
-    }
-
-    if ( selected_bank_a != -1) {
-      sequence_a[selected_bank_a].forEach( function(val, i) {
-        var _elm = document.querySelectorAll('.seq_butt .button')[i]
-        if ( val != "" ) {
-          _elm.dataset.timecode = val
-          _elm.innerText = Math.round(val*100)/100
-          _elm.previousElementSibling.classList.add('green')
-        }else{
-          _elm.dataset.timecode = ""
-          _elm.innerText = ""
-        }
-      })
-    } else if( bank_c != -1) {
-      // console.log("use bank", bank_c)
-      sequence_a[bank_c].forEach( function(val, i) {
-        var _elm = document.querySelectorAll('.seq_butt .button')[i]
-        if ( val != "" ) {
-          _elm.dataset.timecode = val
-          _elm.innerText = Math.round(val*100)/100
-          _elm.previousElementSibling.classList.add('green')
-        }else{
-          _elm.dataset.timecode = ""
-          _elm.innerText = ""
-        }
-      })
-    }
-  })
-}
 
 // runs from the upate interval
 // updates on beat (every bpm tic)
@@ -566,40 +517,10 @@ function do_beat() {
   // sequencer
   if ( elm('sequencer_play_pause').dataset.paused == "true" ) return
 
-  // clear lights and bunk
-  document.querySelectorAll(".seq_butt .button").forEach( (elm) => elm.previousElementSibling.classList.remove('blue') )
-  document.querySelectorAll(".seq_butt .bank").forEach( (elm) => elm.classList.remove('blue') )
-
-  if ( ( selected_bank_a == -1 || selected_bank_a == bank_c ) && bank_c != -1 ) {
-    var current_a = elm("button_a_" + seq_c)
-    current_a.previousElementSibling.classList.add('blue')
-  }
-
-  if ( bank_c != -1 && seq_c != -1 ) {
-    var to_send = sequence_a[ bank_c ][ seq_c ]
-    if ( to_send != "" ) {
-      socket1.send( get_client_id(), 'sec_a', sequence_a[ bank_c ][ seq_c ] - 0.2 )
-      console.log("send A: ", sequence_a[ bank_c ][ seq_c ] - 0.2 )
-    }
-  }
-
-  // if ( current_b.dataset.timecode != "" ) {
-  //   socket1.send( get_client_id(), 'sec_b', current_b.dataset.timecode - 0.2  )
-  //   console.log("send B: ", current_b.dataset.timecode - 0.2 )
-  // }
-
-  seq_c += 1
-  if ( seq_c >= sequencer_rows ) {
-    seq_c = 0
-    doNextBank()
-  }
-
-  if (bank_c != -1) {
-    next_blue = document.querySelectorAll(".sequence_buttons_a .seq_butt .bank")[bank_c]
-    next_blue.classList.add('blue')
-  }
-
-  redraw_sequencer()
+  // assuming they all have a sequence class
+  document.querySelectorAll('.sequencer').forEach( function( _elm, i ) {
+    _elm.update()
+  })
 }
 
 // the update function

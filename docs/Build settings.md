@@ -41,12 +41,12 @@ With Generators you can bootstrap your mixers and controllers. It creates a set 
   writing  ./public/compositions/my_new_mixer.js
   writing  ./public/stylesheets/compositions/my_new_mixer.sass
 
-  $ npm run remove_controller my_new_mixer
+  $ npm run remove_mixer my_new_mixer
   [...]
   removing  ./views/compositions/my_new_mixer.jade
   removing  ./public/compositions/my_new_mixer.js
   removing  ./public/stylesheets/compositions/my_new_mixer.sass
 
-  $ npm run remove_mixer my_new_mixer TODO
-  $ npm run remove_controller my_new_mixer TODO
+  $ npm run generate_controller my_new_controller TODO
+  $ npm run remove_controller my_new_controller TODO
 ```

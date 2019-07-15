@@ -1,0 +1,23 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')		
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/donkey.css')
+	body 
+	
+	body(onclick="document.getElementById('play_button').style.display = 'none';audio.play();")
+		a.logo(href='/')
+		button.play_button#play_button(style="filter:invert(1);")
+		button.mute_button#mute_button(style="display:none")
+
+		canvas#glcanvas
+		.blink
+		.payoff
+			| <h3>donkey</small></h3>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			script(src='/compositions/donkey.js')
+			include ../partials/analytics

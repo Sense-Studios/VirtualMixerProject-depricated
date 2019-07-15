@@ -38,7 +38,7 @@ function FileManager( _source ) {
 
   var _self = this
   _self.function_list = [["CHZ", "method","changez"]]
-  
+
   _self.uuid = "Filemanager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.defaultQuality = ""
@@ -127,7 +127,7 @@ function FileManager( _source ) {
   _self.change = function( _num ) {
     if ( _self.set.length != 0 ) {
       if ( _num != undefined ) {
-        _Self.changeToNum( _num );
+        _self.changeToNum( _num );
         return;
       }
 

@@ -254,15 +254,16 @@ html
           .seq_butt
             //.num 0
             .light
-            .button(data-id=0, data-timecode="", onmousedown='sequenceButton(this)', ontouchstart='sequenceButton(this)')            
-            .bank(onmousedown='bankButton(this)', ontouchstart='bankButton(this)')            
+            .button
+            .bank
 
         // sequence a container attacher
-        .sequence_buttons_a#seq_butts_a
+        .sequence_buttons_a#seq_butts_a.sequencer
           
         // sequence a container attacher
-        .sequence_buttons_b#seq_butts_b
+        .sequence_buttons_b#seq_butts_b.sequencer
         
+        // might need to be generated somehow, too?
         .sequence_control_a
             button(onmousedown='control_button("fbwd_a")') <<
             button(onmousedown='control_button("bwd_a")') <

@@ -119,8 +119,8 @@ socket1.addEventListener('ffwd_b',          function(e) { video2.video.currentTi
 socket1.addEventListener('fwd_b',           function(e) { video2.video.currentTime = video2.video.currentTime + 10 } )
 socket1.addEventListener('play_pause_b',    function(e) { video2.paused() ? video2.play() : video2.pause() } )
 
-socket1.addEventListener('sec_a',           function(e) { console.log('sequence A', e); try { video1.video.currentTime = e } catch(err) { console.warn(e, err ) } } )
-socket1.addEventListener('sec_b',           function(e) { console.log('sequence B', e); try { video2.video.currentTime = e } catch(err) { console.warn(e, err ) } } )
+socket1.addEventListener('seq_butts_a',           function(e) { console.log('sequence A', e); try { video1.video.currentTime = e } catch(err) { console.warn(e, err ) } } )
+socket1.addEventListener('seq_butts_b',           function(e) { console.log('sequence B', e); try { video2.video.currentTime = e } catch(err) { console.warn(e, err ) } } )
 
 socket1.addEventListener('get_mixer_status',        function(e) {
   console.log("get status:", e.request_id )
@@ -133,10 +133,18 @@ socket1.addEventListener('sequence_button', function(e) {
   var video_target = video1
   var target_time = (new Date()) - e.timestamp
   var set_time = video_target.video.currentTime - (target_time/1000)
-  if ( e.button_id.indexOf('button_b')) video_target = video2
+
+  // assign sequences to target videosources
+  if ( e.sequence_id == "seq_butts_a") video_target = video1
+  if ( e.sequence_id == "seq_butts_b") video_target = video2
 
   video_target.video.currentTime = set_time
-  socket1.send( e.target_id, "sequence_set", { time: set_time, button_id: e.button_id, sequence: e.sequence })
+  socket1.send( e.target_id, "sequence_set", {
+    time: set_time,
+    button_id: e.button_id,
+    sequence_id: e.sequence_id,
+    sequence: e.sequence
+  })
 })
 // source1.video.playbackRate
 // filemanager1.change()

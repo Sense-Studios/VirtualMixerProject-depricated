@@ -255,7 +255,7 @@ var Mixer = class {
      */
 
     _self.update = function() {
-      
+
       if ( _self.autoFade ) { // maybe call this bpmFollow?
         // pod = currentBPM
         currentBPM = currentBpmFunc()
@@ -267,7 +267,7 @@ var Mixer = class {
 
         var now = (new Date()).getTime()
         fadeAtTime = (fadeTime - now);
-        _num = fadeAtTime/fadeDuration
+        var _num = fadeAtTime/fadeDuration
         if (fadeTo =="b") _num = Math.abs(_num - 1)
         //console.log("fader...", _num, Math.abs(_num - 1), fadeAtTime, fadeTime, now, fadeDuration, fadeTo)
         if (_num < 0 ) _num = 0
@@ -279,7 +279,6 @@ var Mixer = class {
           _self.fading = false
 
           // allstop
-          _num = Math.round(_num)
           _num = Math.round(_num)
           _self.pod(_num)
         }
@@ -517,8 +516,8 @@ var Mixer = class {
 
       var now = (new Date()).getTime()
       fadeTime = ( now + _duration );
-      fadeTo == "a" ? fadeTo = "b" : fadeTo = "a"
-      //console.log("fadeTo", fadeTo, fadeTime, now, _duration)
+      _self.pod() > 0.5 ? fadeTo = "a" : fadeTo = "b"
+      console.log("fadeTo", fadeTo, fadeTime, now, _duration)
       fadeDuration = _duration
     }
   }
