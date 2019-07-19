@@ -117,13 +117,13 @@ setTimeout( function() {
   elm('speed_b').onchange = function() {           socket1.send( get_client_id(), "speed_b",         [elm('speed_b').value] ); }
 
   // bpm adjustment knobs
-  document.querySelectorAll('.bpm_adjust').forEach( function(_elm, i) {
-    _elm.getElementsByClassName('knob-input__input')[0].onchange = function(evt) {
+  document.querySelectorAll('.bpm_adjust').forEach( function(_elm) {
+    _elm.getElementsByClassName('knob-input__input')[0].onchange = function() {
       bpm = orig_bpm * this.value
-      document.querySelectorAll('.bpm_display .display').forEach( (elm) => elm.innerText = Math.round(bpm) )
+      document.querySelectorAll('.bpm_display .display').forEach( function(_display) { _display.innerText = Math.round(bpm) } )
     }
 
-    _elm.getElementsByClassName('knob-input__input')[0].onmouseup = _elm.getElementsByClassName('knob-input__input')[0].ontouchend = function(evt) {
+    _elm.getElementsByClassName('knob-input__input')[0].onmouseup = _elm.getElementsByClassName('knob-input__input')[0].ontouchend = function() {
       socket1.send( get_client_id(), "bpm", bpm );
     }
   })
@@ -133,6 +133,9 @@ setTimeout( function() {
   elm('effectb_1_extra').oninput = function() {  socket1.send( get_client_id(), "effectb_1_extra", [elm('effectb_1_extra').value] ); }
   */
 
+  // ---------------------------------------------------------------------------
+  // Main Navigation
+  // ---------------------------------------------------------------------------
   function clear_state() {
     elm('movies_container').classList.remove('state_1', 'state_2', 'state_3')
     elm('mixer_container').classList.remove('state_1', 'state_2', 'state_3')
@@ -167,7 +170,7 @@ setTimeout( function() {
     elm('sequencer_container').classList.add('state_2')
   }
 
-
+  // TODO
   elm('blackout_button').onclick = function() {
     // socket1.send( get_client_id(), "blackout", [elm('effects_b41_extra').value] );
   }
@@ -192,49 +195,84 @@ function replace_rules( _str ) {
   return _str
 }
 
-// load set A
-utils.get('/sets/programs_awesome.json', function(e) {
+function loadSetOntoElement( _set, _elm, _command1, _command2 ) {
+  utils.get( _set , function(e) {
+    var html = ""
+    JSON.parse(e).forEach( function( value, key ) {
+      console.log(" ===> ", value, replace_rules(value))
+      html += '<div class="thumbnail" data-key="'+key+'"><img src="'+replace_rules(value)+'" ></div>'
+    })
+    _elm.innerHTML = html
+
+    _elm.querySelectorAll('.thumbnail').forEach( function(_thumb) {
+      _thumb.onclick = function() {
+        if ( this.className.indexOf('active') != -1 ) {
+          socket1.send(get_client_id(), _command1, [])
+        }else{
+          _elm.querySelectorAll('.thumbnail').forEach( function( _thumb2 ) { _thumb2.classList.remove('active') } )
+          this.classList.add('active')
+          socket1.send(get_client_id(), _command2, [this.dataset.key])
+        }
+      }
+    })
+  })
+}
+
+function loadExpandedSetOntoElement( _set, _elm, _command1, _command2 ) {
   var html = ""
-  JSON.parse(e).forEach( function( value, key ) {
+  JSON.parse(_set).forEach( function( value, key ) {
     console.log(" ===> ", value, replace_rules(value))
     html += '<div class="thumbnail" data-key="'+key+'"><img src="'+replace_rules(value)+'" ></div>'
   })
-  elm('thumbnails_a').innerHTML = html
+  _elm.innerHTML = html
 
-  document.querySelectorAll('#thumbnails_a .thumbnail').forEach( function(_elm) {
-    _elm.onclick = function() {
+  _elm.querySelectorAll('.thumbnail').forEach( function(_thumb) {
+    _thumb.onclick = function() {
       if ( this.className.indexOf('active') != -1 ) {
-        socket1.send(get_client_id(), "jump_a", [])
+        socket1.send( get_client_id(), _command1, [] )
       }else{
-        document.querySelectorAll('#thumbnails_a .thumbnail').forEach( function(_elm2 ) { _elm2.classList.remove('active') } )
+        _elm.querySelectorAll('.thumbnail').forEach( function( _thumb2 ) { _thumb2.classList.remove('active') } )
         this.classList.add('active')
-        socket1.send(get_client_id(), "change_a", [this.dataset.key])
+        socket1.send( get_client_id(), _command2, [this.dataset.key] )
       }
     }
   })
-})
+}
 
-// load set B
-utils.get('/sets/programs_runner.json', function(e) {
-  var html = ""
-  JSON.parse(e).forEach( function( value, key ) {
-    //console.log("repolace: ", value)
-    //console.log("... ", value.replace('720p_h264.mp4', 'medium/3.png') )
-    html += '<div class="thumbnail" data-key="'+key+'"><img src="'+value.replace('720p_h264.mp4', 'medium/3.png')+'" ></div>'
-  })
-  elm('thumbnails_b').innerHTML = html
+elm('change_set').onclick = function(_evt)  {
+  document.querySelector('.modal').classList.remove('hidden')
+}
 
-  document.querySelectorAll('#thumbnails_b .thumbnail').forEach( function(_elm) {
-    _elm.onclick = function() {
-      if ( this.className.indexOf('active') != -1 ) {
-      }else{
-        document.querySelectorAll('#thumbnails_b .thumbnail').forEach( function(_elm2 ) { _elm2.classList.remove('active') } )
-        this.classList.add('active')
-        socket1.send(get_client_id(), "change_b", [this.dataset.key])
-      }
-    }
+elm('close_button').onclick = function(_evt)  {
+  document.querySelector('.modal').classList.add('hidden')
+}
+
+elm('select_set').onchange = function(_evt) {
+  utils.get( this.value , function(e) {
+    elm('set_input').innerText = e
   })
-})
+}
+
+elm('load_into_a').onclick = function(_evt)  {
+  document.querySelector('.modal').classList.add('hidden')
+  loadExpandedSetOntoElement( elm('set_input').innerText, elm('thumbnails_a'), 'jump_a', "change_a" )
+  console.log("send to a1")  
+  socket1.send( get_client_id(), 'update_set_a', elm('set_input').innerText )
+}
+
+elm('load_into_b').onclick = function(_evt)  {
+  document.querySelector('.modal').classList.add('hidden')
+  loadExpandedSetOntoElement( elm('set_input').innerText, elm('thumbnails_b'), 'jump_b', "change_b" )
+  console.log("send to b2")
+  socket1.send( get_client_id(), 'update_set_b', elm('set_input').innerText )
+}
+
+function loadCustomData( _target ) {
+    _elm(custom)
+}
+
+loadSetOntoElement( '/sets/programs_awesome.json', elm('thumbnails_a'), 'jump_a', "change_a" )
+loadSetOntoElement( '/sets/programs_runner.json', elm('thumbnails_b'), 'jump_b', "change_b" )
 
 // -----------------------------------------------------------------------------
 // Set Up Sequencer
@@ -265,6 +303,7 @@ function toggleSequencer( _elm ) {
 
 // ---
 
+var adjust_time = 0
 function create_sequence( _elm ) {
 
   // for lutsers
@@ -287,6 +326,7 @@ function create_sequence( _elm ) {
   _elm.bank_c = -1            // current bank
   _elm.seq_c = -1             // current sequence
   _elm.selected_button = -1   // current selection, if any
+  _elm.selected_sequence = -1 // current selection, if any
   _elm.selected_bank = -1     // current bank selected, if any
   _elm.debug = false
 
@@ -331,6 +371,7 @@ function create_sequence( _elm ) {
 
       if ( _button.innerText != "" ) {
         _elm.sequence[le_bank][_button.dataset.id] = ""
+        if ( _elm.selected_button == _button.dataset.id ) document.querySelector('.adjust_display .display').innerText = ""
         _elm.redraw()
       }else{
         socket1.send( get_client_id(), 'sequence_button', {
@@ -345,9 +386,27 @@ function create_sequence( _elm ) {
 
     // longpress
     button.button_longpress = function( _button ) {
-      console.log("button_longpress", _button)
       _button.onmouseup = _button.ontouchend = null
-      _elm.selected_button = _button.dataset.id
+      if ( _elm.selected_button == _button.dataset.id ) {
+        _elm.selected_button = -1
+        document.querySelector('.adjust_display .display').innerText = ""
+      } else if ( _elm.selected_button == -1 ) {
+        elm('seq_butts_a').selected_button = -1 // hackity, set other off as well
+        elm('seq_butts_b').selected_button = -1 // hackity, set other off as well
+        _elm.selected_button = _button.dataset.id
+        document.querySelector('.adjust_display .display').innerText = Math.round( _button.dataset.timecode * 100 ) / 100
+        elm('timecode_adjust_knob').value = 0
+        adjust_time = _button.dataset.timecode
+        current_adjust_time = adjust_time
+      } else {
+        elm('seq_butts_a').selected_button = -1 // hackity, set other off as well
+        elm('seq_butts_b').selected_button = -1 // hackity, set other off as well
+        _elm.selected_button = _button.dataset.id
+        document.querySelector('.adjust_display .display').innerText = Math.round( _button.dataset.timecode * 100 ) / 100
+        elm('timecode_adjust_knob').value = 0
+        adjust_time = _button.dataset.timecode
+        current_adjust_time = adjust_time
+      }
     }
 
     // -------------------------------------------------------------------------
@@ -450,9 +509,16 @@ function create_sequence( _elm ) {
     _elm.sequence[ _bank ].forEach( function( val, j ) {
       var seq_button = _elm.querySelectorAll('.button')[j]
       if ( val != "" ) {
-        seq_button.previousElementSibling.classList.add('green')
-        seq_button.innerText = Math.round( val * 100 ) / 100
-        seq_button.dataset.timecode = val
+        if ( _elm.selected_button == j ) {
+          seq_button.previousElementSibling.classList.add('yellow')
+          seq_button.innerText = Math.round( current_adjust_time * 100 ) / 100
+          seq_button.dataset.timecode = current_adjust_time
+        }else{
+          seq_button.previousElementSibling.classList.add('green')
+          seq_button.innerText = Math.round( val * 100 ) / 100
+          seq_button.dataset.timecode = val
+        }
+
       }else{
         seq_button.innerText = ""
         seq_button.dataset.timecode = ""
@@ -489,9 +555,29 @@ function create_sequence( _elm ) {
 
 }
 
-
 create_sequence( elm('seq_butts_a') )
 create_sequence( elm('seq_butts_b') )
+
+// should go in the element, but not now
+var current_adjust_time = 0
+setTimeout( function() {
+  elm('timecode_adjust_knob').oninput = elm('timecode_adjust_knob').onchange = function(_evt) {
+
+    current_adjust_time = Number(adjust_time) + Number(this.value)
+
+    document.querySelector('.adjust_display .display').innerText = Math.round( current_adjust_time * 100 ) / 100
+    if ( elm('seq_butts_a').selected_button != -1 ) {
+      elm('seq_butts_a').querySelectorAll('.button')[elm('seq_butts_a').selected_button].dataset.timecode = current_adjust_time
+      elm('seq_butts_a').querySelectorAll('.button')[elm('seq_butts_a').selected_button].innerText = Math.round( current_adjust_time * 100 ) / 100
+    }
+
+    if ( elm('seq_butts_b').selected_button != -1 ) {
+      elm('seq_butts_b').querySelectorAll('.button')[elm('seq_butts_b').selected_button].dataset.timecode = current_adjust_time
+      elm('seq_butts_b').querySelectorAll('.button')[elm('seq_butts_b').selected_button].innerText = Math.round( current_adjust_time * 100 ) / 100
+    }
+
+  }
+}, 500)
 
 
 

@@ -104,8 +104,11 @@ socket1.addEventListener('change_a',        function(e) { console.log("change 1"
 socket1.addEventListener('change_b',        function(e) { console.log("change 2");  filemanager2.changeToNum(e[0]) } )
 socket1.addEventListener('jump_a',          function(e) { console.log("jump 1");  video1.jump() } )
 socket1.addEventListener('jump_b',          function(e) { console.log("jump 2");  video2.jump() } )
-socket1.addEventListener('speed_a',         function(e) { console.log("speed 1");  video1.video.playbackRate = e[0] } )
-socket1.addEventListener('speed_b',         function(e) { console.log("speed 2");  video2.video.playbackRate = e[0] } )
+socket1.addEventListener('speed_a',         function(e) { console.log("speed 1");  try { video1.video.playbackRate = e[0] } catch(e) {} } )
+socket1.addEventListener('speed_b',         function(e) { console.log("speed 2");  try { video2.video.playbackRate = e[0] } catch(e) {} } )
+
+socket1.addEventListener('update_set_a',    function(e) { console.log('update set 1-a'); filemanager1.set = JSON.parse(e) } )
+socket1.addEventListener('update_set_b',    function(e) { console.log('update set 2-b'); filemanager2.set = JSON.parse(e) } )
 
 socket1.addEventListener('fbwd_a',          function(e) { video1.video.currentTime = video1.video.currentTime - 10 } )
 socket1.addEventListener('bwd_a',           function(e) { video1.video.currentTime = video1.video.currentTime - 1 } )
@@ -132,12 +135,11 @@ socket1.addEventListener('sequence_button', function(e) {
   console.log("sequence button ... ", e)
   var video_target = video1
   var target_time = (new Date()) - e.timestamp
-  var set_time = video_target.video.currentTime - (target_time/1000)
 
   // assign sequences to target videosources
   if ( e.sequence_id == "seq_butts_a") video_target = video1
   if ( e.sequence_id == "seq_butts_b") video_target = video2
-
+  var set_time = video_target.video.currentTime - (target_time/1000)
   video_target.video.currentTime = set_time
   socket1.send( e.target_id, "sequence_set", {
     time: set_time,

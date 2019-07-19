@@ -148,6 +148,37 @@ select {
   width: 100%;
   margin-left: 0%; }
 
+.modal {
+  position: absolute;
+  z-index: 2;
+  width: 90%;
+  height: 90%;
+  top: 5%;
+  left: 5%;
+  box-shadow: 4px 4px 4px black;
+  background: #353535;
+  outline: solid 12px black;
+  padding: 4px;
+  opacity: 1;
+  transition-duration: 0.6s; }
+  .modal header {
+    display: flex; }
+    .modal header select {
+      width: 90%; }
+    .modal header button {
+      width: 10%; }
+  .modal.hidden {
+    display: none !important;
+    opacity: 0;
+    transition-duration: 0.6s; }
+  .modal textarea {
+    min-width: 100%;
+    height: calc( 80% - 32px); }
+  .modal #load_into_a, .modal #load_into_b {
+    height: 32px;
+    width: 50%;
+    top: 8px; }
+
 #movies_container {
   position: absolute;
   left: 100vw;
@@ -161,7 +192,9 @@ select {
   background: radial-gradient(#1a1d22, #121318);
   grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%;
   grid-template-rows: 10% 75% 15%;
-  grid-template-areas: ". . . . bpm_display bpm_adjust tap sync right_butt ." ". thumbnails_a thumbnails_a thumbnails_a thumbnails_a thumbnails_b thumbnails_b thumbnails_b thumbnails_b ." ". play_a play_a speed_a speed_a play_b play_b speed_b speed_b ."; }
+  grid-template-areas: ". load_set . . bpm_display bpm_adjust tap sync right_butt ." ". thumbnails_a thumbnails_a thumbnails_a thumbnails_a thumbnails_b thumbnails_b thumbnails_b thumbnails_b ." ". play_a play_a speed_a speed_a play_b play_b speed_b speed_b ."; }
+  #movies_container .load_set {
+    grid-area: load_set; }
   #movies_container .left_butt {
     grid-area: left_butt; }
   #movies_container .bpm_adjust {

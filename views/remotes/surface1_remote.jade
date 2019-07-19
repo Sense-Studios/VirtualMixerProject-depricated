@@ -27,7 +27,19 @@ html
         feComposite(in='blur',in2='SourceGraphic',operator='over')
       
   body
-  
+    
+    .modal.hidden 
+      header      
+        select#select_set 
+          option(value='/sets/programs_awesome.json') Awesome
+          option(value='/sets/programs_runner.json') Runners          
+          option(value='/sets/notv_bucket.json') Notv
+          option(value='/sets/vjacademy.json') VJAcademy
+        button#close_button close
+      textarea#set_input or paste here
+      button#load_into_a feed a 
+      button#load_into_b feed b
+    
     .scroll-container
       
       // -----------------------------------------------------------------------
@@ -35,6 +47,10 @@ html
       // -----------------------------------------------------------------------
       
       #movies_container.state_2
+      
+        .load_set 
+          button#change_set chg
+        
         .bpm_adjust
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
@@ -210,7 +226,7 @@ html
         .timecode_adjust
           .fl-studio-envelope__tension
             //.fl-studio-envelope__label speed
-            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='timecode_adjust_knob', data-min=0, data-max=2)
+            div(class='knob-input fl-studio-envelope__knob tension-knob speed', data-id='timecode_adjust_knob', data-min=-2, data-max=2, value=0)
               svg.knob-input__visual(viewBox='-10 -10 60 60')
                 circle.focus-indicator(cx=20,cy=20,r=18,fill='#4eccff',filter='url(#glow)')
                 circle.indicator-ring-bg(cx=20,cy=20,r=18,fill='#353b3f',stroke='#23292d')
