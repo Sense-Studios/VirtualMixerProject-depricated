@@ -256,7 +256,7 @@ elm('select_set').onchange = function(_evt) {
 elm('load_into_a').onclick = function(_evt)  {
   document.querySelector('.modal').classList.add('hidden')
   loadExpandedSetOntoElement( elm('set_input').innerText, elm('thumbnails_a'), 'jump_a', "change_a" )
-  console.log("send to a1")  
+  console.log("send to a1")
   socket1.send( get_client_id(), 'update_set_a', elm('set_input').innerText )
 }
 
@@ -579,8 +579,6 @@ setTimeout( function() {
   }
 }, 500)
 
-
-
 // listen for updates of sequence markers and
 // set them in the appropriate button -- AND BANK
 socket1.addEventListener('sequence_set', function( e ) {
@@ -590,7 +588,6 @@ socket1.addEventListener('sequence_set', function( e ) {
   sequence_elm.sequence[ e.sequence[0] ][ e.sequence[1] ] = e.time
   sequence_elm.redraw()
 })
-
 
 // runs from the upate interval
 // updates on beat (every bpm tic)
