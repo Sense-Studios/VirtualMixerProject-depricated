@@ -682,6 +682,7 @@ select {
   transition-duration: 0.6s;
   background: radial-gradient(#1a1d22, #121318);
   grid-template-columns: 1% 12% 12% 12% 12% 12% 12% 12% 12% 1%;
+  grid-template-rows: 10% 10% 10% 55% 10%;
   background: radial-gradient(#1a1d22, #121318);
   grid-template-areas: ". left_butt        client_id        client_id    bpm_display bpm_adjust    tap   sync   right_butt       ." ". mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   mixmode_select   ." ". blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select blendmode_select ." ". effects_a        effects_a        effects_a        effects_a        effects_b        effects_b        effects_b        effects_b        ." ". main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         main_pod         ." ". blackout         blackout         blackout         blackout         whiteout         whiteout         whiteout         whiteout         .";
   transition-duration: 0.6s; }
@@ -847,7 +848,7 @@ select {
     transition: all 300ms cubic-bezier(0.39, 0.575, 0.565, 1); }
   .fl-studio-envelope__knob:hover .dial, .fl-studio-envelope__knob.drag-active .dial {
     transform: scale(0.9);
-    filter: brightness(10.2);
+    filter: brightness(116%);
     transition: all 300ms cubic-bezier(0.39, 0.575, 0.565, 1); }
   .fl-studio-envelope__knob:hover .dial-highlight, .fl-studio-envelope__knob.drag-active .dial-highlight {
     opacity: 0.05; }

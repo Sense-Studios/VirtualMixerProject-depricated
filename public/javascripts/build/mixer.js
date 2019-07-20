@@ -1088,7 +1088,7 @@ function FileManager( _source ) {
   _self.change = function( _num ) {
     if ( _self.set.length != 0 ) {
       if ( _num != undefined ) {
-        _Self.changeToNum( _num );
+        _self.changeToNum( _num );
         return;
       }
 
@@ -4694,16 +4694,17 @@ function SolidSource(renderer, options) {
   * @param {float} r - red value
   * @param {float} g - green value
   * @param {float} b - blue value
-  * @param {float} a - alpha value (optional, will be forced to 1.0)
+  * @param {float} a - alpha value (optional)
   * @returns color
   */
   _self.color = function( c ) {
-    if ( c == undefined ) return color
-    color = c
-
-    // just make  sure that alpha is set
-    if (color.a == undefined ) color.a = 1.0
-    renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector3( color.r, color.g, color.b, color.a ) }
+    if ( c != undefined ) {
+      color = c
+      if (color.a == undefined ) color.a = 1.0 // just to be sore
+      console.log(_self.uuid, " sets color: ", color )
+      renderer.customUniforms[_self.uuid + "_color"] = { type: "v4", value: new THREE.Vector4( color.r, color.g, color.b, color.a ) }
+    }
+    return color
   }
 
   _self.jump = function( _num ) {

@@ -11,6 +11,7 @@ var renderer = new GlRenderer();
 
 var video1 = new VideoSource( renderer, { src: 'https://assets.mixkit.co/videos/302/302-720.mp4'} )
 var video2 = new VideoSource( renderer, { src: 'https://assets.mixkit.co/videos/348/348-720.mp4'} )
+var transcolor = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } )
 
 var filemanager1 = new FileManager(video1)
 var filemanager2 = new FileManager(video2)
@@ -37,6 +38,10 @@ var effect_b_4 = new ColorEffect( renderer, { source: effect_b_3, effect: 1 });
 
 var mixer1 = new Mixer( renderer, { source1: effect_b_4, source2: effect_a_4 } );
 
+var transmixer = new Mixer( renderer, { source1: transcolor, source2: mixer1 })
+// var clutter
+
+
 var bpm = new BPM( renderer );
 bpm.bpm = 128
 //bpm.add( mixer1.pod )
@@ -45,7 +50,7 @@ bpm.bpm = 128
 var midi1 = new MidiController( renderer )
 midi1.debug = true
 
-var output = new Output( renderer, mixer1 )
+var output = new Output( renderer, transmixer )
 
 // here comes the code
 var socket1 = new SocketController();
@@ -97,8 +102,9 @@ socket1.addEventListener('effectb_3_extra', function(e) { effect_b_3.extra(e[0]/
 socket1.addEventListener('effectb_4',       function(e) { effect_b_4.effect(e[0])      } )
 socket1.addEventListener('effectb_4_extra', function(e) { effect_b_4.extra(e[0]/ 10)   } )
 
-socket1.addEventListener('blackout',        function(e) { console.log("blackout") } )
-socket1.addEventListener('whiteout',        function(e) { console.log("whiteout") } )
+socket1.addEventListener('blackout',        function(e) { console.log("blackout"); transcolor.color({ r: 0.0, g: 0.0, b: 0.0, a: 1.0 }); transmixer.pod(1) } )
+socket1.addEventListener('whiteout',        function(e) { console.log("whiteout"); transcolor.color({ r: 1.0, g: 1.0, b: 1.0, a: 1.0 }); transmixer.pod(1) } )
+socket1.addEventListener('transout',        function(e) { console.log("transout"); transmixer.pod(0) } )
 
 socket1.addEventListener('change_a',        function(e) { console.log("change 1");  filemanager1.changeToNum(e[0]) } )
 socket1.addEventListener('change_b',        function(e) { console.log("change 2");  filemanager2.changeToNum(e[0]) } )

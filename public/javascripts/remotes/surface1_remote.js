@@ -171,12 +171,19 @@ setTimeout( function() {
   }
 
   // TODO
-  elm('blackout_button').onclick = function() {
+  elm('blackout_button').onmousedown = elm('blackout_button').ontouchstart = function() {
     // socket1.send( get_client_id(), "blackout", [elm('effects_b41_extra').value] );
+    socket1.send( get_client_id(), "blackout", [] );
   }
 
-  elm('whiteout_button').onclick = function() {
+  elm('whiteout_button').onmousedown = elm('whiteout_button').ontouchstart = function() {
     // socket1.send( get_client_id(), "whiteout", [elm('effects_b41_extra').value] );
+    socket1.send( get_client_id(), "whiteout", [] );
+  }
+
+  elm('blackout_button').onmouseup = elm('blackout_button').ontouchend = elm('whiteout_button').onmouseup = elm('whiteout_button').ontouchend = function() {
+    // transout
+    socket1.send( get_client_id(), "transout", [] );
   }
 
 }, 200)
@@ -679,6 +686,7 @@ var tensionKnobs = tensionKnobs.map((el, idx) => new KnobInput(el, {
     var theta = Math.PI*2*norm + 0.5*Math.PI;
     var endX = this.r*Math.cos(theta) + 20;
     var endY = this.r*Math.sin(theta) + 20;
+    if ( isNaN(this.r) ) this.r = 18  // quickhack for firefox
     this.indicatorRing.setAttribute('d',`M20,20l0,-${this.r}A${this.r},${this.r},0,0,${norm<0.5?0:1},${endX},${endY}Z`);
   },
   id: el.dataset.id,
