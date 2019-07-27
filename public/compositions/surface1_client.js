@@ -11,7 +11,7 @@ var renderer = new GlRenderer();
 
 var video1 = new VideoSource( renderer, { src: 'https://assets.mixkit.co/videos/302/302-720.mp4'} )
 var video2 = new VideoSource( renderer, { src: 'https://assets.mixkit.co/videos/348/348-720.mp4'} )
-var transcolor = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } )
+var transcolor = new SolidSource( renderer, { color: { r: 0.0, g: 0.0, b: 0.0 } } )
 
 var filemanager1 = new FileManager(video1)
 var filemanager2 = new FileManager(video2)
@@ -39,6 +39,7 @@ var effect_b_4 = new ColorEffect( renderer, { source: effect_b_3, effect: 1 });
 var mixer1 = new Mixer( renderer, { source1: effect_b_4, source2: effect_a_4 } );
 
 var transmixer = new Mixer( renderer, { source1: transcolor, source2: mixer1 })
+
 // var clutter
 
 
@@ -51,6 +52,9 @@ var midi1 = new MidiController( renderer )
 midi1.debug = true
 
 var output = new Output( renderer, transmixer )
+renderer.init();
+renderer.render();
+transmixer.pod(0)
 
 // here comes the code
 var socket1 = new SocketController();
@@ -196,10 +200,6 @@ setInterval( function() {
   current_status.video_b.playbackrate = video2.video.playbackRate
 
 } )
-
-renderer.init();
-renderer.render();
-
 // ------------------------------------------------------------
 
 // change this to select gamepad, if multiple devices can identify as gamepad

@@ -227,8 +227,9 @@ function loadSetOntoElement( _set, _elm, _command1, _command2 ) {
 
 function loadExpandedSetOntoElement( _set, _elm, _command1, _command2 ) {
   var html = ""
+  console.log("load into Expended set", _set )
   JSON.parse(_set).forEach( function( value, key ) {
-    console.log(" ===> ", value, replace_rules(value))
+    //console.log(" ===> ", value, replace_rules(value))
     html += '<div class="thumbnail" data-key="'+key+'"><img src="'+replace_rules(value)+'" ></div>'
   })
   _elm.innerHTML = html
@@ -255,23 +256,24 @@ elm('close_button').onclick = function(_evt)  {
 }
 
 elm('select_set').onchange = function(_evt) {
+  console.log("select set")
   utils.get( this.value , function(e) {
-    elm('set_input').innerText = e
+    elm('set_input').value = e
   })
 }
 
 elm('load_into_a').onclick = function(_evt)  {
   document.querySelector('.modal').classList.add('hidden')
-  loadExpandedSetOntoElement( elm('set_input').innerText, elm('thumbnails_a'), 'jump_a', "change_a" )
+  loadExpandedSetOntoElement( elm('set_input').value, elm('thumbnails_a'), 'jump_a', "change_a" )
   console.log("send to a1")
-  socket1.send( get_client_id(), 'update_set_a', elm('set_input').innerText )
+  socket1.send( get_client_id(), 'update_set_a', elm('set_input').value )
 }
 
 elm('load_into_b').onclick = function(_evt)  {
   document.querySelector('.modal').classList.add('hidden')
-  loadExpandedSetOntoElement( elm('set_input').innerText, elm('thumbnails_b'), 'jump_b', "change_b" )
+  loadExpandedSetOntoElement( elm('set_input').value, elm('thumbnails_b'), 'jump_b', "change_b" )
   console.log("send to b2")
-  socket1.send( get_client_id(), 'update_set_b', elm('set_input').innerText )
+  socket1.send( get_client_id(), 'update_set_b', elm('set_input').value )
 }
 
 function loadCustomData( _target ) {
