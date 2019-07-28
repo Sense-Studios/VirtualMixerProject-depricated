@@ -3442,7 +3442,7 @@ vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
   }
 
   _self.getChainLink = function( _num ) {
-    return _self.sources( _num )
+    return renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value
   }
 
   _self.setAll = function( _alpha = 0 ) {
