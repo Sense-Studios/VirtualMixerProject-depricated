@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: GifSource</title>
+    <title>JSDoc: roadmap</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,220 +17,53 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: GifSource</h1>
+    <h1 class="page-title">roadmap</h1>
 
-    
-
-
-
-
-<section>
+    <section>
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="Source.html">Source</a>#</span>GifSource<span class="signature">(renderer, options)</span><span class="type-signature"></span></h2>
-        
-    
+
+    <h2>roadmap</h2>
 </header>
 
 <article>
-    <div class="container-overview">
-    
-        
-
-    
-
-    
-    <h4 class="name" id="GifSource"><span class="type-signature"></span>new GifSource<span class="signature">(renderer, options)</span><span class="type-signature"></span></h4>
-    
-
-    
-    <p class="summary"><p>Allows for an (animated) GIF file to use as input for the mixer</p></p>
-    
-
-
-
-<div class="description">
-    <p>Allows for an (animated) GIF file to use as input for the mixer</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>renderer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="GlRenderer.html">GlRenderer</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>GlRenderer object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>JSON Object</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="implements">Implements:</dt>
-    <dd class="implements"><ul>
-        
-            <li><a href="Source.html">Source</a></li>
-        
-    </ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sources_GifSource.js.html">sources/GifSource.js</a>, <a href="sources_GifSource.js.html#line4">line 4</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+    <ul>
+<li>More Effects! starting with a Blur Effect</li>
+<li>Yes I know, I node editor.</li>
+<li>wipes through distortion effects</li>
+<li>extend feedback effects</li>
+<li>Text-source</li>
+<li>image-source</li>
+<li>SVG-source</li>
+<li>mixer and controller generator (kind of works)</li>
+<li>rewrite the core in Typescript (I know)</li>
+<li>consider replacing THREE.js with reGL</li>
+</ul>
+<h4>MultipleVideoSource</h4><p>~The MultiVideoSource allows for playback of video files in the Mixer project.<br>It is very similar to the regular video source, however, it used multiple references to the video file.<br>In doing so it allows for very fast jumping through the video even when it is loading from a remote server.<br>The main features are random jumping and a cue list, allowing for smart referencing in video files.~</p>
+<p>I've tested this idea in public/compositions/demo_midi_source, and it seems to<br>work above expectation, but I'm not sure if this also has to do with loaded data.<br>Still, locally it should work great.</p>
+<h4>layout and composition abstraction</h4><p>Describe compositions as below. Serves as input for trackers/ sequencers</p>
+<pre class="prettyprint source"><code>  var my_renderer = {
+    my_source_1 = {
+      type = VideoSource,
+      src = &quot;somefile.mp4&quot;
+    },
+    my_source_2 = {
+      type = GifSource,
+      src = &quot;somefile.gif&quot;
+    },
+    my_mixer_1 = {
+      type = Mixer,
+      src1 = my_source_1,
+      src1 = my_source_2,
+      pod: 0.5,
+      mixmode: 1,
+      blendmode: 1
+    }
+  }</code></pre><h4>And yes, a node editor. I know.</h4>
 </article>
 
 </section>
-
-
-
 
 </div>
 

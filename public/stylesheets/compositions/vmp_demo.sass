@@ -122,6 +122,12 @@ verystrong
       text-align: justify
       padding: 9px
 
+  .grid_item
+    img.item_image
+      background-image: url('') !important
+      height: auto
+      width: 90%
+
   .grid_item_large
     grid-row-end: span 2
 
@@ -132,11 +138,22 @@ verystrong
       grid-column-end: span 3
       margin-left: 8px
 
-  .grid_item
+  .grid_item_broad
+    grid-column-end: span 2
+
     img.item_image
       background-image: url('') !important
       height: auto
-      width: 90%
+      width: 40%
+      float: left
+
+    .titel
+      grid-column-end: span 3
+
+    .content
+      grid-column-end: span 3
+      margin-left: 8px
+
 
 @media only screen and ( max-width: 1100px )
   .grid_container
@@ -152,6 +169,16 @@ verystrong
     width: 80vw
     grid-auto-flow: row
     margin-bottom: 120px
+
+    .grid_item_broad
+      grid-column-end: span 1
+      grid-row-end: span 2
+
+      img.item_image
+        width: 100%
+        float: none
+        clear: both
+
 
 @media only screen and (max-width: 720px)
   .grid_container

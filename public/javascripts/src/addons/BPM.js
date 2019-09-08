@@ -11,8 +11,11 @@ BPM.constructor = BPM;  // re-assign constructor
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
  * var bpm = new BPM( renderer );
- * bpm.bpm = 100
  * bpm.add( mixer1.pod )
+ * window.addEventListener('keypress', function(ev) {
+ *   if (ev.which == 13) bpm.tap()
+ * })
+ *
  * @constructor Addon#BPM
  * @implements Addon
  * @param {GlRenderer} renderer
@@ -196,7 +199,7 @@ function BPM( renderer, options ) {
 
   /**
    * @description Tapping beat control
-   * @function BPM#tap
+   * @function Addon#BPM#tap
    */
   _self.tap = function() {
     _self.useAutoBPM = false
@@ -211,6 +214,10 @@ function BPM( renderer, options ) {
     }
   }
 
+  /**
+   * @description Gets the current BPM (in bpm, as render() gives a float)
+   * @function Addon#BPM#getBpm
+   */
   _self.getBpm = function() {
     return _self.bpm
   }

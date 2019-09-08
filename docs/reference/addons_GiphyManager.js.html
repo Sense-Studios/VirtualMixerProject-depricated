@@ -37,10 +37,13 @@ GiphyManager.constructor = GiphyManager;
  *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
  *
  * @example
- *  var gifsource1 = new GifSource( source1 )
- *  var gifmanager1 = new Gyphymanager( gifsource1 );
- *  gifmanager1.search('vj'); // loads a set of gifs tagged "vj"
- *  gifmanager1.change();     // changes from one giffile to the other in the set
+ *  var gifsource1 = new GifSource( renderer, {} )
+ *  var gifmanager1 = new GiphyManager( gifsource1 )
+ *  gifmanager1.search('vj', function(){ // search giphy and do the callback
+ *    gifmanager1.change();     // changes from one giffile to the other in the set
+ *  })
+ *
+ *  Thee is a working example on codepen: https://codepen.io/xangadix/pen/vqmWzN
  *
  * @constructor Addon#Gyphymanager
  * @implements Addon
@@ -53,9 +56,9 @@ function GiphyManager( _source ) {
   _self.uuid = "GiphyManager_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "AddOn"
   _self.source = _source
-  _self.file
-  _self.programs
-  _self.program
+  _self.file = ""
+  _self.programs = []
+  _self.program = ""
 
   // set in environment
   // this key is for demo purposes only
@@ -66,11 +69,13 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
-  _self.needle = function( _needle ) {
+   
+  _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&amp;q='+_needle, function(d) {
-      _self.programs = d.data
       console.log(" === GIPHY (re)LOADED === ")
+      _self.programs = JSON.parse(d).data
+      if (_callback != undefined) _callback ()
     })
   }
 
@@ -80,8 +85,8 @@ function GiphyManager( _source ) {
     * @function Addon#Gyphymanager#search
     * @param {string} query - Search term
     */
-  _self.search = function( _query ) {
-    _self.needle( _query );
+  _self.search = function( _query, _callback ) {
+    _self.needle( _query, _callback );
   }
 
   /**
@@ -103,8 +108,9 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#change
    */
   _self.change = function() {
-    if ( _self.programs.length == 0 ) return "no programs"
+    if ( _self.programs.length == 0 ) return "no programs found :("
     _self.program = _self.programs[ Math.floor( Math.random() * _self.programs.length ) ]
+    _self.file = _self.program
     _self.setSrc( _self.program.images.original.url );
   }
 
@@ -118,7 +124,7 @@ function GiphyManager( _source ) {
   }
 
   // load it up with defaults
-  _self.needle("vj")
+  //_self.needle("vj")
 }
 </code></pre>
         </article>
@@ -130,13 +136,13 @@ function GiphyManager( _source ) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 22 2019 11:50:37 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Sep 04 2019 01:02:23 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
