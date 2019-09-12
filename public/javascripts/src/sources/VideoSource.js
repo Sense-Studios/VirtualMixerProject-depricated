@@ -5,6 +5,9 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
 *
 * @summary
 *  The videosource allows for playback of video files in the Mixer project
+*  VideoSource Example on codepen:
+*  <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a>
+*
 *
 * @description
 *  The videosource allows for playback of video files in the Mixer project

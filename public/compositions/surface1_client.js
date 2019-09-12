@@ -1,4 +1,37 @@
 /*
+  autofade content
+*/
+var fadeout = null
+var isvisible = true
+function doFadeout() {
+  document.getElementById('client_id').style.display = "none"
+  document.querySelector('.payoff').style.display = "none"
+  document.querySelector('.blink').style.display = "none"
+  document.querySelector('.logo').style.display = "none"
+  document.querySelector('.play_button').style.display = "none"
+  isvisible = false
+}
+
+function doFadeIn() {
+  document.getElementById('client_id').style.display = "block"
+  document.querySelector('.payoff').style.display = "block"
+  document.querySelector('.blink').style.display = "block"
+  document.querySelector('.logo').style.display = "block"
+  fadeout = null
+  fadeout = setTimeout( doFadeout, 16000 )
+  isvisible = true
+}
+
+
+
+window.onmousemove = function() {
+  if (!isvisible) doFadeIn()
+}
+
+// set first timeout
+fadeout = setTimeout( doFadeout, 32000 )
+
+/*
 * Example: Mixing a Gampad with four video sources
 * https://virtualmixproject.com/docs/reference/index.html
 * https://virtualmixproject.com/docs/reference/Controller_MidiController.html

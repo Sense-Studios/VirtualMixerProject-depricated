@@ -1,5 +1,8 @@
 There are several limitations to the Mixer. Most have to do with the limitation of the browser, or limitations with the interpretation of browser code.
 
+* _Make sure WebGL/ Hardware acceleration is available and enabled._
+
+If you have no hardware acceleration available or it is disable the mixer simply won't run properly. There is no option or settings that lets the mixer work on software rendering alone.
 
 * _When in doubt use Chrome, The mixer relies heavily on WebGL and a number of control interfaces._
 

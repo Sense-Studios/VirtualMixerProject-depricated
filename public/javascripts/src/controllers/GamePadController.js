@@ -4,6 +4,10 @@ GamePadController.constructor = GamePadController;
 /**
  * @summary
  *  Search and initialize a Gamepad and make event listeners available.
+ *  tested with X Box controller
+ *  Gamepad Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/gEzZgx" target="_blank">codepen</a>
+ *
  *
  * @description
  *   Check for an example this [video on Youtue](https://www.youtube.com/watch?v=N1AOX8m6U04)

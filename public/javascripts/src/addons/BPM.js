@@ -4,6 +4,8 @@ BPM.constructor = BPM;  // re-assign constructor
 /**
  * @summary
  *   BPM calculates beat per minutes based on a 'tap' function
+ *   Tapped BPM Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/drqzPr" target="_blank">codepen</a>
  *
  * @description
  *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function

@@ -1,7 +1,16 @@
 Here is rundown for a standard Mixer, or rather a _Compositions_ of mixers.
 It has an example of audio analysis and effects.
 
-create a renderer
+For a working example of AudioAnalysis, check
+[demo on codepen](https://codepen.io/xangadix/pen/VRGzdYthis)
+
+We're basically building the 'awesome' mixer here, so check
+[the original awesome mixer](https://virtualmixproject.com/mixer/awesome)
+and find the code for that [in the repo here](https://github.com/Sense-Studios/VirtualMixerProject/blob/master/public/compositions/awesome.js).
+
+***
+
+first create a renderer
 
 ```
   var renderer = new GlRenderer();
@@ -27,7 +36,7 @@ Crate an audio analyzer and assign it an audiostream. Can be a pls radio stream 
 
 ```
   // var analysis
-  var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
+  var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'https://virtualmixproject.com/radio/nsb' } )
 
 ```
 Now setup two FileManager for the sources. FileManagers keep track of which video is currently played.
@@ -35,10 +44,10 @@ Assign it a 'set' file, which is a JSON file, with an array in it with urls of v
 
 ```
   var filemanager = new FileManager( source1 )
-  filemanager.load_set("/sets/programs_awesome.json")
+  filemanager.load_set("https://virtualmixproject.com/sets/programs_awesome.json")
 
   var filemanager2 = new FileManager( source2 )
-  filemanager2.load_set("/sets/programs_clutter.json")
+  filemanager2.load_set("https://virtualmixproject.com/sets/programs_clutter.json")
 
 ```
 Now add a second mixer to mix both the first mixer with the VHS noice, that way there can be VHS noise independent
@@ -91,7 +100,7 @@ Now we could update the effect here too, but we already set in during initiation
 The effect library has some 64 effect, contrast is effect 61.
 The 'extra' parameter has en extra setting for each effect, the level of contrast
 in with this particular effect.
-http://virtualmixproject.com/docs/reference/Effect_ColorEffect.html
+[Coloreffect docs](http://virtualmixproject.com/docs/reference/Effect_ColorEffect.html)
 
 
 ```
@@ -170,7 +179,7 @@ var filemanager = new FileManager( source1 );
 var filemanager2 = new FileManager( source2 );
 var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 var mixer2 = new Mixer( renderer, { source1: source3, source2: mixer1 });
-var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } );
+var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'https://virtualmixproject.com/radio/nsb' } );
 var contrast = new ColorEffect( renderer, { source: mixer2 } );
 var output = new Output( renderer, contrast );
 
@@ -179,8 +188,8 @@ renderer.render();
 
 /* ---------------------------------------------------------------------------- */
 
-filemanager.load_set("/sets/programs_awesome.json");
-filemanager2.load_set("/sets/programs_clutter.json");
+filemanager.load_set("https://virtualmixproject.com/sets/programs_awesome.json");
+filemanager2.load_set("https://virtualmixproject.com/sets/programs_clutter.json");
 
 mixer2.mixMode(5);
 mixer2.blendMode(1);

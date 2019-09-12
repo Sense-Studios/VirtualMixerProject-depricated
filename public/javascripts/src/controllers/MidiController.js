@@ -4,6 +4,8 @@ MidiController.constructor = MidiController;
 /**
  * @summary
  *  Connects a midicontroller with a range of listeners. Can also send commands Back
+ *  Midi Example on codepen: 
+ *  <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank">codepen</a>
  *
  * @description
  *  The Midi class searches and Connects to a midicontroller with a range of listeners.

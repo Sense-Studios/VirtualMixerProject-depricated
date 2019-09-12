@@ -4,6 +4,8 @@
 
  * @summary
  *   The Effect Class covers a range of input-output-nodes.
+ *   Effects example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  * @description
  *   The effect class covers a range of input-output nodes in between either sources and mixers
@@ -18,6 +20,8 @@
  *     SOURCE ---> EFFECT1 --> MIXER --> EFFECT2 --> ... ---> OUTPUT
  *   ```
  *
+ *   Effects example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  *
  * @author Sense studios

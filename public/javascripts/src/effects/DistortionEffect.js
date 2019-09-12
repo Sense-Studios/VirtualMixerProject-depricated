@@ -4,6 +4,8 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
 /**
  * @summary
  *   The Distortion effect has a series of simple distortion effects, ie. it manipulates, broadly, the UV mapping and pixel placements
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  * @description
  *   Distortion  effect allows for a series of color Distortion, mostly

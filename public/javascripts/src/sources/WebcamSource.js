@@ -5,6 +5,8 @@ WebcamSource.constructor = WebcamSource;  // re-assign constructor
  *
  * @summary
  *  The WebcamSource allows for playback of webcams in the Mixer project
+ *  Webcam Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/moLayR" target="_blank">codepen</a>
  *
  * @description
  *  The WebcamSource allows for playback of webcams in the Mixer project

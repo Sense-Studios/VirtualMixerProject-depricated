@@ -4,6 +4,8 @@ KeyboardController.constructor = KeyboardController;
 /**
  * @summary
  *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
+ *  Keyboard Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/NJzxNy" target="_blank">codepen</a>
  *
  * @description
  *  This controller converts keyboard listeners to a Controller. Events are triggered through keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)

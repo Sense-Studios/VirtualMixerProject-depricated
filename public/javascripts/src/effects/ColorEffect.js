@@ -4,6 +4,9 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
 /**
  * @summary
  *   The color effect has a series of color effects, ie. implements a series of operations on rgba
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
+ *
  *
  * @description
  *   Color effect allows for a series of color effect, mostly

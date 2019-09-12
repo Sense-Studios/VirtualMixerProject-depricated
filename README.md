@@ -128,13 +128,14 @@ Check more detailed info [in the docs](https://virtualmixproject.com/docs/refere
 
 ## Further Reading
 
-* [How this Works](https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html)
 * [Demo collection on Codepen](https://codepen.io/collection/nZyjvW/)
 * [Documentation and Reference](https://virtualmixproject.com/docs/reference/index.html)
-* [Automatic Mixing](https://virtualmixproject.com/docs/reference/tutorial-automatic%20mixing.html)
-* [Limitations](https://virtualmixproject.com/docs/reference/tutorial-some%20limitations.html)
-* [Building](https://virtualmixproject.com/docs/reference/tutorial-build%20settings.html)
-* [Roadmap](https://virtualmixproject.com/docs/reference/tutorial-roadmap.html)
+* [How this Works](https://virtualmixproject.com/docs/reference/tutorial-How%20does%20this%20work.html)
+* [Automatic Mixing](https://virtualmixproject.com/docs/reference/tutorial-Build%20an%20Automatic%20Mixer.html)
+* [Some Limitations](https://virtualmixproject.com/docs/reference/tutorial-Some%20limitations.html)
+* [Build Settings](https://virtualmixproject.com/docs/reference/tutorial-Build%20settings.html)
+* [Roadmap](https://virtualmixproject.com/docs/reference/tutorial-Roadmap.html)
+* [About](https://virtualmixproject.com/docs/reference/tutorial-About.html)
 
 # But Why?!
 

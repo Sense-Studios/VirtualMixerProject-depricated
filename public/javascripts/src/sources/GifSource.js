@@ -4,6 +4,8 @@ GifSource.constructor = GifSource;  // re-assign constructor
 /**
  * @summary
  *  Allows for an (animated) GIF file to use as input for the mixer
+ *  Giphy Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/vqmWzN" target="_blank">codepen</a>
  *
  * @description
  *  Allows for an (animated) GIF file to use as input for the mixer
@@ -89,7 +91,7 @@ function GifSource( renderer, options ) {
     console.log(_self.uuid, " Load", _self.currentSrc, "..." )
     //supergifelement.load_url( _self.currentSrc )
     supergifelement.load_url( _self.currentSrc, function() {
-      console.log("play initial source"); 
+      console.log("play initial source");
       supergifelement.play();
     } )
 

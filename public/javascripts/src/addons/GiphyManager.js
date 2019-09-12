@@ -4,6 +4,8 @@ GiphyManager.constructor = GiphyManager;
 /**
  * @summary
  *   Aquires a set of Gif Files [Giphy](https://giphy.com/), based on tags, and allows choosing from that.
+ *   Giphy Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/vqmWzN" target="_blank">codepen</a>
  *
  * @description
  *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
@@ -41,7 +43,7 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
-   
+
   _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {

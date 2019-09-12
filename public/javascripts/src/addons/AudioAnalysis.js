@@ -4,6 +4,9 @@ AudioAnalysis.constructor = AudioAnalysis;
 /**
 * @summary
 *   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+*  Audio Analysis Example on codepen:
+*  <a href="https://codepen.io/xangadix/pen/VRGzdY" target="_blank">codepen</a>
+*
 *
 * @description
 *   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}

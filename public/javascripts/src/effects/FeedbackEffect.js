@@ -4,6 +4,8 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
 /**
  * @summary
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  * @description
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
