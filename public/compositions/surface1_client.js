@@ -231,8 +231,8 @@ setInterval( function() {
   current_status.video_b.duration = video2.video.duration
   current_status.video_b.currenttime = video2.video.currentTime
   current_status.video_b.playbackrate = video2.video.playbackRate
-
-} )
+  console.log("update")
+}, 1000 )
 // ------------------------------------------------------------
 
 // change this to select gamepad, if multiple devices can identify as gamepad

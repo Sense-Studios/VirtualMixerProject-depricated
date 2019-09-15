@@ -14,6 +14,8 @@ Mixers and Sources are interchangeable, so the output of a one _mixer_ can serve
 
 * Be sure to check out our [Demos](https://virtualmixproject.com/mixer/demos).
 
+* All the code is available, clone and build it it here: [VirtualMixerProject on github](https://github.com/Sense-Studios/VirtualMixerProject).
+
 Or go ahead and continue with the Quickstart below
 
 ## Quickstart
@@ -128,6 +130,7 @@ Check more detailed info [in the docs](https://virtualmixproject.com/docs/refere
 
 ## Further Reading
 
+* [Clone it on Github](https://github.com/Sense-Studios/VirtualMixerProject).
 * [Demo collection on Codepen](https://codepen.io/collection/nZyjvW/)
 * [Documentation and Reference](https://virtualmixproject.com/docs/reference/index.html)
 * [How this Works](https://virtualmixproject.com/docs/reference/tutorial-How%20does%20this%20work.html)

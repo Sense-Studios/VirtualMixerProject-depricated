@@ -24,7 +24,28 @@ router.get('/1', function(req, res, next) {
 
 });
 
-router.get('/nsb', function(req, res, next) { request('http://37.220.36.53:7904').pipe(res); });
+// http://37.220.36.53:7904
+// http://208.123.119.17:7904
+// http://37.220.36.53:7904
+/*
+http://directory.shoutcast.com/?q=65_Breakbeat_61
+[playlist]
+numberofentries=4
+File1=http://37.220.36.53:7904
+Title1=(#1 - 8/1000) NSB Radio
+Length1=-1
+File2=http://208.123.119.17:7904
+Title2=(#2 - 2/200) NSB Radio
+Length2=-1
+File3=http://37.220.36.53:8904
+Title3=(#3 - 20/1000) NSB Radio
+Length3=-1
+File4=http://37.220.36.51:8906
+Title4=(#4 - 3/10) NSB Radio
+Length4=-1
+Version=2
+*/
+router.get('/nsb', function(req, res, next) { request('http://208.123.119.17:7904').pipe(res); });
 router.get('/electrodancefloor', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
 router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
 router.get('/hardstyle', function(req, res, next) { request('http://145.239.10.127:8326/streamTitle1').pipe(res); });
