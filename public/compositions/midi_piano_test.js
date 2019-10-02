@@ -24,7 +24,15 @@ var output = new Output( renderer, chain );
 var mc = new MidiController( renderer, {} );
 mc.debug = true
 
-var keys = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 ]
+var key_mod = 48
+var keys = [ key_mod, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 ]
+
+if ( window.location.search == "?mode=apc" ) {
+	key_mod = 0
+	keys = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, key_mod, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64 ]
+}
+
+
 var videos = [
 	"https://assets.mixkit.co/videos/302/302-720.mp4", // C
 	"https://assets.mixkit.co/videos/303/303-720.mp4", // C#
@@ -33,7 +41,7 @@ var videos = [
 	"https://assets.mixkit.co/videos/341/341-720.mp4", // E
 	"https://assets.mixkit.co/videos/343/343-720.mp4", // F
 	"https://assets.mixkit.co/videos/344/344-720.mp4", // F#
-	"https://assets.mixkit.co/videos/348/348-720.mp4", // G
+	"https://assets.mixkit.co/videos/3key_mod/3key_mod-720.mp4", // G
 	"https://assets.mixkit.co/videos/350/350-720.mp4", // G#
 	"https://assets.mixkit.co/videos/351/351-720.mp4", // A
 	"https://assets.mixkit.co/videos/353/353-720.mp4", // A#
@@ -43,7 +51,7 @@ var videos = [
 	"https://assets.mixkit.co/videos/431/431-720.mp4", // D
 	"https://assets.mixkit.co/videos/432/432-720.mp4", // D#
 	"https://assets.mixkit.co/videos/442/442-720.mp4", // E
-	"https://assets.mixkit.co/videos/448/448-720.mp4", // F
+	"https://assets.mixkit.co/videos/4key_mod/4key_mod-720.mp4", // F
 	"https://assets.mixkit.co/videos/449/449-720.mp4", // F#
 	"https://assets.mixkit.co/videos/453/453-720.mp4", // G
 	"https://assets.mixkit.co/videos/457/457-720.mp4", // G#
@@ -57,14 +65,14 @@ var videos = [
 
   //                                                    00 00       C  D  E  F  G  A
   //
-	"https://assets.mixkit.co/videos/302/302-720.mp4", // 48 00 C     x
+	"https://assets.mixkit.co/videos/302/302-720.mp4", // key_mod 00 C     x
 	"https://assets.mixkit.co/videos/303/303-720.mp4", // 49 01 C#
 	"https://assets.mixkit.co/videos/334/334-720.mp4", // 50 02 D        x
 	"https://assets.mixkit.co/videos/337/337-720.mp4", // 51 03 D#
 	"https://assets.mixkit.co/videos/341/341-720.mp4", // 52 04 E     x     x
 	"https://assets.mixkit.co/videos/343/343-720.mp4", // 53 05 F              x
 	"https://assets.mixkit.co/videos/344/344-720.mp4", // 54 06 F#       x
-	"https://assets.mixkit.co/videos/348/348-720.mp4", // 55 07 G     x           x
+	"https://assets.mixkit.co/videos/3key_mod/3key_mod-720.mp4", // 55 07 G     x           x
 	"https://assets.mixkit.co/videos/350/350-720.mp4", // 56 08 G#          x
 	"https://assets.mixkit.co/videos/351/351-720.mp4", // 57 09 A        x     x     x
 	"https://assets.mixkit.co/videos/353/353-720.mp4", // 58 10 A#
@@ -75,7 +83,7 @@ var videos = [
 	"https://assets.mixkit.co/videos/431/431-720.mp4", // 62 14 D        x        x
 	"https://assets.mixkit.co/videos/432/432-720.mp4", // 63 15 D#
 	"https://assets.mixkit.co/videos/442/442-720.mp4", // 64 16 E     x     x        x
-	"https://assets.mixkit.co/videos/448/448-720.mp4", // 65 17 F        x     x
+	"https://assets.mixkit.co/videos/4key_mod/4key_mod-720.mp4", // 65 17 F        x     x
 	"https://assets.mixkit.co/videos/449/449-720.mp4", // 66 18 F#
 	"https://assets.mixkit.co/videos/453/453-720.mp4", // 67 19 G     x
 	"https://assets.mixkit.co/videos/457/457-720.mp4", // 68 20 G#          x
@@ -103,7 +111,7 @@ var videos = [
   "//nabu-dev.s3.amazonaws.com/uploads/video/574caac56465763793000014/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/574cac12646576379300001e/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d3626465763c5a00004c/720p_webm.webm",
-  "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d3756465763c5a00004f/480p_webM.webm",
+  "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d3756465763c5a00004f/key_mod0p_webM.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d3fa6465763c5a000062/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d5606465763c5a000070/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/57d9d76e6465763c5a000083/720p_webm.webm",
@@ -141,6 +149,8 @@ var mod = 1024
 mc.addEventListener( 1, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001 } )
 mc.addEventListener( 2, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001 } )
 
+mc.addEventListener( key_mod, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001 } )
+mc.addEventListener( 49, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001 } )
 
 // moet per source geregeld worden!
 /*
@@ -163,14 +173,14 @@ function pressedKey(e) {
   console.log("pressed key: ", e )
   if (e[0] == 144) {
     // DOWN!
-    console.log("start", videos[e[1]-48] )
+    console.log("start", videos[e[1]-key_mod] )
 
     // find first availabe source lnk
     var first_available_source = null
     var first_available_source_chain_id = -1
 
     sources.forEach( ( _source, i ) => {
-      if ( _source.currentSrc == videos[e[1]-48] ) {
+      if ( _source.currentSrc == videos[e[1]-key_mod] ) {
         console.log("already assigned")
         first_available_source = _source
         first_available_source_chain_id = i
@@ -186,10 +196,11 @@ function pressedKey(e) {
     console.log(" first availabe source is: ", first_available_source, first_available_source_chain_id )
 
     if ( first_available_source != null ) {
-      if ( first_available_source.currentSrc == videos[e[1]-48] ) {
+      if ( first_available_source.currentSrc == videos[e[1]-key_mod] ) {
         first_available_source.jump()
       }else{
-        first_available_source.src( videos[e[1]-48] )
+        // first_available_source.src( videos[e[1]-key_mod] )
+				first_available_source.src( videos[e[1]-key_mod] )
         chain.setChainLink( first_available_source_chain_id, 0)
       }
       first_available_source.isDown = true
@@ -203,7 +214,7 @@ function pressedKey(e) {
     // source1.isDown = false
     // release last source?
     sources.forEach( ( _source, i ) => {
-      if ( _source.currentSrc == videos[ e[1]-48] ) {
+      if ( _source.currentSrc == videos[ e[1]-key_mod] ) {
         _source.isDown = false
       }
     })

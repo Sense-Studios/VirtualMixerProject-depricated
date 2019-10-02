@@ -45,20 +45,18 @@ Title4=(#4 - 3/10) NSB Radio
 Length4=-1
 Version=2
 */
-router.get('/nsb', function(req, res, next) { request('http://208.123.119.17:7904').pipe(res); });
+router.get('/nsb', function(req, res, next) { console.log("download"); request('http://5.39.71.159:8729/stream?type=http&nocache=49969').pipe(res); });
 router.get('/electrodancefloor', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
 router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
-router.get('/hardstyle', function(req, res, next) { request('http://145.239.10.127:8326/streamTitle1').pipe(res); });
+router.get('/hardstyle', function(req, res, next) { request('http://145.239.10.127:8326/streamTitle1').pipe(res); }); // dead
 router.get('/rap', function(req, res, next) { request('http://149.56.157.81:8569/streamTitle1').pipe(res); });
 // router.get( '/dunklenacht', function(req, res, next) { request('http://93.90.201.81:8000').pipe(res); }); //offline
 
-router.get('/breakbeat', function(req, res, next) { request('http://178.33.115.87:8004/stream').pipe(res); });
+router.get('/breakbeat', function(req, res, next) { request('http://178.33.115.87:8004/stream').pipe(res); });  // dead
 router.get('/trance', function(req, res, next) { request('http://137.74.45.136:80/pulstranceAAC64.mp3').pipe(res); });
-router.get('/subfm', function(req, res, next) { request('http://5.39.71.159:8729/').pipe(res); });
+router.get('/subfm', function(req, res, next) { request('http://5.39.71.159:8729/stream?type=http&nocache=49973').pipe(res); });
 router.get('/lounge', function(req, res, next) { request('http://185.33.21.112:80/chilloutlounge_128').pipe(res); });
 router.get('/psyradio', function(req, res, next) { request('http://81.88.36.42:8020/chillout/').pipe(res); });
-
-
 
 /*
 http://178.33.115.87:8004/stream .. breakbeat

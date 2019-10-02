@@ -1,0 +1,19 @@
+.payoff {
+  bottom: 24px;
+  left: 24px;
+  position: absolute;
+  color: white;
+  font-family: arial, sans-serif; }
+  .payoff a {
+    color: white;
+    font-weight: 600; }
+
+#client_id {
+  position: absolute;
+  top: 9px;
+  left: 42px;
+  color: white;
+  background-color: #00000000;
+  font-weight: bold; }
+
+/*# sourceMappingURL=surface1.css.map */

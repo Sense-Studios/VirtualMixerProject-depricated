@@ -44,6 +44,8 @@ router.get('/controllers/*', function(req, res, next) {
 
 router.get('/remotes/*', function(req, res, next) {
   var repl_url = req.originalUrl.replace('/remotes', 'remotes')
+  repl_url = repl_url.split('?')[0]
+  console.log("replace url was: ", repl_url)
   res.render(repl_url, { title: 'Remote Controller: ' });
 });
 
@@ -52,6 +54,8 @@ router.get('/mixer/*', function(req, res, next) {
   //console.log(req, res, next)
   var repl_url = req.originalUrl.replace('/mixer', 'compositions')
   var title = req.originalUrl.replace('/mixer/', '')
+  repl_url = repl_url.split('?')[0]
+  console.log("replace url was: ", repl_url)
   res.render(repl_url, { title: 'Composition: ' + title });
 });
 
