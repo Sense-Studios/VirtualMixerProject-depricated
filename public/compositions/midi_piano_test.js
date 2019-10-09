@@ -1,13 +1,13 @@
 var renderer = new GlRenderer();
 
-var source1 = new VideoSource( renderer, {});
-var source2 = new VideoSource( renderer, {});
-var source3 = new VideoSource( renderer, {});
-var source4 = new VideoSource( renderer, {});
-var source5 = new VideoSource( renderer, {});
-var source6 = new VideoSource( renderer, {});
-var source7 = new VideoSource( renderer, {});
-var source8 = new VideoSource( renderer, {});
+var source1 = new VideoSource( renderer, { src: "" });
+var source2 = new VideoSource( renderer, { src: "" });
+var source3 = new VideoSource( renderer, { src: "" });
+var source4 = new VideoSource( renderer, { src: "" });
+var source5 = new VideoSource( renderer, { src: "" });
+var source6 = new VideoSource( renderer, { src: "" });
+var source7 = new VideoSource( renderer, { src: "" });
+var source8 = new VideoSource( renderer, { src: "" });
 
 // var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 var sources = [ source1, source2, source3, source4, source5, source6, source7, source8 ]
@@ -25,11 +25,11 @@ var mc = new MidiController( renderer, {} );
 mc.debug = true
 
 var key_mod = 48
-var keys = [ key_mod, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 ]
+var keys = [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 ]
 
 if ( window.location.search == "?mode=apc" ) {
 	key_mod = 0
-	keys = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, key_mod, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64 ]
+	keys = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64 ]
 }
 
 
@@ -95,7 +95,17 @@ var videos = [
 ]
 
 var videos = [
-  "//nabu-dev.s3.amazonaws.com/uploads/video/53979650646576797eb60000/720p_webm.webm",
+	"../video/ignore/apenknooi_making_of.mp4",
+	"../video/ignore/life/Life - S01E01 - Challenges of Life [YIFY].mp4",
+	"../video/ignore/life/Life - S01E02 - Reptiles and Amphibians [YIFY].mp4",
+	"../video/ignore/life/Life - S01E03 - Mammals [YIFY].mp4",
+	"../video/ignore/life/Life - S01E04 - Fish [YIFY].mp4",
+	"../video/ignore/life/Life - S01E05 - Birds [YIFY].mp4",
+	"../video/ignore/life/Life - S01E06 - Insects [YIFY].mp4",
+	"../video/ignore/life/Life - S01E07 - Hunters and Hunted [YIFY].mp4",
+	"../video/ignore/life/Life - S01E08 - Creatures of the Deep [YIFY].mp4",
+	"../video/ignore/life/Life - S01E09 - Plants [YIFY].mp4",
+	"../video/ignore/life/Life - S01E10 - Primates [YIFY].mp4",
   "//nabu-dev.s3.amazonaws.com/uploads/video/53e2c6466465761455390000/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/53e536fc6465764182340000/720p_webm.webm",
   "//nabu-dev.s3.amazonaws.com/uploads/video/53e537366465764182370000/720p_webm.webm",
@@ -135,22 +145,22 @@ keys.forEach( function( _key ) {
 
 var fadeInValue = 0.025
 var fadeIn = function() {
-  if ( fadeInValue > 0.12 ) { fadeInValue = 1 }
+  if ( fadeInValue > 0.4 ) { fadeInValue = 0.4 }
   return fadeInValue
 }
 
 var fadeOutValue = 0.025
 var fadeOut = function() {
-  if ( fadeOutValue > 0.12 ) { fadeOutValue = 0.25 }
+  if ( fadeOutValue > 0.4 ) { fadeOutValue = 0.4 }
   return fadeOutValue
 }
 var mod = 1024
 
-mc.addEventListener( 1, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001 } )
-mc.addEventListener( 2, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001 } )
+mc.addEventListener( 1, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001; console.log(fadeInValue)} )
+mc.addEventListener( 2, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001; console.log(fadeOutValue)} )
 
-mc.addEventListener( key_mod, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001 } )
-mc.addEventListener( 49, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001 } )
+mc.addEventListener( 48, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001; console.log(fadeInValue) } )
+mc.addEventListener( 49, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001; console.log(fadeOutValue)} )
 
 // moet per source geregeld worden!
 /*
@@ -200,11 +210,16 @@ function pressedKey(e) {
         first_available_source.jump()
       }else{
         // first_available_source.src( videos[e[1]-key_mod] )
+				first_available_source.video.src = ""
+				first_available_source.video.load()
+				console.log("source reset ...")
+
 				first_available_source.src( videos[e[1]-key_mod] )
         chain.setChainLink( first_available_source_chain_id, 0)
       }
       first_available_source.isDown = true
       first_available_source.isAvailable = false
+
     }else{
       console.warn("You ran our of sources")
     }
@@ -215,17 +230,24 @@ function pressedKey(e) {
     // release last source?
     sources.forEach( ( _source, i ) => {
       if ( _source.currentSrc == videos[ e[1]-key_mod] ) {
+				console.log("current source: ", _source.uuid, _source.currentSrc )
         _source.isDown = false
       }
     })
   }
 }
 
+
 function fader() {
   // each chainLink not < 0 fadeout
   if (renderer == undefined) return
   for(var i = 1; i < 9; i++ ) {
     var _alpha = chain.getChainLink(i-1, _alpha )
+
+		// fix ?
+		//if (_alpha > 1 ) {
+		//	var newalpha = 0.1
+		//}
 
     if ( _alpha > 0 && !window['source' + i].isDown ) {
       var newalpha = Number(_alpha - fadeOut())
@@ -237,6 +259,9 @@ function fader() {
       var newalpha = Number(_alpha + fadeIn())
       chain.setChainLink(i-1, newalpha ) // adjustable
       console.log("add alpha", i-1, newalpha, fadeIn())
+
+			//add alpha 1 1 1
+			//midi_piano_test.js:256 add alpha 1 2 1
 
     } else if ( chain.getChainLink(i-1) <= 0 && !window['source' + i].isAvailable ) {
       window['source' + i].isAvailable = true

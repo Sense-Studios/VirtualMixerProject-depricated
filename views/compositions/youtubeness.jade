@@ -1,0 +1,39 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/youtubeness.css')
+	body 
+		a.logo(href='/')
+		.controls 
+			| channel 1: 
+			input#input1(value="vj")
+			button#search1 search 
+			| &nbsp;&nbsp;
+			button#change1 change
+			| &nbsp;&nbsp;
+			button#jump1 jump			
+			br 
+			br 
+			| channel 2: 
+			input#input2(value="videosynthesis")
+			button#search2 search 
+			| &nbsp;&nbsp;
+			button#change2 change
+			| &nbsp;&nbsp;
+			button#jump2 jump
+			
+			
+		canvas#glcanvas
+		.blink
+		.payoff
+			| <h3>youtubeness</small></h3>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			script(src='/compositions/youtubeness.js')
+			include ../partials/analytics
+
+			

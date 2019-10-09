@@ -38,7 +38,10 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
     "node-sass-middleware": "0.11.0",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "ytdl": "^0.13.1",
+    "ytdl-core": "^1.0.0",
+    "ytsr": "^0.1.8"
   },
   "bugs": {
     "url": "https://github.com/Sense-Studios/VirtualMixerProject/issues"
@@ -49,7 +52,8 @@
     "glob": "^3.1.10",
     "gulp-concat": "^2.6.1",
     "gulp-minify": "^3.1.0",
-    "del":"4.2.0",
-    "jsdoc": "^3.5.5"
+    "del": "4.2.0",
+    "jsdoc": "^3.5.5",
+    "gulp-cli": "2.2.0"
   }
 }
