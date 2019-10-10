@@ -69,10 +69,96 @@ router.get('/nocorsaudio/*', function( req, res, next ) {
   res.sendFile( path.join(__dirname, '../public', repl_url) );
 });
 
+/* -------------------------------------------------------------------------- */
 
 var fs = require('fs');
 var ytdl = require('ytdl-core');
 var request = require('request');
+
+router.get('/yt/*', function(req, res, next) {
+  var videoID = req.originalUrl.split('/yt/')[1].split('/')[0]
+  var itag = req.originalUrl.split('/yt/')[1].split('/')[1]
+  var url = "https://www.youtube.com/watch?v=" + videoID
+
+  if (itag !== undefined) {
+    var yt_result = ytdl( url, { filter: (format) => format.itag === itag } )
+  }else{
+    var yt_result = ytdl( url )
+  }
+
+
+  var ctl = null
+  yt_result.once('response', (resp) => {
+    console.log(' ----------------------------- ')
+    console.log( resp.headers['content-length'] )
+    console.log(' ----------------------------- ')
+
+    var total = resp.headers['content-length']
+
+    //res.header('Content-lenght', ctl )
+    //res.header('Content-Type', 'video/mp4');
+    //res.header('Accept-Ranges', 'bytes');
+
+    /*
+    if (req.headers['range']) {
+       var range = req.headers.range;
+       var parts = range.replace(/bytes=/, "").split("-");
+       var partialstart = parts[0];
+       var partialend = parts[1];
+
+       var start = parseInt(partialstart, 10);
+       var end = partialend ? parseInt(partialend, 10) : total-1;
+       var chunksize = (end-start)+1;
+       console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+
+       // var file = fs.createReadStream(path, {start: start, end: end});
+       //res.writeHead(206, { 'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 'Accept-Ranges': 'bytes', 'Content-Length': total, 'Content-Type': 'video/mp4' });
+       res.writeHead(206, { 'Content-Length': total, 'Content-Type': 'video/mp4','Accept-Ranges': 'bytes', });
+       yt_result.pipe( res )
+
+     } else {
+       console.log('ALL: ' + total);
+       res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', });
+       //fs.createReadStream(path).pipe(res);
+       yt_result.pipe( res )
+     }
+     */
+
+     res.writeHead(200, {
+       'Content-Length': total,
+       'Content-Type': 'video/mp4',
+       'Accept-Ranges': 'bytes',
+       'Access-Control-Allow-Origin': '*',
+       'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+       'Access-Control-Allow-Headers': 'POST, GET, OPTIONS',
+     });
+
+     yt_result.pipe( res )
+  })
+
+  yt_result.on('info', function( info, format) {
+    //console.log(' ----------------------------- ')
+    //console.log(info)
+    console.log(' ----------------------------- ')
+    console.log(format)
+    console.log(' ----------------------------- ')
+  })
+
+
+  //if (req.headers['range']) {
+  //  res.writeHead(206, { 'Content-Length': 21977813, 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', });
+  //  yt_result.pipe( res )
+  //}else{
+  //}
+
+  //'Content-Length': 21977813,
+
+
+
+
+})
+
+/* -------------------------------------------------------------------------- */
 
 router.get('/yti/*', function(req, res, next) {
 
@@ -80,17 +166,24 @@ router.get('/yti/*', function(req, res, next) {
   var videoID = ytdl.getURLVideoID(url)
   console.log("gooo ", videoID )
 
-    // Example of choosing a video format.
-  ytdl.getInfo( videoID, (err, info) => {
-    if (err) throw err;
-    let format = ytdl.chooseFormat(info.formats, { quality: '134' });
-    if (format) {
-      console.log('Format found!', format);
-    }
-  });
+  // Example of choosing a video format.
+  //ytdl.getInfo( videoID, (err, info) => {
+  //  if (err) throw err;
+  //  let format = ytdl.chooseFormat(info.formats, { quality: '134' });
+  //  if (format) {
+  //    console.log('Format found!', format);
+  //  }
+  //});
 
 
-  ytdl.getInfo( url, {}, function( err, info ) { console.log(err, info) } )
+  ytdl.getInfo( url, {}, function( err, info ) {
+    // console.log(err, info)
+    // res write
+    res.send(JSON.stringify(info));
+  } )
+
+
+  //res.write('oi!') //http://virtualmixproject.com/yti/3pD68uxRLkM
 })
 
 var ytsr = require('ytsr');
@@ -133,64 +226,6 @@ router.get('/yt_set/*', function(req, res, next) {
   	});
   });
 });
-
-router.get('/yt/*', function(req, res, next) {
-  var url = "https://www.youtube.com/watch?v=" + req.originalUrl.split('/yt/')[1]
-  //ytdl.getBasicInfo(url, {filter: (format) => format.container === 'mp4',}, function( err, info ) { console.log(info)} )
-
-  //res.header('Content-Type': 'video/mp4');
-    res.header('Accept-Ranges', 'bytes');
-  res.header('Content-Type', 'video/mp4')
-
-
-  var yt_result = ytdl( url, {
-    filter: (format) => format.container === 'mp4',
-    begin: '1:15'
-    // range: { start: 100 }
-  } )
-  //console.log('oi oi oi')
-  yt_result.pipe( res )
-
-  let starttime = 0;
-  yt_result.on('progress', function(chunkLength, downloaded, total) {
-    return
-    const percent = downloaded / total;
-    const downloadedMinutes = (Date.now() - starttime) / 1000 / 60;
-    //readline.cursorTo(process.stdout, 0);
-    //process.stdout.write(`${(percent * 100).toFixed(2)}% downloaded `);
-    //process.stdout.write(`(${(downloaded / 1024 / 1024).toFixed(2)}MB of ${(total / 1024 / 1024).toFixed(2)}MB)\n`);
-    //process.stdout.write(`running for: ${downloadedMinutes.toFixed(2)}minutes`);
-    //process.stdout.write(`, estimated time left: ${(downloadedMinutes / percent - downloadedMinutes).toFixed(2)}minutes `);
-    //readline.moveCursor(process.stdout, 0, -1);
-
-    //readline.cursorTo(process.stdout, 0);
-    console.log(`\n${(percent * 100).toFixed(2)}% downloaded `);
-    console.log(`(${(downloaded / 1024 / 1024).toFixed(2)} MB of ${(total / 1024 / 1024).toFixed(2)} MB)`);
-    console.log(`running for: ${downloadedMinutes.toFixed(2)} minutes`);
-    console.log(`estimated time left: ${(downloadedMinutes / percent - downloadedMinutes).toFixed(2) } minutes `);
-    //readline.moveCursor(process.stdout, 0, -1);
-
-  });
-
-  yt_result.on('error', (err) => {
-    console.log('-- ERROR: ', err, '\n\n');
-  });
-
-  yt_result.on('end', () => {
-    console.log('-- end\n\n');
-  });
-
-  //req.pipe( yt_result.createWriteStream('video.mp4') )
-  /*
-  var result = ytdl.getBasicInfo( "https://www.youtube.com/watch?v=" + req.originalUrl.split('/yt/')[1], function(err, info) {
-    console.log("heeeeeere goes ...")
-    console.log(" --> ", resu)
-    //res.sendFile( path.join(__dirname, '../public', info.formats[0].url ) );
-    //request( info.formats[0].url ).pipe(res);
-    request( resu ).pipe(res);
-  })
-  */
-})
 
 
 router.get('/yt2/*', function(req, res, next) {

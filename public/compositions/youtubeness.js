@@ -65,8 +65,8 @@ setInterval(function() {
     // console.log("beat!", beats, dice)
     if (beats == 6) filemanager.changez()
     if (beats == 8) filemanager2.changez()
-    if (beats%6 == 0 && dice < 0.2 ) source1.jump()
-    if (beats%4 == 0 && dice < 0.2 ) source2.jump()
+    if (beats%6 == 0 && dice < 0.6 ) source1.jump( Math.round( Math.random() * source1.video.buffered.end(0) ) )
+    if (beats%4 == 0 && dice < 0.6 ) source2.jump( Math.round( Math.random() * source2.video.buffered.end(0) ) )
     if (beats%16 == 0 && dice < 0.64 ) filemanager.changez(); //setTimeout(function() { source1.jump() }, 1500 )
     if (beats%12 == 0 && dice < 0.64 ) filemanager2.changez(); //setTimeout(function() { source1.jump() }, 1500 )
     if (beats%9 == 0 && dice < 0.7 ) mixer1.blendMode( useBlendmodes[Math.floor( Math.random() * useBlendmodes.length )] );
@@ -96,7 +96,7 @@ document.getElementById('change1').onclick = function() {
  console.log(filemanager.source.currentSrc)
 }
 document.getElementById('jump1').onclick = function() {
- source1.jump()
+ source1.jump( Math.round( Math.random() * source1.video.buffered.end(0) ) )
  console.log( source1.currentTime() )
 }
 
@@ -109,6 +109,6 @@ document.getElementById('change2').onclick = function() {
  console.log(filemanager2.source.currentSrc)
 }
 document.getElementById('jump2').onclick = function() {
- source2.jump()
+ source2.jump( Math.round( Math.random() * source1.video.buffered.end(0) ) )
  console.log( source2.currentTime() )
 }
