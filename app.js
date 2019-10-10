@@ -15,7 +15,7 @@ var ioRouter = require('./routes/io');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 // when we have io,pass it to the requests
 app.use(function(req, res, next) {
