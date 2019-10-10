@@ -103,9 +103,9 @@ gulp.task('remove_mixer_scaffold', function() {
 // commands
 // -----------------------------------------------------------------------------
 
-gulp.task('default', ['vendor-js','mixer-js']); // default (build)
-gulp.task('build', ['vendor-js', 'mixer-js']); // build
-gulp.task('test', ['create_scaffold']);
+gulp.task('default', gulp.series( gulp.parallel('vendor-js','mixer-js') ) ); // default (build)
+gulp.task('build', gulp.series( gulp.parallel('vendor-js', 'mixer-js') ) ); // build
+//gulp.task('test', gulp.series( gulp.parallel('create_scaffold') ) );
 
 // create thumbnails /directory
 // create_mixer

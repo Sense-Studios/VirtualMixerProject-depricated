@@ -1,202 +1,17 @@
-
 /**
- * @summery
- *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
- *
- * @description
- *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
- *
- * @constructor GlRenderer
- * @example
- *    <!-- a Canvas element with id: glcanvas is required! -->
- *    <canvas id="glcanvas"></canvas>
- *
- *
- *    <script>
- *      let renderer = new GlRenderer();
- *
- *      var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
- *      let output = new Output( renderer, red )
- *
- *      renderer.init();
- *      renderer.render();
- *    </script>
- */
+* @summary
+*   Helper classes that add on other classes in the mixer.
+*
+* @description
+*   Helper classes that add on other classes in the mixer.
+*   Addons are elements like filemanagers, bpm, etc.
+*
+* @constructor Addon
+* @interface
+* @author Sense Studios
+*/
 
- /*
-    We might try and change THREEJS and move to regl;
-    https://github.com/regl-project, http://regl.party/examples => video
-    133.6 => ~26kb
- */
-
-var GlRenderer = function( _options ) {
-
-  var _self = this
-
-  /** Set uop options */
-  _self.options = { element: 'glcanvas' }
-  if ( _options != undefined ) {
-    _self.options = _options
-  }
-
-  // set up threejs scene
-  _self.element = _self.options.element
-  _self.scene = new THREE.Scene();
-  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-  _self.camera.position.z = 20
-
-  // container for all elements that inherit init() and update()
-  _self.nodes = [] // sources modules and effects
-
-  // containers for custom uniforms and cosutomDefines
-  _self.customUniforms = {}
-  _self.customDefines = {}
-
-  // base config, screensize and time
-  var cnt = 0.;
-  _self.customUniforms['time'] = { type: "f", value: cnt }
-  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
-
-  /**
-   * The vertex shader
-   * @member GlRenderer#vertexShader
-   */
-  _self.vertexShader = `
-    varying vec2 vUv;\
-    void main() {\
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
-      vUv = uv;\
-    }
-  `
-
-   /**
-    * The fragment shader
-    * @member GlRenderer#fragmentShader
-    */
-     // base fragment shader
-  _self.fragmentShader = `
-    uniform float time;
-    uniform vec2 screenSize;
-
-    /* custom_uniforms */\
-    /* custom_helpers */\
-    varying vec2 vUv;\
-    void main() {\
-      /* custom_main */\
-    }
-  `
-
-  // ---------------------------------------------------------------------------
-  /** @function GlRenderer.init */
-  _self.init = function(  ) {
-    console.log("init renderer")
-    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
-
-    // init nodes
-    // reset the renderer, for a new lay out
-    /**
-     * All the nodes currently added to this renderer
-     * @member GlRenderer#nodes
-     */
-    _self.nodes.forEach(function(n){ n.init() });
-
-    // create the shader
-    _self.shaderMaterial = new THREE.ShaderMaterial({
-       uniforms: _self.customUniforms,
-       defines: _self.customDefines,
-       vertexShader: _self.vertexShader,
-       fragmentShader: _self.fragmentShader,
-       side: THREE.DoubleSide,
-       transparent: true
-    })
-
-    // apply the shader material to a surface
-    _self.flatGeometry = new THREE.PlaneGeometry( 67, 38 );
-    _self.flatGeometry.translate( 0, 0, 0 );
-    _self.surface = new THREE.Mesh( _self.flatGeometry, _self.shaderMaterial );
-    // surface.position.set(60,50,150);
-
-    /**
-     * A reference to the threejs scene
-     * @member GlRenderer#scene
-     */
-    _self.scene.add( _self.surface );
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /** @function GlRenderer.render */
-  _self.render = function() {
-  	requestAnimationFrame( _self.render );
-  	_self.glrenderer.render( _self.scene, _self.camera );
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
-    _self.nodes.forEach( function(n) { n.update() } );
-
-    cnt++;
-    _self.customUniforms['time'].value = cnt;
-  }
-
-  // update size!
-  window.addEventListener('resize', function() {
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
-
-    // resize viewport (write exception for width >>> height, now gives black bars )
-    _self.camera.aspect = window.innerWidth / window.innerHeight;
-    _self.camera.updateProjectionMatrix();
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
-  })
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-
-  // adds nodes to the renderer
-  // function is implicit, and is colled by the modules
-  _self.add = function( module ) {
-    _self.nodes.push( module )
-  }
-
-  // reset the renderer, for a new lay out
-  /**
-   * Disposes the renderer
-   * @function GlRenderer#dispose
-   */
-  _self.dispose = function() {
-    _self.shaderMaterial
-    _self.flatGeometry
-    _self.scene.remove(_self.surface)
-    _self.glrenderer.resetGLState()
-    _self.customUniforms = {}
-    _self.customDefines = {}
-
-    cnt = 0.;
-    _self.customUniforms['time'] = { type: "f", value: cnt }
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
-
-    // reset the vertexshader
-    _self.vertexShader = `
-      varying vec2 vUv;
-      void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-        vUv = uv;
-      }
-    `
-
-    // reset the fragment shader
-    _self.fragmentShader = `
-      uniform int time;
-      uniform vec2 screenSize;
-
-      /* custom_uniforms */
-      /* custom_helpers */
-      varying vec2 vUv;
-      void main() {
-        /* custom_main */
-      }
-    `
-
-    _self.nodes = []
-  }
-}
+function Addon() {}
 
 AudioAnalysis.prototype = new Addon();
 AudioAnalysis.constructor = AudioAnalysis;
@@ -204,6 +19,9 @@ AudioAnalysis.constructor = AudioAnalysis;
 /**
 * @summary
 *   AudioAnalysis returns a BPM based on music analisis. Either mp3 or microphone
+*  Audio Analysis Example on codepen:
+*  <a href="https://codepen.io/xangadix/pen/VRGzdY" target="_blank">codepen</a>
+*
 *
 * @description
 *   see more at [Joe Sullivan]{@link http://joesul.li/van/beat-detection-using-web-audio/}
@@ -737,6 +555,8 @@ BPM.constructor = BPM;  // re-assign constructor
 /**
  * @summary
  *   BPM calculates beat per minutes based on a 'tap' function
+ *   Tapped BPM Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/drqzPr" target="_blank">codepen</a>
  *
  * @description
  *   BPM returns a floating point between 1 and 0, in sync with a bpm the BPM is calculated based on a 'tap' function
@@ -744,8 +564,11 @@ BPM.constructor = BPM;  // re-assign constructor
  * @example
  * var mixer1 = new Mixer( renderer, { source1: mySource, source2: myOtherSource })
  * var bpm = new BPM( renderer );
- * bpm.bpm = 100
  * bpm.add( mixer1.pod )
+ * window.addEventListener('keypress', function(ev) {
+ *   if (ev.which == 13) bpm.tap()
+ * })
+ *
  * @constructor Addon#BPM
  * @implements Addon
  * @param {GlRenderer} renderer
@@ -929,7 +752,7 @@ function BPM( renderer, options ) {
 
   /**
    * @description Tapping beat control
-   * @function BPM#tap
+   * @function Addon#BPM#tap
    */
   _self.tap = function() {
     _self.useAutoBPM = false
@@ -944,6 +767,10 @@ function BPM( renderer, options ) {
     }
   }
 
+  /**
+   * @description Gets the current BPM (in bpm, as render() gives a float)
+   * @function Addon#BPM#getBpm
+   */
   _self.getBpm = function() {
     return _self.bpm
   }
@@ -1119,6 +946,8 @@ GiphyManager.constructor = GiphyManager;
 /**
  * @summary
  *   Aquires a set of Gif Files [Giphy](https://giphy.com/), based on tags, and allows choosing from that.
+ *   Giphy Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/vqmWzN" target="_blank">codepen</a>
  *
  * @description
  *  Like the FileManager, the Giphymanager aquires a set of gif files between which you can choose. It connects to a Gifsource.
@@ -1156,7 +985,7 @@ function GiphyManager( _source ) {
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
    */
-   
+
   _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
@@ -1213,21 +1042,6 @@ function GiphyManager( _source ) {
   // load it up with defaults
   //_self.needle("vj")
 }
-
-/**
-* @summary
-*   Helper classes that add on other classes in the mixer.
-*
-* @description
-*   Helper classes that add on other classes in the mixer.
-*   Addons are elements like filemanagers, bpm, etc.
-*
-* @constructor Addon
-* @interface
-* @author Sense Studios
-*/
-
-function Addon() {}
 
 /*
 
@@ -1552,12 +1366,50 @@ function Behaviour( _renderer, options ) {
   */
 }
 
+ /**
+  * @constructor Controller
+  * @interface
+
+  * @summary
+  *   The Controller Class covers a range of input-output nodes in between either sources and mixers
+  *
+  * @description
+  *   The Controller Class covers a range of interfaces to popular input devices. Keyoard, Midi, Gamepad and Sockets
+  *
+  *
+  *
+  *
+  *
+  *
+  * @author Sense studios
+  */
+
+function Controller( options ) {
+  var _self = this
+
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options;
+
+  _self.type = "Controller"
+  _self.testControllerVar = "test"
+
+  // program interface
+  _self.init =         function() {}
+  _self.update =       function() {}
+  _self.render =       function() {}
+}
+
 GamePadController.prototype = new Controller();
 GamePadController.constructor = GamePadController;
 
 /**
  * @summary
  *  Search and initialize a Gamepad and make event listeners available.
+ *  tested with X Box controller
+ *  Gamepad Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/gEzZgx" target="_blank">codepen</a>
+ *
  *
  * @description
  *   Check for an example this [video on Youtue](https://www.youtube.com/watch?v=N1AOX8m6U04)
@@ -1787,6 +1639,8 @@ KeyboardController.constructor = KeyboardController;
 /**
  * @summary
  *  implements keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes) as controllerevents
+ *  Keyboard Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/NJzxNy" target="_blank">codepen</a>
  *
  * @description
  *  This controller converts keyboard listeners to a Controller. Events are triggered through keyboard [charcodes](https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
@@ -1939,6 +1793,8 @@ MidiController.constructor = MidiController;
 /**
  * @summary
  *  Connects a midicontroller with a range of listeners. Can also send commands Back
+ *  Midi Example on codepen: 
+ *  <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank">codepen</a>
  *
  * @description
  *  The Midi class searches and Connects to a midicontroller with a range of listeners.
@@ -2294,7 +2150,7 @@ SocketController.constructor = SocketController;
  *  // make sure your user sees this string, so he can connects his _remote_ to this _client_
  *
  *  // optionally listen for the ready signal, which gives you the id too
- *  socketcontroller.addEventListener("ready", function(d) console.log("client id:", d ));
+ *  socket1.addEventListener("ready", function(d) console.log("client id:", d ));
  *  > client id: 8170
  *
  *  // write the rest of your listeners
@@ -2321,7 +2177,7 @@ SocketController.constructor = SocketController;
  *  var get_client_id = ()=> { return document.getElementById('socket_client_id').value }
  *
  *  // send trigger 1 to socket get_client_id, may send to multiple ids: "8170,af44" always lowecase
- *  // _commands are arrays of numbers or strings, to be interpreted on the client.
+ *  // _commands are mostly arrays of numbers or strings, but can be interpreted on the client.
  *  // [ "mixer1", "blend", 6 ]
  *  // [ "mixer1", "pod", gamepad1.x-axis ]
  *  // etc.
@@ -2494,39 +2350,46 @@ function SocketController( _options  ) {
 
 function SourceControl( renderer, source ) {}
 
- /**
-  * @constructor Controller
-  * @interface
+/**
+ * @constructor Effect
+ * @interface
 
-  * @summary
-  *   The Controller Class covers a range of input-output nodes in between either sources and mixers
-  *
-  * @description
-  *   The Controller Class covers a range of interfaces to popular input devices. Keyoard, Midi, Gamepad and Sockets
-  *
-  *
-  *
-  *
-  *
-  *
-  * @author Sense studios
-  */
+ * @summary
+ *   The Effect Class covers a range of input-output-nodes.
+ *   Effects example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
+ *
+ * @description
+ *   The effect class covers a range of input-output nodes in between either sources and mixers
+ *   Or mixers and mixers. It depends if the effect needs UV control whichj only works on samplers.
+ *   Broadly I've split up a number of effects in
+ *    * DistortionEffects, handling all kind of UV processes on samplers and more
+ *    * FeedbackEffects, with an extra canvas all effects that involve layering are here
+ *    * ColorEffects, all effects doing with colors, works on mixers as well
+ *
+ *   Connection flow:
+ *   ```
+ *     SOURCE ---> EFFECT1 --> MIXER --> EFFECT2 --> ... ---> OUTPUT
+ *   ```
+ *
+ *   Effects example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
+ *
+ *
+ * @author Sense studios
+ */
 
-function Controller( options ) {
-  var _self = this
 
-  // set options
-  var _options;
-  if ( options != undefined ) _options = options;
+ function Effect( renderer, options ) {
+   var _self = this
 
-  _self.type = "Controller"
-  _self.testControllerVar = "test"
+   _self.type = "Effect"
 
-  // program interface
-  _self.init =         function() {}
-  _self.update =       function() {}
-  _self.render =       function() {}
-}
+   // program interface
+   _self.init =         function() {}
+   _self.update =       function() {}
+   _self.render =       function() {}
+ }
 
 ColorEffect.prototype = new Effect(); // assign prototype to marqer
 ColorEffect.constructor = ColorEffect;  // re-assign constructor
@@ -2534,6 +2397,9 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
 /**
  * @summary
  *   The color effect has a series of color effects, ie. implements a series of operations on rgba
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
+ *
  *
  * @description
  *   Color effect allows for a series of color effect, mostly
@@ -2880,6 +2746,8 @@ DistortionEffect.constructor = DistortionEffect;  // re-assign constructor
 /**
  * @summary
  *   The Distortion effect has a series of simple distortion effects, ie. it manipulates, broadly, the UV mapping and pixel placements
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  * @description
  *   Distortion  effect allows for a series of color Distortion, mostly
@@ -3099,6 +2967,8 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
 /**
  * @summary
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
+ *   Effects Example on codepen:
+ *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
  *
  * @description
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
@@ -3332,46 +3202,239 @@ _self.update = function() {
   }
 }
 
-/**
- * @constructor Effect
- * @interface
 
- * @summary
- *   The Effect Class covers a range of input-output-nodes.
+/**
+ * @summery
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
  *
  * @description
- *   The effect class covers a range of input-output nodes in between either sources and mixers
- *   Or mixers and mixers. It depends if the effect needs UV control whichj only works on samplers.
- *   Broadly I've split up a number of effects in
- *    * DistortionEffects, handling all kind of UV processes on samplers and more
- *    * FeedbackEffects, with an extra canvas all effects that involve layering are here
- *    * ColorEffects, all effects doing with colors, works on mixers as well
+ *  Wraps around a Three.js GLRenderer and sets up the scene and shaders.
  *
- *   Connection flow:
- *   ```
- *     SOURCE ---> EFFECT1 --> MIXER --> EFFECT2 --> ... ---> OUTPUT
- *   ```
+ * @constructor GlRenderer
+ * @example
+ *    <!-- a Canvas element with id: glcanvas is required! -->
+ *    <canvas id="glcanvas"></canvas>
  *
+ *
+ *    <script>
+ *      let renderer = new GlRenderer();
+ *
+ *      var red = new SolidSource( renderer, { color: { r: 1.0, g: 0.0, b: 0.0 } } );
+ *      let output = new Output( renderer, red )
+ *
+ *      renderer.init();
+ *      renderer.render();
+ *    </script>
+ */
+
+ /*
+    We might try and change THREEJS and move to regl;
+    https://github.com/regl-project, http://regl.party/examples => video
+    133.6 => ~26kb
+ */
+
+var GlRenderer = function( _options ) {
+
+  var _self = this
+
+  /** Set uop options */
+  _self.options = { element: 'glcanvas' }
+  if ( _options != undefined ) {
+    _self.options = _options
+  }
+
+  // set up threejs scene
+  _self.element = _self.options.element
+  _self.scene = new THREE.Scene();
+  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  _self.camera.position.z = 20
+
+  // container for all elements that inherit init() and update()
+  _self.nodes = [] // sources modules and effects
+
+  // containers for custom uniforms and cosutomDefines
+  _self.customUniforms = {}
+  _self.customDefines = {}
+
+  // base config, screensize and time
+  var cnt = 0.;
+  _self.customUniforms['time'] = { type: "f", value: cnt }
+  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+  /**
+   * The vertex shader
+   * @member GlRenderer#vertexShader
+   */
+  _self.vertexShader = `
+    varying vec2 vUv;\
+    void main() {\
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\
+      vUv = uv;\
+    }
+  `
+
+   /**
+    * The fragment shader
+    * @member GlRenderer#fragmentShader
+    */
+     // base fragment shader
+  _self.fragmentShader = `
+    uniform float time;
+    uniform vec2 screenSize;
+
+    /* custom_uniforms */\
+    /* custom_helpers */\
+    varying vec2 vUv;\
+    void main() {\
+      /* custom_main */\
+    }
+  `
+
+  // ---------------------------------------------------------------------------
+  /** @function GlRenderer.init */
+  _self.init = function(  ) {
+    console.log("init renderer")
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: glcanvas, alpha: false } );
+
+    // init nodes
+    // reset the renderer, for a new lay out
+    /**
+     * All the nodes currently added to this renderer
+     * @member GlRenderer#nodes
+     */
+    _self.nodes.forEach(function(n){ n.init() });
+
+    // create the shader
+    _self.shaderMaterial = new THREE.ShaderMaterial({
+       uniforms: _self.customUniforms,
+       defines: _self.customDefines,
+       vertexShader: _self.vertexShader,
+       fragmentShader: _self.fragmentShader,
+       side: THREE.DoubleSide,
+       transparent: true
+    })
+
+    // apply the shader material to a surface
+    _self.flatGeometry = new THREE.PlaneGeometry( 67, 38 );
+    _self.flatGeometry.translate( 0, 0, 0 );
+    _self.surface = new THREE.Mesh( _self.flatGeometry, _self.shaderMaterial );
+    // surface.position.set(60,50,150);
+
+    /**
+     * A reference to the threejs scene
+     * @member GlRenderer#scene
+     */
+    _self.scene.add( _self.surface );
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /** @function GlRenderer.render */
+  _self.render = function() {
+  	requestAnimationFrame( _self.render );
+  	_self.glrenderer.render( _self.scene, _self.camera );
+    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.nodes.forEach( function(n) { n.update() } );
+
+    cnt++;
+    _self.customUniforms['time'].value = cnt;
+  }
+
+  // update size!
+  window.addEventListener('resize', function() {
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // resize viewport (write exception for width >>> height, now gives black bars )
+    _self.camera.aspect = window.innerWidth / window.innerHeight;
+    _self.camera.updateProjectionMatrix();
+    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+  })
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+
+  // adds nodes to the renderer
+  // function is implicit, and is colled by the modules
+  _self.add = function( module ) {
+    _self.nodes.push( module )
+  }
+
+  // reset the renderer, for a new lay out
+  /**
+   * Disposes the renderer
+   * @function GlRenderer#dispose
+   */
+  _self.dispose = function() {
+    _self.shaderMaterial
+    _self.flatGeometry
+    _self.scene.remove(_self.surface)
+    _self.glrenderer.resetGLState()
+    _self.customUniforms = {}
+    _self.customDefines = {}
+
+    cnt = 0.;
+    _self.customUniforms['time'] = { type: "f", value: cnt }
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+
+    // reset the vertexshader
+    _self.vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vUv = uv;
+      }
+    `
+
+    // reset the fragment shader
+    _self.fragmentShader = `
+      uniform int time;
+      uniform vec2 screenSize;
+
+      /* custom_uniforms */
+      /* custom_helpers */
+      varying vec2 vUv;
+      void main() {
+        /* custom_main */
+      }
+    `
+
+    _self.nodes = []
+  }
+}
+
+/**
+ * @constructor Module
+ * @interface
+ * @summary
+ *   Modules collect all the mixer elements
+ *
+ * @description
+ *   Modules collect all the mixer elements
  *
  *
  * @author Sense studios
  */
 
+function Module( renderer, options ) {
+  var _self = this
 
- function Effect( renderer, options ) {
-   var _self = this
+  /*
+   renderer
+  */
 
-   _self.type = "Effect"
+  _self.type = "Module"
 
-   // program interface
-   _self.init =         function() {}
-   _self.update =       function() {}
-   _self.render =       function() {}
- }
+  // program interface
+  _self.init =         function() {}
+  _self.update =       function() {}
+  _self.render =       function() {}
+}
 
 /**
  * @summary
  *    A Chain is string of sources, stacked on top of each other
+ *    Chain Example on codepen: 
+ *    <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank">codepen</a>
  *
  * @description
  *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
@@ -3469,6 +3532,8 @@ vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
 /**
  * @summary
  *    A mixer mixes two sources together.
+ *    Mixer example on codepen: 
+ *    <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a>
  *
  * @description
  *   ### Mixmode
@@ -4120,31 +4185,42 @@ vec4 '+_self.uuid+'_output = get_source_'+_self.uuid+'('+_self.uuid+'_active_sou
 }
 
 /**
- * @constructor Module
+ * @constructor Source
  * @interface
  * @summary
- *   Modules collect all the mixer elements
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
  *
  * @description
- *   Modules collect all the mixer elements
+ *   A source is the imput for a mixer. It can be an image, video, text etc.
+ *
  *
  *
  * @author Sense studios
  */
 
-function Module( renderer, options ) {
+function Source( renderer, options ) {
   var _self = this
 
-  /*
-   renderer
-  */
+  _self.type = "Source"
+  _self.function_list = [["JUMP","method","jump"]]
 
-  _self.type = "Module"
-
+  // override these
   // program interface
   _self.init =         function() {}
   _self.update =       function() {}
   _self.render =       function() {}
+  _self.start =        function() {}
+
+  // control interface
+  _self.src =          function( _file ) {} // .gif
+  _self.play =         function() {}
+  _self.pause =        function() {}
+  _self.paused =       function() {}
+  _self.currentFrame = function( _num ) {}  // seconds
+  _self.duration =     function() {}        // seconds
+
+  _self.jump =         function() {}
+  //_self.cue =          function() {}      // still no solid solution
 }
 
 GifSource.prototype = new Source(); // assign prototype to marqer
@@ -4153,6 +4229,8 @@ GifSource.constructor = GifSource;  // re-assign constructor
 /**
  * @summary
  *  Allows for an (animated) GIF file to use as input for the mixer
+ *  Giphy Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/vqmWzN" target="_blank">codepen</a>
  *
  * @description
  *  Allows for an (animated) GIF file to use as input for the mixer
@@ -4238,7 +4316,7 @@ function GifSource( renderer, options ) {
     console.log(_self.uuid, " Load", _self.currentSrc, "..." )
     //supergifelement.load_url( _self.currentSrc )
     supergifelement.load_url( _self.currentSrc, function() {
-      console.log("play initial source"); 
+      console.log("play initial source");
       supergifelement.play();
     } )
 
@@ -4559,15 +4637,6 @@ function MultiVideoSource(renderer, options) {
   // _self.init()
 }
 
-
-SVGSource.prototype = new Source(); // assign prototype to marqer
-SVGSource.constructor = SVGSource;  // re-assign constructor
-
-// TODO
-// hook Lottie up
-
-function SVGSource(renderer, options) {}
-
 SocketSource.prototype = new Source(); // assign prototype to marqer
 SocketSource.constructor = SocketSource;  // re-assign constructor
 
@@ -4714,6 +4783,15 @@ function SolidSource(renderer, options) {
 
 
   // create and instance
+
+
+SVGSource.prototype = new Source(); // assign prototype to marqer
+SVGSource.constructor = SVGSource;  // re-assign constructor
+
+// TODO
+// hook Lottie up
+
+function SVGSource(renderer, options) {}
 
 
 TextSource.prototype = new Source(); // assign prototype to marqer
@@ -4955,6 +5033,9 @@ VideoSource.constructor = VideoSource;  // re-assign constructor
 *
 * @summary
 *  The videosource allows for playback of video files in the Mixer project
+*  VideoSource Example on codepen:
+*  <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a>
+*
 *
 * @description
 *  The videosource allows for playback of video files in the Mixer project
@@ -5249,6 +5330,8 @@ WebcamSource.constructor = WebcamSource;  // re-assign constructor
  *
  * @summary
  *  The WebcamSource allows for playback of webcams in the Mixer project
+ *  Webcam Example on codepen:
+ *  <a href="https://codepen.io/xangadix/pen/moLayR" target="_blank">codepen</a>
  *
  * @description
  *  The WebcamSource allows for playback of webcams in the Mixer project
@@ -5473,43 +5556,4 @@ function WebcamSource(renderer, options) {
   // ===========================================================================
 
   // _self.init()
-}
-
-/**
- * @constructor Source
- * @interface
- * @summary
- *   A source is the imput for a mixer. It can be an image, video, text etc.
- *
- * @description
- *   A source is the imput for a mixer. It can be an image, video, text etc.
- *
- *
- *
- * @author Sense studios
- */
-
-function Source( renderer, options ) {
-  var _self = this
-
-  _self.type = "Source"
-  _self.function_list = [["JUMP","method","jump"]]
-
-  // override these
-  // program interface
-  _self.init =         function() {}
-  _self.update =       function() {}
-  _self.render =       function() {}
-  _self.start =        function() {}
-
-  // control interface
-  _self.src =          function( _file ) {} // .gif
-  _self.play =         function() {}
-  _self.pause =        function() {}
-  _self.paused =       function() {}
-  _self.currentFrame = function( _num ) {}  // seconds
-  _self.duration =     function() {}        // seconds
-
-  _self.jump =         function() {}
-  //_self.cue =          function() {}      // still no solid solution
 }
