@@ -169,13 +169,27 @@ _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */',
 vec4 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
 } // init
 
+/*
+  Herunder is a script that uses a canvas to add feedback to the texture
+  but to do it right, we need another scene. this has to do with the fact
+  that three renders everything in a gl buffer, so we need another scene
+  to get this done.
+  https://github.com/samhains/minimal-threejs-feedback-glsl/blob/master/index.html
+
+  Either we build another three JS texture here, OR we switch from render
+  engine and move over to another core engine like reGL
+*/
+
+// -----------------------------------------------------------------------------
 
 var vector = new THREE.Vector2();
 //var glcanvas = document.getElementById('glcanvas');
 //var glcanvas = _renderer.glrenderer.context.canvas
 var i = 0
 _self.update = function() {
-  i++
+
+  i++;
+
   // mixmode
   // blendmode
   // pod

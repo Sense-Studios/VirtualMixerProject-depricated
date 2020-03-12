@@ -70,9 +70,24 @@ function FileManager( _source ) {
    * @function Addon#FileManager#setSrc
    *
   */
-  _self.setSrc = function( file ) {
-    _self.source.src(file)
+
+  /* helper */
+  if ( window.in_app != undefined ) {
+    _self.eu = window.eu
   }
+
+  _self.setSrc = function( file ) {
+    if ( window.in_app == undefined ) {
+      _self.source.src(file)
+      console.log("filemanager: set normal source:", file)
+    }else{
+      _self.source.src(_self.eu.check_file(file) )
+      console.log("filemanager: set checked source:", _self.eu.check_file(file) )
+    }
+  }
+
+  // load entire set
+  // filemanager.set.forEach(function(item) { window.eu.check_file(item) })
 
   // ---------------------------------------------------------------------------
   // HELPERS

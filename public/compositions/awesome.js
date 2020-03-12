@@ -13,7 +13,9 @@ var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 
 // var analisi
 // var bpm = new BPM( renderer ) tapped beat control
-var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
+//var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
+var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'http://37.220.36.51:8906/;?type=http&nocache=' + Math.round( Math.random() * 100000 )  } )
+// var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'https://nsbradio.co.uk/play.php' } )
 
 var filemanager = new FileManager( source1 )
 filemanager.load_set("/sets/programs_awesome.json")
@@ -51,6 +53,13 @@ contrast.extra(0.4)
 
 audioanalysis1.add( mixer1.pod )
 audioanalysis1.mod = 1
+
+/*
+  Init local ( i hate myseld)
+  setInterval( function() {
+  // eu.check_set(filemanager2.set)
+  })
+*/
 
 var wasSet = false
 var beats = 0

@@ -1,3 +1,9 @@
+
+// #############################################################################
+// May need update:
+// note for update to 4.x https://codeburst.io/switching-to-gulp-4-0-271ae63530c0
+// #############################################################################
+
 var glob = require('glob');
 var gulp = require('gulp');
 var del = require('del');
@@ -73,35 +79,46 @@ function generateMixerSass( _name ) {
 	return sass
 }
 
+
 // create:mixer
 // create:controller
 // remove:mixer
 // remove:controller
-gulp.task('create_mixer_scaffold', function() {
-  console.log(" -- Create mixer: " + process.argv[4])
-	var scaffold_name = process.argv[4]
-	require('fs').writeFileSync('./views/compositions/'+scaffold_name+'.jade', generateMixerJade( scaffold_name ) );
-  console.log("writing ", './views/compositions/'+scaffold_name+'.jade')
-	require('fs').writeFileSync('./public/compositions/'+scaffold_name+'.js', generateMixerJs( scaffold_name ) );
-  console.log("writing ", './public/compositions/'+scaffold_name+'.js')
-	require('fs').writeFileSync('./public/stylesheets/compositions/'+scaffold_name+'.sass', generateMixerSass( scaffold_name ) );
-  console.log("writing ", './public/stylesheets/compositions/'+scaffold_name+'.sass')
-})
 
-gulp.task('remove_mixer_scaffold', function() {
-  console.log(" -- Removing mixer: " + process.argv[4])
+function createMixerCode(cb) {
+	console.log(" -- Create mixer: " + process.argv[4])
 	var scaffold_name = process.argv[4]
-	del( './views/compositions/'+scaffold_name+'.jade' )
-  console.log("removing ", './views/compositions/'+scaffold_name+'.jade' )
+
+	require('fs').writeFileSync('./views/compositions/'+scaffold_name+'.pug', generateMixerJade( scaffold_name ) );
+	console.log("writing ", './views/compositions/'+scaffold_name+'.pug')
+	require('fs').writeFileSync('./public/compositions/'+scaffold_name+'.js', generateMixerJs( scaffold_name ) );
+	console.log("writing ", './public/compositions/'+scaffold_name+'.js')
+	require('fs').writeFileSync('./public/stylesheets/compositions/'+scaffold_name+'.sass', generateMixerSass( scaffold_name ) );
+	console.log("writing ", './public/stylesheets/compositions/'+scaffold_name+'.sass')
+	cb()
+}
+
+function removeMixerCode(cb) {
+	console.log(" -- Removing mixer: " + process.argv[4])
+	var scaffold_name = process.argv[4]
+	del( './views/compositions/'+scaffold_name+'.pug' )
+	console.log("removing ", './views/compositions/'+scaffold_name+'.pug' )
 	del( './public/compositions/'+scaffold_name+'.js' )
-  console.log("removing ", './public/compositions/'+scaffold_name+'.js')
+	console.log("removing ", './public/compositions/'+scaffold_name+'.js')
 	del( './public/stylesheets/compositions/'+scaffold_name+'.sass' )
-  console.log("removing ", './public/stylesheets/compositions/'+scaffold_name+'.sass' )
-})
+	console.log("removing ", './public/stylesheets/compositions/'+scaffold_name+'.sass' )
+	cb()
+}
+
+gulp.task('create_mixer_scaffold', gulp.series( createMixerCode ) )
+gulp.task('remove_mixer_scaffold', gulp.series( removeMixerCode ) )
 
 // -----------------------------------------------------------------------------
 // commands
 // -----------------------------------------------------------------------------
+
+// #############################################################################
+// note for update to 4.x https://codeburst.io/switching-to-gulp-4-0-271ae63530c0
 
 gulp.task('default', gulp.series( gulp.parallel('vendor-js','mixer-js') ) ); // default (build)
 gulp.task('build', gulp.series( gulp.parallel('vendor-js', 'mixer-js') ) ); // build

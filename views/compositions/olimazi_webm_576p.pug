@@ -1,0 +1,18 @@
+doctype html
+html
+	head
+		title Olimazi Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/olimazi.css')
+	body 		
+		canvas#glcanvas
+		
+		script.
+			var dinerset = '/sets/olimazi_diner_webm_576p.json';
+			var afterdinerset = '/sets/olimazi_after_diner.json';
+			var logoset = '/sets/olimazi_logos.json';
+			
+		script(src='/compositions/olimazi.js')
+		include ../partials/analytics

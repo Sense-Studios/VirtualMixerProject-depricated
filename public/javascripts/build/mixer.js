@@ -127,6 +127,8 @@ function AudioAnalysis( _renderer, _options ) {
   var audio = new Audio()
   _self.audio = audio
 
+  // on mobile this is only allowed AFTER user interaction
+  // https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
   var context = new(window.AudioContext || window.webkitAudioContext); // AudioContext object instance
   var source //= context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -171,10 +173,11 @@ function AudioAnalysis( _renderer, _options ) {
     context.resume().then(() => {
       audio.play();
       console.log('Playback resumed successfully');
+      document.body.removeEventListener('click', forceAudio);
+      document.body.removeEventListener('touchstart', forceAudio);
     });
-    document.body.removeEventListener('click', forceAudio);
-    document.body.removeEventListener('touchstart', forceAudio);
   }
+
   document.body.addEventListener('click', forceAudio)
   document.body.addEventListener('touchstart', forceAudio)
 
@@ -290,7 +293,44 @@ function AudioAnalysis( _renderer, _options ) {
     source.connect(context.destination);
 
     // start the sampler
-    setInterval( sampler, 1);
+
+    // -------------------------------------------------------------------------
+    /*
+      Intercept HERE -- this part should be loaded of into a web worker so it
+      can be offloaded into another thread -- also do this for gif!
+    */
+    // -------------------------------------------------------------------------
+
+    // this is new
+    // opens in domain.com/mixer.js
+    if (window.Worker) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+      // var myWorker = new Worker('worker.js');
+      // and myWorker.terminate();
+      /*
+       Inline worker (so we can pack it)
+        var bb = new BlobBuilder();
+        bb.append("onmessage =
+        function(e)
+        {
+        postMessage('Inline worker creation');
+        }");
+
+        var blobURL = window.URL.createObjectURL(bb.getBlob());
+
+        var worker = new Worker(blobURL);
+        worker.onmessage = function(e) {
+          alert(e.data)
+        };
+        worker.postMessage();
+      */
+
+      // this wil be replaced.
+      setInterval( sampler, 1);
+    }else{
+      // this is now the fallback
+      setInterval( sampler, 1);
+    }
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
@@ -858,8 +898,20 @@ function FileManager( _source ) {
    * @function Addon#FileManager#setSrc
    *
   */
+
+  /* helper */
+  if ( window.in_app != undefined ) {
+    _self.eu = window.eu
+  }
+
   _self.setSrc = function( file ) {
-    _self.source.src(file)
+    if ( window.in_app == undefined ) {
+      _self.source.src(file)
+      console.log("filemanager: set remote source:", file)
+    }else{
+      _self.source.src(_self.eu.check_file(file) )
+      console.log("filemanager: set local source:", _self.eu.check_file(file) )
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -3132,13 +3184,27 @@ _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_main */',
 vec4 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.uuid+'_currentfeedbackeffect' + ', vUv );\n  /* custom_main */')
 } // init
 
+/*
+  Herunder is a script that uses a canvas to add feedback to the texture
+  but to do it right, we need another scene. this has to do with the fact
+  that three renders everything in a gl buffer, so we need another scene
+  to get this done.
+  https://github.com/samhains/minimal-threejs-feedback-glsl/blob/master/index.html
+
+  Either we build another three JS texture here, OR we switch from render
+  engine and move over to another core engine like reGL
+*/
+
+// -----------------------------------------------------------------------------
 
 var vector = new THREE.Vector2();
 //var glcanvas = document.getElementById('glcanvas');
 //var glcanvas = _renderer.glrenderer.context.canvas
 var i = 0
 _self.update = function() {
-  i++
+
+  i++;
+
   // mixmode
   // blendmode
   // pod
