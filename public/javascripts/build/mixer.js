@@ -44,11 +44,10 @@ AudioAnalysis.constructor = AudioAnalysis;
 * @param {Object} options - object with several settings
 */
 
-// returns a floating point between 1 and 0, in sync with a bpm
-// it also returns actual BPM numbers and a set of options
 function AudioAnalysis( _renderer, _options ) {
   var _self = this
 
+  // ---------------------------------------------------------------------------
   // exposed variables.
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
@@ -114,6 +113,7 @@ function AudioAnalysis( _renderer, _options ) {
     _self.options = _options;
   }
 
+  // ---------------------------------------------------------------------------
   // somewhat private private
   var calibrating = true
   var nodes = []
@@ -151,7 +151,6 @@ function AudioAnalysis( _renderer, _options ) {
   audio.controls = true;
   audio.loop = true;
   audio.autoplay = true;
-  audio.crossOrigin = "anonymous"
   audio.crossorigin = "anonymous"
 
   // or as argument(settings.passFreq ? settings.passFreq : 350);
@@ -161,25 +160,6 @@ function AudioAnalysis( _renderer, _options ) {
   analyser.fftSize = 128;
   bufferLength = analyser.frequencyBinCount;
 
-  /**
-   * @description
-   *  firstload for mobile, forces all control to the site on click
-   *  tries and forces another play-event after a click
-   * @function Addon#AudioAnalysis~forceAudio
-   *
-  */
-  var forceAudio = function() {
-    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    context.resume().then(() => {
-      audio.play();
-      console.log('Playback resumed successfully');
-      document.body.removeEventListener('click', forceAudio);
-      document.body.removeEventListener('touchstart', forceAudio);
-    });
-  }
-
-  document.body.addEventListener('click', forceAudio)
-  document.body.addEventListener('touchstart', forceAudio)
 
   /**
    * @description
@@ -211,8 +191,30 @@ function AudioAnalysis( _renderer, _options ) {
     return _self.bpm
   }
 
-  // main ----------------------------------------------------------------------
+  /**
+   * @description
+   *  firstload for mobile, forces all control to the site on click
+   *  tries and forces another play-event after a click
+   * @function Addon#AudioAnalysis~forceAudio
+   *
+  */
+  var forceAudio = function() {
+    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+      document.body.removeEventListener('click', forceAudio);
+      document.body.removeEventListener('touchstart', forceAudio);
+    });
+  }
 
+  document.body.addEventListener('click', forceAudio)
+  document.body.addEventListener('touchstart', forceAudio)
+
+
+  // MAIN ----------------------------------------------------------------------
+
+  // INIT
   /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
@@ -237,6 +239,23 @@ function AudioAnalysis( _renderer, _options ) {
     }
   }
 
+  // RENDER
+  // returns a floating point between 1 and 0, in sync with a bpm
+  /** @function Addon#AudioAnalysis#render */
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+  // ADD
+  // Adds callback function from another node and gives the
+  // bpm float ( result of render() ) as an argument to that function
+  /** @function Addon#AudioAnalysis#add */
+  _self.add = function( _callback ) {
+    nodes.push( _callback )
+  }
+
+  // UPDATE
   /** @function Addon#AudioAnalysis~update */
   _self.update = function() {
     if ( _self.bypass ) return
@@ -255,19 +274,8 @@ function AudioAnalysis( _renderer, _options ) {
     // set new numbers
     _self.bpm = _self.tempodata_bpm
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
-  }
-
-  /** @function Addon#AudioAnalysis#render */
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
-  }
-
-  /** @function Addon#AudioAnalysis#add */
-  _self.add = function( _func ) {
-    nodes.push( _func )
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60 // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2    // Math.sin( 128 / 60 )
   }
 
   // actual --------------------------------------------------------------------
@@ -304,29 +312,36 @@ function AudioAnalysis( _renderer, _options ) {
     // this is new
     // opens in domain.com/mixer.js
     if (window.Worker) {
+      //alert("i can has worker!")
       // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
       // var myWorker = new Worker('worker.js');
       // and myWorker.terminate();
-      /*
-       Inline worker (so we can pack it)
-        var bb = new BlobBuilder();
-        bb.append("onmessage =
-        function(e)
-        {
-        postMessage('Inline worker creation');
-        }");
 
-        var blobURL = window.URL.createObjectURL(bb.getBlob());
+      // Inline worker, so we can package it later
+      // we only use the worker to load of this work to another thread
+      console.log("go")
+      var data = `
+        onmessage = function(e) {
+          postMessage('Inline worker creation ' + e.data);
+          console.log("msgevent:", e)
+        }
+      `
 
-        var worker = new Worker(blobURL);
-        worker.onmessage = function(e) {
-          alert(e.data)
-        };
-        worker.postMessage();
-      */
+      // convert the worker to a blob and 'load' it
+      var bb = new Blob([data]);
+      var blobURL = window.URL.createObjectURL( bb );
+      var worker = new Worker(blobURL);
+      worker.onmessage = function(e) {
+        console.log(e.data)
+      };
 
-      // this wil be replaced.
+      window.my_worker = worker
+      console.log("post message")
+      worker.postMessage("1");
+
+      // =======================================================================
       setInterval( sampler, 1);
+
     }else{
       // this is now the fallback
       setInterval( sampler, 1);
@@ -344,6 +359,8 @@ function AudioAnalysis( _renderer, _options ) {
    *
   */
   var warningWasSet = false
+
+  // MAIN Sampler
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -351,7 +368,6 @@ function AudioAnalysis( _renderer, _options ) {
     //if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
-    // if ... -- return
 
     var dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray)
@@ -587,7 +603,7 @@ function AudioAnalysis( _renderer, _options ) {
 
     return tempoCounts
   } // end groupNeighborsByTempo
-}
+}// end AudioAnalysis
 
 BPM.prototype = new Addon(); // assign prototype to marqer
 BPM.constructor = BPM;  // re-assign constructor
@@ -907,12 +923,15 @@ function FileManager( _source ) {
   _self.setSrc = function( file ) {
     if ( window.in_app == undefined ) {
       _self.source.src(file)
-      console.log("filemanager: set remote source:", file)
+      console.log("filemanager: set normal source:", file)
     }else{
       _self.source.src(_self.eu.check_file(file) )
-      console.log("filemanager: set local source:", _self.eu.check_file(file) )
+      console.log("filemanager: set checked source:", _self.eu.check_file(file) )
     }
   }
+
+  // load entire set
+  // filemanager.set.forEach(function(item) { window.eu.check_file(item) })
 
   // ---------------------------------------------------------------------------
   // HELPERS
@@ -5247,16 +5266,19 @@ function VideoSource(renderer, options) {
 
   var i = 0
   _self.update = function() {
+
+
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
 
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
-      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
-      // console.log("SEND IN BLACK!")
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      _self.alpha = 0
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );  // send last image
+      // TODO: console.log("SEND IN BLACK!") ?
+      // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
+      //_self.alpha = 0
+      if ( videoTexture ) videoTexture.needsUpdate = true;
     }
   }
 
@@ -5374,6 +5396,7 @@ function VideoSource(renderer, options) {
         videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
       }catch(e){
         console.log("prevented a race error")
+        videoElement.currentTime = 0
       }
     } else {
       videoElement.currentTime = _num

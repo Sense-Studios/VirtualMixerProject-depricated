@@ -297,7 +297,7 @@ function AudioAnalysis( _renderer, _options ) {
     // this is new
     // opens in domain.com/mixer.js
     if (window.Worker) {
-      alert("i can has worker!")
+      //alert("i can has worker!")
       // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
       // var myWorker = new Worker('worker.js');
       // and myWorker.terminate();
@@ -317,7 +317,7 @@ function AudioAnalysis( _renderer, _options ) {
       var blobURL = window.URL.createObjectURL( bb );
       var worker = new Worker(blobURL);
       worker.onmessage = function(e) {
-        alert(e.data)
+        console.log(e.data)
       };
 
       window.my_worker = worker

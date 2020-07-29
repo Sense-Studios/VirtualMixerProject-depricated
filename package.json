@@ -43,7 +43,8 @@
     "ytsr": "^0.1.8",
     "minimist": ">=0.2.1",
     "kind-of": ">=6.0.3",
-    "acorn": ">=5.7.4"
+    "acorn": ">=5.7.4",
+    "lodash": ">=4.17.16"
   },
   "bugs": {
     "url": "https://github.com/Sense-Studios/VirtualMixerProject/issues"

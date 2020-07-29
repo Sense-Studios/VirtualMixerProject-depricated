@@ -153,16 +153,19 @@ function VideoSource(renderer, options) {
 
   var i = 0
   _self.update = function() {
+
+
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
 
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
-      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
-      // console.log("SEND IN BLACK!")
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      _self.alpha = 0
+      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );  // send last image
+      // TODO: console.log("SEND IN BLACK!") ?
+      // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
+      //_self.alpha = 0
+      if ( videoTexture ) videoTexture.needsUpdate = true;
     }
   }
 
@@ -280,6 +283,7 @@ function VideoSource(renderer, options) {
         videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
       }catch(e){
         console.log("prevented a race error")
+        videoElement.currentTime = 0
       }
     } else {
       videoElement.currentTime = _num
