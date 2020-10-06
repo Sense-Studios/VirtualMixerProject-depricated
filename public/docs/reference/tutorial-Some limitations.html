@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Some limitations</title>
+    <title>JSDoc: Tutorial: Some limitations</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Some limitations</h1>
+    <h1 class="page-title">Tutorial: Some limitations</h1>
 
     <section>
 
@@ -36,7 +36,8 @@
 <ul>
 <li><em>When in doubt use Chrome, The mixer relies heavily on WebGL and a number of control interfaces.</em></li>
 </ul>
-<p>Although WebGL is available in most browsers, I've found that only Chrome, and to a certain degree Firefox support all the functions necessary to run the mixer.<br>particularly controlling the mixer with MIDI or a Gamepad are features that rely on (sometimes experimental) support by the Chrome browser.</p>
+<p>Although WebGL is available in most browsers, I've found that only Chrome, and to a certain degree Firefox support all the functions necessary to run the mixer.<br>
+particularly controlling the mixer with MIDI or a Gamepad are features that rely on (sometimes experimental) support by the Chrome browser.</p>
 <ul>
 <li><em>Distortion effect only works directly on sources.</em></li>
 </ul>
@@ -44,19 +45,28 @@
 <ul>
 <li><em>Shaders allow up to 16 sources.</em></li>
 </ul>
-<p>On most systems, the Shader-buffer allows for a maximum of 16 textures. As all sources require a texture-slot to operate, that means that within the mixer there is a maximum of 16 slots available.<br>Note that the FeedbackEffect also uses a sampler, and counts against your maximum number of shaders.</p>
+<p>On most systems, the Shader-buffer allows for a maximum of 16 textures. As all sources require a texture-slot to operate, that means that within the mixer there is a maximum of 16 slots available.<br>
+Note that the FeedbackEffect also uses a sampler, and counts against your maximum number of shaders.</p>
 <ul>
 <li><em>Autoplay, Webcam, Microphone, Gamepad, and Midi-controllers require https:// .</em></li>
 </ul>
-<p>If you run the mixer on your website, make sure that you have a certificate installed.<br>A number of functions will only work when https is available and enabled. These include the webcam (and subsequently the microphone!), Gamepad control, Midi Control, and Autoplay functionality.</p>
+<p>If you run the mixer on your website, make sure that you have a certificate installed.<br>
+A number of functions will only work when https is available and enabled. These include the webcam (and subsequently the microphone!), Gamepad control, Midi Control, and Autoplay functionality.</p>
 <ul>
 <li><em>Mobile browsers require interaction to start</em></li>
 </ul>
-<p>Due to loading concerns, it is not possible to autoplay video on a mobile<br>device. Make sure that you have some kind of 'play'-functionality in place<br>that serves as some kind of interaction. There is some first-start code<br>in place in the sources, but that doesn't work on all platforms.<br>Call <em>firstRun</em> on the sources to utilize this behavior.</p>
+<p>Due to loading concerns, it is not possible to autoplay video on a mobile<br>
+device. Make sure that you have some kind of 'play'-functionality in place<br>
+that serves as some kind of interaction. There is some first-start code<br>
+in place in the sources, but that doesn't work on all platforms.<br>
+Call <em>firstRun</em> on the sources to utilize this behavior.</p>
 <ul>
-<li><del><em>iOS does not allow for more than one video to play simultaneous (gif is fine though)</em></del></li>
+<li><s><em>iOS does not allow for more than one video to play simultaneous (gif is fine though)</em></s></li>
 </ul>
-<p><del>Apple has decided, in all their wisdom, that you should not be allowed to play multiple videos on one page. Even though Apple has finally allowed to<br>play inline video on mobile devices, it is still not allowed to play 2 or more videos simultaneously.<br>Luckily Apple does allow as many gif sources as you'd like, so when you<br>target Apple devices build your mixers with only one videoSource max.</del></p>
+<p><s>Apple has decided, in all their wisdom, that you should not be allowed to play multiple videos on one page. Even though Apple has finally allowed to<br>
+play inline video on mobile devices, it is still not allowed to play 2 or more videos simultaneously.<br>
+Luckily Apple does allow as many gif sources as you'd like, so when you<br>
+target Apple devices build your mixers with only one videoSource max.</s></p>
 <p>Apple has fixed this as of iOS 11.x, mix along on iPhone!</p>
 <ul>
 <li><em>Seeking and loading (remote) video delays the video and results in hiccups</em></li>
@@ -74,13 +84,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 16 2019 00:58:32 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Sep 12 2020 11:57:52 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

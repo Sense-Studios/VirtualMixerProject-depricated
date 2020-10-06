@@ -24,6 +24,8 @@ function VideoSource(renderer, options) {
   // create and instance
   var _self = this;
 
+  var texture_size = 1024
+
   if ( options.uuid == undefined ) {
     _self.uuid = "VideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   } else {
@@ -70,8 +72,8 @@ function VideoSource(renderer, options) {
     console.log('loaded source: ', videoElement.src )
 
     // set properties
-    videoElement.height = 1024;
-    videoElement.width = 1024;
+    videoElement.height = texture_size;
+    videoElement.width = texture_size;
     videoElement.volume = 0;
     videoElement.loop = true          // must call after setting/changing source
     videoElement.load();              // must call after setting/changing source
@@ -109,8 +111,8 @@ function VideoSource(renderer, options) {
 
     // create canvas
     canvasElement = document.createElement('canvas');
-    canvasElement.width = 1024;
-    canvasElement.height = 1024;
+    canvasElement.width = texture_size;
+    canvasElement.height = texture_size;
     canvasElementContext = canvasElement.getContext( '2d' );
 
     // create the videoTexture
@@ -157,11 +159,11 @@ function VideoSource(renderer, options) {
 
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
-      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );
 
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
-      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );  // send last image
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );  // send last image
       // TODO: console.log("SEND IN BLACK!") ?
       // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
       //_self.alpha = 0

@@ -1,0 +1,134 @@
+doctype html
+html
+	head
+		title Leung interactive Choreography
+		meta(name="viewport", content="width=device-width, initial-scale=1.0, user-scalable=no")
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='https://use.typekit.net/klo3axg.css')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/leung2.css')
+
+	body 
+		div#container
+			div#grid-container
+				#social_bar
+					div#credits about
+					div#quality 
+						span#hd_button hd
+						span#sd_button.selected sd
+
+				#header
+					h1.title ‘The Same Space’
+						small 
+							|&nbsp;&nbsp;by Peter Leung
+							
+					//h2.subtitle
+					//	|A dance film about the choice of perspective
+					div.info Choose a camera perspective
+
+				#main_screen
+					canvas#glcanvas
+					button.play_button#play_button
+
+				div.mobileinfo Choose a camera perspective
+				
+				div#videoA.preview.selected
+					div.overlay
+					h1.title 1
+					//h2.Acumin pro regular 
+
+				div#videoB.preview
+					div.overlay
+					h1.title 2
+					//h2.Acumin pro regular 
+
+				div#videoC.preview
+					div.overlay
+					h1.title 3
+					//h2.Acumin pro regular 
+
+				div#controls_solo
+					input(type="range" min="0" max="1" step="0.001" value="0.5" class="slider" id="main_index")
+					//audio#main_music(controls, src="https://cdn.virtualmixproject.com/veejay/leung/The+Same+Space+cam+1+test_MUSIC.mp3")
+					audio#main_music(controls, src="https://nabu.s3-eu-west-1.amazonaws.com/veejay/leung/TSS+Top+FINAL+FINAL+w_+audio.mp3")
+										
+		div.modal#credits_modal
+			div.modal_header 
+				strong &nbsp;&nbsp;&nbsp; About ‘The Same Space’
+				div#close_button ×
+			
+			div.modal_body
+				div.scroll_body
+					span.text-body
+						| <blockquote>“I am approaching this virtual residency as a work-in-progress, a continuation of my personal and collaborative research and work. My aim is to gain insights into the relation between performance and audience, performers and performative sculpture, and, as a choreographer, the relation with composers and dancers.”</blockquote>
+						|
+						| ‘The Same Space’ is an interactive dance film research project created by Peter Leung. With this project he explores choices of the performers and the audience. The creation process with the dancers of Dutch National Ballet took place during 20 hours of studio time. Peter saw it necessary to stay flexible, and knowing that the time in the studio would be limited, he wanted the process to be as open and kind as possible, removing the pressure of being perfect and exploring what a very personal investment in  creation could be. None of the dancers were replaceable, and if someone was sick or had another rehearsal, they simply left a space where that dancer would have been.									
+						|
+						| From the beginning of the process he integrated the dancers voices by asking them questions and recording the responses. Composer  <a href="https://www.bertusPelser.nl/" target="_blank">Bertus Pelser</a> took the recordings of their voices to create the soundscape for the work, and all sounds have been produced by the dancers. The set is a simple black box, devoid of an audience, with three metal cubes.  This is the dancers’ space, and the boxes represent both limitations and safe havens. The dancers are observed by 3 fixed cameras. The online audience has the possibility to observe this performance via an interface designed by Daan Nolen (<a href="https://sense-studios.com" target="_blank">Sense Studio</a>) that gives viewers the possibility to choose which of these camera perspectives they want to watch from at any time during the 19 minute performance. The idea of the audience being able to choose the camera perspective came about as Peter felt the need for an audience to be able to engage with an online dance performance in a way that brings them closer to a live experience.
+						|
+						| ‘The Same Space’ advances Peter’s ongoing collaborative work, such as his work around dance and performative sculpture (<a href="http://houseofmakers.nl/resonance" target="_blank">Resonance</a> with Frouke ten Velden and Nicholas Thayer), dance in virtual spaces (<a href="https://vjacademy.nl/" target="_blank">Vj Academy</a>), and his site-specific interdisciplinary work with <a href="https://houseofmakers.nl/" target="_blank">Foundation House of Makers</a> (most recently developing ideas for live streaming with Brigitte van Hagen and Fabienne Vegt for Het Grachtenfestival).
+						|
+						| <strong>Credits:</strong>
+						| 
+						| Peter Leung						concept / artistic direction / choreography
+						| Sebia Plantefève				dancer / collaborator
+						| Clara Superfine					dancer / collaborator / choreographic assistant
+						| Costa Allen						dancer / collaborator
+						| Leo Hepler						dancer / collaborator
+						| Salome Leverashvili				dancer / collaborator
+						| Daan Nolen / Sense Studios		video interface development
+						| Hidde Kross / VJ Academy		advice interface
+						| Bertus Pelser					music composition
+						| Levien Priem					colour grading
+						| Alejandro Fernandez			camera
+						| Anu Viheriaranta				production manager HNB
+						|
+						|
+						| <strong><i>Co-produced by Nederlandse Dansdagen & Dutch National Ballet</i></strong>
+						|
+						|"Having made ‘<a href="https://www.youtube.com/watch?v=DkegOufcN5Q&t=10s" target="_blank">Gently Quiet</a>’, a series of short dance film portraits for online consumption, I wanted to take the opportunity to research what it means to make a dance film performance for today. How can I keep an audience invested and interested over a period of more than a few minutes? How does an audience experience a dance work online in a way that feels live? With this project I hope to find out more about these questions and how we, as a dance sector, can keep growing artistically in the digital realm that isn’t a substitute for the stage, but is considering the digital world as it’s own site-specific platform."
+						|
+						|
+						|
+						|
+						|
+						|
+						|
+					
+
+			
+				
+			div.modal_body_hidden(style="display:none;")
+				div.scroll_body
+					| ‘The Same Space’ is a dance film research project created by Peter Leung where he explores performer and audience’s choices. From the beginning of the process he integrated the dancers “voices” through asking them questions. Bertus Peisner has taken recordings of their voices to create the soundscape that accompanies them in this work. The set is a simple box, devoid of an audience, with three metal cubes, this is their space and the boxes represent both limitations and safe havens. | The dancers are being observed by three fixed cameras that are within this space. The online audience can observe this performance via an interface designed by Daan Nolen (Vj Academy) that gives them the possibility to choose which of these camera perspectives they want to watch from at any time during the ten minute performance. This work explores Peter’s ongoing work, such as his work around dance and performative sculpture (‘<a href="http://houseofmakers.nl/resonance" target="_blank">Resonance</a>’ with Frouke ten Velden and Nicholas Thayer), dance in virtual spaces (Vj Academy) and his immersive performative work with House of Makers, (most recently developing ideas for live streaming with Brigitte van Hagen and Fabienne Vegt).
+					| 
+					| <strong>Credits:</strong>
+					| 
+					| Peter Leung					concept & artistic direction
+					| Sebia Plantefève			dancer / collaborator 
+					| Clara Superfine				dancer / collaborator / choreographic assistant 
+					| Costa Allen					dancer / collaborator
+					| Leo Hepler  					dancer / collaborator
+					| Salome Leverashvili  		dancer / collaborator 
+					| Daan Nolen & Hidde Kross 
+					| VJ Academy -				video interface
+					| Bertus Peisner 				soundscape / composition created using the dancers voices
+					| Alejandro Fernandez		camera and video post-production
+					| Anu Viheriaranta  			production manager HNB 
+					| Altin Kaftira  				video production supervision
+					|
+					| <strong><i>Co-produced by Nederlandse Dansdagen & Dutch National Ballet</i></strong>
+			div.modal_footer    
+		div#modal_background
+				
+		a.logo(href='/')
+		.blink
+		.payoff
+			| <h3>leung</small></h3>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			script(src='/javascripts/src/sources/VideoSource.js')
+			script(src='/javascripts/src/GlRenderer.js')
+			script(src='/compositions/leung2.js')
+			include ../partials/analytics

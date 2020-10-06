@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: How does this work</title>
+    <title>JSDoc: Tutorial: How does this work</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">How does this work</h1>
+    <h1 class="page-title">Tutorial: How does this work</h1>
 
     <section>
 
@@ -28,7 +28,8 @@
 </header>
 
 <article>
-    <h2>Introduction</h2><p>The most basic mixer setup is laid out hereunder in ASCII art:</p>
+    <h2>Introduction</h2>
+<p>The most basic mixer setup is laid out hereunder in ASCII art:</p>
 <pre class="prettyprint source"><code>        ______________
         |  Renderer  |
         --------------
@@ -42,7 +43,10 @@
            /     \            
   __________     __________   &lt;--- somefile.mp4
   | Source |     | Source |   &lt;--- play, pause, currentTime, etc. (html5 interface)
-  ----------     ----------   </code></pre><p>This diagram flows from bottom to top;<br>This particular configuration can be described as</p>
+  ----------     ----------   
+</code></pre>
+<p>This diagram flows from bottom to top;<br>
+This particular configuration can be described as</p>
 <pre class="prettyprint source"><code>  var renderer = new GlRenderer();
   var testSource1 = new GifSource(   renderer, { src: 'somefile.gif' } );
   var testSource2 = new VideoSource( renderer, { src: 'somefile.mp4' } );
@@ -51,7 +55,10 @@
 
   renderer.init();
   renderer.render();
-</code></pre><p>This configuration compiles to a fragment shader, that can be retrieved from<br>the renderer with 'renderer.fragmentShader'. This will output the shader:</p>
+
+</code></pre>
+<p>This configuration compiles to a fragment shader, that can be retrieved from<br>
+the renderer with 'renderer.fragmentShader'. This will output the shader:</p>
 <pre class="prettyprint source"><code>uniform sampler2D textureTest;
 uniform float wave;
 uniform sampler2D GifSource_1b3cc459;
@@ -100,10 +107,18 @@ void main() {
   gl_FragColor = vec4( Mixer_54ba1ab5_output, 1.0 );
 
 
-}</code></pre><p>Don't be fooled by all the math in the Blend function, it's put there by the Mixer<br>and allows for blending the images together. I didn't write that, but you can find a lot about it on http://<a href="http://www.nutty.ca/articles/blend_modes/">www.nutty.ca/articles/blend_modes/</a><br>The code is much easier to read if you just focus on the main() function.</p>
-<p>After the configuration is loaded, the shader is applied to a surface in a<br>3D scene and shown on screen.</p>
-<p>After the configuration is loaded, the shader is applied to a surface in a<br>3D scene and shown on screen.</p>
-<h2>chaining components</h2><p>The configuration can be extended so we can swap Source 2 with another mixer<br>and have an additional source.</p>
+}
+</code></pre>
+<p>Don't be fooled by all the math in the Blend function, it's put there by the Mixer<br>
+and allows for blending the images together. I didn't write that, but you can find a lot about it on http://www.nutty.ca/articles/blend_modes/<br>
+The code is much easier to read if you just focus on the main() function.</p>
+<p>After the configuration is loaded, the shader is applied to a surface in a<br>
+3D scene and shown on screen.</p>
+<p>After the configuration is loaded, the shader is applied to a surface in a<br>
+3D scene and shown on screen.</p>
+<h2>chaining components</h2>
+<p>The configuration can be extended so we can swap Source 2 with another mixer<br>
+and have an additional source.</p>
 <pre class="prettyprint source"><code>      ______________
       |  Renderer  |
       --------------
@@ -123,7 +138,9 @@ void main() {
                  /     \
         __________       __________
        | Source 2 |     | Source 3 |
-       ------------     ------------</code></pre><p>Could be written as:</p>
+       ------------     ------------
+</code></pre>
+<p>Could be written as:</p>
 <pre class="prettyprint source"><code>  var renderer = new GLrenderer()
   var videosource1 = new VideoSource( renderer, {} )
   var videosource2 = new VideoSource( renderer, {} )
@@ -134,7 +151,10 @@ void main() {
 
   renderer.init()
   renderer.start()
-</code></pre><h2>Add a Tapped BPM controller</h2><p>So it breaks down to three main components; a <em>Renderer</em> (output), <em>Modules</em> (ie. mixers) and <em>Sources</em> (ie. video or gif) in our demo. As you can see, a mixer is actually <strong>also</strong> a <em>Source</em>.</p>
+
+</code></pre>
+<h2>Add a Tapped BPM controller</h2>
+<p>So it breaks down to three main components; a <em>Renderer</em> (output), <em>Modules</em> (ie. mixers) and <em>Sources</em> (ie. video or gif) in our demo. As you can see, a mixer is actually <strong>also</strong> a <em>Source</em>.</p>
 <p>There are also <em>Addons</em> like a BPM counter and <em>Controllers</em>, that allows keyboard or midi input. A BPM is created and connected to the Mixer. The BPM Addon will then start moving the handle back and forth in a set tempo. A <em>Controller</em> finally will allow you to <strong>tap</strong> the BPM in sync with the music and have the mixer mix on the beat.</p>
 <pre class="prettyprint source"><code>      ______________
       |  Renderer  |
@@ -156,7 +176,9 @@ __________     _________        |
        __________     __________
        | Source |     | Source |
        ----------     ----------
-</code></pre><p>Can be written as:</p>
+
+</code></pre>
+<p>Can be written as:</p>
 <pre class="prettyprint source"><code>  var renderer = new GLrenderer()
   var videosource1 = new VideoSource( renderer, {} )
   var videosource2 = new VideoSource( renderer, {} )
@@ -177,8 +199,11 @@ __________     _________        |
     if (e.keyCode == 13) bpm1.tap()
   });
 
-</code></pre><p>Note that the BPM can control multiple mixers at once if you don't want that. Below you'll find a breakdown of all the Modules that are sort or less available.</p>
-<h3>The Renderer</h3><p>It loads all components, it builds the shaders and starts rendering them.</p>
+
+</code></pre>
+<p>Note that the BPM can control multiple mixers at once if you don't want that. Below you'll find a breakdown of all the Modules that are sort or less available.</p>
+<h3>The Renderer</h3>
+<p>It loads all components, it builds the shaders and starts rendering them.</p>
 <pre class="prettyprint source"><code>
   // availeble functions on GLRenderer instance
 
@@ -201,17 +226,28 @@ __________     _________        |
   vertexShader
   customDefines
   customUniforms
-</code></pre><p>As you can see, there is a scene, in which there is a plane. On the plane, a shader material is rendered and therein is our mixer.</p>
-<h3>Sources</h3><p><a href="https://virtualmixproject.com/docs/reference/Source.html">Sources Docs</a>: take a video file or an image and display it. Sources can be made from anything that can be drawn on a CanvasElement. They also include a reference to the original object like a VideoElement or an ImageElement. So you can control a video and change the src.</p>
-<h4>Output</h4><p>Is a <em>Module</em> Mandatory at the end of the chain, so the Renderer knows what is last.</p>
-<pre class="prettyprint source"><code>var output = new Output( renderer, Source )</code></pre><p><a href="https://virtualmixproject.com/docs/reference/Module.html">Module Docs</a><br><a href="https://virtualmixproject.com/docs/reference/Module_Output.html">Output Docs</a></p>
-<h4>Mixer</h4><p>Mixes to sources through a blendMode.<br>exposes a <code>pod</code> which is a float between 0 and 1 that resembles the position of the mixer's pod.</p>
+
+</code></pre>
+<p>As you can see, there is a scene, in which there is a plane. On the plane, a shader material is rendered and therein is our mixer.</p>
+<h3>Sources</h3>
+<p><a href="https://virtualmixproject.com/docs/reference/Source.html">Sources Docs</a>: take a video file or an image and display it. Sources can be made from anything that can be drawn on a CanvasElement. They also include a reference to the original object like a VideoElement or an ImageElement. So you can control a video and change the src.</p>
+<h4>Output</h4>
+<p>Is a <em>Module</em> Mandatory at the end of the chain, so the Renderer knows what is last.</p>
+<pre class="prettyprint source"><code>var output = new Output( renderer, Source )
+</code></pre>
+<p><a href="https://virtualmixproject.com/docs/reference/Module.html">Module Docs</a><br>
+<a href="https://virtualmixproject.com/docs/reference/Module_Output.html">Output Docs</a></p>
+<h4>Mixer</h4>
+<p>Mixes to sources through a blendMode.<br>
+exposes a <code>pod</code> which is a float between 0 and 1 that resembles the position of the mixer's pod.</p>
 <pre class="prettyprint source"><code>var mixer1 = new Mixer( renderer, { source1: Source, source2: Source } );
 
 mixer1.mixMode( 4 )
 mixer1.blendMode( 3 )
 
-mixer3.pod(0.5)</code></pre><p>This is the pod, it's on the left side.</p>
+mixer3.pod(0.5)
+</code></pre>
+<p>This is the pod, it's on the left side.</p>
 <pre class="prettyprint source"><code>   LEFT (A)         RIGHT (B)
    ____
   /    \
@@ -221,7 +257,9 @@ mixer3.pod(0.5)</code></pre><p>This is the pod, it's on the left side.</p>
   |    |_______________|
   |    |
   \____/
-</code></pre><p>Move it to the right;</p>
+
+</code></pre>
+<p>Move it to the right;</p>
 <pre class="prettyprint source"><code>   LEFT (A)         RIGHT (B)
                        ____
                       /    \
@@ -231,39 +269,64 @@ mixer3.pod(0.5)</code></pre><p>This is the pod, it's on the left side.</p>
       |_______________|    |
                       |    |
                       \____/
-</code></pre><p>These are the available <em>Blendmodes</em></p>
-<pre class="prettyprint source"><code>1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE, 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT, 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION</code></pre><p>Look them up, they're almost like you know them from photoshop; https://photoblogstop.com/photoshop/photoshop-blend-modes-explained</p>
+
+</code></pre>
+<p>These are the available <em>Blendmodes</em></p>
+<pre class="prettyprint source"><code>1 ADD (default), 2 SUBSTRACT, 3 MULTIPLY, 4 DARKEN, 5 COLOUR BURN, 6 LINEAR_BURN, 7 LIGHTEN,  8 SCREEN, 9 COLOUR_DODGE, 10 LINEAR_DODGE, 11 OVERLAY, 12 SOFT_LIGHT, 13 HARD_LIGHT, 14 VIVID_LIGHT, 15 LINEAR_LIGHT, 16 PIN_LIGHT, 17 DIFFERENCE, 18 EXCLUSION
+</code></pre>
+<p>Look them up, they're almost like you know them from photoshop; https://photoblogstop.com/photoshop/photoshop-blend-modes-explained</p>
 <p>These are the available <em>Mixmodes</em></p>
-<pre class="prettyprint source"><code>1 NORMAL, 2 HARD, 3 NAM, 4 FAM, 5 LEFT, 6 RIGHT, CENTER, BOOM</code></pre><p><strong>1. NORMAL:</strong> Both sides fadeout in a straight line, if the pod is exactly in the middle both sources will be 50% opaque.<br><strong>2. HARD:</strong> This is &quot;Hard&quot; mix, so there is no fading, the Source switches over the other if the pod touches the middle.<br><strong>3. NAM:</strong> A mix where the curves are parabolic (eased out) and overlayed so that both sides are never under ~75% opaque.<br><strong>4. FAM:</strong> A more extreme version of NAM, where the alpha &gt; 1 is not maxed out; allows for more than ~100% opaque.<br><strong>5. NON-DARK:</strong> Boosts the alpha levels of a NAM mix allowing for a NAM with <em>more light</em> so to speak (when you have a lot of dark material)</p>
+<pre class="prettyprint source"><code>1 NORMAL, 2 HARD, 3 NAM, 4 FAM, 5 LEFT, 6 RIGHT, CENTER, BOOM
+</code></pre>
+<p><strong>1. NORMAL:</strong> Both sides fadeout in a straight line, if the pod is exactly in the middle both sources will be 50% opaque.<br>
+<strong>2. HARD:</strong> This is &quot;Hard&quot; mix, so there is no fading, the Source switches over the other if the pod touches the middle.<br>
+<strong>3. NAM:</strong> A mix where the curves are parabolic (eased out) and overlayed so that both sides are never under ~75% opaque.<br>
+<strong>4. FAM:</strong> A more extreme version of NAM, where the alpha &gt; 1 is not maxed out; allows for more than ~100% opaque.<br>
+<strong>5. NON-DARK:</strong> Boosts the alpha levels of a NAM mix allowing for a NAM with <em>more light</em> so to speak (when you have a lot of dark material)</p>
 <p>With the last 4 blend modes, changing the pod() value doesn't affect the mixer.</p>
-<p><strong>6. LEFT:</strong> The pod is set to the left (pod cannot be moved)<br><strong>7. RIGHT:</strong> The pod is set to the right (pod cannot be moved)<br><strong>8. CENTER:</strong> The pod is set to dead center (pod cannot be moved)<br><strong>9. BOOM:</strong> Both sources are added to each other (pod cannot be moved)</p>
+<p><strong>6. LEFT:</strong> The pod is set to the left (pod cannot be moved)<br>
+<strong>7. RIGHT:</strong> The pod is set to the right (pod cannot be moved)<br>
+<strong>8. CENTER:</strong> The pod is set to dead center (pod cannot be moved)<br>
+<strong>9. BOOM:</strong> Both sources are added to each other (pod cannot be moved)</p>
 <p><a href="https://virtualmixproject.com/docs/reference/Module_Mixer.html">Mixer Docs</a></p>
-<h4>Chain</h4><p>WIP. A chain is much like a mixer, but it simply stacks a number of sources. Still, it can be used to chain a lot of empty channels together, from which only a few are actually _On_.<br><a href="https://virtualmixproject.com/docs/reference/Module_Chain.html">Chain Docs</a></p>
-<h4>Switch</h4><p>A switch is also a lot like a mixer, but it allows for two sources, and can <code>switch()</code>, or be set (0 or 1). A switch can be chained into complex patterns.</p>
+<h4>Chain</h4>
+<p>WIP. A chain is much like a mixer, but it simply stacks a number of sources. Still, it can be used to chain a lot of empty channels together, from which only a few are actually <em>On</em>.<br>
+<a href="https://virtualmixproject.com/docs/reference/Module_Chain.html">Chain Docs</a></p>
+<h4>Switch</h4>
+<p>A switch is also a lot like a mixer, but it allows for two sources, and can <code>switch()</code>, or be set (0 or 1). A switch can be chained into complex patterns.</p>
 <pre class="prettyprint source"><code>var switcher1 = new Switcher( renderer, [ Source, Source ] );
 switcher1.switch()
 switcher1.switch(1)
-switcher1.switch(0)</code></pre><p><a href="https://virtualmixproject.com/docs/reference/Module_Switcher.html">Switcher Docs</a></p>
-<h3>Effects</h3><p>Effects can be put in a chain between the source or mixer and the output. Here's how you'd set up<br>a brightness and contrast chain.</p>
+switcher1.switch(0)
+</code></pre>
+<p><a href="https://virtualmixproject.com/docs/reference/Module_Switcher.html">Switcher Docs</a></p>
+<h3>Effects</h3>
+<p>Effects can be put in a chain between the source or mixer and the output. Here's how you'd set up<br>
+a brightness and contrast chain.</p>
 <ul>
-<li><ol start="60">
+<li>
+<ol start="60">
 <li>Brightness</li>
 </ol>
 </li>
-<li><ol start="61">
+<li>
+<ol start="61">
 <li>Contrast</li>
 </ol>
 </li>
-<li><ol start="62">
+<li>
+<ol start="62">
 <li>Saturation</li>
 </ol>
 </li>
-<li><ol start="63">
+<li>
+<ol start="63">
 <li>Hue</li>
 </ol>
 </li>
 </ul>
-<p><a href="https://virtualmixproject.com/docs/reference/Effect.html">Effect Docs</a><br><a href="https://virtualmixproject.com/docs/reference/Effect_ColorEffect.html">ColorEffect Docs</a></p>
+<p><a href="https://virtualmixproject.com/docs/reference/Effect.html">Effect Docs</a><br>
+<a href="https://virtualmixproject.com/docs/reference/Effect_ColorEffect.html">ColorEffect Docs</a></p>
 <pre class="prettyprint source"><code>
 ...
 
@@ -273,7 +336,10 @@ var saturationEffect = ColorEffect( renderer, { src: contrastEffect, effect: 62 
 var hueEffect = ColorEffect( renderer, { src: saturationEffect, effect: 63 } );
 
 var output = new Output( renderer, { src: hueEffect } );
-</code></pre><h3>Controllers</h3><p><a href="https://virtualmixproject.com/docs/reference/Controller.html">Controller Docs</a></p>
+
+</code></pre>
+<h3>Controllers</h3>
+<p><a href="https://virtualmixproject.com/docs/reference/Controller.html">Controller Docs</a></p>
 </article>
 
 </section>
@@ -281,13 +347,13 @@ var output = new Output( renderer, { src: hueEffect } );
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 16 2019 00:58:32 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Sep 12 2020 11:57:52 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
