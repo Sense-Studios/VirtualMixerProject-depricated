@@ -58,6 +58,7 @@ body
         font-size: 16px
         margin-right: 32px
         font-variant: small-caps
+        display: none
 
         > span
           font-weight: 700
@@ -258,6 +259,10 @@ body
 
 /* Mobile */
 @media screen and (max-width: 720px)
+  .modal.opened
+    top: 100px
+    overflow: hidden
+
   #container #grid-container
     //grid-template-areas: "canvas canvas canvas" "canvas canvas canvas" "canvas canvas canvas" "video1 video2 video3" "controls controls controls"
     //grid-template-areas: "social social social" "header header header" "canvas canvas video1" "canvas canvas video2" "canvas canvas video3"

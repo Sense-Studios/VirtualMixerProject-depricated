@@ -48,7 +48,8 @@ body {
         cursor: pointer;
         font-size: 16px;
         margin-right: 32px;
-        font-variant: small-caps; }
+        font-variant: small-caps;
+        display: none; }
         #container #grid-container #social_bar #quality > span {
           font-weight: 700;
           padding: 6px 9px;
@@ -208,6 +209,9 @@ body {
 
 /* Mobile */
 @media screen and (max-width: 720px) {
+  .modal.opened {
+    top: 100px;
+    overflow: hidden; }
   #container #grid-container {
     grid-template-areas: "social social social" "header header header" "canvas canvas canvas" "info info info" "video1 video2 video3";
     grid-template-rows: 0.1fr auto 2fr 0.1fr 1fr;
