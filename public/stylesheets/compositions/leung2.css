@@ -48,8 +48,7 @@ body {
         cursor: pointer;
         font-size: 16px;
         margin-right: 32px;
-        font-variant: small-caps;
-        display: none; }
+        font-variant: small-caps; }
         #container #grid-container #social_bar #quality > span {
           font-weight: 700;
           padding: 6px 9px;
