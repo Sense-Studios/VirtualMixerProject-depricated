@@ -14,6 +14,7 @@ var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 // var analisi
 // var bpm = new BPM( renderer ) tapped beat control
 var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
+//var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'http://37.220.36.51:8906/;?type=http&nocache=' + Math.round( Math.random() * 100000 )  } )
 
 var filemanager = new FileManager( source1 )
 filemanager.load_set("/sets/programs_awesome.json")

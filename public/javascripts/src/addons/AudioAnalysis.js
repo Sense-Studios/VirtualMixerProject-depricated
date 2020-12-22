@@ -112,6 +112,8 @@ function AudioAnalysis( _renderer, _options ) {
   var audio = new Audio()
   _self.audio = audio
 
+  // on mobile this is only allowed AFTER user interaction
+  // https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
   var context = new(window.AudioContext || window.webkitAudioContext); // AudioContext object instance
   var source //= context.createMediaElementSource(audio);
   var bandpassFilter = context.createBiquadFilter();
@@ -156,10 +158,11 @@ function AudioAnalysis( _renderer, _options ) {
     context.resume().then(() => {
       audio.play();
       console.log('Playback resumed successfully');
+      document.body.removeEventListener('click', forceAudio);
+      document.body.removeEventListener('touchstart', forceAudio);
     });
-    document.body.removeEventListener('click', forceAudio);
-    document.body.removeEventListener('touchstart', forceAudio);
   }
+
   document.body.addEventListener('click', forceAudio)
   document.body.addEventListener('touchstart', forceAudio)
 
@@ -275,7 +278,44 @@ function AudioAnalysis( _renderer, _options ) {
     source.connect(context.destination);
 
     // start the sampler
-    setInterval( sampler, 1);
+
+    // -------------------------------------------------------------------------
+    /*
+      Intercept HERE -- this part should be loaded of into a web worker so it
+      can be offloaded into another thread -- also do this for gif!
+    */
+    // -------------------------------------------------------------------------
+
+    // this is new
+    // opens in domain.com/mixer.js
+    if (window.Worker) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+      // var myWorker = new Worker('worker.js');
+      // and myWorker.terminate();
+      /*
+       Inline worker (so we can pack it)
+        var bb = new BlobBuilder();
+        bb.append("onmessage =
+        function(e)
+        {
+        postMessage('Inline worker creation');
+        }");
+
+        var blobURL = window.URL.createObjectURL(bb.getBlob());
+
+        var worker = new Worker(blobURL);
+        worker.onmessage = function(e) {
+          alert(e.data)
+        };
+        worker.postMessage();
+      */
+
+      // this wil be replaced.
+      setInterval( sampler, 1);
+    }else{
+      // this is now the fallback
+      setInterval( sampler, 1);
+    }
   }
 
   // ANYLISIS STARTS HERE ------------------------------------------------------
