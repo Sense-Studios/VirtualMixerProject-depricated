@@ -43,7 +43,8 @@
     "node-sass-middleware": "0.11.0",
     "pug": ">=3.0.1",
     "pug-code-gen": ">=2.0.3",
-    "socket.io": "^2.4.1",
+    "socket.io": "^2.3.0",
+    "yargs-parser": "^20.2.6",
     "ytdl-core": "^1.0.0",
     "ytsr": "^0.1.8"
   },
