@@ -2,4 +2,23 @@ test {
   margin: 0;
   padding: 0; }
 
+#popuptext {
+  color: white;
+  font-size: 32px;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  opacity: 0; }
+
+#infoblock {
+  color: black;
+  background-color: #a5a5a5;
+  font-size: 12px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none; }
+  #infoblock pre {
+    padding: 12px; }
+
 /*# sourceMappingURL=olimazi.css.map */

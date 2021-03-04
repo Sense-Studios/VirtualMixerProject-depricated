@@ -43,25 +43,33 @@
 
 
     <section>
-        <article><h1>VirtualMixerProject</h1><p>The VirtualMixerProject is a virtual video mixer that can be built through a chainable interface and runs in WebGL. There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>. There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...</p>
+        <article><h1>VirtualMixerProject</h1>
+<p>The VirtualMixerProject is a virtual video mixer that can be built through a chainable interface and runs in WebGL. There is a website: <a href="https://virtualmixproject.com/">VirtualMixerProject.com</a>. There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...</p>
 <p><img src="https://virtualmixproject.com/images/vmp_demo/vmp_logo.png" alt="logo"></p>
 <p>it comes in a package for use on your website or an npm build for use on your local DMZ. With these tools, you can Build your own video mixer in JavaScript. The application takes a number of <em>sources</em> ( video, gif, whathaveyou ) and allows you to crossfade and mix them.</p>
 <p>Mixers and Sources are interchangeable, so the output of a one <em>mixer</em> can serve as a <em>source</em> for another <em>mixer</em>. In this way, a series of layers can be 'stacked' or 'chained' together to build even more elaborate mixers. You can also add effects and interfaces to your mixers and we have support for <em>gamepads</em> en <em>midi</em> devices.</p>
 <ul>
-<li><p>Check more detailed info in <a href="https://virtualmixproject.com/docs/reference/index.html">the Documentation</a></p>
+<li>
+<p>Check more detailed info in <a href="https://virtualmixproject.com/docs/reference/index.html">the Documentation</a></p>
 </li>
-<li><p>Check out <a href="https://codepen.io/xangadix/pen/zewydR">this</a> basic example on Codepen: or any from <a href="https://codepen.io/collection/nZyjvW/">our other examples and demos</a> on Codepen</p>
+<li>
+<p>Check out <a href="https://codepen.io/xangadix/pen/zewydR">this</a> basic example on Codepen: or any from <a href="https://codepen.io/collection/nZyjvW/">our other examples and demos</a> on Codepen</p>
 </li>
-<li><p>Be sure to check out our <a href="https://virtualmixproject.com/mixer/demos">Demos</a>.</p>
+<li>
+<p>Be sure to check out our <a href="https://virtualmixproject.com/mixer/demos">Demos</a>.</p>
 </li>
-<li><p>All the code is available, clone and build it it here: <a href="https://github.com/Sense-Studios/VirtualMixerProject">VirtualMixerProject on github</a>.</p>
+<li>
+<p>All the code is available, clone and build it it here: <a href="https://github.com/Sense-Studios/VirtualMixerProject">VirtualMixerProject on github</a>.</p>
 </li>
 </ul>
 <p>Or go ahead and continue with the Quickstart below</p>
-<h2>Quickstart</h2><p>So, if you want to use this on your website. Make sure you include the build files. (and in this order)</p>
+<h2>Quickstart</h2>
+<p>So, if you want to use this on your website. Make sure you include the build files. (and in this order)</p>
 <pre class="prettyprint source"><code>  https://virtualmixproject.com/javascripts/build/vendor-min.js
   https://virtualmixproject.com/javascripts/build/mixer-min.js
-</code></pre><p>Write your Webpage:</p>
+
+</code></pre>
+<p>Write your Webpage:</p>
 <pre class="prettyprint source"><code>&lt;html>
   &lt;head>
     &lt;script src=&quot;https://virtualmixproject.com/javascripts/build/vendor-min.js&quot;>&lt;/script>
@@ -88,7 +96,9 @@
     &lt;/script>
   &lt;/body>
 &lt;/html>
-</code></pre><p>See it all wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
+
+</code></pre>
+<p>See it all wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.</p>
 <p>So here is what happens; the most basic mixer setup is laid out hereunder in ASCII art:</p>
 <pre class="prettyprint source"><code>    ____________     ____________   &lt;--- src: somefile.mp4
     | Source 1 |     | Source 2 |   &lt;--- play(), pause(), currentTime(), etc. (html5 interface)
@@ -105,7 +115,10 @@
             |   Output   |            
             --------------
 
-</code></pre><p>This diagram flows from top to bottom. By default the <em>pod</em> (handle) of the <em>mixer</em> is set to 0, so we see <code>Source 1</code> in our <code>Output</code>.<br>Set the <code>pod</code> to 1 to show the <code>Source 2</code>. Or set it to any value in between to mix the two sources together.</p>
+
+</code></pre>
+<p>This diagram flows from top to bottom. By default the <em>pod</em> (handle) of the <em>mixer</em> is set to 0, so we see <code>Source 1</code> in our <code>Output</code>.<br>
+Set the <code>pod</code> to 1 to show the <code>Source 2</code>. Or set it to any value in between to mix the two sources together.</p>
 <pre class="prettyprint source"><code>mixer1.pod(0)    // default shows Source 1
 mixer1.pod(1)    // shows Source 2
 mixer1.pod(0.5)  // shows both sources at 50%, not that this is darker as both add to only ~75% opacity
@@ -117,14 +130,33 @@ setInterval( function() {
   c += 0.01
   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
 })
-</code></pre><p>See it all wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.<br>Or check out <a href="https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html">how it works</a></p>
-<h2>Installation</h2><p>You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance! <em>if</em> you store your videos locally.</p>
-<p>1) clone the package, defaults to VirtualMixerProject/</p>
-<pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git</code></pre><p>2) run the installer</p>
-<pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install</code></pre><p>3) start the app</p>
-<pre class="prettyprint source"><code>  $ VirtualMixerProject/  npm start</code></pre><p>4) Go to 127.0.0.1:3000 and enjoy the show!</p>
+
+</code></pre>
+<p>See it all wired up on <a href="https://codepen.io/xangadix/pen/zewydR">CodePen</a>.<br>
+Or check out <a href="https://virtualmixproject.com/docs/reference/tutorial-how%20does%20this%20work.html">how it works</a></p>
+<h2>Installation</h2>
+<p>You can also clone it and run on your local computer and network. This gives you a GREAT improvement in performance! <em>if</em> you store your videos locally.</p>
+<ol>
+<li>clone the package, defaults to VirtualMixerProject/</li>
+</ol>
+<pre class="prettyprint source"><code>  $ git clone git@github.com:Sense-Studios/VirtualMixerProject.git
+</code></pre>
+<ol start="2">
+<li>run the installer</li>
+</ol>
+<pre class="prettyprint source"><code>  $ VirtualMixerProject/ npm install
+</code></pre>
+<ol start="3">
+<li>start the app</li>
+</ol>
+<pre class="prettyprint source"><code>  $ VirtualMixerProject/  npm start
+</code></pre>
+<ol start="4">
+<li>Go to 127.0.0.1:3000 and enjoy the show!</li>
+</ol>
 <p>Check more detailed info <a href="https://virtualmixproject.com/docs/reference/index.html">in the docs</a></p>
-<h2>Further Reading</h2><ul>
+<h2>Further Reading</h2>
+<ul>
 <li><a href="https://github.com/Sense-Studios/VirtualMixerProject">Clone it on Github</a>.</li>
 <li><a href="https://codepen.io/collection/nZyjvW/">Demo collection on Codepen</a></li>
 <li><a href="https://virtualmixproject.com/docs/reference/index.html">Documentation and Reference</a></li>
@@ -135,8 +167,10 @@ setInterval( function() {
 <li><a href="https://virtualmixproject.com/docs/reference/tutorial-Roadmap.html">Roadmap</a></li>
 <li><a href="https://virtualmixproject.com/docs/reference/tutorial-About.html">About</a></li>
 </ul>
-<h1>But Why?!</h1><pre class="prettyprint source"><code>&quot;Any application that can be written in JavaScript, will eventually be written in JavaScript.&quot;
--- Jeff Atwood</code></pre></article>
+<h1>But Why?!</h1>
+<pre class="prettyprint source"><code>&quot;Any application that can be written in JavaScript, will eventually be written in JavaScript.&quot;
+-- Jeff Atwood
+</code></pre></article>
     </section>
 
 
@@ -147,13 +181,13 @@ setInterval( function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 16 2019 00:58:32 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Sep 12 2020 11:57:52 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -46,50 +46,64 @@
     
 
     
-    <p class="summary"><p>A mixer mixes two sources together.<br>   Mixer example on codepen:<br>   <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a></p></p>
+    <p class="summary"><p>A mixer mixes two sources together.<br>
+Mixer example on codepen:<br>
+<a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a></p></p>
     
 
 
 
 <div class="description">
-    <h3>Mixmode</h3><p> Mixers support a <a href="Mixer.html#mixMode"><code>Mixmode</code></a>.<br> The Mixmode defines the curvature of the crossfade.</p>
-<p> In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is <strong>darker</strong> in the middle of  the crossfade then it is at both ends. This is the default <em>Mixmode</em>, the other modes play with these settings</p>
-<pre class="prettyprint source"><code>   1: NORMAL (default),   regular, linear crossfade
-   2: HARD,               switches with a hard cut at 50%
-   3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
-   4: FAM,                fades with a downward curve, forcing a 'overlay' period
-   5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
-   6: LEFT,               forces the pod on 0 (locks pod)
-   7: RIGHT,              forces the pod on 1 (locks pod)
-   8: CENTER,             forces both sources at ~66% (locks pod)
-   9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</code></pre><h3>Blendmode</h3><p> Mixers also support a <a href="Mixer.html#blendMode"><code>Blendmode</code></a>.<br> Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.</p>
-<pre class="prettyprint source"><code>   1 ADD (default),
-   2 SUBSTRACT,
-   3 MULTIPLY,
-   4 DARKEN,
-   5 COLOUR BURN,
-   6 LINEAR_BURN,
-   7 LIGHTEN,
-   8 SCREEN,
-   9 COLOUR_DODGE,
-   10 LINEAR_DODGE,
-   11 OVERLAY,
-   12 SOFT_LIGHT,
-   13 HARD_LIGHT,
-   14 VIVID_LIGHT,
-   15 LINEAR_LIGHT,
-   16 PIN_LIGHT,
-   17 DIFFERENCE,
-   18 EXCLUSION</code></pre><p> Switch both mixer and blendmode in realtime:</p>
-<pre class="prettyprint source"><code> mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
- mixer1.mixMode(8)      // set MixMode to BOOM
- mixer1.blendMode(1)    // set blendmode to ADD (default)
- mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT</code></pre><p> Move the pod up and down over time, or fade from source1 to source2 and back<br> again.</p>
-<pre class="prettyprint source"><code> ar c = 0;
- setInterval( function() {
-   c += 0.01
-   mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
- })</code></pre>
+    <h3>Mixmode</h3>
+<p>Mixers support a <a href="Mixer.html#mixMode"><code>Mixmode</code></a>.<br>
+The Mixmode defines the curvature of the crossfade.</p>
+<p>In a regular crossfade, source 1 would fade out while source 2 fades in. At the center both sources are then both at 50% opacity; however, 2 sources with 50% opacity only add up to ~75% opacity, not to 100%. This means that the output is <strong>darker</strong> in the middle of  the crossfade then it is at both ends. This is the default <em>Mixmode</em>, the other modes play with these settings</p>
+<pre class="prettyprint source"><code>  1: NORMAL (default),   regular, linear crossfade
+  2: HARD,               switches with a hard cut at 50%
+  3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+  4: FAM,                fades with a downward curve, forcing a 'overlay' period
+  5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+  6: LEFT,               forces the pod on 0 (locks pod)
+  7: RIGHT,              forces the pod on 1 (locks pod)
+  8: CENTER,             forces both sources at ~66% (locks pod)
+  9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+</code></pre>
+<h3>Blendmode</h3>
+<p>Mixers also support a <a href="Mixer.html#blendMode"><code>Blendmode</code></a>.<br>
+Think of them as the a Photoshop Blendmodes. They tell the mixer how to blend Source 1 and Source 2 together.</p>
+<pre class="prettyprint source"><code>  1 ADD (default),
+  2 SUBSTRACT,
+  3 MULTIPLY,
+  4 DARKEN,
+  5 COLOUR BURN,
+  6 LINEAR_BURN,
+  7 LIGHTEN,
+  8 SCREEN,
+  9 COLOUR_DODGE,
+  10 LINEAR_DODGE,
+  11 OVERLAY,
+  12 SOFT_LIGHT,
+  13 HARD_LIGHT,
+  14 VIVID_LIGHT,
+  15 LINEAR_LIGHT,
+  16 PIN_LIGHT,
+  17 DIFFERENCE,
+  18 EXCLUSION
+</code></pre>
+<p>Switch both mixer and blendmode in realtime:</p>
+<pre class="prettyprint source"><code>mixer1.mixMode()       // shows mixmode (default 1, NORMAL)
+mixer1.mixMode(8)      // set MixMode to BOOM
+mixer1.blendMode(1)    // set blendmode to ADD (default)
+mixer1.blendMode(14)   // set blendmode to VIVID_LIGHT
+</code></pre>
+<p>Move the pod up and down over time, or fade from source1 to source2 and back<br>
+again.</p>
+<pre class="prettyprint source"><code>ar c = 0;
+setInterval( function() {
+  c += 0.01
+  mixer1.pod ( ( Math.sin(c) * 0.5 ) + 0.5 );
+})
+</code></pre>
 </div>
 
 
@@ -236,6 +250,8 @@
 
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>let myMixer = new Mixer( renderer, { source1: myVideoSource, source2: myOtherMixer });</code></pre>
@@ -276,7 +292,9 @@
 
 
 <div class="description">
-    <p>binds <em>currentBpmFunc</em> to a function<br> whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br> it's called on update</p>
+    <p>binds <em>currentBpmFunc</em> to a function<br>
+whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br>
+it's called on update</p>
 </div>
 
 
@@ -396,6 +414,8 @@
 
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var mixer1 = new Mixer( renderer, { source1: file, source2: file})
@@ -418,7 +438,9 @@
 
 
 <div class="description">
-    <p>binds <em>currentBpmFunc</em> to a function<br> whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br> it's called on update</p>
+    <p>binds <em>currentBpmFunc</em> to a function<br>
+whatever BPM <em>currentBpmFunc</em> returns will be bpm used.<br>
+it's called on update</p>
 </div>
 
 
@@ -538,6 +560,8 @@
 
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var mixer1 = new Mixer( renderer, { source1: file, source2: file})
@@ -561,24 +585,25 @@
 
 <div class="description">
     <p>gets or sets the <em>blendMode</em>, there are 18 Blendmodes available, numbered 1-18;</p>
-<pre class="prettyprint source"><code> 1 ADD (default),
- 2 SUBSTRACT,
- 3 MULTIPLY,
- 4 DARKEN,
- 5 COLOUR BURN,
- 6 LINEAR_BURN,
- 7 LIGHTEN,
- 8 SCREEN,
- 9 COLOUR_DODGE,
- 10 LINEAR_DODGE,
- 11 OVERLAY,
- 12 SOFT_LIGHT,
- 13 HARD_LIGHT,
- 14 VIVID_LIGHT,
- 15 LINEAR_LIGHT,
- 16 PIN_LIGHT,
- 17 DIFFERENCE,
- 18 EXCLUSION</code></pre>
+<pre class="prettyprint source"><code>1 ADD (default),
+2 SUBSTRACT,
+3 MULTIPLY,
+4 DARKEN,
+5 COLOUR BURN,
+6 LINEAR_BURN,
+7 LIGHTEN,
+8 SCREEN,
+9 COLOUR_DODGE,
+10 LINEAR_DODGE,
+11 OVERLAY,
+12 SOFT_LIGHT,
+13 HARD_LIGHT,
+14 VIVID_LIGHT,
+15 LINEAR_LIGHT,
+16 PIN_LIGHT,
+17 DIFFERENCE,
+18 EXCLUSION
+</code></pre>
 </div>
 
 
@@ -699,6 +724,8 @@
 
 
 
+
+
         
             
 
@@ -713,7 +740,8 @@
 
 
 <div class="description">
-    <p>gets or sets the <em>bpm</em> or beats per minutes, locally in this mixer<br> defaults to 128</p>
+    <p>gets or sets the <em>bpm</em> or beats per minutes, locally in this mixer<br>
+defaults to 128</p>
 </div>
 
 
@@ -834,6 +862,8 @@
 
 
 
+
+
         
             
 
@@ -848,7 +878,9 @@
 
 
 <div class="description">
-    <p>gets or sets the <em>currentMOD</em> or modifyer for the bpm<br> this way you can modify the actual tempo, make the beats<br> follow on half speed, or dubbel speed or <em>4, </em>2, /2, /4 etc.</p>
+    <p>gets or sets the <em>currentMOD</em> or modifyer for the bpm<br>
+this way you can modify the actual tempo, make the beats<br>
+follow on half speed, or dubbel speed or *4, *2, /2, /4 etc.</p>
 </div>
 
 
@@ -951,6 +983,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -1104,6 +1138,8 @@
 
 
 
+
+
         
             
 
@@ -1119,15 +1155,16 @@
 
 <div class="description">
     <p>gets or sets the <em>mixMode</em>, there are 8 MixModes available, numbered 1-9;</p>
-<pre class="prettyprint source"><code> 1: NORMAL (default),   regular, linear crossfade
- 2: HARD,               switches with a hard cut at 50%
- 3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
- 4: FAM,                fades with a downward curve, forcing a 'overlay' period
- 5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
- 6: LEFT,               forces the pod on 0 (locks pod)
- 7: RIGHT,              forces the pod on 1 (locks pod)
- 8: CENTER,             forces both sources at ~66% (locks pod)
- 9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)</code></pre>
+<pre class="prettyprint source"><code>1: NORMAL (default),   regular, linear crossfade
+2: HARD,               switches with a hard cut at 50%
+3: NAM,                fades with an upward curvature forcing 100% opacity throughout the crossfade (lighter!)
+4: FAM,                fades with a downward curve, forcing a 'overlay' period
+5: NON DARK,           Never goes dark, 0-2 linear curve, capped at 1 and .36
+6: LEFT,               forces the pod on 0 (locks pod)
+7: RIGHT,              forces the pod on 1 (locks pod)
+8: CENTER,             forces both sources at ~66% (locks pod)
+9: BOOM                forces both sources at 100%, allows for overflow (lighter!) (locks pod)
+</code></pre>
 </div>
 
 
@@ -1230,6 +1267,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -1383,6 +1422,8 @@
 
 
 
+
+
         
             
 
@@ -1518,6 +1559,8 @@
 
 
 
+
+
         
     
 
@@ -1534,13 +1577,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Further reading</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Addon_AudioAnalysis.html">AudioAnalysis</a></li><li><a href="Addon_BPM.html">BPM</a></li><li><a href="Addon_FileManager.html">FileManager</a></li><li><a href="Addon_Gyphymanager.html">Gyphymanager</a></li><li><a href="Controller_GamePadController.html">GamePadController</a></li><li><a href="Controller_KeyboardController.html">KeyboardController</a></li><li><a href="Controller_MidiController.html">MidiController</a></li><li><a href="Controller_SocketController.html">SocketController</a></li><li><a href="Effect_ColorEffect.html">ColorEffect</a></li><li><a href="Effect_DistortionEffect.html">DistortionEffect</a></li><li><a href="Effect_FeedbackEffect.html">FeedbackEffect</a></li><li><a href="GlRenderer.html">GlRenderer</a></li><li><a href="Module_Chain.html">Chain</a></li><li><a href="Module_Mixer.html">Mixer</a></li><li><a href="Module_Output.html">Output</a></li><li><a href="Module_Switcher.html">Switcher</a></li><li><a href="Source_GifSource.html">GifSource</a></li><li><a href="Source_MultiVideoSource.html">MultiVideoSource</a></li><li><a href="Source_SolidSource.html">SolidSource</a></li><li><a href="Source_VideoSource.html">VideoSource</a></li><li><a href="Source_WebcamSource.html">WebcamSource</a></li><li><a href="Soutce_SocketSource.html">SocketSource</a></li></ul><h3>Interfaces</h3><ul><li><a href="Addon.html">Addon</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Effect.html">Effect</a></li><li><a href="Module.html">Module</a></li><li><a href="Source.html">Source</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-About.html">About</a></li><li><a href="tutorial-Build an Automatic Mixer.html">Build an Automatic Mixer</a></li><li><a href="tutorial-Build settings.html">Build settings</a></li><li><a href="tutorial-How does this work.html">How does this work</a></li><li><a href="tutorial-Roadmap.html">Roadmap</a></li><li><a href="tutorial-Some limitations.html">Some limitations</a></li><li><a href="tutorial-roadmap_.html">roadmap</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 16 2019 00:58:32 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Sep 12 2020 11:57:52 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

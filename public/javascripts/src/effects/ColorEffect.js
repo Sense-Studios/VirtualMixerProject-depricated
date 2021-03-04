@@ -49,6 +49,8 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  63. Hue
  *  64. Hard black edge. black/white.
 
+    70. CCTV
+
  *  ```
 
 
@@ -99,6 +101,32 @@ function ColorEffect( _renderer, _options ) {
     if ( renderer.fragmentShader.indexOf('vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
+/*
+float rand ( float seed ) {
+  return fract(sin(dot(vec2(seed) ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+vec2 displace(vec2 co, float seed, float seed2) {
+  vec2 shift = vec2(0);
+  if (rand(seed) > 0.5) {
+      shift += 0.1 * vec2(2. * (0.5 - rand(seed2)));
+  }
+  if (rand(seed2) > 0.6) {
+      if (co.y > 0.5) {
+          shift.x *= rand(seed2 * seed);
+      }
+  }
+  return shift;
+}
+
+vec4 interlace(vec2 co, vec4 col) {
+  if (int(co.y) % 3 == 0) {
+      return col * ((sin(time * 4.) * 0.1) + 0.75) + (rand(time) * 0.05);
+  }
+  return col;
+}
+*/
+
 vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                                              // normal
 
@@ -257,6 +285,15 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
     return src;
   }
+
+
+  if ( currentcoloreffect == 70 ) {
+    return src;
+  }
+
+
+
+
 
   // default
   return src;

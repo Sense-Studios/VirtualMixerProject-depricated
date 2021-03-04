@@ -40,9 +40,16 @@ var GlRenderer = function( _options ) {
   }
 
   // set up threejs scene
-  _self.element = _self.options.element
+  //_self.element = _self.options.element
+  _self.element = document.getElementById(_self.options.element)
+
+  // default
+  // window.innerWidth, window.innerHeight
+  _self.width = window.innerWidth //_self.element.offsetWidth
+  _self.height = window.innerHeight //_self.element.offsetHeight
+
   _self.scene = new THREE.Scene();
-  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  _self.camera = new THREE.PerspectiveCamera( 75, _self.width / _self.height, 0.1, 1000 );
   _self.camera.position.z = 20
 
   // container for all elements that inherit init() and update()
@@ -55,7 +62,7 @@ var GlRenderer = function( _options ) {
   // base config, screensize and time
   var cnt = 0.;
   _self.customUniforms['time'] = { type: "f", value: cnt }
-  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
   /**
    * The vertex shader
@@ -129,7 +136,7 @@ var GlRenderer = function( _options ) {
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.glrenderer.setSize( _self.width, _self.height );
     _self.nodes.forEach( function(n) { n.update() } );
 
     cnt++;
@@ -137,13 +144,17 @@ var GlRenderer = function( _options ) {
   }
 
   // update size!
-  window.addEventListener('resize', function() {
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  _self.resize = function() {
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
     // resize viewport (write exception for width >>> height, now gives black bars )
-    _self.camera.aspect = window.innerWidth / window.innerHeight;
+    _self.camera.aspect = _self.width / _self.height;
     _self.camera.updateProjectionMatrix();
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.glrenderer.setSize( _self.width, _self.height );
+  }
+
+  window.addEventListener('resize', function() {
+    _self.resize()
   })
 
   // ---------------------------------------------------------------------------
@@ -170,7 +181,7 @@ var GlRenderer = function( _options ) {
 
     cnt = 0.;
     _self.customUniforms['time'] = { type: "f", value: cnt }
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
     // reset the vertexshader
     _self.vertexShader = `

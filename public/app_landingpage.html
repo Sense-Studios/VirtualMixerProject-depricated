@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <script>
+      var electron = require('electron');
+      function do_fs() {
+        electron.remote.getCurrentWindow().setFullScreen(true)
+      }
+    </script>
+    <style>
+      html, body {
+        color: white;
+        background-color: black;
+        font-family: Helvetica, Verdana, _sans;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      a {
+        color: white;
+        font-weight: bolder;
+      }
+
+      .logo_holder {
+        float: right;
+        width: 39%;
+        text-align: center;
+      }
+
+      .stats {
+        width: 61%;
+      }
+
+      .main {
+        margin-left: 12px;
+      }
+
+
+    </style>
+  </head>
+
+  <body>
+
+    <div class="logo_holder">
+      <img width="80%" src="https://camo.githubusercontent.com/87c41be2d229d0c282891784860c6fcfce6c8fef/68747470733a2f2f7669727475616c6d697870726f6a6563742e636f6d2f696d616765732f766d705f64656d6f2f766d705f6c6f676f2e706e67">
+    </div>
+
+    <div class="stats">
+      <h1>
+        <small> Virtual Mix Project </small>
+        Remote App
+      </h1>
+      <hr>
+      <pre>
+        We are using node <script>document.write(process.versions.node)</script>,<br>
+        Chrome <script>document.write(process.versions.chrome)</script>,<br>
+        and Electron <script>document.write(process.versions.electron)</script>.<br>
+        Storage DIR: <script>document.write(process.env.HOME)</script>.
+      </pre>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+    <br>
+    <br>
+    <div class="main">
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sit amet
+        mollis risus, eu pretium nisl. Praesent quis quam porta, suscipit massa
+        id, efficitur tellus. Nam finibus purus sed enim eleifend, a pretium massa
+        placerat. Sed nisl massa, blandit vel eros et, egestas placerat metus.
+        Aenean eget metus accumsan, tincidunt velit eget, elementum nunc. Vivamus
+        feugiat leo nec feugiat iaculis. Morbi bibendum id risus mollis egestas.
+      </p>
+      <a href="http://virtualmixproject.com/app_landingpage.html" onclick="do_fs()">Start</a>
+      <br>
+      <br>
+      <a href="http://virtualmixproject.com/mixer/olimazi" onclick="do_fs()">Direct naar Olimazi</a>
+      <br>
+    </div>
+
+  </body>
+</html>

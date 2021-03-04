@@ -112,9 +112,95 @@ var _oldsrc2 = ""
 var _oldsrc1_time = (new Date()).getTime()
 var _oldsrc2_time = (new Date()).getTime()
 
+// for feedback
+var fadeTimeOut = null
+var textFadeCount = 0
+function popUpText( _text ) {
+  textFadeCount = 2
+  _elm = document.getElementById('popuptext')
+  _elm.innerHTML = _text
+  _elm.style.opacity = textFadeCount
+  clearInterval(fadeTimeOut)
+  fadeTimeOut = setInterval( function( _elm ) {
+    _elm.style.opacity = textFadeCount
+    textFadeCount = textFadeCount - .042
+    if ( textFadeCount < 0 ) {
+      _elm.style.opacity = 0
+      clearInterval(fadeTimeOut)
+    }
+  }, 10, _elm )
+}
+
+function updateInfo() {
+  _elm = document.getElementById('infoblock')
+  var html = "<pre>"
+  html += "-------------------------------------------------"
+  html += "\n Framerate:\t" + fps
+  html += "\n\n Mixer 1:\t" + Math.round( mixer1.pod() * 1000 ) / 1000
+  html += "\n blendmode\t" + mixer1.blendMode()
+  html += "\n mixmode\t" + mixer1.mixMode()
+  html += "\n\n Mixer 2:\t" + Math.round( mixer2.pod() * 1000 ) / 1000
+  html += "\n blendmode\t" + mixer2.blendMode()
+  html += "\n mixmode\t" + mixer2.mixMode()
+  html += "\n\n Source 1:\t" + Math.round( source1.video.currentTime * 1000 ) / 1000 + "\t" + Math.round( source1.video.duration * 1000 ) / 1000
+  html += "\n" + source1.video.src.substr(0, 7) + "..." + source1.video.src.split("/").pop()
+  html += "\n\n Source 2:\t" + Math.round( source2.video.currentTime * 1000 ) / 1000 + "\t" + Math.round( source2.video.duration * 1000 ) / 1000
+  html += "\n" + source2.video.src.substr(0, 7) + "..." + source2.video.src.split("/").pop()
+  html += "\n\n Logo Source:\t" + Math.round( logo_source.video.currentTime * 1000 ) / 1000 + "\t" + Math.round( logo_source.video.duration * 1000 ) / 1000
+  html += "\n" + logo_source.video.src.substr(0, 7) + "..." + logo_source.video.src.split("/").pop()
+  html += "\n\n\n-------------------------------------------------"
+  html += "\n\n P: \t\tToggle Partymode"
+  html += "\n I or H: \tToggle this screen"
+  html += "\n C: \t\tForce change all the sources"
+  html += "\n F: \t\tForce fade all the sources"
+  html += "\n F11: \t\tFullscreen"
+  html += "\n ALT+F4: \tForce quit"
+  html += "\n-------------------------------------------------"
+  html += "</pre>"
+  _elm.innerHTML = html
+}
+
+var info_is_shown = false
+function toggleInfo() {
+  _elm = document.getElementById('infoblock')
+  if (info_is_shown == false) {
+    _elm.style.display = "block"
+    info_is_shown = true
+  }else{
+    _elm.style.display = "none"
+    info_is_shown = false
+  }
+  console.log("toggle info ", _elm.style.display, info_is_shown)
+}
+
+// for FPS
+const times = [];
+let fps;
+
+function refreshLoop() {
+  window.requestAnimationFrame(() => {
+    const now = performance.now();
+    while (times.length > 0 && times[0] <= now - 1000) {
+      times.shift();
+    }
+    times.push(now);
+    fps = times.length;
+    refreshLoop();
+    updateInfo()
+  });
+}
+
+refreshLoop();
+
+// =============================================================================
+
 window.addEventListener('keypress', function(ev) {
+  console.log("keypress ", ev.which)
+
+  // P
   if ( ev.which == 112 ) {
     if ( partymode ) {
+      popUpText("Partymode OFF")
       // switch partymode off
       partymode = false
       bpm.bpm = 8
@@ -132,6 +218,7 @@ window.addEventListener('keypress', function(ev) {
 
     }else{
       // switch partymode on
+      popUpText("Partymode ON!")
       partymode = true
       bpm.bpm = 68
       bpm.bypass = false
@@ -154,6 +241,7 @@ window.addEventListener('keypress', function(ev) {
 
   // C
   if ( ev.which == 99 ) {
+    popUpText("Force Change all")
     filemanager_logo.changez()
     filemanager1.changez()
     filemanager2.changez()
@@ -162,26 +250,47 @@ window.addEventListener('keypress', function(ev) {
   }
 
   // L
-  if ( ev.which == 108 ) {
-    console.log("do the fader 1")
+  if ( ev.which == 102 ) {
+    popUpText("Force Fade over")
     mixer2.fade(1000);
     setTimeout( function() { mixer2.fade(1000) }, 8000 );
     setTimeout( function() { mixer2.pod(1) }, 10000 );
   }
 
+  // H
+  if ( ev.which == 104 ) {
+    popUpText( "Show Help..." )
+    toggleInfo()
+  }
+
   // I
-  if ( ev.which == 108 ) {
-    // set info ?
+  if ( ev.which == 105 ) {
+    popUpText("Toggle Infoblock")
+    toggleInfo()
   }
 })
 
-setTimeout( function() {
-  filemanager_logo.changez()
-  filemanager1.changez()
-  filemanager2.changez()
-  cycle() // start the app
-}, 750 )
+// =============================================================================
 
+setTimeout( function() {
+  // populate the app
+  if ( window.in_app ) {
+    window.eu.check_set(filemanager_logo.set)
+    window.eu.check_set(filemanager1.set)
+    window.eu.check_set(filemanager2.set)
+  }
+
+  setTimeout( function()  {
+    filemanager_logo.changez()
+    filemanager1.changez()
+    filemanager2.changez()
+  }, 3000)
+
+  cycle() // start the app
+
+}, 1500 )
+
+// =============================================================================
 // main loop
 function cycle() {
   if ( bpm.render() > 0.99 && !wasSet ) {
@@ -191,6 +300,7 @@ function cycle() {
     console.log("beat!", beats, dice)
 
     if ( partymode ) {
+
       if (beats%4 == 0 && dice < 0.2 ) source1.jump()
       if (beats%4 == 0 && dice < 0.2 ) source2.jump()
       if (beats%6 == 0 && dice < 0.64 ) filemanager_logo.changez();
@@ -215,20 +325,45 @@ function cycle() {
     wasSet = false
   }
 
-  // -------------------------------------------------------------------------
+  // ===========================================================================
 
   if (!partymode) { // this is not a party
 
     c++
     // if (c%800 == 0 && dice < 0.12 ) filemanager2.changez();//setTimeout(function() { source1.jump() }, 1500 )
     // if (c%900 == 0 && dice < 0.12 ) filemanager1.changez(); //setTimeout(function() { source1.jump() }, 1500 )
-    if (c%900 == 0 && dice < 0.12 ) mixer2.fade(1000); //setTimeout(function() { source1.jump() }, 1500 )
-    if (c%1000 == 0 && dice < 0.1 ) filemanager_logo.changez(); //setTimeout(function() { source1.jump() }, 1500 )
-    //if (c%1000 == 0 && dice < 0.6 ) mixer1.blendMode( useBlendmodes[Math.floor( Math.random() * useBlendmodes.length )] );
-    //if (c%1200 == 0 && dice < 0.3 ) mixer1.mixMode( useMixmodes[Math.floor( Math.random() * useMixmodes.length )] );
-    if (c%1600 == 0 && dice < 0.2 && ( mixer1.pod() == 1 || mixer1.pod() == 0 ) ) mixer1.fade(1800)
-    if (c%2400 == 0 && dice < 0.5 ) c = Math.round( Math.random() * 6000 )
-    if (c%3200 == 0 && dice < 0.6 && ( mixer2.pod() == 1 || mixer2.pod() == 0 ) ) {
+    if (c%1200 == 0 && dice < 0.50 ) {
+      console.log("fade 1")
+      mixer1.fade( Math.random() * 2400 ); //setTimeout(function() { source1.jump() }, 1500 )
+
+    } else if (c%1200 == 0 && dice < 0.9 ) {
+      console.log("fade 2")
+      mixer2.fade(  Math.random() * 4200 ); //setTimeout(function() { source1.jump() }, 1500 )
+
+    } else if (c%1000 == 0 && dice < 0.1 ) {
+      console.log("logo changez")
+      filemanager_logo.changez(); //setTimeout(function() { source1.jump() }, 1500 )
+      //if (c%1000 == 0 && dice < 0.6 ) mixer1.blendMode( useBlendmodes[Math.floor( Math.random() * useBlendmodes.length )] );
+      //if (c%1200 == 0 && dice < 0.3 ) mixer1.mixMode( useMixmodes[Math.floor( Math.random() * useMixmodes.length )] );
+    } else if (c%1100 == 0 && dice < 0.8 && mixer1.pod() == 0 ) { // mixer 2 is showing source 2
+      console.log("source 1 changez")
+      filemanager1.changez()
+
+    } else if (c%1300 == 0 && dice < 0.8 && mixer1.pod() == 1 ) { // mixer 2 is showing source 1
+      console.log("source 2 changez")
+      filemanager2.changez()
+    }
+    /*
+    } else if (c%2000 == 0 && dice < 0.2 && ( mixer1.pod() == 1 || mixer1.pod() == 0 ) ) {
+      console.log("fade 1")
+      mixer1.fade(1800)
+
+    } else if (c%3000 == 0 && dice < 0.5 ) {
+      console.log("random c ?")
+      c = Math.round( Math.random() * 6000 )
+
+    } else if (c%5000 == 0 && dice < 0.6 && ( mixer2.pod() == 1 || mixer2.pod() == 0 ) ) {
+
       console.log("do the fader 2");
       mixer1.pod( Math.round( mixer1.pod() ))
       mixer1.blendMode(1)
@@ -237,7 +372,7 @@ function cycle() {
       mixer2.mixMode(1)
       mixer2.fade(1000);
       setTimeout( function() { mixer2.fade(1000) }, 12000 );
-    }
+    }*/
 
     // check c ~20 seconds
     if (c%200 == 0) {

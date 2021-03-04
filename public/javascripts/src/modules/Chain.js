@@ -1,13 +1,13 @@
 /**
  * @summary
  *    A Chain is string of sources, stacked on top of each other
- *    Chain Example on codepen: 
+ *    Chain Example on codepen:
  *    <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank">codepen</a>
  *
  * @description
  *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
- * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
+ * @example let myChain = new Chain( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] } );
  * @constructor Module#Chain
  * @implements Module
  * @param renderer:GlRenderer

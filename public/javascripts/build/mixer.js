@@ -44,11 +44,10 @@ AudioAnalysis.constructor = AudioAnalysis;
 * @param {Object} options - object with several settings
 */
 
-// returns a floating point between 1 and 0, in sync with a bpm
-// it also returns actual BPM numbers and a set of options
 function AudioAnalysis( _renderer, _options ) {
   var _self = this
 
+  // ---------------------------------------------------------------------------
   // exposed variables.
   _self.uuid = "Analysis_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   _self.type = "Addon"
@@ -114,6 +113,7 @@ function AudioAnalysis( _renderer, _options ) {
     _self.options = _options;
   }
 
+  // ---------------------------------------------------------------------------
   // somewhat private private
   var calibrating = true
   var nodes = []
@@ -151,7 +151,6 @@ function AudioAnalysis( _renderer, _options ) {
   audio.controls = true;
   audio.loop = true;
   audio.autoplay = true;
-  audio.crossOrigin = "anonymous"
   audio.crossorigin = "anonymous"
 
   // or as argument(settings.passFreq ? settings.passFreq : 350);
@@ -211,8 +210,30 @@ function AudioAnalysis( _renderer, _options ) {
     return _self.bpm
   }
 
-  // main ----------------------------------------------------------------------
+  /**
+   * @description
+   *  firstload for mobile, forces all control to the site on click
+   *  tries and forces another play-event after a click
+   * @function Addon#AudioAnalysis~forceAudio
+   *
+  */
+  var forceAudio = function() {
+    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
+    context.resume().then(() => {
+      audio.play();
+      console.log('Playback resumed successfully');
+      document.body.removeEventListener('click', forceAudio);
+      document.body.removeEventListener('touchstart', forceAudio);
+    });
+  }
 
+  document.body.addEventListener('click', forceAudio)
+  document.body.addEventListener('touchstart', forceAudio)
+
+
+  // MAIN ----------------------------------------------------------------------
+
+  // INIT
   /** @function Addon#AudioAnalysis~init */
   _self.init = function() {
     console.log("init AudioAnalysis Addon.")
@@ -237,6 +258,23 @@ function AudioAnalysis( _renderer, _options ) {
     }
   }
 
+  // RENDER
+  // returns a floating point between 1 and 0, in sync with a bpm
+  /** @function Addon#AudioAnalysis#render */
+  _self.render = function() {
+    // returns current bpm 'position' as a value between 0 - 1
+    return _self.bpm_float
+  }
+
+  // ADD
+  // Adds callback function from another node and gives the
+  // bpm float ( result of render() ) as an argument to that function
+  /** @function Addon#AudioAnalysis#add */
+  _self.add = function( _callback ) {
+    nodes.push( _callback )
+  }
+
+  // UPDATE
   /** @function Addon#AudioAnalysis~update */
   _self.update = function() {
     if ( _self.bypass ) return
@@ -255,19 +293,8 @@ function AudioAnalysis( _renderer, _options ) {
     // set new numbers
     _self.bpm = _self.tempodata_bpm
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60            // * _self.mod
-    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2               // Math.sin( 128 / 60 )
-  }
-
-  /** @function Addon#AudioAnalysis#render */
-  _self.render = function() {
-    // returns current bpm 'position' as a value between 0 - 1
-    return _self.bpm_float
-  }
-
-  /** @function Addon#AudioAnalysis#add */
-  _self.add = function( _func ) {
-    nodes.push( _func )
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60 // * _self.mod
+    _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2    // Math.sin( 128 / 60 )
   }
 
   // actual --------------------------------------------------------------------
@@ -304,6 +331,7 @@ function AudioAnalysis( _renderer, _options ) {
     // this is new
     // opens in domain.com/mixer.js
     if (window.Worker) {
+
       // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
       // var myWorker = new Worker('worker.js');
       // and myWorker.terminate();
@@ -327,6 +355,37 @@ function AudioAnalysis( _renderer, _options ) {
 
       // this wil be replaced.
       setInterval( sampler, 1);
+
+      //alert("i can has worker!")
+      // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+      // var myWorker = new Worker('worker.js');
+      // and myWorker.terminate();
+
+      // Inline worker, so we can package it later
+      // we only use the worker to load of this work to another thread
+      console.log("go")
+      var data = `
+        onmessage = function(e) {
+          postMessage('Inline worker creation ' + e.data);
+          console.log("msgevent:", e)
+        }
+      `
+
+      // convert the worker to a blob and 'load' it
+      var bb = new Blob([data]);
+      var blobURL = window.URL.createObjectURL( bb );
+      var worker = new Worker(blobURL);
+      worker.onmessage = function(e) {
+        console.log(e.data)
+      };
+
+      window.my_worker = worker
+      console.log("post message")
+      worker.postMessage("1");
+
+      // =======================================================================
+      setInterval( sampler, 1);
+
     }else{
       // this is now the fallback
       setInterval( sampler, 1);
@@ -344,6 +403,8 @@ function AudioAnalysis( _renderer, _options ) {
    *
   */
   var warningWasSet = false
+
+  // MAIN Sampler
   var sampler = function() {
     //if ( !_self.useAutoBpm ) return;
     if ( _self.audio.muted ) return;
@@ -351,7 +412,6 @@ function AudioAnalysis( _renderer, _options ) {
     //if ( _self.audio_src != "" && !_self.useMicrophone ) return;
     if ( _self.bypass ) return;
     // if  no src && no mic -- return
-    // if ... -- return
 
     var dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray)
@@ -587,7 +647,7 @@ function AudioAnalysis( _renderer, _options ) {
 
     return tempoCounts
   } // end groupNeighborsByTempo
-}
+}// end AudioAnalysis
 
 BPM.prototype = new Addon(); // assign prototype to marqer
 BPM.constructor = BPM;  // re-assign constructor
@@ -898,9 +958,24 @@ function FileManager( _source ) {
    * @function Addon#FileManager#setSrc
    *
   */
-  _self.setSrc = function( file ) {
-    _self.source.src(file)
+
+  /* helper */
+  if ( window.in_app != undefined ) {
+    _self.eu = window.eu
   }
+
+  _self.setSrc = function( file ) {
+    if ( window.in_app == undefined ) {
+      _self.source.src(file)
+      console.log("filemanager: set normal source:", file)
+    }else{
+      _self.source.src(_self.eu.check_file(file) )
+      console.log("filemanager: set checked source:", _self.eu.check_file(file) )
+    }
+  }
+
+  // load entire set
+  // filemanager.set.forEach(function(item) { window.eu.check_file(item) })
 
   // ---------------------------------------------------------------------------
   // HELPERS
@@ -2482,6 +2557,8 @@ ColorEffect.constructor = ColorEffect;  // re-assign constructor
  *  63. Hue
  *  64. Hard black edge. black/white.
 
+    70. CCTV
+
  *  ```
 
 
@@ -2532,6 +2609,32 @@ function ColorEffect( _renderer, _options ) {
     if ( renderer.fragmentShader.indexOf('vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv )') == -1 ) {
     _renderer.fragmentShader = _renderer.fragmentShader.replace('/* custom_helpers */',
 `
+/*
+float rand ( float seed ) {
+  return fract(sin(dot(vec2(seed) ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+vec2 displace(vec2 co, float seed, float seed2) {
+  vec2 shift = vec2(0);
+  if (rand(seed) > 0.5) {
+      shift += 0.1 * vec2(2. * (0.5 - rand(seed2)));
+  }
+  if (rand(seed2) > 0.6) {
+      if (co.y > 0.5) {
+          shift.x *= rand(seed2 * seed);
+      }
+  }
+  return shift;
+}
+
+vec4 interlace(vec2 co, vec4 col) {
+  if (int(co.y) % 3 == 0) {
+      return col * ((sin(time * 4.) * 0.1) + 0.75) + (rand(time) * 0.05);
+  }
+  return col;
+}
+*/
+
 vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
   if ( currentcoloreffect == 1 ) return vec4( src.rgba );                                                                                              // normal
 
@@ -2690,6 +2793,15 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
     return src;
   }
+
+
+  if ( currentcoloreffect == 70 ) {
+    return src;
+  }
+
+
+
+
 
   // default
   return src;
@@ -3298,9 +3410,16 @@ var GlRenderer = function( _options ) {
   }
 
   // set up threejs scene
-  _self.element = _self.options.element
+  //_self.element = _self.options.element
+  _self.element = document.getElementById(_self.options.element)
+
+  // default
+  // window.innerWidth, window.innerHeight
+  _self.width = window.innerWidth //_self.element.offsetWidth
+  _self.height = window.innerHeight //_self.element.offsetHeight
+
   _self.scene = new THREE.Scene();
-  _self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  _self.camera = new THREE.PerspectiveCamera( 75, _self.width / _self.height, 0.1, 1000 );
   _self.camera.position.z = 20
 
   // container for all elements that inherit init() and update()
@@ -3313,7 +3432,7 @@ var GlRenderer = function( _options ) {
   // base config, screensize and time
   var cnt = 0.;
   _self.customUniforms['time'] = { type: "f", value: cnt }
-  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
   /**
    * The vertex shader
@@ -3387,7 +3506,7 @@ var GlRenderer = function( _options ) {
   _self.render = function() {
   	requestAnimationFrame( _self.render );
   	_self.glrenderer.render( _self.scene, _self.camera );
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.glrenderer.setSize( _self.width, _self.height );
     _self.nodes.forEach( function(n) { n.update() } );
 
     cnt++;
@@ -3395,13 +3514,17 @@ var GlRenderer = function( _options ) {
   }
 
   // update size!
-  window.addEventListener('resize', function() {
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+  _self.resize = function() {
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
     // resize viewport (write exception for width >>> height, now gives black bars )
-    _self.camera.aspect = window.innerWidth / window.innerHeight;
+    _self.camera.aspect = _self.width / _self.height;
     _self.camera.updateProjectionMatrix();
-    _self.glrenderer.setSize( window.innerWidth, window.innerHeight );
+    _self.glrenderer.setSize( _self.width, _self.height );
+  }
+
+  window.addEventListener('resize', function() {
+    _self.resize()
   })
 
   // ---------------------------------------------------------------------------
@@ -3428,7 +3551,7 @@ var GlRenderer = function( _options ) {
 
     cnt = 0.;
     _self.customUniforms['time'] = { type: "f", value: cnt }
-    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( window.innerWidth,  window.innerHeight ) }
+    _self.customUniforms['screenSize'] = { type: "v2", value: new THREE.Vector2( _self.width,  _self.height ) }
 
     // reset the vertexshader
     _self.vertexShader = `
@@ -3487,13 +3610,13 @@ function Module( renderer, options ) {
 /**
  * @summary
  *    A Chain is string of sources, stacked on top of each other
- *    Chain Example on codepen: 
+ *    Chain Example on codepen:
  *    <a href="https://codepen.io/xangadix/pen/BbVogR" target="_blank">codepen</a>
  *
  * @description
  *   Chains together a string of sources, gives them an alpha channel, and allows for switching them on and off with fade effects. Ideal for a piano board or a midicontroller
  *
- * @example let myChain = new Mixer( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] );
+ * @example let myChain = new Chain( renderer, { sources: [ myVideoSource, myOtherMixer, yetAnotherSource ] } );
  * @constructor Module#Chain
  * @implements Module
  * @param renderer:GlRenderer
@@ -5106,6 +5229,8 @@ function VideoSource(renderer, options) {
   // create and instance
   var _self = this;
 
+  var texture_size = 1024
+
   if ( options.uuid == undefined ) {
     _self.uuid = "VideoSource_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
   } else {
@@ -5152,8 +5277,8 @@ function VideoSource(renderer, options) {
     console.log('loaded source: ', videoElement.src )
 
     // set properties
-    videoElement.height = 1024;
-    videoElement.width = 1024;
+    videoElement.height = texture_size;
+    videoElement.width = texture_size;
     videoElement.volume = 0;
     videoElement.loop = true          // must call after setting/changing source
     videoElement.load();              // must call after setting/changing source
@@ -5191,8 +5316,8 @@ function VideoSource(renderer, options) {
 
     // create canvas
     canvasElement = document.createElement('canvas');
-    canvasElement.width = 1024;
-    canvasElement.height = 1024;
+    canvasElement.width = texture_size;
+    canvasElement.height = texture_size;
     canvasElementContext = canvasElement.getContext( '2d' );
 
     // create the videoTexture
@@ -5235,16 +5360,19 @@ function VideoSource(renderer, options) {
 
   var i = 0
   _self.update = function() {
+
+
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
-      canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );
 
       if ( videoTexture ) videoTexture.needsUpdate = true;
     }else{
-      // canvasElementContext.drawImage( videoElement, 0, 0, 1024, 1024 );
-      // console.log("SEND IN BLACK!")
-      canvasElementContext.clearRect(0, 0, 1024, 1024);
-      _self.alpha = 0
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );  // send last image
+      // TODO: console.log("SEND IN BLACK!") ?
+      // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
+      //_self.alpha = 0
+      if ( videoTexture ) videoTexture.needsUpdate = true;
     }
   }
 
@@ -5362,6 +5490,7 @@ function VideoSource(renderer, options) {
         videoElement.currentTime = Math.floor( ( Math.random() * _self.duration() ) )
       }catch(e){
         console.log("prevented a race error")
+        videoElement.currentTime = 0
       }
     } else {
       videoElement.currentTime = _num

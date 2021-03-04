@@ -1,0 +1,61 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		script(src='/javascripts/src/GlRenderer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/leung.css')
+	
+	body 
+
+		div#container
+			
+			#main_screen
+				canvas#glcanvas
+			
+			div#videoA.preview
+			div#videoB.preview
+			div#videoC.preview
+				
+			div#controls
+				
+				div.button_group
+					button#startA restart
+					button#playA play
+					button#jumpA jump
+					button#soloA Solo
+								
+				div.button_group
+					button#startB restart
+					button#playB play
+					button#jumpB jump
+					button#soloB Solo
+					
+				div.button_group
+					button#startC restart
+					button#playC play
+					button#jumpC jump
+					button#soloC Solo
+				
+				input(type="range" min="0" max="1" step="0.001" value="0.5" class="slider" id="main_index")
+				
+				div.button_group.wide
+					button#start_all Restart All
+					button#play_all Play All
+					button#jump_all Jump All
+					span ""
+					button#audio_start Audio Restart
+					button#audio_play Audio Play
+					audio#main_music(controls, src="http://xangadix.net/music/Ballet_dancers_ in_the_quiet_streets_of_Amsterdam.mp3")
+				
+		
+		a.logo(href='/')
+		.blink
+		.payoff
+			| <h3>leung</small></h3>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			script(src='/compositions/leung.js')
+			include ../partials/analytics

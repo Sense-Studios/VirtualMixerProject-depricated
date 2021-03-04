@@ -47,7 +47,9 @@ Length4=-1
 Version=2
 */
 
-router.get('/nsb', function(req, res, next) { console.log("download"); request('http://5.39.71.159:8729/stream?type=http&nocache=49969').pipe(res); });
+// router.get('/nsb', function(req, res, next) { console.log("download"); request('http://5.39.71.159:8729/stream?type=http&nocache=49969').pipe(res); });
+router.get('/nsb', function(req, res, next) { console.log("download:play"); request('https://nsbradio.co.uk/play.php').pipe(res); });
+
 
 //router.get('/nsb', function(req, res, next) { console.log("download"); request('http://live.nsbradio.co.uk:8904/;?type=http&nocache=43144').pipe(res); });
 

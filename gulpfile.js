@@ -32,6 +32,11 @@ gulp.task('mixer-js', function () {
 		.pipe(gulp.dest('public/javascripts/build/'));
 });
 
+
+
+var vendor = glob.sync("./public/javascripts/vendor/**/*.js")
+var mixer_min = glob.sync("./public/javascripts/src/**/*.js")
+
 // -----------------------------------------------------------------------------
 //  Scaffolding
 // -----------------------------------------------------------------------------

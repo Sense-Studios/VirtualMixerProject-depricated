@@ -35,9 +35,9 @@ var renderer = new GlRenderer();
 
 // create sources
 var testSource1 = new GifSource(   renderer, { src: '//nabu.sense-studios.com/assets/nabu_themes/sense/slowclap.gif' } );
-var testSource2 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
-var testSource3 = new VideoSource( renderer, { src: '/video/alaro_carnage_the_underground_gif_remix.mp4' } );
-var testSource4 = new VideoSource( renderer, { src: '/video/1UP_Graffiti_olympic.mp4' } );
+var testSource2 = new VideoSource( renderer, { src: '/video/ignore/1UP_Graffiti_olympic.mp4' } );
+var testSource3 = new VideoSource( renderer, { src: '/video/ignore/alaro_carnage_the_underground_gif_remix.mp4' } );
+var testSource4 = new VideoSource( renderer, { src: '/video/ignore/1UP_Graffiti_olympic.mp4' } );
 
 var clutter = new VideoSource( renderer, { src: '/video/16MMDUSTproc.mp4' } );
 
