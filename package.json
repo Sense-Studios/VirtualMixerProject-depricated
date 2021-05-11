@@ -14,6 +14,9 @@
     "test": "node test",
     "help": "echo 'use: $npm run [SCRIPT]\n\nstart\tStarts the application,\nbuild\tbuilds and minifies the application\ndocs\twrites the documentation\ntest\tis sadly empty\nhelp\tthis file'"
   },
+  "engines": {
+    "node": ">=10.16.3"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/Sense-Studios/VirtualMixerProject.git"
@@ -35,16 +38,19 @@
     "debug": "~4.1.1",
     "del": "5.1.0",
     "express": "~4.17.1",
+    "hosted-git-info": ">=2.8.9",
     "http-errors": "~1.7.3",
     "kind-of": ">=6.0.3",
-    "lodash": ">=4.17.16",
+    "lodash": ">=4.17.21",
     "minimist": ">=0.2.1",
     "morgan": "~1.9.1",
     "node-sass-middleware": "0.11.0",
     "pug": ">=3.0.1",
     "pug-code-gen": ">=2.0.3",
-    "socket.io": "^2.3.0",
-    "yargs-parser": "^20.2.6",
+    "socket.io": "^4.1.0",
+    "xmlhttprequest-ssl": ">=1.6.2",
+    "y18n": ">=3.2.2",
+    "yargs-parser": ">=5.0.0-security.0",
     "ytdl-core": "^1.0.0",
     "ytsr": "^0.1.8"
   },
@@ -53,15 +59,12 @@
   },
   "homepage": "https://virtualmixproject.com",
   "devDependencies": {
-    "gulp": "^4.0.2",
     "glob": "^7.1.4",
+    "gulp": "^4.0.2",
+    "gulp-cli": "2.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-minify": "^3.1.0",
-    "del": "5.1.0",
-    "jsdoc": "^3.6.3",
-    "gulp-cli": "2.2.0",
-    "minimist": ">=0.2.1",
-    "kind-of": ">=6.0.3",
-    "acorn": ">=5.7.4"
+    "jsdoc": "~3.6.3",
+    "underscore": "^1.13.1"
   }
 }
