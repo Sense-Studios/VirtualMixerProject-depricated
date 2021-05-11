@@ -15,7 +15,8 @@
     "help": "echo 'use: $npm run [SCRIPT]\n\nstart\tStarts the application,\nbuild\tbuilds and minifies the application\ndocs\twrites the documentation\ntest\tis sadly empty\nhelp\tthis file'"
   },
   "engines": {
-    "node": ">=10.16.3"
+    "node": ">=10.16.3",
+    "npm": ">=6.9.0"
   },
   "repository": {
     "type": "git",
