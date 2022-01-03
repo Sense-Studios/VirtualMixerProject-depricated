@@ -56,7 +56,8 @@ router.get('/nsb', function(req, res, next) { console.log("download:play"); requ
 // http://live.nsbradio.co.uk:8904/;?type=http&nocache=43148
 
 router.get('/electrodancefloor', function(req, res, next) { request('http://listen.radionomy.com:80/electrodancefloor').pipe(res); });
-router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
+//router.get('/deepdanceradio', function(req, res, next) { request('https://streaming.radionomy.com/DeepDanceRadio').pipe(res); });
+router.get('/deepdanceradio', function(req, res, next) { request('http://igor.torontocast.com:1290/stream').pipe(res); });
 router.get('/hardstyle', function(req, res, next) { request('http://145.239.10.127:8326/streamTitle1').pipe(res); }); // dead
 router.get('/rap', function(req, res, next) { request('http://149.56.157.81:8569/streamTitle1').pipe(res); });
 // router.get( '/dunklenacht', function(req, res, next) { request('http://93.90.201.81:8000').pipe(res); }); //offline

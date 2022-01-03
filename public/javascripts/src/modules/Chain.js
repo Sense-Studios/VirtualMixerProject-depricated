@@ -13,7 +13,18 @@
  * @param renderer:GlRenderer
  * @param options:Object
  */
-function Chain(renderer, options) {
+
+
+var Chain = class {
+  static function_list() {
+    return []
+  }
+
+  static help() {
+    return "ownoes!"
+  }
+
+  constructor( renderer, options ) {
 
   // create and instance
   var _self = this;

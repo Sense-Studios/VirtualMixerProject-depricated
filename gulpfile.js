@@ -38,7 +38,7 @@ var vendor = glob.sync("./public/javascripts/vendor/**/*.js")
 var mixer_min = glob.sync("./public/javascripts/src/**/*.js")
 
 // -----------------------------------------------------------------------------
-//  Scaffolding
+//  Mixer Scaffolding
 // -----------------------------------------------------------------------------
 
 function generateMixerJade( _name ) {
@@ -119,6 +119,39 @@ gulp.task('create_mixer_scaffold', gulp.series( createMixerCode ) )
 gulp.task('remove_mixer_scaffold', gulp.series( removeMixerCode ) )
 
 // -----------------------------------------------------------------------------
+//  Controller Scaffolding
+// -----------------------------------------------------------------------------
+
+function generateControllerJade( _name ) {
+}
+
+function generateControllerJs( _name ) {
+}
+
+function generateControllerSass( _name ) {
+}
+
+// create:mixer
+// create:controller
+// remove:mixer
+// remove:controller
+
+function createControllerCode(cb) {
+	var scaffold_name = process.argv[4]
+	console.log("\n\ncreate controller not implemented,", scaffold_name, "not created\n\n")
+	cb()
+}
+
+function removeControllerCode(cb) {
+	var scaffold_name = process.argv[4]
+	console.log("\n\nremove controller not implemented,", scaffold_name, "\n\n")
+	cb()
+}
+
+gulp.task('create_controller_scaffold', gulp.series( createControllerCode ) )
+gulp.task('remove_controller_scaffold', gulp.series( removeControllerCode ) )
+
+// -----------------------------------------------------------------------------
 // commands
 // -----------------------------------------------------------------------------
 
@@ -132,3 +165,6 @@ gulp.task('build', gulp.series( gulp.parallel('vendor-js', 'mixer-js') ) ); // b
 // create thumbnails /directory
 // create_mixer
 // create_controller
+
+// create_remote  ? 
+// create_editor ?

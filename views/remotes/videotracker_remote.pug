@@ -1,0 +1,42 @@
+doctype html
+html
+  head
+    title= title
+    meta(name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui')
+    
+    script(src='/javascripts/build/vendor.js')
+    script(src='/javascripts/build/mixer.js')    
+    //link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/remotes/videotracker_remote.css')
+
+  body
+    
+    header
+    
+    #page1_player.tracker_grid_container
+      #previews
+        |previews come here 
+        
+      #instruments.scrollable
+        table
+          - for(var j=0; j < 24; j++)
+            tr
+              td= j
+              td= "video" + j
+            
+        
+      #tracker 
+        |active tracker comes here
+        
+    #page2_instrument.instrument_grid_container
+      #effects1
+        active effects?
+      #effects2
+        active effects?
+        
+      #notes
+        cue points, through notes 
+        
+    // add remote javascript
+    script(src='/javascripts/remotes/videotracker_remote.js')
+    include ../partials/analytics
