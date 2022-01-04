@@ -17,8 +17,15 @@ html
     header
     
     #page1_player.tracker_grid_container
+
       #previews
-        |previews come here 
+        #master_previews  
+          canvas#glcanvas
+          canvas#monitoring_canvas
+          
+        #channel_previews
+          - for(var j=1; j <= 8; j++)
+            canvas.small(id="monitoring_canvas_"+j) 
         
       #instruments.scrollable
         table
@@ -29,29 +36,35 @@ html
             
         
       #tracker 
-        |active tracker comes here
-        | for now, actual canvas:
-        br
-        canvas#glcanvas
-        
-        br
-        | monitoring canvas
-        br
-        canvas#monitoring_canvas
       
-        br
-        | monitoring canvasses
-        canvas.small#monitoring_canvas_1  
-        canvas.small#monitoring_canvas_2
-        canvas.small#monitoring_canvas_3 
-        canvas.small#monitoring_canvas_4 
-        canvas.small#monitoring_canvas_5 
-        canvas.small#monitoring_canvas_6 
-        canvas.small#monitoring_canvas_7
-        canvas.small#monitoring_canvas_8 
-        canvas.small#monitoring_canvas_9
-        canvas.small#monitoring_canvas_10
+        table.header
+          tr
+            th /
+            th channel 1
+            th channel 2
+            th channel 3
+            th channel 4
+            th channel 5
+            th channel 6
+            th channel 7
+            th channel 8
         
+        #main_table
+          #highlight
+          table
+            tr            
+            - for(var row=0; row < 64; row++)
+              - var klass = (row%4 == 0 ? 'highlight_beat' : '')
+                tr(class=klass)
+                  td.mono.trnum= row
+                  - for(var col=0; col < 8; col++)
+                    td.mono(data-row=row, data-col=col, data-rowcol=row+","+col)
+                      .trigger_cell
+                        span.index ..
+                        span.cue ...
+                        span.effect ..
+                        span.effect_extra ..
+
     #page2_instrument.instrument_grid_container
       #effects1
         active effects?

@@ -16,18 +16,6 @@ header
 .scrollable
   overflow-y: auto
 
-canvas
-  background-color: black
-  width: 320px !important
-  height: 240px !important
-
-canvas.small
-  background-color: purple
-  width: 128px !important
-  height: 64px !important
-  display: inline
-  margin: 2px
-
 @mixin grid_container
   position: absolute
   display: grid
@@ -48,13 +36,41 @@ canvas.small
   height: calc( 100vh - 50px )
   width: 100vw
   background-color: orange
-  grid-template-columns: 4f
+  grid-template-columns: 26.66% 26.66% 26.66% 20%
   grid-template-rows: 25% 75%
   grid-template-areas: "previews previews previews instruments" "tracker tracker tracker tracker"
 
 #previews
   grid-area: previews
   background-color: blue
+  overflow: hidden
+  display: flex
+
+  #master_previews
+    display: flex
+    width: 40vw
+    justify-content: space-around
+    align-items: center;
+
+    canvas
+      background-color: black
+      width: 45% !important
+      height: 80% !important
+      display: inline
+
+  #channel_previews
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-around
+    align-items: center;
+    width: 60vw
+
+    canvas.small
+      background-color: purple
+      width: 24% !important
+      height: 90px !important
+      display: inline
+      margin: 2px
 
 #instruments
   grid-area: instruments
@@ -63,6 +79,62 @@ canvas.small
 #tracker
   grid-area: tracker
   background-color: grey
+  height: calc( 100vh - 230px)
+  overflow-x: hidden
+  overflow-y: scroll
+
+  #main_table
+    top: 50%
+    margin-bottom: 514px
+    position: relative
+    width: 100%
+
+    #highlight
+      position: fixed
+      opacity: 0.5
+      background-color: yellow
+      height: 14px
+      width: 100%
+      margin-top: 4px
+
+  table.header
+    position: fixed
+    z-index: 1
+    background-color: grey
+
+  table
+    border-color: black
+    border-width: 5px
+    width: 100%
+
+    td.trnum
+      text-align: center
+
+    td.mono
+      font-family: monospace
+      font-size: 10px
+      background: black
+      color: white
+
+    tr.highlight_beat td
+      background-color: #999
+
+    td
+      .trigger_cell
+        display: flex
+        flex-direction: row
+        flex-wrap: nowrap
+        justify-content: space-around
+
+        .index
+          display: inline-block
+
+        .note
+          display: inline-block
+
+        .effect
+          display: inline-block
+
 
 .instrument_grid_container
   @include grid_container
