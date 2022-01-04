@@ -16,6 +16,18 @@ header {
 .scrollable {
   overflow-y: auto; }
 
+canvas {
+  background-color: black;
+  width: 320px !important;
+  height: 240px !important; }
+
+canvas.small {
+  background-color: purple;
+  width: 128px !important;
+  height: 64px !important;
+  display: inline;
+  margin: 2px; }
+
 .tracker_grid_container {
   position: absolute;
   display: grid;

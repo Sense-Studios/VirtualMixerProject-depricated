@@ -253,7 +253,6 @@ var Mixer = class {
     var fadeTo = "b"
     var fadeDuration = 0
 
-    /** @function Addon#Mixer~update */
 
     /**
      * @description

@@ -90,9 +90,6 @@ function AudioAnalysis( _renderer, _options ) {
   /** @member Addon#AudioAnalysis.sec */
   _self.sec = 0
 
-  /** @member Addon#AudioAnalysis.count */
-  _self.count = 0
-
   /** @member Addon#AudioAnalysis.dataSet */
   _self.dataSet
 
@@ -277,56 +274,8 @@ function AudioAnalysis( _renderer, _options ) {
     nodes.push( _callback )
   }
 
-  // SYNC
-  // syncs the bpm again on the first beat
-  /** @function Addon#AudioAnalysis#sync */
-  _self.sync = function() {
-    starttime = new Date().getTime()
-  }
-
-  // TODO: getBlackOut
-  // tries and detects "blackouts", no sound or no-beat moments
-  /** @function Addon#AudioAnalysis#getBlackOut */
-  _self.getBlackOut = function() {
-
-  }
-
-  // TODO: getAmbience
-  // tries and detects "ambience", or the complexity/ sphere of sounds
-  /** @function Addon#AudioAnalysis#getAmbience */
-  _self.getAmbience = function() {
-
-  }
-
-  // TODO: getHighLevels -> also check this tutorial
-  // https://www.youtube.com/watch?v=gUELH_B2wsE
-  // returns 1 on high level tick
-  /** @function Addon#AudioAnalysis#getHighLevels */
-  _self.getHighLevels = function() {
-
-  }
-
-  // TODO: getMidLevels
-  // returns 1 on mid level tick
-  /** @function Addon#AudioAnalysis#getMidLevels */
-  _self.getMidLevels = function() {
-
-  }
-
-  // TODO: getLowLevels
-  // returns 1 on low level tick
-  /** @function Addon#AudioAnalysis#getLowLevels */
-  _self.getLowLevels = function() {
-
-  }
-
-
-  // ----------------------------------------------------------------------------
-
   // UPDATE
   /** @function Addon#AudioAnalysis~update */
-  _self.delayed_bpm = 128
-  _self.use_delay = true
   _self.update = function() {
     if ( _self.bypass ) return
 
@@ -341,28 +290,10 @@ function AudioAnalysis( _renderer, _options ) {
       });
     }
 
-    // TODO: shouldn't we have a "sync"
-    // function here, that only updates after 4 beats
-    // and resets to the first beat ?
-    // --> resetting start time, should do this
-
-    // TODO: if confidence is low, don't switch ?
-
     // set new numbers
     _self.bpm = _self.tempodata_bpm
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.count = c
-    //c = 0
-
-    // make it float toward the right number
-    if ( _self.use_delay ) {
-      if ( _self.delayed_bpm < _self.bpm  ) { _self.delayed_bpm += 0.1 }
-      if ( _self.delayed_bpm > _self.bpm  ) { _self.delayed_bpm -= 0.1 }
-    }else{
-      _self.delayed_bpm = _self.bpm
-    }
-
-    _self.sec = c * Math.PI * ( _self.delayed_bpm * _self.mod) / 60 // * _self.mod
+    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60 // * _self.mod
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2    // Math.sin( 128 / 60 )
   }
 
@@ -588,7 +519,6 @@ function AudioAnalysis( _renderer, _options ) {
         }
         html += ']<br/>'
       })
-
       if (document.getElementById('info') != null) {
         document.getElementById('info').html = html
       }
@@ -1169,29 +1099,12 @@ function GiphyManager( _source ) {
    * @description same as [search]{@link Addon#Needle#Gyphymanager#search}
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
-   * @param {function} callback - function to call when done
    */
 
   _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
-    //u.get('https://api.giphy.com/v1/gifs/trending?api_key=tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu&limit=300', function(d) {
-      console.log(" === GIPHY (re)LOADED SERACH: " + _needle + " === ")
-      _self.programs = JSON.parse(d).data
-      if (_callback != undefined) _callback ()
-    })
-  }
-
-  /**
-   * @description Get Trending Gifs from Giphy
-   * @function Addon#Gyphymanager#trending
-   * @param {function} callback - function to call when done
-   */
-
-  _self.trending = function( _callback ) {
-    var u = new Utils()
-    u.get('https://api.giphy.com/v1/gifs/trending?api_key=tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu&limit=300', function(d) {
-      console.log(" === GIPHY (re)LOADED TRENDING! === ")
+      console.log(" === GIPHY (re)LOADED === ")
       _self.programs = JSON.parse(d).data
       if (_callback != undefined) _callback ()
     })
@@ -3725,85 +3638,84 @@ var Chain = class {
 
   constructor( renderer, options ) {
 
-    // create and instance
-    var _self = this;
+  // create and instance
+  var _self = this;
 
-    // set or get uid
-    if ( options.uuid == undefined ) {
-      _self.uuid = "Chain_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-    } else {
-      _self.uuid = options.uuid
-    }
+  // set or get uid
+  if ( options.uuid == undefined ) {
+    _self.uuid = "Chain_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
 
-    // add to renderer
-    renderer.add(_self)
+  // add to renderer
+  renderer.add(_self)
 
-    // set options
-    var _options;
-    if ( options != undefined ) _options = options
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options
 
-    _self.type = "Module"
-    _self.sources = _options.sources
+  _self.type = "Module"
+  _self.sources = _options.sources
 
-    // add source alpha to custom uniforms
+  // add source alpha to custom uniforms
+  _self.sources.forEach( function( source, index ) {
+    renderer.customUniforms[_self.uuid+'_source'+index+'_'+'alpha'] = { type: "f", value: 0.5 }
+  })
+
+  // add source uniforms to fragmentshader
+  _self.sources.forEach( function( source, index ) {
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
+  })
+
+  // add chain output and chain alpha to shader
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_'+'alpha;\n/* custom_uniforms */')
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+
+  _self.init = function() {
+    // bould output module
+    var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
     _self.sources.forEach( function( source, index ) {
-      renderer.customUniforms[_self.uuid+'_source'+index+'_'+'alpha'] = { type: "f", value: 0.5 }
+      generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
+    });
+    //generatedOutput += ";\n"
+
+    // put it in the shader
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
+
+  }
+
+  _self.update = function() {}
+
+  // ---------------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------------
+  _self.setChainLink = function( _num, _alpha ) {
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
+  }
+
+  _self.getChainLink = function( _num ) {
+    return renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value
+  }
+
+  _self.setAll = function( _alpha = 0 ) {
+    _self.sources.forEach( function( _num,i ) {
+      renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
     })
+  }
 
-    // add source uniforms to fragmentshader
-    _self.sources.forEach( function( source, index ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
-    })
-
-    // add chain output and chain alpha to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_'+'alpha;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
-
-    _self.init = function() {
-      // bould output module
-      var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
-      _self.sources.forEach( function( source, index ) {
-        generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
-      });
-      //generatedOutput += ";\n"
-
-      // put it in the shader
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-  vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
-
+  _self.toggle = function( _num, _state ) {
+    if ( _state !== undefined ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
+      return;
     }
 
-    _self.update = function() {}
-
-    // ---------------------------------------------------------------------------
-    // HELPERS
-    // ---------------------------------------------------------------------------
-    _self.setChainLink = function( _num, _alpha ) {
-      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
-    }
-
-    _self.getChainLink = function( _num ) {
-      return renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value
-    }
-
-    _self.setAll = function( _alpha = 0 ) {
-      _self.sources.forEach( function( _num,i ) {
-        renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
-      })
-    }
-
-    _self.toggle = function( _num, _state ) {
-      if ( _state !== undefined ) {
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
-        return;
-      }
-
-      if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
-      }else{
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-        current = _num
-      }
+    if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
+    }else{
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
+      current = _num
     }
   }
 }
@@ -4062,7 +3974,6 @@ var Mixer = class {
     var fadeTime = 0
     var fadeTo = "b"
     var fadeDuration = 0
-
 
     /**
      * @description
@@ -4454,7 +4365,7 @@ var Monitor = class {
       */
 
       // create an internal renderer
-      _self.internal_renderer = new GlRenderer({element: options.element});
+      _self.internal_renderer = new GlRenderer({element: 'monitoring_canvas'});
 
       // copy the fragment and vertex shader so far
       _self.internal_renderer.fragmentShader = _self.renderer.fragmentShader
@@ -4759,7 +4670,6 @@ function GifSource( renderer, options ) {
   }
 
   var c = 0;
-  _self.update_mod = 2
   _self.update = function() {
 
     // FIXME: something evil happened here.
@@ -4767,7 +4677,7 @@ function GifSource( renderer, options ) {
     try {
       // modulo is here because gif encoding is insanley expensive
       // TODO: MAKE THE MODULE SETTABLE.
-      if (c%_self.update_mod == 0) {
+      if (c%6 == 0) {
         canvasElementContext.clearRect(0, 0, 1024, 1024);
         canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
         if ( gifTexture ) gifTexture.needsUpdate = true;
