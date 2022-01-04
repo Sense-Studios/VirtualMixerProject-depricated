@@ -19,7 +19,17 @@ html
     #page1_player.tracker_grid_container
       #previews
         |previews come here 
-        
+        br
+        | monitoring canvasses
+        canvas.small#monitoring_canvas_1  
+        canvas.small#monitoring_canvas_2
+        canvas.small#monitoring_canvas_3 
+        canvas.small#monitoring_canvas_4 
+        canvas.small#monitoring_canvas_5 
+        canvas.small#monitoring_canvas_6 
+        canvas.small#monitoring_canvas_7
+        canvas.small#monitoring_canvas_8 
+                  
       #instruments.scrollable
         table
           - for(var j=0; j < 24; j++)
@@ -39,18 +49,7 @@ html
         br
         canvas#monitoring_canvas
       
-        br
-        | monitoring canvasses
-        canvas.small#monitoring_canvas_1  
-        canvas.small#monitoring_canvas_2
-        canvas.small#monitoring_canvas_3 
-        canvas.small#monitoring_canvas_4 
-        canvas.small#monitoring_canvas_5 
-        canvas.small#monitoring_canvas_6 
-        canvas.small#monitoring_canvas_7
-        canvas.small#monitoring_canvas_8 
-        canvas.small#monitoring_canvas_9
-        canvas.small#monitoring_canvas_10
+
         
     #page2_instrument.instrument_grid_container
       #effects1

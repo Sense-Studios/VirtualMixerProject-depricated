@@ -32,8 +32,6 @@ var monitor5 = new Monitor( renderer, { source: source1, element: 'monitoring_ca
 var monitor6 = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas_6' })
 var monitor7 = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas_7' })
 var monitor8 = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas_8' })
-var monitor9 = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas_9' })
-var monitor10 = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas_10' })
 
 // final out
 var output = new Output( renderer, c_effect )
