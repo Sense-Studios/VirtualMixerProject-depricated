@@ -5,7 +5,10 @@ html
     meta(name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui')
     
     script(src='/javascripts/build/vendor.js')
-    script(src='/javascripts/build/mixer.js')    
+    script(src='/javascripts/build/mixer.js')
+    script(src='/javascripts/src/GlRenderer.js')
+    script(src='/javascripts/src/modules/Mixer.js')
+    script(src='/javascripts/src/modules/Monitor.js')
     //link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/remotes/videotracker_remote.css')
 
@@ -27,6 +30,27 @@ html
         
       #tracker 
         |active tracker comes here
+        | for now, actual canvas:
+        br
+        canvas#glcanvas
+        
+        br
+        | monitoring canvas
+        br
+        canvas#monitoring_canvas
+      
+        br
+        | monitoring canvasses
+        canvas.small#monitoring_canvas_1  
+        canvas.small#monitoring_canvas_2
+        canvas.small#monitoring_canvas_3 
+        canvas.small#monitoring_canvas_4 
+        canvas.small#monitoring_canvas_5 
+        canvas.small#monitoring_canvas_6 
+        canvas.small#monitoring_canvas_7
+        canvas.small#monitoring_canvas_8 
+        canvas.small#monitoring_canvas_9
+        canvas.small#monitoring_canvas_10
         
     #page2_instrument.instrument_grid_container
       #effects1

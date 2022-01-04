@@ -3638,85 +3638,84 @@ var Chain = class {
 
   constructor( renderer, options ) {
 
-    // create and instance
-    var _self = this;
+  // create and instance
+  var _self = this;
 
-    // set or get uid
-    if ( options.uuid == undefined ) {
-      _self.uuid = "Chain_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
-    } else {
-      _self.uuid = options.uuid
-    }
+  // set or get uid
+  if ( options.uuid == undefined ) {
+    _self.uuid = "Chain_" + (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
+  } else {
+    _self.uuid = options.uuid
+  }
 
-    // add to renderer
-    renderer.add(_self)
+  // add to renderer
+  renderer.add(_self)
 
-    // set options
-    var _options;
-    if ( options != undefined ) _options = options
+  // set options
+  var _options;
+  if ( options != undefined ) _options = options
 
-    _self.type = "Module"
-    _self.sources = _options.sources
+  _self.type = "Module"
+  _self.sources = _options.sources
 
-    // add source alpha to custom uniforms
+  // add source alpha to custom uniforms
+  _self.sources.forEach( function( source, index ) {
+    renderer.customUniforms[_self.uuid+'_source'+index+'_'+'alpha'] = { type: "f", value: 0.5 }
+  })
+
+  // add source uniforms to fragmentshader
+  _self.sources.forEach( function( source, index ) {
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
+  })
+
+  // add chain output and chain alpha to shader
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_'+'alpha;\n/* custom_uniforms */')
+  renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
+
+  _self.init = function() {
+    // bould output module
+    var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
     _self.sources.forEach( function( source, index ) {
-      renderer.customUniforms[_self.uuid+'_source'+index+'_'+'alpha'] = { type: "f", value: 0.5 }
+      generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
+    });
+    //generatedOutput += ";\n"
+
+    // put it in the shader
+    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
+vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
+
+  }
+
+  _self.update = function() {}
+
+  // ---------------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------------
+  _self.setChainLink = function( _num, _alpha ) {
+    renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
+  }
+
+  _self.getChainLink = function( _num ) {
+    return renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value
+  }
+
+  _self.setAll = function( _alpha = 0 ) {
+    _self.sources.forEach( function( _num,i ) {
+      renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
     })
+  }
 
-    // add source uniforms to fragmentshader
-    _self.sources.forEach( function( source, index ) {
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_source'+index+'_'+'alpha;\n/* custom_uniforms */')
-    })
-
-    // add chain output and chain alpha to shader
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform float '+_self.uuid+'_'+'alpha;\n/* custom_uniforms */')
-    renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_uniforms */', 'uniform vec3 '+_self.uuid+'_output;\n/* custom_uniforms */')
-
-    _self.init = function() {
-      // bould output module
-      var generatedOutput = "vec4(0.0,0.0,0.0,0.0)"
-      _self.sources.forEach( function( source, index ) {
-        generatedOutput += ' + ('+source.uuid+'_'+'output * '+_self.uuid+'_source'+index+'_'+'alpha )'
-      });
-      //generatedOutput += ";\n"
-
-      // put it in the shader
-      renderer.fragmentShader = renderer.fragmentShader.replace('/* custom_main */', '\
-  vec4 '+_self.uuid+'_output = vec4( '+generatedOutput+'); \/* custom_main */')
-
+  _self.toggle = function( _num, _state ) {
+    if ( _state !== undefined ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
+      return;
     }
 
-    _self.update = function() {}
-
-    // ---------------------------------------------------------------------------
-    // HELPERS
-    // ---------------------------------------------------------------------------
-    _self.setChainLink = function( _num, _alpha ) {
-      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _alpha
-    }
-
-    _self.getChainLink = function( _num ) {
-      return renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value
-    }
-
-    _self.setAll = function( _alpha = 0 ) {
-      _self.sources.forEach( function( _num,i ) {
-        renderer.customUniforms[_self.uuid+'_source'+i+'_'+'alpha'].value = _alpha
-      })
-    }
-
-    _self.toggle = function( _num, _state ) {
-      if ( _state !== undefined ) {
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = _state
-        return;
-      }
-
-      if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
-      }else{
-        renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
-        current = _num
-      }
+    if ( renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value == 1 ) {
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 0
+    }else{
+      renderer.customUniforms[_self.uuid+'_source'+_num+'_'+'alpha'].value = 1
+      current = _num
     }
   }
 }
@@ -3975,7 +3974,6 @@ var Mixer = class {
     var fadeTime = 0
     var fadeTo = "b"
     var fadeDuration = 0
-
 
     /**
      * @description
