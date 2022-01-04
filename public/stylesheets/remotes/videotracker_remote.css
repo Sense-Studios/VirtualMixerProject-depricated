@@ -16,18 +16,6 @@ header {
 .scrollable {
   overflow-y: auto; }
 
-canvas {
-  background-color: black;
-  width: 320px !important;
-  height: 240px !important; }
-
-canvas.small {
-  background-color: purple;
-  width: 128px !important;
-  height: 64px !important;
-  display: inline;
-  margin: 2px; }
-
 .tracker_grid_container {
   position: absolute;
   display: grid;
@@ -35,13 +23,37 @@ canvas.small {
   height: calc( 100vh - 50px);
   width: 100vw;
   background-color: orange;
-  grid-template-columns: 4f;
+  grid-template-columns: 26.66% 26.66% 26.66% 20%;
   grid-template-rows: 25% 75%;
   grid-template-areas: "previews previews previews instruments" "tracker tracker tracker tracker"; }
 
 #previews {
   grid-area: previews;
-  background-color: blue; }
+  background-color: blue;
+  overflow: hidden;
+  display: flex; }
+  #previews #master_previews {
+    display: flex;
+    width: 40vw;
+    justify-content: space-around;
+    align-items: center; }
+    #previews #master_previews canvas {
+      background-color: black;
+      width: 45% !important;
+      height: 80% !important;
+      display: inline; }
+  #previews #channel_previews {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    width: 60vw; }
+    #previews #channel_previews canvas.small {
+      background-color: purple;
+      width: 24% !important;
+      height: 90px !important;
+      display: inline;
+      margin: 2px; }
 
 #instruments {
   grid-area: instruments;
@@ -49,7 +61,50 @@ canvas.small {
 
 #tracker {
   grid-area: tracker;
-  background-color: grey; }
+  background-color: grey;
+  height: calc( 100vh - 230px);
+  overflow-x: hidden;
+  overflow-y: scroll; }
+  #tracker #main_table {
+    top: 50%;
+    margin-bottom: 514px;
+    position: relative;
+    width: 100%; }
+    #tracker #main_table #highlight {
+      position: fixed;
+      opacity: 0.5;
+      background-color: yellow;
+      height: 14px;
+      width: 100%;
+      margin-top: 4px; }
+  #tracker table.header {
+    position: fixed;
+    z-index: 1;
+    background-color: grey; }
+  #tracker table {
+    border-color: black;
+    border-width: 5px;
+    width: 100%; }
+    #tracker table td.trnum {
+      text-align: center; }
+    #tracker table td.mono {
+      font-family: monospace;
+      font-size: 10px;
+      background: black;
+      color: white; }
+    #tracker table tr.highlight_beat td {
+      background-color: #999; }
+    #tracker table td .trigger_cell {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-around; }
+      #tracker table td .trigger_cell .index {
+        display: inline-block; }
+      #tracker table td .trigger_cell .note {
+        display: inline-block; }
+      #tracker table td .trigger_cell .effect {
+        display: inline-block; }
 
 .instrument_grid_container {
   position: absolute;
