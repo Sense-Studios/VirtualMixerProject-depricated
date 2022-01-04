@@ -3,10 +3,13 @@ FeedbackEffect.constructor = FeedbackEffect;  // re-assign constructor
 
 /**
  * @summary
- *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
+ *   The Feedback effect has a series of tests for feedback like effects through
+ *   redrawing on an extra canvas
  *   Effects Example on codepen:
  *   <a href="https://codepen.io/xangadix/pen/eXLGwJ" target="_blank">codepen</a>
+ *   ( demo of al the vmx effects )
  *
+
  * @description
  *   The Feedback effect has a series of tests for feedback like effects through redrawing on an extra canvas
  *   mimicing classic mixers like MX50 and V4
@@ -57,11 +60,11 @@ function FeedbackEffect( _renderer, _options ) {
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
   var data = new Uint8Array( textureSize * textureSize * 3 );
-  //var dataTexture = new THREE.DataTexture( canvasElement );
-  //var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
-  //dataTexture.minFilter = THREE.NearestFilter;
-	//dataTexture.magFilter = THREE.NearestFilter;
-	//dataTexture.needsUpdate = true;
+  // var dataTexture = new THREE.DataTexture( canvasElement );
+  // var dataTexture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+  // dataTexture.minFilter = THREE.NearestFilter;
+	// dataTexture.magFilter = THREE.NearestFilter;
+	// dataTexture.needsUpdate = true;
 
   var canvasElement, canvasContext, effectsTexture
 
@@ -110,7 +113,7 @@ function FeedbackEffect( _renderer, _options ) {
       vec2 wuv = vec2(0.,0.);
       // wuv = vUv * vec2( 1.0, 1.0 ) - vec2( 0., 0. );
       wuv = vUv; //* vec2( 1.0, 1.0 ) - vec2( 0., 0. );
-      //wuv = vUv - vec2( 0.1, 0. );
+      // wuv = vUv - vec2( 0.1, 0. );
       // wuv = vUv + vec2( extra, extra );
       // return texture2D( src, wuv ).rgba;
 
@@ -122,8 +125,8 @@ function FeedbackEffect( _renderer, _options ) {
       // return ( texture2D( src, vUv ).rgb );
       // return ( texture2D( `+_self.uuid+`_effectsampler, vUv  ).rgb ) * src + src;
 
-      //vec4 wuv = wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
-      //vec4 tex = texture2D( `+_self.uuid+`_effectsampler, wuv ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
+      // vec4 wuv = wuv = vUv * vec2( extra*6., extra*6. ) - vec2( extra * 3., extra * 3. );
+      // vec4 tex = texture2D( `+_self.uuid+`_effectsampler, wuv ); //+ vec4( src.r, src.g, src.b, vUv * 2. );
 
       // return src.rrr;
       // tex.rgb = vec3(src.r, src.g, src.b);
@@ -177,7 +180,7 @@ vec4 '+_self.uuid+'_output = feedbackeffect( '+source.uuid+'_output, ' + _self.u
   https://github.com/samhains/minimal-threejs-feedback-glsl/blob/master/index.html
 
   Either we build another three JS texture here, OR we switch from render
-  engine and move over to another core engine like reGL
+  engine and move over to another core engine like ReGL
 */
 
 // -----------------------------------------------------------------------------

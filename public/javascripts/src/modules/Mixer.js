@@ -1,7 +1,7 @@
 /**
  * @summary
  *    A mixer mixes two sources together.
- *    Mixer example on codepen: 
+ *    Mixer example on codepen:
  *    <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a>
  *
  * @description
@@ -121,6 +121,18 @@ var Mixer = class {
 
   static function_list() {
     return [["BLEND", "method","blendMode"], ["MIX", "method","mixMode"], ["POD", "set", "pod"] ]
+  }
+
+  static show_blendmodes() {
+    return []
+  }
+
+  static show_mixmodes() {
+    return []
+  }
+
+  static help() {
+    return "ownoes"
   }
 
   constructor( renderer, options ) {
@@ -245,15 +257,11 @@ var Mixer = class {
 
     /**
      * @description
-     *  binds _currentBpmFunc_ to a function
-     *  whatever BPM _currentBpmFunc_ returns will be bpm used.
-     *  it's called on update
+     *  Updates the mixer, called by the renderer
      * @example
-     *   var mixer1 = new Mixer( renderer, { source1: file, source2: file})
-     *   var audioanalysis = new AudioAnalysis( renderer, { audio: file })
-     *   audioanalysis.bindBPM( audioanalysis.getBPM() * 0.5 )
-     * @function Module#Mixer#bindBpm
-     * @param {function} binding allows for overriding internal bpm
+     *  m = Mixer.new
+     *  m.update()
+     * @function Module#Mixer#update
      */
 
     _self.update = function() {
