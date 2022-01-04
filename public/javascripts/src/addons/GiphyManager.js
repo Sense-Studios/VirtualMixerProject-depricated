@@ -42,12 +42,29 @@ function GiphyManager( _source ) {
    * @description same as [search]{@link Addon#Needle#Gyphymanager#search}
    * @function Addon#Gyphymanager#needle
    * @param {string} query - Search term
+   * @param {function} callback - function to call when done
    */
 
   _self.needle = function( _needle, _callback ) {
     var u = new Utils()
     u.get('//api.giphy.com/v1/gifs/search?api_key='+key+'&q='+_needle, function(d) {
-      console.log(" === GIPHY (re)LOADED === ")
+    //u.get('https://api.giphy.com/v1/gifs/trending?api_key=tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu&limit=300', function(d) {
+      console.log(" === GIPHY (re)LOADED SERACH: " + _needle + " === ")
+      _self.programs = JSON.parse(d).data
+      if (_callback != undefined) _callback ()
+    })
+  }
+
+  /**
+   * @description Get Trending Gifs from Giphy
+   * @function Addon#Gyphymanager#trending
+   * @param {function} callback - function to call when done
+   */
+
+  _self.trending = function( _callback ) {
+    var u = new Utils()
+    u.get('https://api.giphy.com/v1/gifs/trending?api_key=tIovPHdiZhUF3w0UC6ETdEzjYOaFZQFu&limit=300', function(d) {
+      console.log(" === GIPHY (re)LOADED TRENDING! === ")
       _self.programs = JSON.parse(d).data
       if (_callback != undefined) _callback ()
     })

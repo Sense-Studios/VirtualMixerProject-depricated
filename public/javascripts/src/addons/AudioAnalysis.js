@@ -75,6 +75,9 @@ function AudioAnalysis( _renderer, _options ) {
   /** @member Addon#AudioAnalysis.sec */
   _self.sec = 0
 
+  /** @member Addon#AudioAnalysis.count */
+  _self.count = 0
+
   /** @member Addon#AudioAnalysis.dataSet */
   _self.dataSet
 
@@ -259,8 +262,56 @@ function AudioAnalysis( _renderer, _options ) {
     nodes.push( _callback )
   }
 
+  // SYNC
+  // syncs the bpm again on the first beat
+  /** @function Addon#AudioAnalysis#sync */
+  _self.sync = function() {
+    starttime = new Date().getTime()
+  }
+
+  // TODO: getBlackOut
+  // tries and detects "blackouts", no sound or no-beat moments
+  /** @function Addon#AudioAnalysis#getBlackOut */
+  _self.getBlackOut = function() {
+
+  }
+
+  // TODO: getAmbience
+  // tries and detects "ambience", or the complexity/ sphere of sounds
+  /** @function Addon#AudioAnalysis#getAmbience */
+  _self.getAmbience = function() {
+
+  }
+
+  // TODO: getHighLevels -> also check this tutorial
+  // https://www.youtube.com/watch?v=gUELH_B2wsE
+  // returns 1 on high level tick
+  /** @function Addon#AudioAnalysis#getHighLevels */
+  _self.getHighLevels = function() {
+
+  }
+
+  // TODO: getMidLevels
+  // returns 1 on mid level tick
+  /** @function Addon#AudioAnalysis#getMidLevels */
+  _self.getMidLevels = function() {
+
+  }
+
+  // TODO: getLowLevels
+  // returns 1 on low level tick
+  /** @function Addon#AudioAnalysis#getLowLevels */
+  _self.getLowLevels = function() {
+
+  }
+
+
+  // ----------------------------------------------------------------------------
+
   // UPDATE
   /** @function Addon#AudioAnalysis~update */
+  _self.delayed_bpm = 128
+  _self.use_delay = true
   _self.update = function() {
     if ( _self.bypass ) return
 
@@ -275,10 +326,28 @@ function AudioAnalysis( _renderer, _options ) {
       });
     }
 
+    // TODO: shouldn't we have a "sync"
+    // function here, that only updates after 4 beats
+    // and resets to the first beat ?
+    // --> resetting start time, should do this
+
+    // TODO: if confidence is low, don't switch ?
+
     // set new numbers
     _self.bpm = _self.tempodata_bpm
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60 // * _self.mod
+    _self.count = c
+    //c = 0
+
+    // make it float toward the right number
+    if ( _self.use_delay ) {
+      if ( _self.delayed_bpm < _self.bpm  ) { _self.delayed_bpm += 0.1 }
+      if ( _self.delayed_bpm > _self.bpm  ) { _self.delayed_bpm -= 0.1 }
+    }else{
+      _self.delayed_bpm = _self.bpm
+    }
+
+    _self.sec = c * Math.PI * ( _self.delayed_bpm * _self.mod) / 60 // * _self.mod
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2    // Math.sin( 128 / 60 )
   }
 
@@ -504,6 +573,7 @@ function AudioAnalysis( _renderer, _options ) {
         }
         html += ']<br/>'
       })
+
       if (document.getElementById('info') != null) {
         document.getElementById('info').html = html
       }

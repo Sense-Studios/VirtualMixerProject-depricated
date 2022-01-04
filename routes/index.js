@@ -69,6 +69,49 @@ router.get('/nocorsaudio/*', function( req, res, next ) {
   res.sendFile( path.join(__dirname, '../public', repl_url) );
 });
 
+const fetch = require('node-fetch');
+router.get('/resolve_streamable/*', function( req, res, next ) {
+  //var repl_url = req.originalUrl.replace('/resolve_streamable', '/streamable')
+  var videoID = req.originalUrl.split('/resolve_streamable/')[1].split('/')[0]
+
+  console.log("get data for video id", videoID)
+  var apiurl = 'https://api.streamable.com/videos/' + videoID;
+  var get_data = request(apiurl)
+
+  fetch(apiurl)
+  .then(response => response.json())
+  .then( function(data) {
+    var newurl = data.files.mp4.url
+    console.log("new url", newurl)
+    //res.send(JSON.stringify(data));
+
+    request(newurl).pipe(res);
+  });
+
+
+  /*
+  res.writeHead(200, {
+    'Content-Length': total,
+    'Content-Type': 'video/mp4',
+    'Accept-Ranges': 'bytes',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'POST, GET, OPTIONS',
+  });
+  */
+
+  //var newurl = 'https://cdn-cf-east.streamable.com/video/mp4/n9k7d0.mp4?Expires=1630280880&Signature=Hp5DeP-k0IGb8y49-ky62ocQtWOA-cBvpjRJK5ISzOXd2y-2z961msR-cYTLJzKD1~1wFQjVuHmqlRn~QizrAf804XBSMqCo8-Dhlgt9GiYUiB94IIVHFHSHWDHGiG9vSAX7ZmZJwI-D4xyS30qSIGx0YbAaVJJGwdquzv4422U7G6RNI2~3sbuGHE84C6yAaHIm2JQ8Ngt8iTbQVjstSLIj27UGNnlF~KDerPfVkXzLVyTnzGn0K1IZEBXvQmlqmtN7UdCwqY-6jyYc~1AmD8U0DcN1K7zF5XcZ3egcR5foIiTvuDGBg7LDp8QyclvtSB2ftIVt2nqGhkIUi1iWfQ__&Key-Pair-Id=APKAIEYUVEN4EVB2OKEQ';
+  //res.header('Access-Control-Allow-Origin', '*');
+  //request(newurl).pipe(res);
+
+
+  // Access-Control-Allow-Origin: <origin> | *
+  // Origin
+  //res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  //res.header('Access-Control-Allow-Headers', 'Content-Type');
+  //res.sendFile( path.join(__dirname, '../public', repl_url) );
+});
+
 /* -------------------------------------------------------------------------- */
 
 var fs = require('fs');

@@ -100,6 +100,7 @@ function GifSource( renderer, options ) {
   }
 
   var c = 0;
+  _self.update_mod = 2
   _self.update = function() {
 
     // FIXME: something evil happened here.
@@ -107,7 +108,7 @@ function GifSource( renderer, options ) {
     try {
       // modulo is here because gif encoding is insanley expensive
       // TODO: MAKE THE MODULE SETTABLE.
-      if (c%6 == 0) {
+      if (c%_self.update_mod == 0) {
         canvasElementContext.clearRect(0, 0, 1024, 1024);
         canvasElementContext.drawImage( supergifelement.get_canvas(), 0, 0, 1024, 1024  );
         if ( gifTexture ) gifTexture.needsUpdate = true;
