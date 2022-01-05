@@ -5,7 +5,7 @@ var renderer = new GlRenderer({element: 'glcanvas'});
 // var bpm = new BPM()
 
 // channels
-var channel1_source = new VideoSource(renderer, { src: "/video/ignore/kinection_oily.mov" })
+var channel1_source = new VideoSource(renderer, { src: "" })
 //var channel1_filemanager = new FileManager( channel1_source )
 var channel1_effect = new ColorEffect( renderer, { source: channel1_source } )
 var channel1_monitor = new Monitor( renderer, { source: channel1_effect, element: 'monitoring_canvas_1' })
