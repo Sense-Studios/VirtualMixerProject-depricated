@@ -6,7 +6,7 @@ body, html {
   font-family: Menlo, Consolas, DejaVu Sans Mono, monospace; }
 
 header {
-  height: 50px;
+  height: 25px;
   width: 100vw;
   background-color: red;
   position: absolute;
@@ -19,12 +19,12 @@ header {
 .tracker_grid_container {
   position: absolute;
   display: grid;
-  top: 50px;
+  top: 25px;
   height: calc( 100vh - 50px);
   width: 100vw;
   background-color: orange;
   grid-template-columns: 26.66% 26.66% 26.66% 20%;
-  grid-template-rows: 25% 75%;
+  grid-template-rows: 312px;
   grid-template-areas: "previews previews previews instruments" "tracker tracker tracker tracker"; }
 
 #previews {
@@ -39,7 +39,7 @@ header {
     align-items: center; }
     #previews #master_previews canvas {
       background-color: black;
-      width: 45% !important;
+      width: 90% !important;
       height: 80% !important;
       display: inline; }
   #previews #channel_previews {
@@ -62,12 +62,12 @@ header {
 #tracker {
   grid-area: tracker;
   background-color: grey;
-  height: calc( 100vh - 230px);
   overflow-x: hidden;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  height: 800px; }
   #tracker #main_table {
-    top: 50%;
-    margin-bottom: 514px;
+    top: 250px;
+    margin-bottom: 780px;
     position: relative;
     width: 100%; }
     #tracker #main_table #highlight {
@@ -80,7 +80,7 @@ header {
   #tracker table.header {
     position: fixed;
     z-index: 1;
-    background-color: grey; }
+    background-color: darkgrey; }
   #tracker table {
     border-color: black;
     border-width: 5px;

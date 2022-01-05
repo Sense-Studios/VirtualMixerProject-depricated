@@ -92,11 +92,12 @@ function VideoSource(renderer, options) {
     }, 400 )
 
     function firstTouch() {
+      return
       videoElement.play();
       _self.firstplay = true
       document.body.removeEventListener('click', firstTouch)
       document.body.removeEventListener('touchstart', firstTouch)
-
+      console.log("first touch was denied")
     }
     // firstload handler for mobile; neest at least 1 user click
     document.body.addEventListener('click', firstTouch)
