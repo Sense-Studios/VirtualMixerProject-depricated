@@ -5,7 +5,7 @@ var renderer = new GlRenderer({element: 'glcanvas'});
 // var bpm = new BPM()
 
 // channels
-var channel1_source = new VideoSource(renderer, { src: "/video/ignore/kinection_oily.mov" })
+var channel1_source = new VideoSource(renderer, { src: "" })
 //var channel1_filemanager = new FileManager( channel1_source )
 var channel1_effect = new ColorEffect( renderer, { source: channel1_source } )
 var channel1_monitor = new Monitor( renderer, { source: channel1_effect, element: 'monitoring_canvas_1' })
@@ -71,92 +71,94 @@ renderer.render();       // start update & animation
 // c_effect.effect(14)
 // contrast.effect(61)
 // contrast.extra(0.4)
+var INSTRUMENTS = []
 
-// -----------------------------------------------------------------------------
-var instruments_data = [
-  ["01", "/video/16MMDUSTproc.mp4"],
-  ["02", "/video/16MMDUSTproc.mp4"],
-  ["03", "/video/16MMDUSTproc.mp4"]
-]
+// add something something
+INSTRUMENTS.push("/video/ignore/dune/Armies.mp4")
+INSTRUMENTS.push("/video/ignore/dune/Armies_2.mp4")
+INSTRUMENTS.push("/video/ignore/dune/duncan_approaching.mp4")
+INSTRUMENTS.push("/video/ignore/dune/face_duncan.mp4")
+INSTRUMENTS.push("/video/ignore/dune/the_desert_2.mp4")
+INSTRUMENTS.push("/video/ignore/dune/welcome_to_gidi_prime.mp4")
 
-// id, cue_time, effect_nuk, effect_value
+// id, opaacity, cue_time, effect_nuk, effect_value
 var initial_data = [
-  [ ["01", "123", "0", "0"],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ ["01", "123", "0", "0"],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01", "123", "0", "0"],[],[],[],[],[],[],[] ],
+  [ [1,1],[2,1],[2,1],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01", "123", "0", "0"],[],[],[],[],[],[],[] ],
+  [ [1,0],[2,0,1.0],[2,1,1.0],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,1],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0],[2,0],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[] ],
+  [ [1,0],[],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[],[] ],
+
+  [ [],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0, 0],[2,0],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0],[2,1],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[] ],
+  [ [1,0],[],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[],[] ],
+
+  [ [],[],[2,0],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0,1.0],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [],[2,0],[4,1],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0],[2,1],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[] ],
+  [ [1,0],[],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[],[] ],
+
+  [ [],[2,0],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [1,0],[2,1],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[] ],
+  [ [1,0],[],[],[],[],[],[],[] ],
+  [ [1,1],[],[],[],[],[],[],[] ],
+
+  [ [1,0],[2,0],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ ["01"],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ ["01"],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ ["01"],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ ["01"],[],[],[],[],[],[],[] ],
+  [ [],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ]
@@ -165,6 +167,17 @@ var initial_data = [
 var is_playing = false
 var bpm = 133
 
+var build_instruments = function( _instruments ) {
+  INSTRUMENTS.forEach((instrument, i) => {
+    //var elm = document.getElementById('#instrument')
+    var table = document.getElementById('instruments').children[0]
+    table.innerHTML = table.innerHTML + "<tr><td>" + i + "</td><td>" + instrument + "</td></tr>"
+
+  });
+
+}
+
+build_instruments(INSTRUMENTS)
 
 var fill_values = function( _val ) {
   _val.forEach((row, x) => {
@@ -175,11 +188,12 @@ var fill_values = function( _val ) {
         console.log("has col: ", col, "rowcol: ", x, y, elm)
 
         // starts the index of an instrument
-        elm.querySelector('.index').textContent = col[0]
-
-        if (col[1]) elm.querySelector('.cue').textContent = col[1]
-        if (col[2]) elm.querySelector('.effect').textContent = col[2]
-        if (col[3]) elm.querySelector('.effect_extra').textContent = col[3]
+        // elm.querySelector('.index').textContent = col[0]
+        if ( !isNaN(col[0]) ) elm.querySelector('.index').textContent = col[0]
+        if ( !isNaN(col[1]) ) elm.querySelector('.opacity').textContent = col[1]
+        if ( !isNaN(col[2]) ) elm.querySelector('.cue').textContent = col[2]
+        if ( !isNaN(col[3]) ) elm.querySelector('.effect').textContent = col[3]
+        if ( !isNaN(col[4]) ) elm.querySelector('.effect_extra').textContent = col[4]
       }
     });
   });
@@ -194,16 +208,54 @@ var update = function() {
     elm.scrollBy(0,16)
     //if ( (elm.scrollTop/16)%4 == 0 ) console.log( elm.scrollTop/16 )
 
-    current_id = elm.scrollTop/16
+    current_id = elm.scrollTop/16 // row
     selectedElements = document.querySelectorAll('td[data-row="'+current_id+'"]')
     selectedElements.forEach(function( item, i ) {
       var index = item.querySelector('.index').textContent
-      var note = item.querySelector('.note').textContent
+      var opacity = item.querySelector('.opacity').textContent
+      var cue = item.querySelector('.cue').textContent
       var effect = item.querySelector('.effect').textContent
       var effect_extra = elm.querySelector('.effect_extra').textContent
 
-      if ( note != ".....") {
-        console.log("got something ", note)
+      if ( !isNaN(index) || !isNaN(opacity) || !isNaN(cue) || !isNaN(effect) || !isNaN(effect_extra) ) {
+        console.log("got something",i," ------ ")
+        console.log( item.dataset )
+        console.log("index ", index )
+        console.log("opacity ", opacity )
+        console.log("cue ", cue )
+        console.log("effect ", effect )
+        console.log("effect_extra ", effect_extra )
+
+        if ( !isNaN(index) ) {
+          var channel = Number(item.dataset.col) + 1
+          var source = window["channel" + channel + "_source"]
+          console.log("should update:", source.video.src.indexOf(INSTRUMENTS[ index ]), INSTRUMENTS[ index ], source.video.src )
+          if ( source.video.src.indexOf(INSTRUMENTS[ index ]) == -1 ) {
+            source.video.src = INSTRUMENTS[ index ]
+            console.warn("source updates!");
+            console.log("source", INSTRUMENTS[ index ], " on channel", channel)
+            source.video.play()
+          }
+        }
+
+        if ( !isNaN(opacity) ) {
+          var channel = Number(item.dataset.col) + 1
+          var source = window["channel" + channel + "_source"]
+          source.alpha(opacity)
+          console.log("opacity", opacity, " on channel", channel)
+        }
+
+        if ( !isNaN(cue) ) {
+          if ( source.video.seeking ) {
+            console.warn("video is seeking")
+            return
+          }
+          var channel = Number(item.dataset.col) + 1
+          var source = window["channel" + channel + "_source"]
+          source.video.currentTime = cue
+          source.video.play()
+          console.log("cue", cue, " on channel", channel)
+        }
       }
     })
   }
@@ -217,4 +269,8 @@ update()
 var reset = function() {
   elm = document.getElementById('tracker')
   elm.scrollTop = 0
+}
+
+document.getElementById('bpm_display').onchange = function() {
+  bpm = Number(this.value)
 }

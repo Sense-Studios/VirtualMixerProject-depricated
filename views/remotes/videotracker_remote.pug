@@ -9,20 +9,23 @@ html
     script(src='/javascripts/src/GlRenderer.js')
     script(src='/javascripts/src/modules/Mixer.js')
     script(src='/javascripts/src/modules/Monitor.js')
+    script(src='/javascripts/src/sources/VideoSource.js')
     //link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/remotes/videotracker_remote.css')
 
   body
     
     header
+      button(onClick="is_playing = !is_playing") PLAY/PAUSE
+      button(onClick="reset()") RESET
+      input#bpm_display(type="number", value="128")
     
     #page1_player.tracker_grid_container
 
       #previews
                   
         #master_previews  
-          canvas#glcanvas
-          canvas#monitoring_canvas
+          canvas#glcanvas          
           
         #channel_previews
           - for(var j=1; j <= 8; j++)
@@ -30,10 +33,7 @@ html
         
       #instruments.scrollable
         table
-          - for(var j=0; j < 24; j++)
-            tr
-              td= j
-              td= "video" + j
+                        
             
         
       #tracker 
@@ -63,6 +63,7 @@ html
                     td.mono(data-row=row, data-col=col, data-rowcol=row+","+col)
                       .trigger_cell
                         span.index ..
+                        span.opacity ..
                         span.cue ...
                         span.effect ..
                         span.effect_extra ..

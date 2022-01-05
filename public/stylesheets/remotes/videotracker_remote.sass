@@ -6,7 +6,7 @@ body, html
   font-family: Menlo, Consolas, DejaVu Sans Mono, monospace
 
 header
-  height: 50px
+  height: 25px
   width: 100vw
   background-color: red
   position: absolute
@@ -32,12 +32,12 @@ header
   //@include grid_container
   position: absolute
   display: grid
-  top: 50px
+  top: 25px
   height: calc( 100vh - 50px )
   width: 100vw
   background-color: orange
   grid-template-columns: 26.66% 26.66% 26.66% 20%
-  grid-template-rows: 25% 75%
+  grid-template-rows: 312px
   grid-template-areas: "previews previews previews instruments" "tracker tracker tracker tracker"
 
 #previews
@@ -50,11 +50,11 @@ header
     display: flex
     width: 40vw
     justify-content: space-around
-    align-items: center;
+    align-items: center
 
     canvas
       background-color: black
-      width: 45% !important
+      width: 90% !important
       height: 80% !important
       display: inline
 
@@ -79,13 +79,19 @@ header
 #tracker
   grid-area: tracker
   background-color: grey
-  height: calc( 100vh - 230px)
+  //height: calc( 100vh - 230px)
   overflow-x: hidden
   overflow-y: scroll
+  height: 800px
 
   #main_table
-    top: 50%
-    margin-bottom: 514px
+    top: 250px
+    // margin-bottom: 514px --? on mac?
+    // margin-bottom: 687px /* on pc? */
+    // margin-bottom: calc( 1028px )
+    margin-bottom: 780px
+    // 1114.73x1024
+    //calc( 50vh - 14px );
     position: relative
     width: 100%
 
@@ -100,7 +106,7 @@ header
   table.header
     position: fixed
     z-index: 1
-    background-color: grey
+    background-color: darkgrey
 
   table
     border-color: black
