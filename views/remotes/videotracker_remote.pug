@@ -34,15 +34,17 @@ html
       #instruments.scrollable
         table
                         
-            
-        
       #tracker 
       
         table.header
           tr
-            th /
-            th channel 1
-            th channel 2
+            th 
+            th 
+              input#channel1_mute(type="checkbox")
+              | channel 1
+            th 
+              input#channel2_mute(type="checkbox")
+              | channel 2
             th channel 3
             th channel 4
             th channel 5
@@ -50,11 +52,9 @@ html
             th channel 7
             th channel 8
 
-        
         #main_table
           #highlight
-          table
-            tr            
+          table          
             - for(var row=0; row < 64; row++)
               - var klass = (row%4 == 0 ? 'highlight_beat' : '')
                 tr(class=klass)

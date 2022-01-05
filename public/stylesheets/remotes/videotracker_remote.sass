@@ -4,6 +4,7 @@ body, html
   margin: 0
   padding: 0
   font-family: Menlo, Consolas, DejaVu Sans Mono, monospace
+  overflow: hidden
 
 header
   height: 25px
@@ -76,6 +77,13 @@ header
   grid-area: instruments
   background-color: green
 
+  tr
+    cursor: pointer
+
+  tr.selected
+    background-color: white
+    color: black
+
 #tracker
   grid-area: tracker
   background-color: grey
@@ -101,7 +109,7 @@ header
       background-color: yellow
       height: 14px
       width: 100%
-      margin-top: 4px
+      margin-top: 2px
 
   table.header
     position: fixed
@@ -110,8 +118,11 @@ header
 
   table
     border-color: black
-    border-width: 5px
     width: 100%
+
+    tr, td
+      height: 14px
+      padding: 0
 
     td.trnum
       text-align: center
@@ -123,9 +134,13 @@ header
       color: white
 
     tr.highlight_beat td
-      background-color: #999
+      background-color: #666
 
     td
+      span.selected
+        background-color: white
+        color: black
+
       .trigger_cell
         display: flex
         flex-direction: row

@@ -138,7 +138,7 @@ var initial_data = [
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,0],[2,1],[],[],[],[],[],[] ],
+  [ [1,0,12.5],[2,1],[],[],[],[],[],[] ],
   [ [1,1],[],[],[],[],[],[] ],
   [ [1,0],[],[],[],[],[],[],[] ],
   [ [1,1],[],[],[],[],[],[],[] ],
@@ -202,14 +202,23 @@ var fill_values = function( _val ) {
 fill_values(initial_data)
 
 var update = function() {
-  if (is_playing) {
-    elm = document.getElementById('tracker')
-    if (elm.scrollTop >= 1008) elm.scrollTop = 0
-    elm.scrollBy(0,16)
-    //if ( (elm.scrollTop/16)%4 == 0 ) console.log( elm.scrollTop/16 )
 
-    current_id = elm.scrollTop/16 // row
-    selectedElements = document.querySelectorAll('td[data-row="'+current_id+'"]')
+  elm = document.getElementById('tracker')
+
+  //if (elm.scrollTop >= 1006) elm.scrollTop = 0
+  //if (elm.scrollTop <= 0) elm.scrollTop = 1006
+
+  elm.scrollTop = Math.round( ( elm.scrollTop/16 ) ) * 16
+  current_row_id = elm.scrollTop/16 // row_id
+  selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
+
+  // console.log( elm.scrollTop, current_row_id )
+
+  if (is_playing) {
+
+    if (elm.scrollTop >= 1006) elm.scrollTop = 0
+    elm.scrollBy(0,16)
+
     selectedElements.forEach(function( item, i ) {
       var index = item.querySelector('.index').textContent
       var opacity = item.querySelector('.opacity').textContent
@@ -226,6 +235,7 @@ var update = function() {
         console.log("effect ", effect )
         console.log("effect_extra ", effect_extra )
 
+        // Set Index
         if ( !isNaN(index) ) {
           var channel = Number(item.dataset.col) + 1
           var source = window["channel" + channel + "_source"]
@@ -238,13 +248,16 @@ var update = function() {
           }
         }
 
+        // Set Opacity
         if ( !isNaN(opacity) ) {
           var channel = Number(item.dataset.col) + 1
           var source = window["channel" + channel + "_source"]
+          console.log("opacity", channel, source, opacity, " on channel", channel)
           source.alpha(opacity)
-          console.log("opacity", opacity, " on channel", channel)
+
         }
 
+        // Set cue
         if ( !isNaN(cue) ) {
           if ( source.video.seeking ) {
             console.warn("video is seeking")
@@ -256,9 +269,23 @@ var update = function() {
           source.video.play()
           console.log("cue", cue, " on channel", channel)
         }
+
+        // Effect
+        // Effect_extra
       }
     })
+  }else{
+    // not playing
+    channel1_source.alpha(0)
+    channel2_source.alpha(0)
+    channel3_source.alpha(0)
+    channel4_source.alpha(0)
+    channel5_source.alpha(0)
+    channel6_source.alpha(0)
+    channel7_source.alpha(0)
+    channel8_source.alpha(0)
   }
+
   // 1 beat = 128/60 = 2.01
   // 1 beat = 128/60 = 2.01
   // 60 000 /
@@ -273,4 +300,96 @@ var reset = function() {
 
 document.getElementById('bpm_display').onchange = function() {
   bpm = Number(this.value)
+}
+
+// -----------------------------------------------------------------------------
+// interaction
+
+// instruments, rollover and click
+var SELECTED_INSTRUMENT = 0
+document.getElementById('instruments').querySelectorAll('tr').forEach( function(elm, i) {
+  elm.onclick = function( evt ) {
+    var siblings = document.getElementById('instruments').querySelectorAll('tr')
+    siblings.forEach(function(elm, i){ elm.classList.remove('selected')})
+    elm.classList.add('selected')
+    SELECTED_INSTRUMENT = elm.querySelectorAll('td')[0].innerText
+  }
+})
+
+keys = []
+selected_in_row = 0
+// current_row_id
+window.onkeydown = function(evt) {
+  // console.log("event:", evt.which)
+
+  //32 -- space
+
+  //38 -- up
+  //37 -- left
+  //39 -- right
+  //40 -- down
+
+  if (evt.which == 32) {
+    is_playing = !is_playing
+    evt.preventDefault
+    return false
+  }
+
+  if ( evt.which == 37 ) {
+    elm = document.getElementById("instruments")
+    elm.querySelectorAll("span")
+    selected_in_row -= 1
+    // if ( selected_in_row < 0 )
+    var row = document.getElementById("main_table").querySelectorAll("tr")[current_row_id]
+    // console.log( current_row_id, selected_in_row )
+    evt.preventDefault
+    return false
+  }
+
+  if ( evt.which == 39 ) {
+    elm = document.getElementById("instruments")
+    elm.querySelectorAll("span")
+    selected_in_row += 1
+    var row = document.getElementById("main_table").querySelectorAll("tr")[current_row_id]
+    // console.log( current_row_id, selected_in_row )
+    evt.preventDefault
+    return false
+  }
+
+  if (evt.which == 38) {
+    if (elm.scrollTop <= 0) {
+      elm.scrollTop = 1006
+      return
+    }
+    elm.scrollBy(0,-16)
+    evt.preventDefault
+    return false
+  }
+
+  if (evt.which == 40) {
+    if (elm.scrollTop >= 1006) {
+      elm.scrollTop = 0
+      return
+    }
+    elm.scrollBy(0,16)
+    evt.preventDefault
+    return false
+  }
+
+  // document.getElementById("main_table").querySelectorAll("tr")
+
+  /*
+  49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187,
+   1,  2,  3,  4,  5,  6,  7,  8,  9,  0,   -,   =,
+
+  81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221,
+   q,  w,  e,  r,  t,  y,  u,  i,  o,  p,   [,   ],
+
+  65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, 220,
+   a,  s,  d,  f,  g,  h,  j,  k,   l,   ;,   ',   \,
+
+ 192, 90, 88, 67, 86, 66, 78, 77, 188, 190, 191
+   `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
+
+  */
 }

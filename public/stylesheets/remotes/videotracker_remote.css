@@ -3,7 +3,8 @@ body, html {
   color: #e8e8e8;
   margin: 0;
   padding: 0;
-  font-family: Menlo, Consolas, DejaVu Sans Mono, monospace; }
+  font-family: Menlo, Consolas, DejaVu Sans Mono, monospace;
+  overflow: hidden; }
 
 header {
   height: 25px;
@@ -58,6 +59,11 @@ header {
 #instruments {
   grid-area: instruments;
   background-color: green; }
+  #instruments tr {
+    cursor: pointer; }
+  #instruments tr.selected {
+    background-color: white;
+    color: black; }
 
 #tracker {
   grid-area: tracker;
@@ -76,15 +82,17 @@ header {
       background-color: yellow;
       height: 14px;
       width: 100%;
-      margin-top: 4px; }
+      margin-top: 2px; }
   #tracker table.header {
     position: fixed;
     z-index: 1;
     background-color: darkgrey; }
   #tracker table {
     border-color: black;
-    border-width: 5px;
     width: 100%; }
+    #tracker table tr, #tracker table td {
+      height: 14px;
+      padding: 0; }
     #tracker table td.trnum {
       text-align: center; }
     #tracker table td.mono {
@@ -93,7 +101,7 @@ header {
       background: black;
       color: white; }
     #tracker table tr.highlight_beat td {
-      background-color: #999; }
+      background-color: #666; }
     #tracker table td .trigger_cell {
       display: flex;
       flex-direction: row;
