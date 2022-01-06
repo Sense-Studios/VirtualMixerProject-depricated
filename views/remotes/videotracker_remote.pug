@@ -19,6 +19,7 @@ html
       button(onClick="is_playing = !is_playing") PLAY/PAUSE
       button(onClick="reset()") RESET
       input#bpm_display(type="number", value="128")
+      button(onClick="updatebpm()") TAP
     
     #page1_player.tracker_grid_container
 
@@ -45,12 +46,31 @@ html
             th 
               input#channel2_mute(type="checkbox")
               | channel 2
-            th channel 3
-            th channel 4
-            th channel 5
-            th channel 6
-            th channel 7
-            th channel 8
+
+            th 
+              input#channel3_mute(type="checkbox")
+              | channel 3
+            
+            th 
+              input#channel4_mute(type="checkbox")
+              | channel 4
+
+            th 
+              input#channel5_mute(type="checkbox")
+              | channel 5
+
+            th 
+              input#channel6_mute(type="checkbox")
+              | channel 6
+
+            th 
+              input#channel7_mute(type="checkbox")
+              | channel 7
+
+            th 
+              input#channel8_mute(type="checkbox")
+              | channel 8
+
 
         #main_table
           #highlight
@@ -60,13 +80,13 @@ html
                 tr(class=klass)
                   td.mono.trnum= row
                   - for(var col=0; col < 8; col++)
-                    td.mono(data-row=row, data-col=col, data-rowcol=row+","+col)
+                    td.mono.cell(data-row=row, data-col=col, data-rowcol=row+","+col)
                       .trigger_cell
-                        span.index ..
-                        span.opacity ..
-                        span.cue ...
-                        span.effect ..
-                        span.effect_extra ..
+                        span.index
+                        span.opacity
+                        span.cue
+                        span.effect
+                        span.effect_extra
 
     #page2_instrument.instrument_grid_container
       #effects1

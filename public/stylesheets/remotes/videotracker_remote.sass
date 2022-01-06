@@ -110,6 +110,8 @@ header
       height: 14px
       width: 100%
       margin-top: 2px
+      pointer-events: none
+      filter: saturate(1.5) opacity(0.6) contrast(1.4)
 
   table.header
     position: fixed
@@ -124,19 +126,26 @@ header
       height: 14px
       padding: 0
 
-    td.trnum
-      text-align: center
-
-    td.mono
-      font-family: monospace
-      font-size: 10px
-      background: black
-      color: white
-
     tr.highlight_beat td
       background-color: #666
 
     td
+      &.selected
+        background-color: #CCCCCC99 !important
+        color: black
+
+      &.trnum
+        text-align: center
+
+      &.mono
+        font-family: monospace
+        font-size: 10px
+        background: black
+        color: white
+
+      &.cell
+        width: 12vw
+
       span.selected
         background-color: white
         color: black
@@ -147,6 +156,13 @@ header
         flex-wrap: nowrap
         justify-content: space-around
 
+        span
+          text-align: center
+          border-left: solid 1px #666
+          display: inline-block
+          min-width: 20%
+          height: auto
+
         .index
           display: inline-block
 
@@ -156,6 +172,14 @@ header
         .effect
           display: inline-block
 
+        input
+          display: inline-block
+          max-width: 20px
+          font-size: 12px
+          border: none
+          font-family: monospace
+          padding: 0
+          margin: 0
 
 .instrument_grid_container
   @include grid_container
@@ -163,6 +187,10 @@ header
   grid-template-columns: 100%
   grid-template-rows: 25% 75%
   grid-template-areas: "effects" "notes"
+
+
+
+
 
 #page2_instrument
   display: none

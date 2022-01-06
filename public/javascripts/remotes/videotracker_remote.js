@@ -50,6 +50,10 @@ var end_chain = new Chain( renderer, { sources: [
   channel5_effect, channel6_effect, channel7_effect, channel8_effect
 ] } );
 
+var tap_bpm = new BPM(renderer);
+
+
+
 // master effects
 // var master_effect1 = new ColorEffect( renderer, { source: end_chain } )
 // var master_effect2 = new ColorEffect( renderer, { source: master_effect1 } )
@@ -215,7 +219,7 @@ var update = function() {
   // console.log( elm.scrollTop, current_row_id )
 
   if (is_playing) {
-
+    select_cell("none")
     if (elm.scrollTop >= 1006) elm.scrollTop = 0
     elm.scrollBy(0,16)
 
@@ -236,7 +240,7 @@ var update = function() {
         console.log("effect_extra ", effect_extra )
 
         // Set Index
-        if ( !isNaN(index) ) {
+        if ( !isNaN(index) && index != "" ) {
           var channel = Number(item.dataset.col) + 1
           var source = window["channel" + channel + "_source"]
           console.log("should update:", source.video.src.indexOf(INSTRUMENTS[ index ]), INSTRUMENTS[ index ], source.video.src )
@@ -249,7 +253,7 @@ var update = function() {
         }
 
         // Set Opacity
-        if ( !isNaN(opacity) ) {
+        if ( !isNaN(opacity) && opacity != "" ) {
           var channel = Number(item.dataset.col) + 1
           var source = window["channel" + channel + "_source"]
           console.log("opacity", channel, source, opacity, " on channel", channel)
@@ -258,7 +262,7 @@ var update = function() {
         }
 
         // Set cue
-        if ( !isNaN(cue) ) {
+        if ( !isNaN(cue) && cue != "" ) {
           if ( source.video.seeking ) {
             console.warn("video is seeking")
             return
@@ -317,8 +321,59 @@ document.getElementById('instruments').querySelectorAll('tr').forEach( function(
 })
 
 keys = []
-selected_in_row = 0
-// current_row_id
+selected_in_row = 1
+current_row_id = 0
+
+function select_cell( _none = "" ){
+  var elm = document.getElementById("main_table")
+  var row = elm.querySelectorAll("tr")[current_row_id]
+  var cell = row.querySelectorAll("td")[selected_in_row] // console.log( current_row_id, selected_in_row )
+  console.log("cell", _none, row, current_row_id, cell)
+
+  // reset others
+  elm.querySelectorAll("td.selected").forEach(function(td, i) {
+    //if ( td == cell ) return
+
+    console.log("td remove:", td)
+
+    html = `
+      <div class="trigger_cell">
+        <span class="index">${td.querySelector('.index').value}</span>
+        <span class="opacity">${td.querySelector('.opacity').value}</span>
+        <span class="cue">${td.querySelector('.cue').value}</span>
+        <span class="effect">${td.querySelector('.effect').value}</span>
+        <span class="effect_extra">${td.querySelector('.effect_extra').value}</span>
+      </div>
+    `
+
+    td.innerHTML = html
+    td.classList.remove('selected')
+  })
+
+  if (_none == "none") {
+    // reset all
+    return
+  }
+
+  //highlight
+  cell.classList.add('selected')
+
+  html = `
+    <div class="trigger_cell">
+      <input class="index" value="${cell.querySelector('.index').innerText}"/>
+      <input class="opacity" value="${cell.querySelector('.opacity').innerText}"/>
+      <input class="cue" value="${cell.querySelector('.cue').innerText}"/>
+      <input class="effect" value="${cell.querySelector('.effect').innerText}"/>
+      <input class="effect_extra" value="${cell.querySelector('.effect_extra').innerText}"/>
+    </div>
+  `
+
+  cell.innerHTML = html
+  cell.querySelector('.index').focus()
+
+}
+select_cell()
+
 window.onkeydown = function(evt) {
   // console.log("event:", evt.which)
 
@@ -336,22 +391,17 @@ window.onkeydown = function(evt) {
   }
 
   if ( evt.which == 37 ) {
-    elm = document.getElementById("instruments")
-    elm.querySelectorAll("span")
     selected_in_row -= 1
-    // if ( selected_in_row < 0 )
-    var row = document.getElementById("main_table").querySelectorAll("tr")[current_row_id]
-    // console.log( current_row_id, selected_in_row )
+    if (selected_in_row < 1) selected_in_row = 1
+    select_cell()
     evt.preventDefault
     return false
   }
 
   if ( evt.which == 39 ) {
-    elm = document.getElementById("instruments")
-    elm.querySelectorAll("span")
     selected_in_row += 1
-    var row = document.getElementById("main_table").querySelectorAll("tr")[current_row_id]
-    // console.log( current_row_id, selected_in_row )
+    if (selected_in_row > 8) selected_in_row = 8
+    select_cell()
     evt.preventDefault
     return false
   }
@@ -362,6 +412,9 @@ window.onkeydown = function(evt) {
       return
     }
     elm.scrollBy(0,-16)
+    current_row_id -= 1
+    select_cell()
+
     evt.preventDefault
     return false
   }
@@ -372,6 +425,9 @@ window.onkeydown = function(evt) {
       return
     }
     elm.scrollBy(0,16)
+    current_row_id += 1
+    select_cell()
+
     evt.preventDefault
     return false
   }
@@ -392,4 +448,10 @@ window.onkeydown = function(evt) {
    `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
 
   */
+}
+
+function updatebpm() {
+  tap_bpm.tap()
+  bpm = tap_bpm.bpm
+  document.getElementById('bpm_display').value = Math.round(bpm*100)/100
 }
