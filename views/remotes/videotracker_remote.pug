@@ -15,11 +15,12 @@ html
 
   body
     
-    header
-      button(onClick="is_playing = !is_playing") PLAY/PAUSE
-      button(onClick="reset()") RESET
+    header      
       input#bpm_display(type="number", value="128")
       button(onClick="updatebpm()") TAP
+      button(onClick="reset()") RESET
+      |
+      button(onClick="is_playing = !is_playing") PLAY/PAUSE
     
     #page1_player.tracker_grid_container
 
@@ -87,6 +88,8 @@ html
                         span.cue
                         span.effect
                         span.effect_extra
+            tr
+              td
 
     #page2_instrument.instrument_grid_container
       #effects1

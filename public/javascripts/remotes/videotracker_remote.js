@@ -16,6 +16,7 @@ var channel2_effect = new ColorEffect( renderer, { source: channel2_source } )
 var channel2_monitor = new Monitor( renderer, { source: channel2_effect, element: 'monitoring_canvas_2' })
 
 var channel3_source = new VideoSource(renderer, { src: "" })
+channel3_source.video.loop
 //var channel3_filemanager = new FileManager( channel3_source )
 var channel3_effect = new ColorEffect( renderer, { source: channel3_source } )
 var channel3_monitor = new Monitor( renderer, { source: channel3_effect, element: 'monitoring_canvas_3' })
@@ -84,6 +85,9 @@ INSTRUMENTS.push("/video/ignore/dune/duncan_approaching.mp4")
 INSTRUMENTS.push("/video/ignore/dune/face_duncan.mp4")
 INSTRUMENTS.push("/video/ignore/dune/the_desert_2.mp4")
 INSTRUMENTS.push("/video/ignore/dune/welcome_to_gidi_prime.mp4")
+INSTRUMENTS.push("/video/ignore/dune/House_artreides_long.mp4")
+INSTRUMENTS.push("/video/ignore/flash/flash_1.mp4")
+INSTRUMENTS.push("/video/ignore/flash/flash_slow_1.mp4")
 
 // id, opaacity, cue_time, effect_nuk, effect_value
 var initial_data = [
@@ -92,80 +96,80 @@ var initial_data = [
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,1],[2,1],[2,1],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ [1,0],[2,0,1.0],[2,1,1.0],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,1],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ [1,0],[2,0],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[] ],
-  [ [1,0],[],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[],[] ],
-
-  [ [],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,0, 0],[2,0],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ [1,0],[2,1],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[] ],
-  [ [1,0],[],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[],[] ],
-
-  [ [],[],[2,0],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,0,1.0],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ],
-
-  [ [],[2,0],[4,1],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,0,12.5],[2,1],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[] ],
-  [ [1,0],[],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[],[] ],
-
-  [ [],[2,0],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [1,0],[2,1],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[] ],
-  [ [1,0],[],[],[],[],[],[],[] ],
-  [ [1,1],[],[],[],[],[],[],[] ],
-
-  [ [1,0],[2,0],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
 
-  [ [],[2,1],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
   [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ]
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
+  [ [],[],[],[],[],[],[],[] ],
 ]
 
 var is_playing = false
@@ -176,9 +180,7 @@ var build_instruments = function( _instruments ) {
     //var elm = document.getElementById('#instrument')
     var table = document.getElementById('instruments').children[0]
     table.innerHTML = table.innerHTML + "<tr><td>" + i + "</td><td>" + instrument + "</td></tr>"
-
   });
-
 }
 
 build_instruments(INSTRUMENTS)
@@ -211,18 +213,11 @@ var update = function() {
 
   //if (elm.scrollTop >= 1006) elm.scrollTop = 0
   //if (elm.scrollTop <= 0) elm.scrollTop = 1006
-
-  elm.scrollTop = Math.round( ( elm.scrollTop/16 ) ) * 16
-  current_row_id = elm.scrollTop/16 // row_id
-  selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
-
   // console.log( elm.scrollTop, current_row_id )
 
   if (is_playing) {
     select_cell("none")
-    if (elm.scrollTop >= 1006) elm.scrollTop = 0
-    elm.scrollBy(0,16)
-
+    selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
     selectedElements.forEach(function( item, i ) {
       var index = item.querySelector('.index').textContent
       var opacity = item.querySelector('.opacity').textContent
@@ -230,8 +225,14 @@ var update = function() {
       var effect = item.querySelector('.effect').textContent
       var effect_extra = elm.querySelector('.effect_extra').textContent
 
-      if ( !isNaN(index) || !isNaN(opacity) || !isNaN(cue) || !isNaN(effect) || !isNaN(effect_extra) ) {
-        console.log("got something",i," ------ ")
+      if (
+          !isNaN(index) && index != "" ||
+          !isNaN(opacity) && opacity != ""  ||
+          !isNaN(cue) && cue != ""  ||
+          !isNaN(effect) && effect != ""  ||
+          !isNaN(effect_extra)  && effect_extra != ""
+        ) {
+        console.log("got something",i, !isNaN(index),!isNaN(opacity),!isNaN(cue),!isNaN(effect),!isNaN(effect_extra))
         console.log( item.dataset )
         console.log("index ", index )
         console.log("opacity ", opacity )
@@ -278,7 +279,21 @@ var update = function() {
         // Effect_extra
       }
     })
+
+    // afdter evaluation we update
+    elm.scrollBy(0,16)
+
+    if (elm.scrollTop >= 1022) {
+       elm.scrollTop = 0
+    }
+    current_row_id = Math.round(elm.scrollTop/16) // row_id
+
+
   }else{
+    elm.scrollTop = Math.round( ( elm.scrollTop / 16 ) ) * 16
+    current_row_id = Math.round( elm.scrollTop / 16 ) // row_id
+    selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
+
     // not playing
     channel1_source.alpha(0)
     channel2_source.alpha(0)
@@ -299,7 +314,8 @@ update()
 
 var reset = function() {
   elm = document.getElementById('tracker')
-  elm.scrollTop = 0
+  elm.scrollTop = -16
+  current_row_id = 0
 }
 
 document.getElementById('bpm_display').onchange = function() {
@@ -328,13 +344,13 @@ function select_cell( _none = "" ){
   var elm = document.getElementById("main_table")
   var row = elm.querySelectorAll("tr")[current_row_id]
   var cell = row.querySelectorAll("td")[selected_in_row] // console.log( current_row_id, selected_in_row )
-  console.log("cell", _none, row, current_row_id, cell)
+  // console.log("cell", _none, row, current_row_id, cell)
 
   // reset others
   elm.querySelectorAll("td.selected").forEach(function(td, i) {
     //if ( td == cell ) return
 
-    console.log("td remove:", td)
+    // console.log("td remove:", td)
 
     html = `
       <div class="trigger_cell">
@@ -375,7 +391,7 @@ function select_cell( _none = "" ){
 select_cell()
 
 window.onkeydown = function(evt) {
-  // console.log("event:", evt.which)
+  console.log("event:", evt.which)
 
   //32 -- space
 
@@ -430,6 +446,16 @@ window.onkeydown = function(evt) {
 
     evt.preventDefault
     return false
+  }
+
+  // home
+  if (evt.which == 36) {
+    select_cell('none')
+    reset()
+  }
+
+  if (evt.which == 8) {
+    updatebpm()
   }
 
   // document.getElementById("main_table").querySelectorAll("tr")
