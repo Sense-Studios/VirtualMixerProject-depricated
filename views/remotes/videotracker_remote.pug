@@ -78,7 +78,7 @@ html
           table          
             - for(var row=0; row < 64; row++)
               - var klass = (row%4 == 0 ? 'highlight_beat' : '')
-                tr(class=klass)
+                tr(class="track_row " + klass)
                   td.mono.trnum= row
                   - for(var col=0; col < 8; col++)
                     td.mono.cell(data-row=row, data-col=col, data-rowcol=row+","+col)

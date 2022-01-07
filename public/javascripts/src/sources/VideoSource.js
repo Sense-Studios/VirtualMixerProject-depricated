@@ -92,7 +92,7 @@ function VideoSource(renderer, options) {
     }, 400 )
 
     function firstTouch() {
-      return
+      //return
       videoElement.play();
       _self.firstplay = true
       document.body.removeEventListener('click', firstTouch)
