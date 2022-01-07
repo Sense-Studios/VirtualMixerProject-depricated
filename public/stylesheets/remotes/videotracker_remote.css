@@ -59,11 +59,21 @@ header {
 #instruments {
   grid-area: instruments;
   background-color: green; }
+  #instruments table {
+    width: 100%; }
   #instruments tr {
     cursor: pointer; }
   #instruments tr.selected {
     background-color: white;
     color: black; }
+    #instruments tr.selected input.instrument {
+      color: black; }
+  #instruments input.instrument {
+    width: 100%;
+    background-color: unset;
+    border: 0;
+    font-family: monospace;
+    color: white; }
 
 #tracker {
   grid-area: tracker;
