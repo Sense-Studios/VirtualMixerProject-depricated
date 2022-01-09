@@ -72,6 +72,7 @@ var output = new Output( renderer, end_chain )
 renderer.init();         // init
 renderer.render();       // start update & animation
 
+// disable looping
 channel1_source.video.loop = false
 channel2_source.video.loop = false
 channel3_source.video.loop = false
@@ -84,6 +85,12 @@ channel8_source.video.loop = false
 // c_effect.effect(14)
 // contrast.effect(61)
 // contrast.extra(0.4)
+
+var bpm = tap_bpm.bpm
+var is_playing = false
+
+// -----------------------------------------------------------------------------
+// this is gonna be depricated
 var INSTRUMENTS = []
 
 // add something something
@@ -96,6 +103,23 @@ INSTRUMENTS.push("/video/ignore/dune/welcome_to_gidi_prime.mp4")
 INSTRUMENTS.push("/video/ignore/dune/House_artreides_long.mp4")
 INSTRUMENTS.push("/video/ignore/flash/flash_1.mp4")
 INSTRUMENTS.push("/video/ignore/flash/flash_slow_1.mp4")
+
+var build_instruments = function( _instruments ) {
+  INSTRUMENTS.forEach((instrument, i) => {
+    //var elm = document.getElementById('#instrument')
+    var table = document.getElementById('instruments').children[0]
+    table.innerHTML = table.innerHTML + "<tr><td>" + i + "</td><td><input class='instrument' id='instrument_'"+i+" value='" + instrument + "'></td><td class='instrument_pointer' data-instrument-id='"+i+"'>»</td></tr>"
+  });
+}
+
+build_instruments(INSTRUMENTS)
+
+// add interaction
+document.querySelectorAll('.instrument').forEach( function( instrument, i ) {
+  instrument.onchange = function(e) { INSTRUMENTS[i] = instrument.value }
+})
+
+// -----------------------------------------------------------------------------
 
 // id, opaacity, cue_time, effect_nuk, effect_value
 var initial_data = [
@@ -181,37 +205,29 @@ var initial_data = [
 ]
 
 // setup for actually saving data
+// one data format to rule them all!
 var saved_file = {
-  instruments: [
+  instruments: {
+    0: {
+      url: '/video/ignore/dune/Armies.mp4',
+      cues: [ [0,1], [2.1, 5] ]
+    },
 
-  ],
+    1: {
+      url: '/video/ignore/dune/Armies_2.mp4',
+      cues: [ [0,1], [2.1, 5] ]
+    }
+  },
+
   sheet_data: [
-
+    [],
+    [ "sheet 1" ],
+    [ "sheet 1" ]
   ]
 }
 
 initial_data = [[["4","0","0.1","",""],["8","1","0.1","",""],["5","1","0.1","",""],["3","1","0.1","",""],["6","1","0.1","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","2","","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["8","1","0","",""],["5","1","","",""],["3","0","","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","2","0","",""],["3","1","0","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","0","",""],["8","2","0","",""],["5","2","0","",""],["3","0","","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","","",""],["","","","",""],["5","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","","",""],["","","","",""],["5","2","0","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","1","","",""],["","","","",""],["5","5.2","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["8","1","0","",""],["5","1","0","",""],["3","2","0","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","1","3","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["8","2","0","",""],["","","","",""],["","","","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","","",""],["","","","",""],["","","","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","0","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","4","",""],["8","1","0","",""],["","","","",""],["3","0","0","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","1","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","4","","",""],["","","","",""],["","","","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","1.5","0","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0.5","0","",""],["8","2","0","",""],["","","","",""],["","","","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","5","",""],["","","","",""],["","","","",""],["3","1","0","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","0","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","2","0","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["8","1","0","",""],["","","","",""],["","","","",""],["6","1","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["4","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["6","0","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["5","0.5","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]],[["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""],["","","","",""]]]
 
-var is_playing = false
-var bpm = 133
-
-var build_instruments = function( _instruments ) {
-  INSTRUMENTS.forEach((instrument, i) => {
-    //var elm = document.getElementById('#instrument')
-    var table = document.getElementById('instruments').children[0]
-    table.innerHTML = table.innerHTML + "<tr><td>" + i + "</td><td><input class='instrument' id='instrument_'"+i+" value='" + instrument + "'></td></tr>"
-  });
-}
-
-build_instruments(INSTRUMENTS)
-
-// add interaction
-document.querySelectorAll('.instrument').forEach( function( instrument, i ) {
-  instrument.onchange = function(e) {
-    console.log("i click you",i, instrument.value)
-    INSTRUMENTS[i] = instrument.value
-  }
-})
 
 var fill_values = function( _val ) {
   _val.forEach((row, x) => {
@@ -235,6 +251,11 @@ var fill_values = function( _val ) {
 
 fill_values(initial_data)
 
+// -----------------------------------------------------------------------------
+// Update Cycle
+// -----------------------------------------------------------------------------
+
+
 var update = function() {
 
   elm = document.getElementById('tracker')
@@ -246,73 +267,7 @@ var update = function() {
   if (is_playing) {
     select_cell("none")
     selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
-    selectedElements.forEach(function( item, i ) {
-      var index = item.querySelector('.index').textContent
-      var opacity = item.querySelector('.opacity').textContent
-      var cue = item.querySelector('.cue').textContent
-      var effect = item.querySelector('.effect').textContent
-      var effect_extra = elm.querySelector('.effect_extra').textContent
-
-      if (
-          !isNaN(index) && index != "" ||
-          !isNaN(opacity) && opacity != ""  ||
-          !isNaN(cue) && cue != ""  ||
-          !isNaN(effect) && effect != ""  ||
-          !isNaN(effect_extra)  && effect_extra != ""
-        ) {
-        console.log("got something",i, !isNaN(index),!isNaN(opacity),!isNaN(cue),!isNaN(effect),!isNaN(effect_extra))
-        console.log( item.dataset )
-        console.log("index ", index )
-        console.log("opacity ", opacity )
-        console.log("cue ", cue )
-        console.log("effect ", effect )
-        console.log("effect_extra ", effect_extra )
-
-        // Set Index
-        if ( !isNaN(index) && index != "" ) {
-          var channel = Number(item.dataset.col) + 1
-          var source = window["channel" + channel + "_source"]
-          console.log("should update:", source.video.src.indexOf(INSTRUMENTS[ index ]), INSTRUMENTS[ index ], source.video.src )
-          if ( source.video.src.indexOf( encodeURI( INSTRUMENTS[ index ] ) ) == -1 ) {
-            source.video.src = INSTRUMENTS[ index ]
-            console.warn("source updates!");
-            console.log("source", INSTRUMENTS[ index ], " on channel", channel)
-            source.video.play()
-          }
-        }
-
-        // Set Opacity
-        if ( !isNaN(opacity) && opacity != "" ) {
-          var channel = Number(item.dataset.col) + 1
-          var source = window["channel" + channel + "_source"]
-          console.log("opacity", channel, source, opacity, " on channel", channel)
-          source.alpha(opacity)
-        }
-
-        // Override that shit
-        if ( document.getElementById('channel' + channel + '_mute').checked ) {
-          source.alpha(0)
-        }
-
-
-        // Set cue
-        if ( !isNaN(cue) && cue != "" ) {
-          if ( source.video.seeking ) {
-            console.warn("video is seeking")
-            return
-          }
-          var channel = Number(item.dataset.col) + 1
-          var source = window["channel" + channel + "_source"]
-          source.video.currentTime = cue
-          source.video.play()
-          console.log("cue", cue, " on channel", channel)
-        }
-
-        // Effect
-        // Effect_extra
-      }
-    })
-
+    selectedElements.forEach( (item, i)=> checkEntry(item, i)  )
 
     if (elm.scrollTop >= 1022) {
        elm.scrollTop = 0
@@ -345,6 +300,75 @@ var update = function() {
   setTimeout( update, ( ( 60000 / bpm ) / 4 ) )
 }
 update()
+
+// check if there is an entry in the cell, and execute it
+function checkEntry(item, i) {
+  var index = item.querySelector('.index').textContent
+  var opacity = item.querySelector('.opacity').textContent
+  var cue = item.querySelector('.cue').textContent
+  var effect = item.querySelector('.effect').textContent
+  var effect_extra = elm.querySelector('.effect_extra').textContent
+
+  if (
+      !isNaN(index) && index != "" ||
+      !isNaN(opacity) && opacity != ""  ||
+      !isNaN(cue) && cue != ""  ||
+      !isNaN(effect) && effect != ""  ||
+      !isNaN(effect_extra)  && effect_extra != ""
+    ) {
+
+    console.log("got something",i, !isNaN(index),!isNaN(opacity),!isNaN(cue),!isNaN(effect),!isNaN(effect_extra))
+    console.log( item.dataset )
+    console.log("index ", index )
+    console.log("opacity ", opacity )
+    console.log("cue ", cue )
+    console.log("effect ", effect )
+    console.log("effect_extra ", effect_extra )
+
+    // Set Index
+    if ( !isNaN(index) && index != "" ) {
+      var channel = Number(item.dataset.col) + 1
+      var source = window["channel" + channel + "_source"]
+      console.log("should update:", source.video.src.indexOf(INSTRUMENTS[ index ]), INSTRUMENTS[ index ], source.video.src )
+      if ( source.video.src.indexOf( encodeURI( INSTRUMENTS[ index ] ) ) == -1 ) {
+        source.video.src = INSTRUMENTS[ index ]
+        console.warn("source updates!");
+        console.log("source", INSTRUMENTS[ index ], " on channel", channel)
+        source.video.play()
+      }
+    }
+
+    // Set Opacity
+    if ( !isNaN(opacity) && opacity != "" ) {
+      var channel = Number(item.dataset.col) + 1
+      var source = window["channel" + channel + "_source"]
+      console.log("opacity", channel, source, opacity, " on channel", channel)
+      source.alpha(opacity)
+    }
+
+    // Override that shit
+    if ( document.getElementById('channel' + channel + '_mute').checked ) {
+      source.alpha(0)
+    }
+
+
+    // Set cue
+    if ( !isNaN(cue) && cue != "" ) {
+      if ( source.video.seeking ) {
+        console.warn("video is seeking")
+        return
+      }
+      var channel = Number(item.dataset.col) + 1
+      var source = window["channel" + channel + "_source"]
+      source.video.currentTime = cue
+      source.video.play()
+      console.log("cue", cue, " on channel", channel)
+    }
+
+    // Effect
+    // Effect_extra
+  }
+}
 
 var reset = function() {
   elm = document.getElementById('tracker')
@@ -533,6 +557,99 @@ function export_sheet() {
 
 function import_sheet(sheet_data) {
 
+}
+
+function open_instrument(_id){
+  document.getElementById('page1_player').classList.remove('selected')
+  document.getElementById('page2_instrument').classList.add('selected')
+  console.log("Instrument: ", _id, INSTRUMENTS[_id])
+  document.querySelector("#page2_instrument .main .title").innerHTML = "INSTRUMENT: " + _id + ": " + INSTRUMENTS[_id]
+
+  load_up_instrument(_id)
+}
+
+function open_tracker() {
+  document.getElementById('page1_player').classList.add('selected')
+  document.getElementById('page2_instrument').classList.remove('selected')
+}
+
+document.querySelectorAll('.instrument_pointer').forEach((pointer, i) => {
+  pointer.onclick = function() { open_instrument( pointer.dataset.instrumentId ) }
+});
+
+document.getElementById('tracker_back').onclick = function() { open_tracker() }
+
+var instrument_preview_interval = setInterval(function(){})
+function load_up_instrument(_id) {
+  var v = document.getElementById('instrument_video')
+  v.src = INSTRUMENTS[_id]
+
+  var c = document.getElementById('cue_canvas')
+  var width = document.querySelector('.cueeditor').offsetWidth
+  c.width = width
+  c.height = 250
+  var cctx = c.getContext( '2d' );
+
+  // cctx.clearRect(0, 0, 1024, 1024); // send nothing
+  var cnt = 10
+
+  clearInterval(instrument_preview_interval)
+  instrument_preview_interval = setInterval( function() {
+
+    //var idmgData = cctx.getImageData(0, 0, 1000, 1000);
+    //cctx.rect( cnt + 150, 0, 1000, 300);
+    //cctx.clip();
+    //cctx.drawImage( v, cnt, 0, 360, 1280, cnt, 0, 200, 400 );
+
+    //The source image is taken from the coordinates (33, 71),
+    // with a width of 104 and a height of 124. It is drawn to the canvas
+    //  at (21, 20), where it is given a width of 87 and a height of 104.
+    console.log('trr', r_h, r_w)
+    var r_h = v.videoHeight
+    var r_w = v.videoWidth
+
+    if ( v.readyState === v.HAVE_ENOUGH_DATA && !v.seeking) {
+
+
+      //cctx.drawImage( v, 960, 0, 960, 1080, cnt-10, 0, 150, 240 );
+      cctx.drawImage( v, r_w/2, 0, r_w/2, r_h, cnt-15, 0, 150, 240 );
+      //cctx.putImageData(imgData, 0, 0);
+      
+      console.log("ding")
+      //|              |
+      //       900
+
+      //----------------
+      //duration / width
+
+      v.currentTime += (v.duration / width) * 11
+
+      if ( v.currentTime >= v.duration ) {
+        clearInterval(instrument_preview_interval)
+      }
+      cnt += 10
+    }
+  },10)
+
+  /*
+  var i = 0
+  _self.update = function() {
+
+
+    if (_self.bypass = false) return
+    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );
+
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }else{
+      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );  // send last image
+      // TODO: console.log("SEND IN BLACK!") ?
+      // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
+      //_self.alpha = 0
+      if ( videoTexture ) videoTexture.needsUpdate = true;
+    }
+  }
+  */
 }
 
 function reset() {

@@ -22,7 +22,7 @@ html
       |
       button(onClick="is_playing = !is_playing") PLAY/PAUSE
     
-    #page1_player.tracker_grid_container
+    #page1_player.tracker_grid_container.selected
 
       #previews
                   
@@ -35,43 +35,52 @@ html
         
       #instruments.scrollable
         table
-                        
-      #tracker 
       
+      #sheets
+            
+      #tracker
         table.header
           tr
             th 
             th 
-              input#channel1_mute(type="checkbox")
               | channel 1
+              |
+              input#channel1_mute(type="checkbox")
+              
             th 
-              input#channel2_mute(type="checkbox")
               | channel 2
+              |
+              input#channel2_mute(type="checkbox")
 
             th 
-              input#channel3_mute(type="checkbox")
               | channel 3
+              |
+              input#channel3_mute(type="checkbox")
             
             th 
-              input#channel4_mute(type="checkbox")
               | channel 4
-
+              |
+              input#channel4_mute(type="checkbox")
+              
             th 
-              input#channel5_mute(type="checkbox")
               | channel 5
-
+              |
+              input#channel5_mute(type="checkbox")
+              
             th 
-              input#channel6_mute(type="checkbox")
               | channel 6
-
+              |
+              input#channel6_mute(type="checkbox")
+              
             th 
-              input#channel7_mute(type="checkbox")
               | channel 7
-
+              |
+              input#channel7_mute(type="checkbox")
+              
             th 
-              input#channel8_mute(type="checkbox")
               | channel 8
-
+              |
+              input#channel8_mute(type="checkbox")
 
         #main_table
           #highlight
@@ -91,15 +100,23 @@ html
             tr
               td
 
+
     #page2_instrument.instrument_grid_container
-      #effects1
-        active effects?
-      #effects2
-        active effects?
-        
-      #notes
-        cue points, through notes 
-        
-    // add remote javascript
-    script(src='/javascripts/remotes/videotracker_remote.js')
-    include ../partials/analytics
+      .cuelist
+
+      .main
+        .container
+          h1.title Hier komt de titel
+          p
+            button#tracker_back Back
+            
+      .preview
+        video#instrument_video(controls)
+
+      .cueeditor
+        canvas#cue_canvas
+          
+// -----------------------------------------------------------------------------
+// add remote javascript
+script(src='/javascripts/remotes/videotracker_remote.js')
+include ../partials/analytics

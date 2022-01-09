@@ -24,9 +24,13 @@ header {
   height: calc( 100vh - 50px);
   width: 100vw;
   background-color: orange;
-  grid-template-columns: 26.66% 26.66% 26.66% 20%;
+  grid-template-columns: 5% 25% 25% 25% 20%;
   grid-template-rows: 24vw;
-  grid-template-areas: "previews previews previews instruments" "tracker tracker tracker tracker"; }
+  grid-template-areas: "previews previews previews previews instruments" "sheets tracker tracker tracker tracker";
+  left: -100vw;
+  transition-duration: 0.6s; }
+  .tracker_grid_container.selected {
+    left: 0; }
 
 #previews {
   grid-area: previews;
@@ -74,13 +78,22 @@ header {
     border: 0;
     font-family: monospace;
     color: white; }
+  #instruments td.instrument_pointer {
+    text-align: center; }
+
+#sheets {
+  grid-area: sheets;
+  background-color: #3388AA;
+  width: 100%;
+  height: 100%; }
 
 #tracker {
   grid-area: tracker;
   background-color: grey;
   overflow-x: hidden;
   overflow-y: scroll;
-  height: 800px; }
+  height: 800px;
+  width: 100%; }
   #tracker #main_table {
     top: 250px;
     margin-bottom: 780px;
@@ -98,7 +111,9 @@ header {
   #tracker table.header {
     position: fixed;
     z-index: 1;
-    background-color: darkgrey; }
+    background-color: darkgrey;
+    width: 95%;
+    margin-top: 0px; }
   #tracker table {
     border-color: black;
     width: 100%; }
@@ -148,20 +163,37 @@ header {
         padding: 0;
         margin: 0; }
 
-.instrument_grid_container {
+#page2_instrument.instrument_grid_container {
   position: absolute;
   display: grid;
-  top: 50px;
+  top: 25px;
+  left: 100vw;
   padding: 0;
   width: 100vw;
-  height: calc( 100vw - 50px);
+  height: calc( 100vh - 25px);
   transition-duration: 0.6s;
-  left: 100vw;
-  grid-template-columns: 100%;
-  grid-template-rows: 25% 75%;
-  grid-template-areas: "effects" "notes"; }
-
-#page2_instrument {
-  display: none; }
+  background-color: purple;
+  grid-template-columns: 20% 60% 20%;
+  grid-template-rows: auto 240px;
+  grid-template-areas: "cuelist maincenter preview" "cueeditor cueeditor cueeditor"; }
+  #page2_instrument.instrument_grid_container.selected {
+    left: 0vw; }
+  #page2_instrument.instrument_grid_container .cuelist {
+    grid-area: cuelist;
+    background-color: blue; }
+  #page2_instrument.instrument_grid_container .main {
+    grid-area: maincenter;
+    background-color: green;
+    padding: 16px 12px; }
+  #page2_instrument.instrument_grid_container .preview {
+    grid-area: preview;
+    background-color: brown; }
+    #page2_instrument.instrument_grid_container .preview #instrument_video {
+      width: 100%; }
+  #page2_instrument.instrument_grid_container .cueeditor {
+    grid-area: cueeditor;
+    background-color: yellow; }
+    #page2_instrument.instrument_grid_container .cueeditor canvas#cue_canvas {
+      background-color: darkgrey; }
 
 /*# sourceMappingURL=videotracker_remote.css.map */
