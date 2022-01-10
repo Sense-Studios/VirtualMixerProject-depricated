@@ -194,6 +194,6 @@ header {
     grid-area: cueeditor;
     background-color: yellow; }
     #page2_instrument.instrument_grid_container .cueeditor canvas#cue_canvas {
-      background-color: darkgrey; }
+      background-color: black; }
 
 /*# sourceMappingURL=videotracker_remote.css.map */
