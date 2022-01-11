@@ -386,7 +386,10 @@ function checkEntry(item, i) {
 
     // Override that shit
     if ( document.getElementById('channel' + channel + '_mute').checked ) {
-      source.alpha(0)
+      //source.alpha(0)
+      end_chain.setChainLink(channel-1, 0)
+    }else{
+      end_chain.setChainLink(channel-1, 1)
     }
 
 
