@@ -181,10 +181,16 @@ header {
   #page2_instrument.instrument_grid_container .cuelist {
     grid-area: cuelist;
     background-color: blue; }
+    #page2_instrument.instrument_grid_container .cuelist .cue-still canvas#cue-still-canvas {
+      width: 64px;
+      height: 64px;
+      background-color: darkgrey; }
   #page2_instrument.instrument_grid_container .main {
     grid-area: maincenter;
     background-color: green;
     padding: 16px 12px; }
+    #page2_instrument.instrument_grid_container .main #instrument_video {
+      width: 100%; }
   #page2_instrument.instrument_grid_container .preview {
     grid-area: preview;
     background-color: brown; }
@@ -192,7 +198,8 @@ header {
       width: 100%; }
   #page2_instrument.instrument_grid_container .cueeditor {
     grid-area: cueeditor;
-    background-color: yellow; }
+    background-color: yellow;
+    cursor: pointer; }
     #page2_instrument.instrument_grid_container .cueeditor canvas#cue_canvas {
       background-color: black; }
 

@@ -226,6 +226,12 @@ header
     grid-area: cuelist
     background-color: blue
 
+    .cue-still
+      canvas#cue-still-canvas
+        width: 64px
+        height: 64px
+        background-color: darkgrey
+
   .main
     grid-area: maincenter
     background-color: green
@@ -233,16 +239,20 @@ header
 
     h1.title
 
+    #instrument_video
+      width: 100%
+
   .preview
     grid-area: preview
     background-color: brown
-
+    
     #instrument_video
       width: 100%
 
   .cueeditor
     grid-area: cueeditor
     background-color: yellow
+    cursor: pointer
 
     canvas#cue_canvas
       background-color: black

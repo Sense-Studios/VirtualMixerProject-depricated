@@ -32,6 +32,7 @@ html
         #channel_previews
           - for(var j=1; j <= 8; j++)
             canvas.small(id="monitoring_canvas_"+j) 
+            .disabled-sign
         
       #instruments.scrollable
         table
@@ -103,16 +104,27 @@ html
 
     #page2_instrument.instrument_grid_container
       .cuelist
+        .cue-container.cue#cue-1
+          .cue-still
+            canvas#cue-still-canvas
+          .cue-in 15.2
+          .cue-out 8.1
+
+        .cue-container.cue#cue-2
+          .cue-still
+            canvas#cue-still-canvas
+          .cue-in 15.2
+          .cue-out 8.1
 
       .main
         .container
-          h1.title Hier komt de titel
-          p
-            button#tracker_back Back
+          video#instrument_video(controls)
             
       .preview
-        video#instrument_video(controls)
-
+        h1.title Hier komt de titel
+        p
+          button#tracker_back Back
+          
       .cueeditor
         canvas#cue_canvas
           

@@ -11,11 +11,11 @@ var saved_file = {
   instruments: [
     {
       url: '/video/ignore/dune/Armies.mp4',
-      cues: [ ["C2",1], ["D2", 5] ]
+      cues: [ ["C2",1], ["D2", 2] ]
     },
     {
       url: '/video/ignore/dune/Armies_2.mp4',
-      cues: [ ["C2",1], ["D2", 5] ]
+      cues: [ ["C2",1], ["D2", 2] ]
     },
     {
       url: "/video/ignore/dune/Armies_2.mp4",
@@ -266,6 +266,7 @@ document.querySelectorAll('.instrument').forEach( function( instrument, i ) {
 })
 
 // -----------------------------------------------------------------------------
+//
 
 var fill_values = function( _val ) {
   _val.forEach((row, x) => {
@@ -321,7 +322,7 @@ var update = function() {
     current_row_id = Math.round( elm.scrollTop / 16 ) // row_id
     selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
 
-    // not playing
+    // black, while not playing
     channel1_source.alpha(0)
     channel2_source.alpha(0)
     channel3_source.alpha(0)
@@ -622,7 +623,7 @@ function open_instrument(_id){
   document.getElementById('page1_player').classList.remove('selected')
   document.getElementById('page2_instrument').classList.add('selected')
   console.log("Instrument: ", _id, INSTRUMENTS[_id])
-  document.querySelector("#page2_instrument .main .title").innerHTML = "INSTRUMENT: " + _id + ": " + INSTRUMENTS[_id]
+  document.querySelector("#page2_instrument .title").innerHTML = "INSTRUMENT: " + _id + ": " + INSTRUMENTS[_id]
 
   load_up_instrument(_id)
 }
