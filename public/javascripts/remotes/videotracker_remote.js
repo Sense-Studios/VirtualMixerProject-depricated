@@ -624,7 +624,6 @@ function open_instrument(_id){
   document.getElementById('page2_instrument').classList.add('selected')
   console.log("Instrument: ", _id, INSTRUMENTS[_id])
   document.querySelector("#page2_instrument .title").innerHTML = "INSTRUMENT: " + _id + ": " + INSTRUMENTS[_id]
-
   load_up_instrument(_id)
 }
 
@@ -655,6 +654,8 @@ function load_up_instrument(_id) {
   var cnt = 0
   var cues = saved_file.instruments[_id].cues
   var loaded_cues = 0
+
+  document.getElementById('cuelist').innerHTML = ""
 
   clearInterval(instrument_preview_interval)
   instrument_preview_interval = setInterval( function() {
@@ -699,7 +700,13 @@ function load_up_instrument(_id) {
       if ( cues.length > 0 && loaded_cues < cues.length ) {
         if ( cues[ loaded_cues ][1] < v.currentTime ) {
           console.log("found a CUE!", loaded_cues, cues[ loaded_cues ])
-          loaded_cues += 1
+          createCue( cues, loaded_cues )
+
+          /// c.width = width
+          //  c.height = 250
+          //  var cctx = c.getContext( '2d' );
+
+          loaded_cues+=1
         }
       }
     }
@@ -745,6 +752,39 @@ function load_up_instrument(_id) {
     }
   }
   */
+}
+
+function createCue( cues, loaded_cues ) {
+  var html = `
+      <div class='cue-container cue' id='cue-${loaded_cues}'>
+        <div class='cue-still'>
+          <div class='cue-in'> ${cues[ loaded_cues ][0]} </div>
+          <div class='cue-out'> ${cues[ loaded_cues ][1]} </div>
+        </div>
+      </div>
+    `
+    // NEEDS APPEND!
+  var new_html = document.createElement('div')
+  new_html.innerHTML += html
+  document.getElementById('cuelist').append(new_html)
+
+  var v = document.getElementById('instrument_video')
+  var r_h = v.videoHeight
+  var r_w = v.videoWidth
+
+  var _id = "cue-still-canvas-" + loaded_cues
+  console.log(_id)
+  var cvs = document.createElement('canvas')
+  cvs.classList.add('cue-canvas')
+  var cvsctx = cvs.getContext('2d')
+
+  // cvsctx.fillRect(0, 0, 10, 10)
+  // cvsctx.drawImage( v, r_w, 0, r_w, r_h, 0, 0, 64, 64 );
+  cvsctx.drawImage(v, 0, 0, 300,150)
+
+  document.getElementById('cue-' + loaded_cues).append(cvs)
+
+  console.log(v, cvs)
 }
 
 function reset() {

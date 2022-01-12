@@ -197,6 +197,10 @@ header
           font-family: monospace
           padding: 0
           margin: 0
+canvas.cue-canvas
+  width: 64px
+  height: 64px
+  background-color: darkgrey
 
 #page2_instrument.instrument_grid_container
   position: absolute
@@ -222,12 +226,12 @@ header
   &.selected
     left: 0vw
 
-  .cuelist
+  #cuelist
     grid-area: cuelist
     background-color: blue
 
     .cue-still
-      canvas#cue-still-canvas
+      canvas.cue-canvas
         width: 64px
         height: 64px
         background-color: darkgrey
@@ -245,7 +249,7 @@ header
   .preview
     grid-area: preview
     background-color: brown
-    
+
     #instrument_video
       width: 100%
 
