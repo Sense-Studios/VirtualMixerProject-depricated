@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title= title
+    title VMX :: Remote Controller
     meta(name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui')
     
     script(src='/javascripts/build/vendor.js')
@@ -93,6 +93,7 @@ html
                   - for(var col=0; col < 8; col++)
                     td.mono.cell(data-row=row, data-col=col, data-rowcol=row+","+col)
                       .trigger_cell
+                        span.note
                         span.index
                         span.opacity
                         span.cue
@@ -109,6 +110,11 @@ html
         .container
           video#instrument_video(controls)
             
+          .button-group
+            button.btn#btn-set-in Set In
+            button.btn#btn-set-out Set Out
+          
+          
       .preview
         h1.title Hier komt de titel
         p
