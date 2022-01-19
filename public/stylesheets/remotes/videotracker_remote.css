@@ -146,8 +146,9 @@ header {
         text-align: center;
         border-left: solid 1px #666;
         display: inline-block;
-        min-width: 20%;
-        height: auto; }
+        width: 16.6666%;
+        height: auto;
+        text-align: center; }
       #tracker table td .trigger_cell .index {
         display: inline-block; }
       #tracker table td .trigger_cell .note {
@@ -156,12 +157,15 @@ header {
         display: inline-block; }
       #tracker table td .trigger_cell input {
         display: inline-block;
-        max-width: 20px;
+        width: 16.6666%;
         font-size: 12px;
         border: none;
         font-family: monospace;
         padding: 0;
-        margin: 0; }
+        margin: 0;
+        text-align: center;
+        border-left: 1px solid grey;
+        border-right: 1px solid grey; }
 
 canvas.cue-canvas {
   width: 64px;
@@ -205,6 +209,43 @@ canvas.cue-canvas {
     grid-area: cueeditor;
     background-color: yellow;
     cursor: pointer; }
+    #page2_instrument.instrument_grid_container .cueeditor .playhead {
+      background-color: red;
+      position: absolute;
+      width: 2px;
+      left: 100px;
+      height: 100%;
+      pointer-events: none; }
+    #page2_instrument.instrument_grid_container .cueeditor .cues {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; }
+      #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker {
+        height: 100%;
+        width: 100px;
+        background-color: #88882288;
+        position: absolute; }
+        #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker .left_handle {
+          width: 8px;
+          position: absolute;
+          z-index: 10;
+          left: 0;
+          height: 100%;
+          background-color: #888822FF;
+          pointer-events: all; }
+          #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker .left_handle:hover {
+            background-color: red; }
+          #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker .left_handle:active {
+            background-color: blue; }
+        #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker .right_handle {
+          width: 8px;
+          position: absolute;
+          right: 0;
+          height: 100%;
+          background-color: #888822FF;
+          pointer-events: all;
+          cursor: grab; }
     #page2_instrument.instrument_grid_container .cueeditor canvas#cue_canvas {
       background-color: black; }
 
