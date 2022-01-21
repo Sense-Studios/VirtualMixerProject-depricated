@@ -1,209 +1,10 @@
-// DATA ------------------------------------------------------------------------
-
-// setup for actually saving data
-// one data format to rule them all!
-var saved_file = {
-  bmp: 128,
-  mp3: 'none.mp3',
-  title: 'demo project',
-  description: 'This is the first demo project of the VMX video tracker',
-  author: 'XangadiX -- Sense Studios',
-  instruments: [
-    { url: '/video/ignore/dune/Armies.mp4', cues: [ ["C2", 0.3, 0.6], ["D2", 1, 1.2] ] },
-    { url: '/video/ignore/dune/Armies_2.mp4', cues: [ ["C2", 1, 2], ["D2", 2, 3] ] },
-    { url: "/video/ignore/dune/Armies_2.mp4", cues: [] },
-    { url: "/video/ignore/dune/duncan_approaching.mp4",cues: [] },
-    { url: "/video/ignore/dune/face_duncan.mp4", cues: [] },
-    { url: "/video/ignore/dune/the_desert_2.mp4", cues: [ ["C2", 1, 2], ["D2", 5, 6] ] },
-    { url: "/video/ignore/dune/welcome_to_gidi_prime.mp4", cues: [] },
-    { url: "/video/ignore/dune/House_artreides_long.mp4", cues: [  ["C2",1, 2], ["D2", 5, 6] ] },
-    { url: "/video/ignore/flash/flash_1.mp4", cues: [] },
-    { url: "/video/ignore/flash/flash_slow_1.mp4", cues: [] }
-  ],
-  sheet_data: [
-    [
-      [["C1", "4", "0", "0.1", "", ""],["C1", "8", "1", "0.1", "", ""],["C1", "5", "1", "0.1", "", ""],["C1", "3", "1", "0.1", "", ""],["C1", "6", "1", "0.1", "", ""],["","","","","","",""],["","","","","","",""],["","","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","2","","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["C1", "8","1","0","",""],["C1", "5","1","","",""],["3","0","","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","2","0","",""],["C1", "3","1","0","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","0","",""],["C1", "8","2","0","",""],["C1", "5","2","0","",""],["C1", "3","0","","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","","",""],["","","","","",""],["C1", "5","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","","",""],["","","","","",""],["C1", "5","2","0","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","1","","",""],["","","","","",""],["C1", "5","5.2","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["C1", "8","1","0","",""],["C1", "5","1","0","",""],["C1", "3","2","0","",""],["6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","1","3","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["C1", "8","2","0","",""],["","","","","",""],["","","","","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","4","",""],["C1", "8","1","0","",""],["","","","","",""],["C1", "3","0","0","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","4","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","1.5","0","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0.5","0","",""],["C1", "8","2","0","",""],["","","","","",""],["","","","","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","5","",""],["","","","","",""],["","","","","",""],["C1", "3","1","0","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","2","0","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["C1", "8","1","0","",""],["","","","","",""],["","","","","",""],["C1", "6","1","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["C1", "4","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["C1", "6","0","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["C1", "5","0.5","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]],
-      [["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""],["","","","","",""]]
-    ],
-    [ "sheet 2" ],
-    [ "sheet 3" ]
-  ]
-}
-
-// id, opaacity, cue_time, effect_nuk, effect_value
-var clear_data = [
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-  [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ], [ [],[],[],[],[],[],[],[] ],
-]
-var initial_data = saved_file.sheet_data[ 0 ]
-
-
-// VMX -------------------------------------------------------------------------
-
-// create the main renderer
-var renderer = new GlRenderer({element: 'glcanvas'});
-
-// channels
-var channel1_source = new VideoSource(renderer, { src: "" })
-//var channel1_filemanager = new FileManager( channel1_source )
-var channel1_effect = new ColorEffect( renderer, { source: channel1_source } )
-var channel1_monitor = new Monitor( renderer, { source: channel1_effect, element: 'monitoring_canvas_1' })
-
-var channel2_source = new VideoSource(renderer, { src: "" })
-//var channel2_filemanager = new FileManager( channel2_source )
-var channel2_effect = new ColorEffect( renderer, { source: channel2_source } )
-var channel2_monitor = new Monitor( renderer, { source: channel2_effect, element: 'monitoring_canvas_2' })
-
-var channel3_source = new VideoSource(renderer, { src: "" })
-//var channel3_filemanager = new FileManager( channel3_source )
-var channel3_effect = new ColorEffect( renderer, { source: channel3_source } )
-var channel3_monitor = new Monitor( renderer, { source: channel3_effect, element: 'monitoring_canvas_3' })
-
-var channel4_source = new VideoSource(renderer, { src: "" })
-//var channel4_filemanager = new FileManager( channel4_source )
-var channel4_effect = new ColorEffect( renderer, { source: channel4_source } )
-var channel4_monitor = new Monitor( renderer, { source: channel4_effect, element: 'monitoring_canvas_4' })
-
-var channel5_source = new VideoSource(renderer, { src: "" })
-//var channel5_filemanager = new FileManager( channel5_source )
-var channel5_effect = new ColorEffect( renderer, { source: channel5_source } )
-var channel5_monitor = new Monitor( renderer, { source: channel5_effect, element: 'monitoring_canvas_5' })
-
-var channel6_source = new VideoSource(renderer, { src: "" })
-//var channel6_filemanager = new FileManager( channel6_source )
-var channel6_effect = new ColorEffect( renderer, { source: channel6_source } )
-var channel6_monitor = new Monitor( renderer, { source: channel6_effect, element: 'monitoring_canvas_6' })
-
-var channel7_source = new VideoSource(renderer, { src: "" })
-//var channel7_filemanager = new FileManager( channel7_source )
-var channel7_effect = new ColorEffect( renderer, { source: channel7_source } )
-var channel7_monitor = new Monitor( renderer, { source: channel7_effect, element: 'monitoring_canvas_7' })
-
-var channel8_source = new VideoSource(renderer, { src: "" })
-//var channel8_filemanager = new FileManager( channel8_source )
-var channel8_effect = new ColorEffect( renderer, { source: channel8_source } )
-var channel8_monitor = new Monitor( renderer, { source: channel8_effect, element: 'monitoring_canvas_8' })
-
-var end_chain = new Chain( renderer, { sources: [
-  channel1_effect, channel2_effect, channel3_effect, channel4_effect,
-  channel5_effect, channel6_effect, channel7_effect, channel8_effect
-] } );
-
-var tap_bpm = new BPM(renderer);
-
-// master effects
-// var master_effect1 = new ColorEffect( renderer, { source: end_chain } )
-// var master_effect2 = new ColorEffect( renderer, { source: master_effect1 } )
-
-// mixer?
-// var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
-
-// preview out
-// var monitor = new Monitor( renderer, { source: mixer1, element: 'monitoring_canvas' })
-
-// final out
-var output = new Output( renderer, end_chain )
-
-// initialize the renderer and start the renderer
-renderer.init();         // init
-renderer.render();       // start update & animation
-
-// disable looping
-channel1_source.video.loop = false
-channel2_source.video.loop = false
-channel3_source.video.loop = false
-channel4_source.video.loop = false
-channel5_source.video.loop = false
-channel6_source.video.loop = false
-channel7_source.video.loop = false
-channel8_source.video.loop = false
-
-// c_effect.effect(14)
-// contrast.effect(61)
-// contrast.extra(0.4)
-
-var bpm = tap_bpm.bpm
 var is_playing = false
 
 
-// Build Instruments -----------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Build Instruments
 
+var current_instrument_id = 0
 var INSTRUMENTS = []
 saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
 
@@ -223,7 +24,7 @@ document.querySelectorAll('.instrument').forEach( function( instrument, i ) {
 })
 
 // -----------------------------------------------------------------------------
-//
+// FILL THE TRACK
 
 var fill_values = function( _val ) {
   _val.forEach((row, x) => {
@@ -295,6 +96,18 @@ var update = function() {
 
   v = document.getElementById("instrument_video")
   var newleft  = ( (v.currentTime / v.duration ) * 100 ) + "%"
+
+  //if (v.paused)  {
+  //  v.style.opacity = 0.3
+  //} else {
+  //  v.style.opacity = 1
+  //}
+
+  // loop?
+  //setTimeout( function() {
+  //  newleft
+  //})
+
   //console.log(newleft)
   document.querySelector('.playhead').style.left = newleft
 
@@ -306,7 +119,7 @@ var update = function() {
 }
 update()
 
-// check if there is an entry in the cell, and execute it
+// Update helper: check if there is an entry in the cell, and execute it
 function checkEntry(item, i) {
   var note = item.querySelector('.note').textContent
   var index = item.querySelector('.index').textContent
@@ -326,7 +139,7 @@ function checkEntry(item, i) {
 
     console.log("got something",i, !isNaN(note), !isNaN(index),!isNaN(opacity),!isNaN(cue),!isNaN(effect),!isNaN(effect_extra))
     console.log( item.dataset )
-    console.log("index ", note )
+    console.log("note ", note )
     console.log("index ", index )
     console.log("opacity ", opacity )
     console.log("cue ", cue )
@@ -334,7 +147,44 @@ function checkEntry(item, i) {
     console.log("effect_extra ", effect_extra )
 
     // Set Note
-    if ( !isNaN(note) && note != "" ) {
+    if (note) {
+      console.log("git note", note)
+      var channel = Number(item.dataset.col) + 1
+      var source = window["channel" + channel + "_source"]
+      if ( source.video.seeking ) {
+        console.warn("video is seeking")
+        return
+      }
+
+      // failsafe
+      if (!saved_file.instruments[index]) return
+
+      var cues = saved_file.instruments[index].cues
+      cues.forEach((cue, j) => {
+         if ( cue[0] == note ) {
+          source.video.currentTime = Number(cue[1])
+          source.video.play()
+
+          // set timout for source out
+          // Number(cue[1])
+          console.log("we got contact", cue, note, Number(cue[1]))
+        }
+
+      //keymap.forEach((key, i) => {
+      //  console.log("git key", key)
+      // if (note == key[0]) {
+        /*
+         var cues = saved_file.instruments[current_instrument_id].cues
+         cues.forEach((cue, j) => {
+           if ( cue[0] == key[0] ) {
+             var v = document.getElementById('index')
+             v.currentTime = Number(cue[1])
+           }
+         });
+       }
+        */
+
+      });
     }
 
     // Set Index
@@ -413,6 +263,7 @@ keys = []
 selected_in_row = 1
 current_row_id = 0
 
+// Tracker interaction helper
 function select_cell( _none = "" ){
   var elm = document.getElementById("main_table")
   var row = elm.querySelectorAll("tr")[current_row_id]
@@ -465,22 +316,72 @@ function select_cell( _none = "" ){
 }
 select_cell()
 
+// document.getElementById("main_table").querySelectorAll("tr")
+
+/*
+49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187,
+ 1,  2,  3,  4,  5,  6,  7,  8,  9,  0,   -,   =,
+
+81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221,
+ q,  w,  e,  r,  t,  y,  u,  i,  o,  p,   [,   ],
+
+65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, 220,
+ a,  s,  d,  f,  g,  h,  j,  k,   l,   ;,   ',   \,
+
+192, 90, 88, 67, 86, 66, 78, 77, 188, 190, 191
+ `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
+
+ https://wikide.openmpt.org/images/thumb/5/50/Setup_keyboard_keymap.png/500px-Setup_keyboard_keymap.png
+
+*/
+
+var keymap = [
+   ["C1", 81 ], // q
+   ["C#1", 50 ], // 2
+   ["D1", 87 ], // w
+   ["D#1", 51 ], // 3
+   ["E1", 69 ], // e
+   ["F1", 82 ], // r
+   ["F#1", 53 ], // 5
+   ["G1", 84 ], // t
+   ["G#1", 54 ], // 6
+   ["A1", 89 ], // y
+   ["A#1", 55 ], // 7
+   ["B1", 85 ], // u
+   ["C2", 73 ], // i
+   ["C#2", 57 ], // 9
+   ["D2", 79 ], // o
+   ["D#2", 48 ], // 0
+   ["E2", 80 ], // p
+   ["F2", 219 ], // [
+   ["F#2", 81 ], // =
+   ["G2", 221 ], // ]
+
+   ["C3", 90 ], // z
+   ["C#3", 83 ], // s
+   ["D3", 88 ], // x
+   ["D#3", 68 ], // d
+   ["E3", 67 ], // c
+   ["F3", 86 ], // v
+   ["F#3", 71 ], // g
+   ["G3", 66 ], // b
+   ["G#3", 72 ], // h
+   ["A3", 78 ], // n
+   ["A#3", 74 ], // j
+   ["B3", 77 ] // m
+ ]
+
 window.onkeydown = function(evt) {
-  console.log("event:", evt.which)
+  console.log("onkeydownevent:", evt.which)
 
-  //32 -- space
-
-  //38 -- up
-  //37 -- left
-  //39 -- right
-  //40 -- down
-
+  //32 -- space: TRACKER PLAY TOGGLE
   if (evt.which == 32) {
     is_playing = !is_playing
     evt.preventDefault
     return false
   }
 
+  //37 -- left: NAVIGATE TRACKER LEFT
   if ( evt.which == 37 ) {
     selected_in_row -= 1
     if (selected_in_row < 1) selected_in_row = 1
@@ -489,6 +390,7 @@ window.onkeydown = function(evt) {
     return false
   }
 
+  //39 -- right: NAVIGATE TRACKER RIGHT
   if ( evt.which == 39 ) {
     selected_in_row += 1
     if (selected_in_row > 8) selected_in_row = 8
@@ -497,6 +399,7 @@ window.onkeydown = function(evt) {
     return false
   }
 
+  //38 -- up: NAVIGATE TRACKER UP
   if (evt.which == 38) {
     if (elm.scrollTop <= 0) {
       elm.scrollTop = 1006
@@ -510,6 +413,7 @@ window.onkeydown = function(evt) {
     return false
   }
 
+  //40 -- down: NAVIGATE TRACKER DOWN
   if (evt.which == 40) {
     if (elm.scrollTop >= 1006) {
       elm.scrollTop = 0
@@ -523,49 +427,28 @@ window.onkeydown = function(evt) {
     return false
   }
 
-  // home
+  // home: RESET TRACKER
   if (evt.which == 36) {
     select_cell('none')
     reset()
   }
 
+  // backspace
   if (evt.which == 8) {
     updatebpm()
   }
 
-  // document.getElementById("main_table").querySelectorAll("tr")
-
-  /*
-  49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187,
-   1,  2,  3,  4,  5,  6,  7,  8,  9,  0,   -,   =,
-
-  81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221,
-   q,  w,  e,  r,  t,  y,  u,  i,  o,  p,   [,   ],
-
-  65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, 220,
-   a,  s,  d,  f,  g,  h,  j,  k,   l,   ;,   ',   \,
-
- 192, 90, 88, 67, 86, 66, 78, 77, 188, 190, 191
-   `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
-
-   https://wikide.openmpt.org/images/thumb/5/50/Setup_keyboard_keymap.png/500px-Setup_keyboard_keymap.png
-
-
-   C
-
-   C#
-
-   D
-
-   D#
-
-   E
-
-   F
-
-   F#
-
-  */
+  keymap.forEach((key, i) => {
+   if (evt.which == key[1]) {
+     var cues = saved_file.instruments[current_instrument_id].cues
+     cues.forEach((cue, j) => {
+       if ( cue[0] == key[0] ) {
+         var v = document.getElementById('instrument_video')
+         v.currentTime = Number(cue[1])
+       }
+     });
+   }
+  });
 }
 
 function updatebpm() {
@@ -591,9 +474,10 @@ function export_sheet() {
 }
 
 function import_sheet(sheet_data) {
-
+  // TODO
 }
 
+// open through  button
 function open_instrument(_id){
   document.getElementById('page1_player').classList.remove('selected')
   document.getElementById('page2_instrument').classList.add('selected')
@@ -615,206 +499,7 @@ document.getElementById('tracker_back').onclick = function() { open_tracker() }
 
 var instrument_preview_interval = setInterval(function(){})
 
-function load_up_instrument(_id) {
-  var v = document.getElementById('instrument_video')
-  v.src = INSTRUMENTS[_id]
-
-  var c = document.getElementById('cue_canvas')
-  var width = document.querySelector('.cueeditor').offsetWidth
-  c.width = width
-  c.height = 250
-  var cctx = c.getContext( '2d' );
-
-  // cctx.clearRect(0, 0, 1024, 1024); // send nothing
-  var cnt = 0
-  var cues = saved_file.instruments[_id].cues
-  var loaded_cues = 0
-
-  document.getElementById('cuelist').innerHTML = ""
-
-
-  clearInterval(instrument_preview_interval)
-  instrument_preview_interval = setInterval( function() {
-
-    //var idmgData = cctx.getImageData(0, 0, 1000, 1000);
-    //cctx.rect( cnt + 150, 0, 1000, 300);
-    //cctx.clip();
-    //cctx.drawImage( v, cnt, 0, 360, 1280, cnt, 0, 200, 400 );
-
-    //The source image is taken from the coordinates (33, 71),
-    // with a width of 104 and a height of 124. It is drawn to the canvas
-    //  at (21, 20), where it is given a width of 87 and a height of 104.
-    //console.log('trr', r_h, r_w)
-    var r_h = v.videoHeight
-    var r_w = v.videoWidth
-
-    if ( v.readyState === v.HAVE_ENOUGH_DATA && !v.seeking) {
-
-
-      //cctx.drawImage( v, 960, 0, 960, 1080, cnt-10, 0, 150, 240 );
-      cctx.drawImage( v, r_w/2, 0, r_w/2, r_h, cnt-5, 0, 150, 240 );
-      //cctx.putImageData(imgData, 0, 0);
-
-      //console.log("ding", cnt)
-      //|              |
-      //       900
-
-      //----------------
-      //duration / width
-
-      v.currentTime += ( v.duration / width) * 10
-
-      if ( v.currentTime >= v.duration ) {
-        clearInterval(instrument_preview_interval)
-      }
-      cnt += 10
-
-      // cues.sort() ?
-      //console.log( loaded_cues, v.currentTime )
-      // cues[ loaded_cues ][0] = Note
-      // cues[ loaded_cues ][1] = in-point
-      if ( cues.length > 0 && loaded_cues < cues.length ) {
-        if ( cues[ loaded_cues ][1] < v.currentTime ) {
-          console.log("found a CUE!", loaded_cues, cues[ loaded_cues ])
-          createCue( cues, loaded_cues )
-
-          /// c.width = width
-          //  c.height = 250
-          //  var cctx = c.getContext( '2d' );
-
-          loaded_cues+=1
-        }
-      }
-    }
-  },10) // end interval
-
-  var scrub_interval = setInterval(function() {}, 1000000)
-  c.onmousedown = function(evt) {
-    console.log("mousedown, START")
-    clearInterval(scrub_interval)
-    //scrub_interval = setInterval( function() {
-    v.currentTime = ( evt.offsetX / width ) * v.duration
-
-    c.onmousemove = function(mm_evt) {
-      console.log("tik", v.seeking, mm_evt.offsetX )
-      if (!v.seeking) {
-        v.currentTime = ( mm_evt.offsetX / width ) * v.duration
-      }
-
-      if (isdown) {
-        console.log("do drag", isdown, mm_evt)
-        isdown.style.left = mm_evt.screenX + "px"
-      }
-    }
-  }
-
-  //
-  document.querySelector('.cueeditor').onmouseout = c.onmouseup = function(evt) {
-    console.log("mouseup, stop")
-    clearInterval(scrub_interval)
-    c.onmousemove = null
-  }
-
-  /*
-  var i = 0
-  _self.update = function() {
-
-
-    if (_self.bypass = false) return
-    if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
-      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );
-
-      if ( videoTexture ) videoTexture.needsUpdate = true;
-    }else{
-      canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );  // send last image
-      // TODO: console.log("SEND IN BLACK!") ?
-      // canvasElementContext.clearRect(0, 0, 1024, 1024); // send nothing
-      //_self.alpha = 0
-      if ( videoTexture ) videoTexture.needsUpdate = true;
-    }
-  }
-  */
-}
-
-var isdown = null
-var dragInterval = setInterval(function(){},10000)
-function createCue( cues, loaded_cues ) {
-  var html = `
-      <div class='cue-container cue' id='cue-${loaded_cues}'>
-        <div class='cue-still'>
-          <div class='cue-note'> ${cues[ loaded_cues ][0]} </div>
-          <div class='cue-in'> ${cues[ loaded_cues ][1]} </div>
-          <div class='cue-out'> ${cues[ loaded_cues ][2]} </div>
-          <button class="btn" id="cue-duplicate-button">duplicate</button>
-          <button class="btn" id="cue-delete-button">delete</button>
-        </div>
-        </div>
-      </div>
-    `
-    // NEEDS APPEND!
-  var new_html = document.createElement('div')
-  new_html.innerHTML += html
-  document.getElementById('cuelist').append(new_html)
-
-  var v = document.getElementById('instrument_video')
-  var r_h = v.videoHeight
-  var r_w = v.videoWidth
-
-  var _id = "cue-still-canvas-" + loaded_cues
-  console.log(_id)
-  var cvs = document.createElement('canvas')
-  cvs.classList.add('cue-canvas')
-  var cvsctx = cvs.getContext('2d')
-
-  // cvsctx.fillRect(0, 0, 10, 10)
-  // cvsctx.drawImage( v, r_w, 0, r_w, r_h, 0, 0, 64, 64 );
-  cvsctx.drawImage(v, 0, 0, 300,150)
-  document.getElementById('cue-' + loaded_cues).append(cvs)
-  console.log(v, cvs)
-
-  // ====
-  var in_point = cues[ loaded_cues ][1] / v.duration
-  var out_point = cues[ loaded_cues ][2] / v.duration
-
-  // and so below
-  var html = `
-      <div class="cue-marker"
-        data-inpoint="${in_point*100}%"
-        data-outpoint="${in_point*100}%"
-        style="left:${in_point*100}%;width:${out_point*100}%"
-        >
-        <div class="left_handle"></div>
-        <div class="right_handle"></div>
-      </div>
-    `
-  var new_html = document.createElement('div')
-  new_html.innerHTML += html
-  document.querySelector('.cues').append(new_html)
-
-  setTimeout( function() {
-    document.querySelectorAll('.left_handle').forEach((item, i) => {
-      //item.onmouseup = function() {
-      //  console.log("mousedown, ITEM STOP", item)
-      //  isdown = null
-      //}
-      item.onmousedown = function() {
-        console.log("mousedown, ITEM START", item)
-        isdown = item
-        clearInterval(dragInterval)
-        dragInterval = setInterval( function(_evt) {
-          drag(item, _evt)
-        }, 200 )
-      }
-    });
-  }, 20)
-  //document.querySelectorAll('.right_handle')
-}
-
-function drag(item, evt) {
-  console.log("drag", item, evt)
-}
-
-
+// reset tracker
 function reset() {
   elm = document.getElementById('tracker')
   elm.scrollTop = 0

@@ -104,7 +104,13 @@ html
 
 
     #page2_instrument.instrument_grid_container
-      #cuelist
+      
+      #cuelist      
+        .cue-containers
+
+        hr
+        button#add-cue-button add cue
+
 
       .main
         .container
@@ -129,5 +135,9 @@ html
           
 // -----------------------------------------------------------------------------
 // add remote javascript
+script(src='/javascripts/remotes/videotracker/file1.js')
+script(src='/javascripts/remotes/videotracker/mixer.js')
+script(src='/javascripts/remotes/videotracker/instruments.js')
+script(src='/javascripts/remotes/videotracker/cue_editor.js')
 script(src='/javascripts/remotes/videotracker_remote.js')
 include ../partials/analytics
