@@ -21,6 +21,8 @@ html
       button(onClick="reset()") RESET
       |
       button(onClick="is_playing = !is_playing") PLAY/PAUSE
+      button(onClick="import_sheet()") IMPORT
+      button(onClick="export_sheet()") SAVE
     
     #page1_player.tracker_grid_container.selected
 
@@ -137,6 +139,7 @@ html
 // add remote javascript
 script(src='/javascripts/remotes/videotracker/file1.js')
 script(src='/javascripts/remotes/videotracker/mixer.js')
+script(src='/javascripts/remotes/videotracker/tracker.js')
 script(src='/javascripts/remotes/videotracker/instruments.js')
 script(src='/javascripts/remotes/videotracker/cue_editor.js')
 script(src='/javascripts/remotes/videotracker_remote.js')
