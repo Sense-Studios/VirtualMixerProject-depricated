@@ -1,71 +1,3 @@
-
-
-// KEYMAP ----------------------------------------------------------------------
-// document.getElementById("main_table").querySelectorAll("tr")
-
-/*
-49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187,
- 1,  2,  3,  4,  5,  6,  7,  8,  9,  0,   -,   =,
-
-81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221,
- q,  w,  e,  r,  t,  y,  u,  i,  o,  p,   [,   ],
-
-65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, 220,
- a,  s,  d,  f,  g,  h,  j,  k,   l,   ;,   ',   \,
-
-192, 90, 88, 67, 86, 66, 78, 77, 188, 190, 191
- `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
-
- https://wikide.openmpt.org/images/thumb/5/50/Setup_keyboard_keymap.png/500px-Setup_keyboard_keymap.png
-
-*/
-
-var keymap = [
-   ["C1", 81 ], // q
-   ["C#1", 50 ], // 2
-   ["D1", 87 ], // w
-   ["D#1", 51 ], // 3
-   ["E1", 69 ], // e
-   ["F1", 82 ], // r
-   ["F#1", 53 ], // 5
-   ["G1", 84 ], // t
-   ["G#1", 54 ], // 6
-   ["A1", 89 ], // y
-   ["A#1", 55 ], // 7
-   ["B1", 85 ], // u
-   ["C2", 73 ], // i
-   ["C#2", 57 ], // 9
-   ["D2", 79 ], // o
-   ["D#2", 48 ], // 0
-   ["E2", 80 ], // p
-   ["F2", 219 ], // [
-   ["F#2", 81 ], // =
-   ["G2", 221 ], // ]
-
-   ["C3", 90 ], // z
-   ["C#3", 83 ], // s
-   ["D3", 88 ], // x
-   ["D#3", 68 ], // d
-   ["E3", 67 ], // c
-   ["F3", 86 ], // v
-   ["F#3", 71 ], // g
-   ["G3", 66 ], // b
-   ["G#3", 72 ], // h
-   ["A3", 78 ], // n
-   ["A#3", 74 ], // j
-   ["B3", 77 ] // m
- ]
-
- // -----------------------------------------------------------------------------
- // Constants
-
-
-
-var keys = []
-
-//  trackeditor
-
-
 // -----------------------------------------------------------------------------
 // Update Cycle
 // -----------------------------------------------------------------------------
@@ -206,7 +138,16 @@ function updatebpm() {
 }
 
 function import_sheet( _data ) {
-  saved_file = JSON.parse(_data)
+  if (!_data) {
+    navigator.clipboard.readText().then( function(_data) {
+      console.log(_data)
+      saved_file = JSON.parse(_data)
+      fill_values( saved_file.sheet_data[current_sheet])
+    });
+  }else{
+    saved_file = JSON.parse(_data)
+    fill_values( saved_file.sheet_data[current_sheet])
+  }
 }
 
 function export_sheet() {

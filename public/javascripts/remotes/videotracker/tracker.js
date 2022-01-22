@@ -4,11 +4,71 @@ var current_sheet = 0
 var selected_in_row = 1
 var current_row_id = 0
 
+// KEYMAP ----------------------------------------------------------------------
+// document.getElementById("main_table").querySelectorAll("tr")
+
+/*
+49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187,
+ 1,  2,  3,  4,  5,  6,  7,  8,  9,  0,   -,   =,
+
+81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221,
+ q,  w,  e,  r,  t,  y,  u,  i,  o,  p,   [,   ],
+
+65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, 220,
+ a,  s,  d,  f,  g,  h,  j,  k,   l,   ;,   ',   \,
+
+192, 90, 88, 67, 86, 66, 78, 77, 188, 190, 191
+ `,  z,  x,  c,  v,  b,  n,  m,   ,,   .,   /
+
+ https://wikide.openmpt.org/images/thumb/5/50/Setup_keyboard_keymap.png/500px-Setup_keyboard_keymap.png
+
+*/
+
+var keys = []
+var keymap = [
+   ["C1", 81 ], // q
+   ["C#1", 50 ], // 2
+   ["D1", 87 ], // w
+   ["D#1", 51 ], // 3
+   ["E1", 69 ], // e
+   ["F1", 82 ], // r
+   ["F#1", 53 ], // 5
+   ["G1", 84 ], // t
+   ["G#1", 54 ], // 6
+   ["A1", 89 ], // y
+   ["A#1", 55 ], // 7
+   ["B1", 85 ], // u
+   ["C2", 73 ], // i
+   ["C#2", 57 ], // 9
+   ["D2", 79 ], // o
+   ["D#2", 48 ], // 0
+   ["E2", 80 ], // p
+   ["F2", 219 ], // [
+   ["F#2", 81 ], // =
+   ["G2", 221 ], // ]
+
+   ["C3", 90 ], // z
+   ["C#3", 83 ], // s
+   ["D3", 88 ], // x
+   ["D#3", 68 ], // d
+   ["E3", 67 ], // c
+   ["F3", 86 ], // v
+   ["F#3", 71 ], // g
+   ["G3", 66 ], // b
+   ["G#3", 72 ], // h
+   ["A3", 78 ], // n
+   ["A#3", 74 ], // j
+   ["B3", 77 ] // m
+ ]
+
 // -----------------------------------------------------------------------------
 // FILL THE TRACK
 
 var fill_values = function( _val ) {
   console.log("fill")
+
+  saved_file.sheet_data[0] = _val
+
   _val.forEach((row, x) => {
     row.forEach((col, y) => {
       //console.log("filling: row:", x, "col:", y)
@@ -179,9 +239,12 @@ function select_cell( _none = "" ){
   //highlight
   cell.classList.add('selected')
 
+  // <input class="note" value="${cell.querySelector('.note').innerText}"/>
+  var randid = "note_" + Math.round( Math.random() * 1000000 )
+  var current_note = cell.querySelector('.note').innerText
   html = `
     <div class="trigger_cell">
-      <input class="note" value="${cell.querySelector('.note').innerText}"/>
+      <select id="note-${randid}" class="note" value=""/></select>
       <input class="index" value="${cell.querySelector('.index').innerText}"/>
       <input class="opacity" value="${cell.querySelector('.opacity').innerText}"/>
       <input class="cue" value="${cell.querySelector('.cue').innerText}"/>
@@ -191,8 +254,8 @@ function select_cell( _none = "" ){
   `
 
   cell.innerHTML = html
+  fillnotekeys( document.getElementById(`note-${randid}`), current_note )
   cell.querySelector('.index').focus()
-
 }
 
 // Tracker reset helper
@@ -202,7 +265,21 @@ var reset = function() {
   current_row_id = 0
 }
 
+// helper
+var fillnotekeys = function( _selectelement, _select ) {
+  console.log("fill keys", _selectelement, "note:", _select)
+  var html = "<option value=''></option>"
+  keymap.forEach((note, i) => {
+    if ( _select == note[0] ) {
+      html += `<option selected value='${note[0]}'>${note[0]}</option>`
+    }else{
+      html += `<option value='${note[0]}'>${note[0]}</option>`
+    }
+  });
+  _selectelement.innerHTML = html
+}
+
 // MAIN
 select_cell()
-//fill_values( saved_file.sheet_data[current_sheet])
-fill_values( clear_data )
+fill_values( saved_file.sheet_data[current_sheet])
+//fill_values( clear_data )
