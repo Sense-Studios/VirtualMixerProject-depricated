@@ -97,7 +97,7 @@ var GlRenderer = function( _options ) {
   /** @function GlRenderer.init */
   _self.init = function(  ) {
     console.log("init renderer")
-    _self.glrenderer = new THREE.WebGLRenderer( { canvas: _self.element, alpha: false } );
+    _self.glrenderer = new THREE.WebGLRenderer( { canvas: _self.element, alpha: false, preserveDrawingBuffer: true } );
 
     // init nodes
     // reset the renderer, for a new lay out

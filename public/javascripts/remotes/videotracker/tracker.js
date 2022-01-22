@@ -8,23 +8,32 @@ var current_row_id = 0
 // FILL THE TRACK
 
 var fill_values = function( _val ) {
+  console.log("fill")
   _val.forEach((row, x) => {
     row.forEach((col, y) => {
       //console.log("filling: row:", x, "col:", y)
       if ( col[0] != undefined ) {
         var elm = document.querySelector('td[data-rowcol="'+x + "," + y +'"]')
-        // console.log("has col: ", col, "rowcol: ", x, y, elm)
+        console.log("has col: ", col, "rowcol: ", x, y, elm)
 
         // starts the index of an instrument
-        // console.log( "-", col[0], elm.querySelector('.note'), "--" )
+        console.log( "-", col[0], elm.querySelector('.note'), "--" )
 
         // elm.querySelector('.index').textContent = col[0]
-        if ( col[0] ) elm.querySelector('.note').textContent = col[0]
-        if ( col[1] ) elm.querySelector('.index').textContent = col[1]
-        if ( col[2] ) elm.querySelector('.opacity').textContent = col[2]
-        if ( col[3] ) elm.querySelector('.cue').textContent = col[3]
-        if ( col[4] ) elm.querySelector('.effect').textContent = col[4]
-        if ( col[5] ) elm.querySelector('.effect_extra').textContent = col[5]
+        //if ( col[0] ) elm.querySelector('.note').textContent = col[0]
+        //if ( col[1] ) elm.querySelector('.index').textContent = col[1]
+        //if ( col[2] ) elm.querySelector('.opacity').textContent = col[2]
+        //if ( col[3] ) elm.querySelector('.cue').textContent = col[3]
+        //if ( col[4] ) elm.querySelector('.effect').textContent = col[4]
+        //if ( col[5] ) elm.querySelector('.effect_extra').textContent = col[5]
+
+        elm.querySelector('.note').textContent = col[0]
+        elm.querySelector('.index').textContent = col[1]
+        elm.querySelector('.opacity').textContent = col[2]
+        elm.querySelector('.cue').textContent = col[3]
+        elm.querySelector('.effect').textContent = col[4]
+        elm.querySelector('.effect_extra').textContent = col[5]
+
       }
     });
   });
@@ -195,4 +204,5 @@ var reset = function() {
 
 // MAIN
 select_cell()
-fill_values( saved_file.sheet_data[current_sheet])
+//fill_values( saved_file.sheet_data[current_sheet])
+fill_values( clear_data )
