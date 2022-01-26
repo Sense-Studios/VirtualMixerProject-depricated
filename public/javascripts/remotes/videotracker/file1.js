@@ -176,4 +176,4 @@ var clear_data = [
 
 ]
 
-var initial_data = saved_file.sheet_data[ 0 ]sa
+var initial_data = saved_file.sheet_data[ 0 ]
