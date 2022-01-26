@@ -206,28 +206,30 @@ document.onkeyup = function(e){
     // check the keymap
     console.log("(key up) check keymap", e.which)
 
-    keymap.forEach((key, i) => {
-    console.log("--", e.which, key[1])
-     if (e.which == key[1]) {
-       trackervalues[0].value = key[0]
-       trackervalues[1].value = current_instrument_id
-       trackervalues[2].value = 1
-       trackervalues[3].value = ""
-       trackervalues[4].value = ""
-       trackervalues[5].value = ""
+    if (!e.ctrlKey) {
+      keymap.forEach((key, i) => {
+        console.log("--", e.which, key[1])
+       if (e.which == key[1]) {
+         trackervalues[0].value = key[0]
+         trackervalues[1].value = current_instrument_id
+         trackervalues[2].value = 1
+         trackervalues[3].value = ""
+         trackervalues[4].value = ""
+         trackervalues[5].value = ""
 
-       // scroll tracker       
-       if (elm.scrollTop >= 1006) {
-         elm.scrollTop = 0
+         // scroll tracker
+         if (elm.scrollTop >= 1006) {
+           elm.scrollTop = 0
+           return
+         }
+         elm.scrollBy(0,16)
+         current_row_id += 1
+         select_cell()
+         console.log("move element ...")
          return
        }
-       elm.scrollBy(0,16)
-       current_row_id += 1
-       select_cell()
-       console.log("move element ...")
-       return
-     }
-   })
+     })
+   }
 
     console.log("check key", e.key, e.ctrlKey)
     if ((e.key == 'c') && e.ctrlKey){
@@ -264,5 +266,4 @@ document.onkeyup = function(e){
 
         // One down? Four down?
     }
-
 }
