@@ -3,11 +3,13 @@
 
 var current_instrument_id = 0
 var INSTRUMENTS = []
+var SELECTED_INSTRUMENT = 0
 
 var build_instruments = function( _instruments ) {
+  var table = document.getElementById('instruments').children[0]
+  table.innerHTML = []
   INSTRUMENTS.forEach((instrument, i) => {
     //var elm = document.getElementById('#instrument')
-    var table = document.getElementById('instruments').children[0]
     table.innerHTML = table.innerHTML + "<tr><td>" + i + "</td><td><input class='instrument' data-instrumentindex='" + i + "' id='instrument_'"+i+" value='" + instrument + "'></td><td class='instrument_pointer' data-instrument-id='"+i+"'>»</td></tr>"
   });
 
@@ -32,15 +34,19 @@ var build_instruments = function( _instruments ) {
 // interaction
 
 // instruments, rollover and click
-var SELECTED_INSTRUMENT = 0
-document.getElementById('instruments').querySelectorAll('tr').forEach( function(elm, i) {
-  elm.onclick = function( evt ) {
-    var siblings = document.getElementById('instruments').querySelectorAll('tr')
-    siblings.forEach(function(elm, i){ elm.classList.remove('selected')})
-    elm.classList.add('selected')
-    SELECTED_INSTRUMENT = elm.querySelectorAll('td')[0].innerText
-  }
-})
+var init_instruments = function() {
+  console.log("init instrument", document.getElementById('instruments').querySelectorAll('tr'))
+  document.getElementById('instruments').querySelectorAll('tr').forEach( function(elm, i) {
+    elm.onclick = function( evt ) {
+      console.log("add click hadnler: ", elm.querySelectorAll('td')[1].innerText, elm.querySelectorAll('td')[2].dataset.instrumentId)
+      var siblings = document.getElementById('instruments').querySelectorAll('tr')
+      siblings.forEach(function(elm, i){ elm.classList.remove('selected')})
+      elm.classList.add('selected')
+      SELECTED_INSTRUMENT = elm.querySelectorAll('td')[1].innerText
+      current_instrument_id = elm.querySelectorAll('td')[2].dataset.instrumentId
+    }
+  })
+}
 
 // UI open through  button
 function open_instrument(_id){
@@ -52,5 +58,6 @@ function open_instrument(_id){
 }
 
 // INIT
-saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
+saved_file.instruments.forEach(function( instrument, i ) { INSTRUMENTS.push(instrument.url) })
 build_instruments(INSTRUMENTS)
+init_instruments()
