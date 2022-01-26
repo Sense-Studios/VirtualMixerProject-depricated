@@ -44,7 +44,7 @@ var keymap = [
    ["D#2", 48 ], // 0
    ["E2", 80 ], // p
    ["F2", 219 ], // [
-   ["F#2", 81 ], // =
+   ["F#2", 187 ], // =
    ["G2", 221 ], // ]
 
    ["C3", 90 ], // z
@@ -74,10 +74,10 @@ var fill_values = function( _val ) {
       //console.log("filling: row:", x, "col:", y)
       if ( col[0] != undefined ) {
         var elm = document.querySelector('td[data-rowcol="'+x + "," + y +'"]')
-        console.log("has col: ", col, "rowcol: ", x, y, elm)
+        // console.log("has col: ", col, "rowcol: ", x, y, elm)
 
         // starts the index of an instrument
-        console.log( "-", col[0], elm.querySelector('.note'), "--" )
+        // console.log( "-", col[0], elm.querySelector('.note'), "--" )
 
         // elm.querySelector('.index').textContent = col[0]
         //if ( col[0] ) elm.querySelector('.note').textContent = col[0]
@@ -255,7 +255,7 @@ function select_cell( _none = "" ){
 
   cell.innerHTML = html
   fillnotekeys( document.getElementById(`note-${randid}`), current_note )
-  cell.querySelector('.index').focus()
+  // cell.querySelector('.index').focus()
 }
 
 // Tracker reset helper
@@ -267,7 +267,7 @@ var reset = function() {
 
 // helper
 var fillnotekeys = function( _selectelement, _select ) {
-  console.log("fill keys", _selectelement, "note:", _select)
+  // console.log("fill keys", _selectelement, "note:", _select)
   var html = "<option value=''></option>"
   keymap.forEach((note, i) => {
     if ( _select == note[0] ) {

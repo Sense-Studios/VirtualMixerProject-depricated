@@ -189,7 +189,9 @@ canvas.cue-canvas {
     left: 0vw; }
   #page2_instrument.instrument_grid_container #cuelist {
     grid-area: cuelist;
-    background-color: blue; }
+    background-color: blue;
+    max-height: 80vh;
+    overflow-y: scroll; }
     #page2_instrument.instrument_grid_container #cuelist .cue-containers {
       display: flex;
       flex-direction: column; }

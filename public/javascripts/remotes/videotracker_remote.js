@@ -139,19 +139,25 @@ function updatebpm() {
 
 function import_sheet( _data ) {
   if (!_data) {
+    alert("will import from clipboard!")
     navigator.clipboard.readText().then( function(_data) {
       console.log(_data)
       saved_file = JSON.parse(_data)
-      fill_values( saved_file.sheet_data[current_sheet])
     });
   }else{
     saved_file = JSON.parse(_data)
-    fill_values( saved_file.sheet_data[current_sheet])
   }
+
+  fill_values( saved_file.sheet_data[current_sheet])
+
+  INSTRUMENTS = []
+  saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
+  build_instruments(INSTRUMENTS)
 }
 
 function export_sheet() {
   navigator.clipboard.writeText( JSON.stringify( saved_file ) )
+  alert("exported to clipboard!")
 }
 
 document.getElementById('tracker_back').onclick = function() {
@@ -173,3 +179,90 @@ document.getElementById('bpm_display').onchange = function() {
 }
 
 update()
+
+
+var myClipboardVariable;
+
+document.onkeyup = function(e){
+    console.log(document.querySelector('td.selected'))
+
+    if ( document.querySelector('td.selected') === null ) return
+
+    var trackervalues = document.querySelector('td.selected .trigger_cell').children
+
+    // Del/ Backspace
+    if (e.which == 46 || e.whichh == 8) {
+      trackervalues[0].value = ""
+      trackervalues[1].value = ""
+      trackervalues[2].value = ""
+      trackervalues[3].value = ""
+      trackervalues[4].value = ""
+      trackervalues[5].value = ""
+      return
+
+      // One down? Four down?
+    }
+
+    // check the keymap
+    console.log("(key up) check keymap", e.which)
+
+    keymap.forEach((key, i) => {
+    console.log("--", e.which, key[1])
+     if (e.which == key[1]) {
+       trackervalues[0].value = key[0]
+       trackervalues[1].value = current_instrument_id
+       trackervalues[2].value = 1
+       trackervalues[3].value = ""
+       trackervalues[4].value = ""
+       trackervalues[5].value = ""
+
+       // scroll tracker       
+       if (elm.scrollTop >= 1006) {
+         elm.scrollTop = 0
+         return
+       }
+       elm.scrollBy(0,16)
+       current_row_id += 1
+       select_cell()
+       console.log("move element ...")
+       return
+     }
+   })
+
+    console.log("check key", e.key, e.ctrlKey)
+    if ((e.key == 'c') && e.ctrlKey){
+        // save data (you want to copy) into variable
+        //myClipboardVariable = ....//some data
+        //window.clipboardData.clearData();
+        console.log("go go go!")
+        var clipboard_text = ""
+        clipboard_text += trackervalues[0].value // note
+        clipboard_text += "|" + trackervalues[1].value // index
+        clipboard_text += "|" + trackervalues[2].value // opacity
+        clipboard_text += "|" + trackervalues[3].value // cue
+        clipboard_text += "|" + trackervalues[4].value // effect
+        clipboard_text += "|" + trackervalues[5].value // effect_extra
+        console.log(clipboard_text)
+        navigator.clipboard.writeText(clipboard_text)
+        // One down? Four down?
+    }
+
+    if ((e.key == 'v') && e.ctrlKey){
+        console.log(" has clipboard data ", navigator.clipboard)
+        navigator.clipboard.readText().then(function(clipboard_text) {
+          console.log("we have", clipboard_text )
+          clipboard_text = clipboard_text.split("|")
+
+          console.log("go go go", trackervalues, clipboard_text)
+          trackervalues[0].value = clipboard_text[0]
+          trackervalues[1].value = clipboard_text[1]
+          trackervalues[2].value = clipboard_text[2]
+          trackervalues[3].value = clipboard_text[3]
+          trackervalues[4].value = clipboard_text[4]
+          trackervalues[5].value = clipboard_text[5]
+        })
+
+        // One down? Four down?
+    }
+
+}
