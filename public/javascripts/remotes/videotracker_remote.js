@@ -191,7 +191,7 @@ document.onkeyup = function(e){
     var trackervalues = document.querySelector('td.selected .trigger_cell').children
 
     // Del/ Backspace
-    if (e.which == 46 || e.whichh == 8) {
+    if (e.which == 46 || e.which == 8) {
       trackervalues[0].value = ""
       trackervalues[1].value = ""
       trackervalues[2].value = ""
