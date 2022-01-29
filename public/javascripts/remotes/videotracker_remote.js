@@ -208,7 +208,7 @@ document.onkeyup = function(e){
 
     if (!e.ctrlKey) {
       keymap.forEach((key, i) => {
-        console.log("--", e.which, key[1])
+       // console.log("--", e.which, key[1])
        if (e.which == key[1]) {
          trackervalues[0].value = key[0]
          trackervalues[1].value = current_instrument_id
