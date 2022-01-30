@@ -3,6 +3,7 @@ var is_recording = false
 var current_sheet = 0
 var selected_in_row = 1
 var current_row_id = 0
+var cue_timeout = setTimeout(function(){}, 100)
 
 // KEYMAP ----------------------------------------------------------------------
 // document.getElementById("main_table").querySelectorAll("tr")
@@ -144,16 +145,33 @@ function checkEntry(item, i) {
          if ( cue[0] == note ) {
           source.video.currentTime = Number(cue[1])
           source.video.play()
-
+          var out = (Number(cue[2]) - Number(cue[1])) * 1000
           // set timout for source out
           // Number(cue[1])
-          console.log("we got contact", cue, note, Number(cue[1]))
+          clearTimeout(source.cue_timeout)
+          console.log(" TIMEOUT set got contact " + out)
+          source.cue_timeout = setTimeout( function() {
+            console.log(" TIMEOUT we got contact", out, cue, note, Number(cue[1]))
+            source.alpha(0)
+          }, out )
+          source.alpha(1)
+
+
 
           // now we actually need to check the last cue too\
           // something about killing the channel if the note has expired cue[2]
           // if cue[1]
         }
       });
+    }
+
+    // Set Opacity
+    if ( !isNaN(opacity) && opacity != "" ) {
+      // clearTimeout(cue_timeout)
+      var channel = Number(item.dataset.col) + 1
+      var source = window["channel" + channel + "_source"]
+      console.log("opacity", channel, source, opacity, " on channel", channel)
+      source.alpha(opacity)
     }
 
     // Set Index
@@ -167,14 +185,6 @@ function checkEntry(item, i) {
         console.log("source", INSTRUMENTS[ index ], " on channel", channel)
         source.video.play()
       }
-    }
-
-    // Set Opacity
-    if ( !isNaN(opacity) && opacity != "" ) {
-      var channel = Number(item.dataset.col) + 1
-      var source = window["channel" + channel + "_source"]
-      console.log("opacity", channel, source, opacity, " on channel", channel)
-      source.alpha(opacity)
     }
 
     // Override that shit, when mute is checked

@@ -178,11 +178,6 @@ document.getElementById('bpm_display').onchange = function() {
   bpm = Number(this.value)
 }
 
-update()
-
-
-var myClipboardVariable;
-
 document.onkeyup = function(e){
     console.log(document.querySelector('td.selected'))
 
@@ -191,7 +186,7 @@ document.onkeyup = function(e){
     var trackervalues = document.querySelector('td.selected .trigger_cell').children
 
     // Del/ Backspace
-    if (e.which == 46 || e.whichh == 8) {
+    if (e.which == 46 || e.which == 8) {
       trackervalues[0].value = ""
       trackervalues[1].value = ""
       trackervalues[2].value = ""
@@ -208,7 +203,7 @@ document.onkeyup = function(e){
 
     if (!e.ctrlKey) {
       keymap.forEach((key, i) => {
-        console.log("--", e.which, key[1])
+      // console.log("--", e.which, key[1])
        if (e.which == key[1]) {
          trackervalues[0].value = key[0]
          trackervalues[1].value = current_instrument_id
@@ -233,9 +228,6 @@ document.onkeyup = function(e){
 
     console.log("check key", e.key, e.ctrlKey)
     if ((e.key == 'c') && e.ctrlKey){
-        // save data (you want to copy) into variable
-        //myClipboardVariable = ....//some data
-        //window.clipboardData.clearData();
         console.log("go go go!")
         var clipboard_text = ""
         clipboard_text += trackervalues[0].value // note
@@ -267,3 +259,12 @@ document.onkeyup = function(e){
         // One down? Four down?
     }
 }
+
+// change perspective
+
+m = renderer.scene.children[0]
+m.position.z = -10
+m.scale.x = 1.4
+
+// START
+update()

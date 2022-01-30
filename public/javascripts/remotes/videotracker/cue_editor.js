@@ -1,3 +1,5 @@
+
+
 // Load up the instrument in the cue editor
 function load_up_instrument(_id) {
   current_instrument_id = _id
@@ -126,6 +128,8 @@ function load_up_instrument(_id) {
 
 var isdown = null
 var dragInterval = setInterval(function(){},10000)
+var cue_timeout = setTimeout(function(){}, 100)
+
 function createCue( cues, loaded_cues ) {
 
   console.log("create or update cues ", loaded_cues)
