@@ -6,10 +6,15 @@ body, html {
   font-family: Menlo, Consolas, DejaVu Sans Mono, monospace;
   overflow: hidden; }
 
+input, select {
+  color: #1e90ff;
+  background-color: #050505;
+  font-size: bolder; }
+
 header {
   height: 25px;
   width: 100vw;
-  background-color: red;
+  background-color: #888888;
   position: absolute;
   display: block;
   z-index: 1; }
@@ -23,7 +28,7 @@ header {
   top: 25px;
   height: calc( 100vh - 50px);
   width: 100vw;
-  background-color: orange;
+  background-color: #333333;
   grid-template-columns: 5% 25% 25% 25% 20%;
   grid-template-rows: 24vw;
   grid-template-areas: "previews previews previews previews instruments" "sheets tracker tracker tracker tracker";
@@ -34,7 +39,7 @@ header {
 
 #previews {
   grid-area: previews;
-  background-color: blue;
+  background-color: #333333;
   overflow: hidden;
   display: flex; }
   #previews #master_previews {
@@ -54,7 +59,7 @@ header {
     align-items: center;
     width: 60vw; }
     #previews #channel_previews canvas.small {
-      background-color: purple;
+      background-color: #333333;
       width: 24% !important;
       height: 34% !important;
       display: inline;
@@ -62,47 +67,61 @@ header {
 
 #instruments {
   grid-area: instruments;
-  background-color: green; }
+  background-color: #333333; }
   #instruments table {
     width: 100%; }
   #instruments tr {
     cursor: pointer; }
   #instruments tr.selected {
-    background-color: white;
-    color: black; }
+    background-color: #e8e8e8;
+    color: #050505; }
     #instruments tr.selected input.instrument {
-      color: black; }
+      color: #050505; }
   #instruments input.instrument {
     width: 100%;
     background-color: unset;
     border: 0;
     font-family: monospace;
-    color: white; }
+    color: #b9b9b9; }
   #instruments td.instrument_pointer {
     text-align: center; }
 
 #sheets {
   grid-area: sheets;
-  background-color: #3388AA;
-  width: 100%;
-  height: 100%; }
+  background-color: #333333; }
+  #sheets .sheets_container {
+    width: 100%;
+    height: 480px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-content: center;
+    align-items: baseline;
+    flex-wrap: wrap; }
+    #sheets .sheets_container .sheet {
+      width: 63%;
+      height: 32px;
+      background-color: #b9b9b9;
+      margin: 10px 0px; }
+    #sheets .sheets_container button {
+      margin-top: 12px; }
 
 #tracker {
   grid-area: tracker;
-  background-color: grey;
+  background-color: #888888;
   overflow-x: hidden;
   overflow-y: scroll;
   height: 800px;
   width: 100%; }
   #tracker #main_table {
     top: 250px;
-    margin-bottom: 780px;
+    margin-bottom: 1114px;
     position: relative;
     width: 100%; }
     #tracker #main_table #highlight {
       position: fixed;
       opacity: 0.5;
-      background-color: yellow;
+      background-color: #fbbc04;
       height: 14px;
       width: 100%;
       margin-top: 2px;
@@ -111,32 +130,35 @@ header {
   #tracker table.header {
     position: fixed;
     z-index: 1;
-    background-color: darkgrey;
+    background-color: #454545;
     width: 95%;
     margin-top: 0px; }
   #tracker table {
-    border-color: black;
+    border-color: #333333;
     width: 100%; }
     #tracker table tr, #tracker table td {
-      height: 14px;
-      padding: 0; }
+      height: 14px !important;
+      padding: 0;
+      overflow: hidden;
+      font-size: 12px; }
     #tracker table tr.highlight_beat td {
-      background-color: #666; }
+      background-color: #b9b9b9;
+      color: #333333;
+      font-weight: bolder; }
     #tracker table td.selected {
-      background-color: #CCCCCC99 !important;
-      color: black; }
+      background-color: #b9b9b9 !important;
+      color: #050505; }
     #tracker table td.trnum {
       text-align: center; }
     #tracker table td.mono {
       font-family: monospace;
-      font-size: 10px;
-      background: black;
-      color: white; }
+      background: #333333;
+      color: #F5F5F5; }
     #tracker table td.cell {
       width: 12vw; }
     #tracker table td span.selected {
-      background-color: white;
-      color: black; }
+      background-color: #F5F5F5;
+      color: #333333; }
     #tracker table td .trigger_cell {
       display: flex;
       flex-direction: row;
@@ -144,7 +166,7 @@ header {
       justify-content: space-around; }
       #tracker table td .trigger_cell span {
         text-align: center;
-        border-left: solid 1px #666;
+        border-left: solid 1px #888888;
         display: inline-block;
         width: 16.6666%;
         height: auto;
@@ -164,13 +186,19 @@ header {
         padding: 0;
         margin: 0;
         text-align: center;
-        border-left: 1px solid grey;
-        border-right: 1px solid grey; }
+        border-left: 1px solid #888888;
+        border-right: 1px solid #888888;
+        height: 14px;
+        color: #F5F5F5; }
+      #tracker table td .trigger_cell select {
+        height: 14px;
+        font-size: 11px;
+        color: #F5F5F5; }
 
 canvas.cue-canvas {
   width: 64px;
   height: 64px;
-  background-color: darkgrey; }
+  background-color: #454545; }
 
 #page2_instrument.instrument_grid_container {
   position: absolute;
@@ -181,7 +209,7 @@ canvas.cue-canvas {
   width: 100vw;
   height: calc( 100vh - 25px);
   transition-duration: 0.6s;
-  background-color: purple;
+  background-color: #333333;
   grid-template-columns: 20% 60% 20%;
   grid-template-rows: auto 240px;
   grid-template-areas: "cuelist maincenter preview" "cueeditor cueeditor cueeditor"; }
@@ -189,7 +217,7 @@ canvas.cue-canvas {
     left: 0vw; }
   #page2_instrument.instrument_grid_container #cuelist {
     grid-area: cuelist;
-    background-color: blue;
+    background-color: #333333;
     max-height: 80vh;
     overflow-y: scroll; }
     #page2_instrument.instrument_grid_container #cuelist .cue-containers {
@@ -205,25 +233,25 @@ canvas.cue-canvas {
         #page2_instrument.instrument_grid_container #cuelist .cue-containers div .cue-container .cue-still canvas.cue-canvas {
           width: 64px;
           height: 64px;
-          background-color: darkgrey; }
+          background-color: #454545; }
   #page2_instrument.instrument_grid_container .main {
     grid-area: maincenter;
-    background-color: green;
+    background-color: #333333;
     padding: 16px 12px; }
     #page2_instrument.instrument_grid_container .main #instrument_video {
       width: 100%;
       max-height: 50vh; }
   #page2_instrument.instrument_grid_container .preview {
     grid-area: preview;
-    background-color: brown; }
+    background-color: #050505; }
     #page2_instrument.instrument_grid_container .preview #instrument_video {
       width: 100%; }
   #page2_instrument.instrument_grid_container .cueeditor {
     grid-area: cueeditor;
-    background-color: yellow;
+    background-color: #333333;
     cursor: pointer; }
     #page2_instrument.instrument_grid_container .cueeditor .playhead {
-      background-color: red;
+      background-color: #fbbc04;
       position: absolute;
       width: 2px;
       left: 100px;
@@ -255,6 +283,6 @@ canvas.cue-canvas {
           #page2_instrument.instrument_grid_container .cueeditor .cues .cue-marker .handle:active {
             background-color: blue; }
     #page2_instrument.instrument_grid_container .cueeditor canvas#cue_canvas {
-      background-color: black; }
+      background-color: #050505; }
 
 /*# sourceMappingURL=videotracker_remote.css.map */

@@ -139,11 +139,27 @@ function createCue( cues, loaded_cues ) {
   var html = `
       <div class='cue-container cue' id='cue-${_loaded_cues}'>
         <div class='cue-note'>
-          <input data-cueindex="${_loaded_cues}" id="cue-note-${_loaded_cues}"
+          <input
+            data-cueindex="${_loaded_cues}"
+            id="cue-note-${_loaded_cues}"
             value="${cues[ loaded_cues ][0]}">
 
-        <div class='cue-in'> ${cues[ loaded_cues ][1]} </div>
-        <div class='cue-out'> ${cues[ loaded_cues ][2]} </div>
+          <input class="cue-in"
+            type="number"
+            step="0.1"
+            data-inpoint="${cues[ loaded_cues ][1]}"
+            data-cueindex="${_loaded_cues}"
+            id="cue-inpoint-${_loaded_cues}"
+            value="${cues[ loaded_cues ][1]}">
+
+          <input class="cue-out"
+            type="number"
+            step="0.1"
+            data-outpoint="${cues[ loaded_cues ][2]}"
+            data-cueindex="${_loaded_cues}"
+            id="cue-outpoint-${_loaded_cues}"
+            value="${cues[ loaded_cues ][2]}">
+        <br>
         <button class="btn" id="cue-duplicate-button">duplicate</button>
         <button class="btn" id="cue-delete-button">delete</button>
       </div>
@@ -158,10 +174,39 @@ function createCue( cues, loaded_cues ) {
     document.querySelector('#cuelist .cue-containers').append(new_html)
   }
 
+  // var fillnotekeys = function( `cue-${_loaded_cues}`, document.getElementById(`cue-${_loaded_cues}`).value ) {
+
   // add interaction
   var note_input = document.getElementById(`cue-note-${_loaded_cues}`)
   note_input.onchange = function(evt) {
     saved_file.instruments[current_instrument_id].cues[Number(this.dataset.cueindex)][0] = this.value
+    console.log("SAVED")
+  }
+
+  var cue_inpoint = document.getElementById(`cue-inpoint-${_loaded_cues}`)
+  cue_inpoint.onchange = function(evt) {
+    saved_file.instruments[current_instrument_id].cues[Number(this.dataset.cueindex)][1] = this.value
+    // update left handle (left, inpoint)
+    // cue-marker-
+    var cues = saved_file.instruments[current_instrument_id].cues
+    var cue_marker = document.getElementById(`cue-marker-${_loaded_cues}`)
+    var in_point = cues[ loaded_cues ][1] / v.duration
+    var out_point = cues[ loaded_cues ][2] / v.duration
+    cue_marker.style = `left:${in_point*100}%;width:${out_point*100-in_point*100}%`
+    console.log("SAVED")
+  }
+
+  var cue_outpoint = document.getElementById(`cue-outpoint-${_loaded_cues}`)
+  cue_outpoint.onchange = function(evt) {
+    saved_file.instruments[current_instrument_id].cues[Number(this.dataset.cueindex)][2] = this.value
+    // update right handle (width, outpoint)
+    // cue-marker-
+
+    var cues = saved_file.instruments[current_instrument_id].cues
+    var cue_marker = document.getElementById(`cue-marker-${_loaded_cues}`)
+    var in_point = cues[ loaded_cues ][1] / v.duration
+    var out_point = cues[ loaded_cues ][2] / v.duration
+    cue_marker.style = `left:${in_point*100}%;width:${out_point*100-in_point*100}%`
     console.log("SAVED")
   }
 
@@ -229,6 +274,7 @@ function createCue( cues, loaded_cues ) {
   }, 20)
   //document.querySelectorAll('.right_handle')
 }
+
 
 document.body.onmousemove = function(_evt) {
   if (isdown) {

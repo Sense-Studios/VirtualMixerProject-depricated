@@ -50,7 +50,7 @@ var update = function() {
 }
 
 
-
+var scroll_step = 16
 window.onkeydown = function(evt) {
   console.log("onkeydownevent:", evt.which)
 
@@ -85,7 +85,7 @@ window.onkeydown = function(evt) {
       elm.scrollTop = 1006
       return
     }
-    elm.scrollBy(0,-16)
+    elm.scrollBy(0,-scroll_step)
     current_row_id -= 1
     select_cell()
 
@@ -99,7 +99,7 @@ window.onkeydown = function(evt) {
       elm.scrollTop = 0
       return
     }
-    elm.scrollBy(0,16)
+    elm.scrollBy(0,scroll_step)
     current_row_id += 1
     select_cell()
 
@@ -139,7 +139,8 @@ function updatebpm() {
 
 function import_sheet( _data ) {
   if (!_data) {
-    alert("will import from clipboard!")
+    // confirm("will import from clipboard!")
+    document.body.focus()
     navigator.clipboard.readText().then( function(_data) {
       console.log(_data)
       saved_file = JSON.parse(_data)
@@ -153,6 +154,7 @@ function import_sheet( _data ) {
   INSTRUMENTS = []
   saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
   build_instruments(INSTRUMENTS)
+  init_instruments()
 }
 
 function export_sheet() {
@@ -203,7 +205,7 @@ document.onkeyup = function(e){
 
     if (!e.ctrlKey) {
       keymap.forEach((key, i) => {
-      // console.log("--", e.which, key[1])
+       // console.log("--", e.which, key[1])
        if (e.which == key[1]) {
          trackervalues[0].value = key[0]
          trackervalues[1].value = current_instrument_id
