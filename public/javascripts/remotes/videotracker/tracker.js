@@ -65,10 +65,13 @@ var keymap = [
 // -----------------------------------------------------------------------------
 // FILL THE TRACK
 
-var fill_values = function( _val ) {
-  console.log("fill")
+var fill_values = function( _val, _sheet_index ) {
 
-  saved_file.sheet_data[0] = _val
+  console.log("fill")
+  if ( _sheet_index == undefined ) _sheet_index = 0
+  saved_file.sheet_data[ _sheet_index ] = _val
+
+  // - - - -
 
   _val.forEach((row, x) => {
     row.forEach((col, y) => {
@@ -100,6 +103,7 @@ var fill_values = function( _val ) {
   });
 }
 
+// -----------------------------------------------------------------------------
 // Update helper: check if there is an entry in the cell, and execute it
 function checkEntry(item, i) {
   var note = item.querySelector('.note').textContent
@@ -268,6 +272,29 @@ function select_cell( _none = "" ){
   // cell.querySelector('.index').focus()
 }
 
+// -----------------------------------------------------------------------------
+// sheets
+// --------
+var build_sheets = function( _sheet_data ) {
+  var sheets_container = document.querySelector(".sheets_container")
+  var html = ""
+  _sheet_data.forEach( function( sheet, i ) {
+    var isselected = ""
+    if ( current_sheet == i ) isselected = "selected"
+    html += `<div class='sheet ${isselected}' id='sheet_${i}' data-index=${i})></div>`
+  })
+  sheets_container.innerHTML = html
+}
+
+// add interaction
+// fill and enable sheet buttons 1
+document.querySelector(".sheets_container .sheet")
+
+// fill 2
+document.querySelector(".sheets_conainter #add_sheet_button")
+
+
+// -----------------------------------------------------------------------------
 // Tracker reset helper
 var reset = function() {
   elm = document.getElementById('tracker')
@@ -289,7 +316,9 @@ var fillnotekeys = function( _selectelement, _select ) {
   _selectelement.innerHTML = html
 }
 
-// MAIN
+// -----------------------------------------------------------------------------
+// MAIN/ INIT
+build_sheets( saved_file.sheet_data )
+fill_values( saved_file.sheet_data[current_sheet] )
 select_cell()
-fill_values( saved_file.sheet_data[current_sheet])
 //fill_values( clear_data )

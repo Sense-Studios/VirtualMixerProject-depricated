@@ -57,6 +57,7 @@ function open_instrument(_id){
   load_up_instrument(_id)
 }
 
+// -----------------------------------------------------------------------------
 // INIT
 saved_file.instruments.forEach(function( instrument, i ) { INSTRUMENTS.push(instrument.url) })
 build_instruments(INSTRUMENTS)

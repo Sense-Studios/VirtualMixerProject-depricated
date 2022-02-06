@@ -111,12 +111,15 @@ window.onkeydown = function(evt) {
   if (evt.which == 36) {
     select_cell('none')
     reset()
+    return
   }
 
   // backspace
-  if (evt.which == 8) {
-    updatebpm()
-  }
+  // if (evt.which == 8) {
+  //  updatebpm()
+  // }
+
+  // for keymap, only use when other buttons turned negative
 
   keymap.forEach((key, i) => {
    if (evt.which == key[1]) {
@@ -137,6 +140,9 @@ function updatebpm() {
   document.getElementById('bpm_display').value = Math.round(bpm*100)/100
 }
 
+// -----------------------------------------------------------------------------
+// Import and Export
+// -----------------------------------------------------------------------------
 function import_sheet( _data ) {
   if (!_data) {
     // confirm("will import from clipboard!")
@@ -167,6 +173,8 @@ document.getElementById('tracker_back').onclick = function() {
   document.getElementById('page2_instrument').classList.remove('selected')
 }
 
+
+// -----------------------------------------------------------------------------
 var instrument_preview_interval = setInterval(function(){})
 
 // reset tracker

@@ -114,6 +114,7 @@ header
 #sheets
   grid-area: sheets
   background-color: $darker
+  text-align: center
 
   .sheets_container
     width: 100%
@@ -124,12 +125,16 @@ header
     align-content: center
     align-items: baseline
     flex-wrap: wrap
+    cursor: pointer
 
     .sheet
       width: 63%
       height: 32px
       background-color: $light
       margin: 10px 0px
+
+      &.selected
+        background-color: $accent-color
 
     button
       margin-top: 12px
