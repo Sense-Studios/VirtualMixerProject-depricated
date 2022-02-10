@@ -1,7 +1,11 @@
+// override
+var is_playing = false
+var is_recording = false
+
+
 // -----------------------------------------------------------------------------
 // Update Cycle
 // -----------------------------------------------------------------------------
-
 var update = function() {
 
   elm = document.getElementById('tracker')
@@ -15,8 +19,30 @@ var update = function() {
     selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
     selectedElements.forEach( (item, i)=> checkEntry(item, i)  )
 
+    if (document.getElementById('knightrider').paused ) {
+      document.getElementById('knightrider').currentTime = 0
+      document.getElementById('knightrider').play()
+    }
+
     if (elm.scrollTop >= 1022) {
        elm.scrollTop = 0
+       document.getElementById('knightrider').currentTime = 0
+       document.getElementById('knightrider').play()
+
+       if (!document.getElementById('loop_sheet_checkbox').checked) {
+         // go_to_next_sheet(_index)
+         document.querySelectorAll(".sheets_container .sheet").forEach((othersheet, j) => {
+           othersheet.classList.remove('selected')
+         });
+
+         saved_file.sheet_data[current_sheet] = read_values()
+         current_sheet += 1
+         if ( current_sheet >= saved_file.sheet_data.length ) current_sheet = 0
+         fill_values( saved_file.sheet_data[current_sheet], current_sheet )
+         reset()
+         document.getElementById('sheet_' + current_sheet).classList.add('selected')
+         // === end go_to_next_sheet
+       }
     }
 
     current_row_id = Math.round(elm.scrollTop/16) // row_id
@@ -25,6 +51,10 @@ var update = function() {
     elm.scrollBy(0,16)
 
   }else{
+    if ( !document.getElementById('knightrider').paused ) {
+      document.getElementById('knightrider').pause()
+    }
+
     elm.scrollTop = Math.round( ( elm.scrollTop / 16 ) ) * 16
     current_row_id = Math.round( elm.scrollTop / 16 ) // row_id
     selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
@@ -47,8 +77,32 @@ var update = function() {
 
   // update taking bpm into account
   setTimeout( update, ( ( 60000 / bpm ) / 4 ) )
-}
 
+  // monitoring (TODO: MOve to slowtick?)
+  if (is_playing && document.getElementById('is_playing_button').classList.contains('inactive')) {
+    document.getElementById('is_playing_button').classList.add('active')
+    document.getElementById('is_playing_button').classList.remove('inactive')
+
+  }else if (!is_playing && document.getElementById('is_playing_button').classList.contains('active')) {
+    document.getElementById('is_playing_button').classList.add('inactive')
+    document.getElementById('is_playing_button').classList.remove('active')
+  }else{
+  }
+
+  if (is_recording && document.getElementById('is_recording_button').classList.contains('inactive')) {
+    document.getElementById('is_recording_button').classList.add('active')
+    document.getElementById('is_recording_button').classList.remove('inactive')
+
+  } else if (!is_recording && document.getElementById('is_recording_button').classList.contains('active')) {
+    document.getElementById('is_recording_button').classList.add('inactive')
+    document.getElementById('is_recording_button').classList.remove('active')
+  }else{
+  }
+
+  if (is_recording) {
+    console.log("recording ...")
+  }
+}
 
 var scroll_step = 16
 window.onkeydown = function(evt) {
@@ -120,7 +174,6 @@ window.onkeydown = function(evt) {
   // }
 
   // for keymap, only use when other buttons turned negative
-
   keymap.forEach((key, i) => {
    if (evt.which == key[1]) {
      var cues = saved_file.instruments[current_instrument_id].cues
@@ -144,6 +197,9 @@ function updatebpm() {
 // Import and Export
 // -----------------------------------------------------------------------------
 function import_sheet( _data ) {
+
+  console.log("import sheet", _data)
+
   if (!_data) {
     // confirm("will import from clipboard!")
     document.body.focus()
@@ -155,7 +211,7 @@ function import_sheet( _data ) {
     saved_file = JSON.parse(_data)
   }
 
-  fill_values( saved_file.sheet_data[current_sheet])
+  fill_values( saved_file.sheet_data[current_sheet] )
 
   INSTRUMENTS = []
   saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
@@ -164,6 +220,7 @@ function import_sheet( _data ) {
 }
 
 function export_sheet() {
+  saved_file.sheet_data[current_sheet] = read_values()
   navigator.clipboard.writeText( JSON.stringify( saved_file ) )
   alert("exported to clipboard!")
 }
@@ -176,13 +233,6 @@ document.getElementById('tracker_back').onclick = function() {
 
 // -----------------------------------------------------------------------------
 var instrument_preview_interval = setInterval(function(){})
-
-// reset tracker
-function reset() {
-  elm = document.getElementById('tracker')
-  elm.scrollTop = 0
-  current_row_id = 0
-}
 
 document.getElementById('bpm_display').onchange = function() {
   bpm = Number(this.value)
@@ -208,32 +258,34 @@ document.onkeyup = function(e){
       // One down? Four down?
     }
 
-    // check the keymap
-    console.log("(key up) check keymap", e.which)
+    if (is_recording) {
+      // check the keymap
+      console.log("(key up) check keymap", e.which)
 
-    if (!e.ctrlKey) {
-      keymap.forEach((key, i) => {
-       // console.log("--", e.which, key[1])
-       if (e.which == key[1]) {
-         trackervalues[0].value = key[0]
-         trackervalues[1].value = current_instrument_id
-         trackervalues[2].value = 1
-         trackervalues[3].value = ""
-         trackervalues[4].value = ""
-         trackervalues[5].value = ""
+      if (!e.ctrlKey) {
+        keymap.forEach((key, i) => {
+         // console.log("--", e.which, key[1])
+         if (e.which == key[1]) {
+           trackervalues[0].value = key[0]
+           trackervalues[1].value = current_instrument_id
+           trackervalues[2].value = 1
+           trackervalues[3].value = ""
+           trackervalues[4].value = ""
+           trackervalues[5].value = ""
 
-         // scroll tracker
-         if (elm.scrollTop >= 1006) {
-           elm.scrollTop = 0
+           // scroll tracker
+           if (elm.scrollTop >= 1006) {
+             elm.scrollTop = 0
+             return
+           }
+           elm.scrollBy(0,16)
+           current_row_id += 1
+           select_cell()
+           console.log("move element ...")
            return
          }
-         elm.scrollBy(0,16)
-         current_row_id += 1
-         select_cell()
-         console.log("move element ...")
-         return
-       }
-     })
+       })
+     }
    }
 
     console.log("check key", e.key, e.ctrlKey)

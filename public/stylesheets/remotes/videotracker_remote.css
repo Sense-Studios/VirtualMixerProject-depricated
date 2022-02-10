@@ -18,6 +18,13 @@ header {
   position: absolute;
   display: block;
   z-index: 1; }
+  header button#is_playing_button.active {
+    background-color: green; }
+  header button#is_recording_button.active {
+    background-color: red; }
+
+audio {
+  display: none; }
 
 .scrollable {
   overflow-y: auto; }
@@ -42,6 +49,12 @@ header {
   background-color: #333333;
   overflow: hidden;
   display: flex; }
+  #previews input[type=range][orient=vertical] {
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+    width: 8px;
+    height: 30%;
+    padding: 0 5px; }
   #previews #master_previews {
     display: flex;
     width: 40vw;
@@ -60,8 +73,8 @@ header {
     width: 60vw; }
     #previews #channel_previews canvas.small {
       background-color: #333333;
-      width: 24% !important;
-      height: 34% !important;
+      width: 22% !important;
+      height: 30% !important;
       display: inline;
       margin: 2px; }
 

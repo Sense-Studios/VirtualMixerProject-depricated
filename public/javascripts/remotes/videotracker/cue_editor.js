@@ -107,7 +107,6 @@ function load_up_instrument(_id) {
   var i = 0
   _self.update = function() {
 
-
     if (_self.bypass = false) return
     if ( videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && !videoElement.seeking) {
       canvasElementContext.drawImage( videoElement, 0, 0, texture_size, texture_size );

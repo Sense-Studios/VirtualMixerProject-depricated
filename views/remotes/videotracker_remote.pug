@@ -12,19 +12,23 @@ html
     script(src='/javascripts/src/sources/VideoSource.js')
     //link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/remotes/videotracker_remote.css')
-
+      
   body
-    
+    audio#knightrider(src="/audio/knightrider.mp3")
+      
     header      
       input#bpm_display(type="number", value="128")
       button(onClick="updatebpm()") TAP
       button(onClick="reset()") RESET
       |
-      button(onClick="is_playing = !is_playing") PLAY/PAUSE
+      button#is_playing_button(class="inactive" onClick="is_playing = !is_playing") PLAY/PAUSE
+      button#is_recording_button(class="inactive" onClick="is_recording = !is_recording") RECORD
       button(onClick="import_sheet()") IMPORT
       button(onClick="export_sheet()") SAVE
       button(onClick="window.open('/remotes/videotracker_preview', ' VMX :: preview', 'popup')") Preview
       button(onClick="fill_values( clear_data );" ) Clear
+      input#loop_sheet_checkbox(type="checkbox")
+      | Loop
       
     
     #page1_player.tracker_grid_container.selected
@@ -38,6 +42,8 @@ html
           - for(var j=1; j <= 8; j++)
             canvas.small(id="monitoring_canvas_"+j) 
             .disabled-sign
+            
+            input(type="range" orient="vertical" id="alpha_range_"+j)
         
       #instruments.scrollable
         table

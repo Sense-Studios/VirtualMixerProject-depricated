@@ -50,6 +50,8 @@ var init_instruments = function() {
 
 // UI open through  button
 function open_instrument(_id){
+  select_cell("none")
+  is_playing = false
   document.getElementById('page1_player').classList.remove('selected')
   document.getElementById('page2_instrument').classList.add('selected')
   console.log("Instrument: ", _id, INSTRUMENTS[_id])

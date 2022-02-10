@@ -33,6 +33,15 @@ header
   display: block
   z-index: 1
 
+  button#is_playing_button.active
+    background-color: green
+
+  button#is_recording_button.active
+    background-color: red
+
+audio
+  display: none
+
 .scrollable
   overflow-y: auto
 
@@ -58,6 +67,13 @@ header
   overflow: hidden
   display: flex
 
+  input[type=range][orient=vertical]
+    writing-mode: bt-lr
+    -webkit-appearance: slider-vertical
+    width: 8px
+    height: 30%
+    padding: 0 5px
+
   #master_previews
     display: flex
     width: 40vw
@@ -79,8 +95,8 @@ header
 
     canvas.small
       background-color: $darker
-      width: 24% !important
-      height: 34% !important
+      width: 22% !important
+      height: 30% !important
       display: inline
       margin: 2px
 

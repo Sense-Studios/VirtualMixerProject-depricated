@@ -67,8 +67,10 @@ var keymap = [
 
 var fill_values = function( _val, _sheet_index ) {
 
-  console.log("fill")
-  if ( _sheet_index == undefined ) _sheet_index = 0
+  console.log("fill ", _sheet_index, _val)
+  if ( _sheet_index == undefined ) _sheet_index = current_sheet
+
+  // save it to the file
   saved_file.sheet_data[ _sheet_index ] = _val
 
   // - - - -
@@ -103,8 +105,31 @@ var fill_values = function( _val, _sheet_index ) {
   });
 }
 
+function read_values() {
+  // get all tnt
+  // return a _val object for fill_values to read
+  var returnval = []
+  var cells = document.querySelectorAll('#main_table .cell')
+  select_cell("none")
+  cells.forEach((cell, i) => {
+
+    trigger = ["","","","","",""]
+    trigger[0] = cell.querySelector('.note').textContent
+    trigger[1] = cell.querySelector('.index').textContent
+    trigger[2] = cell.querySelector('.opacity').textContent
+    trigger[3] = cell.querySelector('.cue').textContent
+    trigger[4] = cell.querySelector('.effect').textContent
+    trigger[5] = cell.querySelector('.effect_extra').textContent
+
+    if ( Number(cell.dataset.col) == 0 ) returnval[Number(cell.dataset.row)] = []
+    returnval[Number(cell.dataset.row)].push(trigger)
+  });
+
+  return returnval
+}
+
 // -----------------------------------------------------------------------------
-// Update helper: check if there is an entry in the cell, and execute it
+// Update handler: check if there is an entry in the cell, and executes it
 function checkEntry(item, i) {
   var note = item.querySelector('.note').textContent
   var index = item.querySelector('.index').textContent
@@ -176,6 +201,9 @@ function checkEntry(item, i) {
       var source = window["channel" + channel + "_source"]
       console.log("opacity", channel, source, opacity, " on channel", channel)
       source.alpha(opacity)
+
+      // assign it to range slider
+      document.getElementById("alpha_range_" + channel).value = opacity * 100
     }
 
     // Set Index
@@ -199,7 +227,7 @@ function checkEntry(item, i) {
       end_chain.setChainLink(channel-1, 1)
     }
 
-    // Set cue
+    // Set cue, expecing time in seconds!
     if ( !isNaN(cue) && cue != "" ) {
       if ( source.video.seeking ) {
         console.warn("video is seeking")
@@ -217,7 +245,8 @@ function checkEntry(item, i) {
   }
 }
 
-// Tracker interaction helper
+// Selects the cell in the tracker at current_row_id and selected_in_row
+// takes "none" for deselecting all
 function select_cell( _none = "" ){
   var elm = document.getElementById("main_table")
   var row = elm.querySelectorAll("tr")[current_row_id]
@@ -258,12 +287,12 @@ function select_cell( _none = "" ){
   var current_note = cell.querySelector('.note').innerText
   html = `
     <div class="trigger_cell">
-      <select id="note-${randid}" class="note" value=""/></select>
-      <input class="index" value="${cell.querySelector('.index').innerText}"/>
-      <input class="opacity" value="${cell.querySelector('.opacity').innerText}"/>
-      <input class="cue" value="${cell.querySelector('.cue').innerText}"/>
-      <input class="effect" value="${cell.querySelector('.effect').innerText}"/>
-      <input class="effect_extra" value="${cell.querySelector('.effect_extra').innerText}"/>
+      <select id="note-${randid}" alt="note" title="note" class="note" value=""/></select>
+      <input class="index" alt="index" title="index" value="${cell.querySelector('.index').innerText}"/>
+      <input class="opacity" alt="opacity" title="opacity" value="${cell.querySelector('.opacity').innerText}"/>
+      <input class="cue" alt="inpoint" title="inpoint" value="${cell.querySelector('.cue').innerText}"/>
+      <input class="effect" alt="effect" title="effect" value="${cell.querySelector('.effect').innerText}"/>
+      <input class="effect_extra" alt="effect_extra" title="effect_extra" value="${cell.querySelector('.effect_extra').innerText}"/>
     </div>
   `
 
@@ -281,28 +310,46 @@ var build_sheets = function( _sheet_data ) {
   _sheet_data.forEach( function( sheet, i ) {
     var isselected = ""
     if ( current_sheet == i ) isselected = "selected"
-    html += `<div class='sheet ${isselected}' id='sheet_${i}' data-index=${i})></div>`
+    html += `<div class='sheet ${isselected}' id='sheet_${i}' data-sheet-index='${i}'></div>`
   })
   sheets_container.innerHTML = html
-}
 
-// add interaction
-// fill and enable sheet buttons 1
-document.querySelector(".sheets_container .sheet")
+  // add interaction
+  // fill and enable sheet buttons 1
+  document.querySelectorAll(".sheets_container .sheet").forEach((sheet, i) => {
+
+    sheet.onclick = function() {
+      console.log("clikketieklik", this)
+      document.querySelectorAll(".sheets_container .sheet").forEach((othersheet, j) => {
+        othersheet.classList.remove('selected')
+      });
+
+      sheet.classList.add('selected')
+      // saved_file.sheet_data[current_sheet]
+      saved_file.sheet_data[current_sheet] = read_values()
+      current_sheet = i
+      fill_values( saved_file.sheet_data[i], i )
+      reset()
+    }
+  })
+}
 
 // fill 2
 document.querySelector(".sheets_conainter #add_sheet_button")
 
 
 // -----------------------------------------------------------------------------
+// Helpers
+
 // Tracker reset helper
 var reset = function() {
   elm = document.getElementById('tracker')
   elm.scrollTop = -16
   current_row_id = 0
+  //current_sheet = 0
 }
 
-// helper
+// helper for making dropdowns from notes
 var fillnotekeys = function( _selectelement, _select ) {
   // console.log("fill keys", _selectelement, "note:", _select)
   var html = "<option value=''></option>"
