@@ -24,7 +24,7 @@ var update = function() {
       document.getElementById('knightrider').play()
     }
 
-    if (elm.scrollTop >= 1022) {
+    if (elm.scrollTop >= 1024) {
        elm.scrollTop = 0
        document.getElementById('knightrider').currentTime = 0
        document.getElementById('knightrider').play()

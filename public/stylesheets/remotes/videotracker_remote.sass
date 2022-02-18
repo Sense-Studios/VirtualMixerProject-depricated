@@ -184,6 +184,7 @@ audio
       margin-top: 2px
       pointer-events: none
       filter: saturate(1.5) opacity(0.6) contrast(1.4)
+      z-index: 1
 
   table.header
     position: fixed
@@ -195,9 +196,11 @@ audio
   table
     border-color: $darker
     width: 100%
+    border-collapse: collapse
+    border-spacing: 0
 
     tr, td
-      height: 14px !important
+      height: 16px !important
       padding: 0
       overflow: hidden
       font-size: 12px
@@ -219,11 +222,13 @@ audio
         font-family: monospace
         background: $darker
         color: $white
+        filter: drop-shadow(0px 0.2px 1px #000000FF)
 
       &.cell
         width: 12vw
 
       span.selected
+        background: unset
         background-color: $white
         color: $darker
 

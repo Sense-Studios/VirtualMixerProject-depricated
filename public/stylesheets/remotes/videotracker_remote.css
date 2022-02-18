@@ -143,7 +143,8 @@ audio {
       width: 100%;
       margin-top: 2px;
       pointer-events: none;
-      filter: saturate(1.5) opacity(0.6) contrast(1.4); }
+      filter: saturate(1.5) opacity(0.6) contrast(1.4);
+      z-index: 1; }
   #tracker table.header {
     position: fixed;
     z-index: 1;
@@ -152,9 +153,11 @@ audio {
     margin-top: 0px; }
   #tracker table {
     border-color: #333333;
-    width: 100%; }
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0; }
     #tracker table tr, #tracker table td {
-      height: 14px !important;
+      height: 16px !important;
       padding: 0;
       overflow: hidden;
       font-size: 12px; }
@@ -170,10 +173,12 @@ audio {
     #tracker table td.mono {
       font-family: monospace;
       background: #333333;
-      color: #F5F5F5; }
+      color: #F5F5F5;
+      filter: drop-shadow(0px 0.2px 1px #000000FF); }
     #tracker table td.cell {
       width: 12vw; }
     #tracker table td span.selected {
+      background: unset;
       background-color: #F5F5F5;
       color: #333333; }
     #tracker table td .trigger_cell {
