@@ -43,7 +43,7 @@
     "http-errors": "~1.7.3",
     "kind-of": ">=6.0.3",
     "lodash": ">=4.17.21",
-    "minimist": ">=0.2.1",
+    "minimist": ">=1.2.6",
     "morgan": "~1.9.1",
     "node-sass-middleware": "0.11.0",
     "pug": ">=3.0.1",
