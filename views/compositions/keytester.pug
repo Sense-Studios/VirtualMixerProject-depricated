@@ -1,0 +1,20 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		script(src='/javascripts/src/modules/Mixer.js')
+		script(src='/javascripts/src/effects/ColorEffect.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/keytester.css')
+	body 
+		a.logo(href='/')
+		canvas#glcanvas
+		.blink
+		.payoff
+			| <h3>keytester</small></h3>
+			| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+			| <small>If you don't hear any music, click somewhere on the screen</small>
+			script(src='/compositions/keytester.js')
+			include ../partials/analytics

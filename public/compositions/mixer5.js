@@ -79,7 +79,9 @@ var output = new Output( renderer, switcher1 )
 
 // create a bpm addon
 var bpm = new BPM( renderer )
+//var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
 var analysis1 = new AudioAnalysis( renderer, { microphone: true })
+var analysis1 = new AudioAnalysis( renderer, {})
 
 // ## CONTROLLERS ##############################################################
 
@@ -231,3 +233,36 @@ function scratch() {
   }catch(err) { console.log("err:", err)}
 };
 scratch()
+
+// https://stackoverflow.com/questions/43710173/upload-and-play-audio-file-j
+
+function handleFiles(event) {
+    var files = event.target.files;
+    console.log("oid", files, audio.src)
+    analysis1.audio.src = URL.createObjectURL(files[0])
+    analysis1.audio.play()
+    //audio.src = URL.createObjectURL(files[0])
+    //audio.play()
+    // $("#src").attr("src", URL.createObjectURL(files[0]));
+    //document.getElementById("audio").load();
+}
+
+var wasSet = false
+var beats = 0
+var dica = 0
+
+setInterval(function() {
+  if ( analysis1.render() > 0.99 && !wasSet ) {
+    wasSet = true
+    beats += 1
+    dice = Math.random()
+    console.log("beat!", beats, dice, analysis1.bpm, analysis1.bpm_float)
+  }
+
+  if ( analysis1.render() < 0.01 ) {
+    wasSet = false
+  }
+
+}, 1 )
+
+document.getElementById("upload").addEventListener("change", handleFiles, false);

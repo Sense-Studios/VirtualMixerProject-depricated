@@ -154,7 +154,7 @@ var fadeOut = function() {
   if ( fadeOutValue > 0.4 ) { fadeOutValue = 0.4 }
   return fadeOutValue
 }
-var mod = 1024
+var mod = 127
 
 mc.addEventListener( 1, function(e) { fadeInValue  = ( e[2] / mod ) + 0.0001; console.log(fadeInValue)} )
 mc.addEventListener( 2, function(e) { fadeOutValue = ( e[2] / mod ) - 0.0001; console.log(fadeOutValue)} )

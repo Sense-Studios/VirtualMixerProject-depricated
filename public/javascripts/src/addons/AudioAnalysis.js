@@ -56,6 +56,26 @@ function AudioAnalysis( _renderer, _options ) {
   _self.bpm = 128
 
   /**
+  * @description delayed bpm is a 'tailing' bpm. it eases jumps in bpm
+  * that may cause flashes and makes sure the bpm is always 'gliding' to new values
+  * @member Controller#AudioAnalysis#delayed_bpm {number}
+  */
+  _self.delayed_bpm = 128
+
+  /**
+  * @description Use delay (default) enables a gliding scale for the bpm and
+  * makes sure no flashes occur when the bpm jumps
+  * @member Controller#AudioAnalysis#use_delay {boolean}
+  */
+  _self.use_delay = true
+
+  /**
+  * @description The bpm may never be higher then this number
+  * @member Controller#AudioAnalysis#bpm_limit {number}
+  */
+  _self.bpm_limit = 256
+
+  /**
    * @description
    *  the bpm float is a reference to the current beat-edge,
    *  it represents a float between 0 and 1, with ±1 being given back every beat
@@ -74,6 +94,9 @@ function AudioAnalysis( _renderer, _options ) {
 
   /** @member Addon#AudioAnalysis.sec */
   _self.sec = 0
+
+  /** @member Addon#AudioAnalysis.count */
+  _self.count = 0
 
   /** @member Addon#AudioAnalysis.dataSet */
   _self.dataSet
@@ -145,25 +168,6 @@ function AudioAnalysis( _renderer, _options ) {
   analyser.fftSize = 128;
   bufferLength = analyser.frequencyBinCount;
 
-  /**
-   * @description
-   *  firstload for mobile, forces all control to the site on click
-   *  tries and forces another play-event after a click
-   * @function Addon#AudioAnalysis~forceAudio
-   *
-  */
-  var forceAudio = function() {
-    console.log("AudioAnalysis is re-intialized after click initialized!", audio.src);
-    context.resume().then(() => {
-      audio.play();
-      console.log('Playback resumed successfully');
-      document.body.removeEventListener('click', forceAudio);
-      document.body.removeEventListener('touchstart', forceAudio);
-    });
-  }
-
-  document.body.addEventListener('click', forceAudio)
-  document.body.addEventListener('touchstart', forceAudio)
 
   /**
    * @description
@@ -259,6 +263,52 @@ function AudioAnalysis( _renderer, _options ) {
     nodes.push( _callback )
   }
 
+  // SYNC
+  // syncs the bpm again on the first beat
+  /** @function Addon#AudioAnalysis#sync */
+  _self.sync = function() {
+    starttime = new Date().getTime()
+  }
+
+  // TODO: getBlackOut
+  // tries and detects "blackouts", no sound or no-beat moments
+  /** @function Addon#AudioAnalysis#getBlackOut */
+  _self.getBlackOut = function() {
+
+  }
+
+  // TODO: getAmbience
+  // tries and detects "ambience", or the complexity/ sphere of sounds
+  /** @function Addon#AudioAnalysis#getAmbience */
+  _self.getAmbience = function() {
+
+  }
+
+  // TODO: getHighLevels -> also check this tutorial
+  // https://www.youtube.com/watch?v=gUELH_B2wsE
+  // returns 1 on high level tick
+  /** @function Addon#AudioAnalysis#getHighLevels */
+  _self.getHighLevels = function() {
+
+  }
+
+  // TODO: getMidLevels
+  // returns 1 on mid level tick
+  /** @function Addon#AudioAnalysis#getMidLevels */
+  _self.getMidLevels = function() {
+
+  }
+
+  // TODO: getLowLevels
+  // returns 1 on low level tick
+  /** @function Addon#AudioAnalysis#getLowLevels */
+  _self.getLowLevels = function() {
+
+  }
+
+
+  // ----------------------------------------------------------------------------
+
   // UPDATE
   /** @function Addon#AudioAnalysis~update */
   _self.update = function() {
@@ -275,10 +325,34 @@ function AudioAnalysis( _renderer, _options ) {
       });
     }
 
+    // TODO: shouldn't we have a "sync"
+    // function here, that only updates after 4 beats
+    // and resets to the first beat ?
+    // --> resetting start time, should do this
+
+    // TODO: if confidence is low, don't switch ?
+
     // set new numbers
     _self.bpm = _self.tempodata_bpm
+
+    if (_self.bpm > _self.bpm_limit) {
+      console.warn("reached bpm limit!: ", _self.bpm, "reset bpm to limit: ", _self.bpm_limit)
+      _self.bpm = _self.bpm_limit
+    }
+
     c = ((new Date()).getTime() - starttime) / 1000;
-    _self.sec = c * Math.PI * (_self.bpm * _self.mod) / 60 // * _self.mod
+    _self.count = c
+    //c = 0
+
+    // make it float toward the right number
+    if ( _self.use_delay ) {
+      if ( _self.delayed_bpm < _self.bpm  ) { _self.delayed_bpm += 0.1 }
+      if ( _self.delayed_bpm > _self.bpm  ) { _self.delayed_bpm -= 0.1 }
+    }else{
+      _self.delayed_bpm = _self.bpm
+    }
+
+    _self.sec = c * Math.PI * ( _self.delayed_bpm * _self.mod) / 60 // * _self.mod
     _self.bpm_float = ( Math.sin( _self.sec ) + 1 ) / 2    // Math.sin( 128 / 60 )
   }
 
@@ -424,7 +498,7 @@ function AudioAnalysis( _renderer, _options ) {
       // getAmbience // TODO -- detects overal 'business' of the sound, it's ambience
 
       if ( tempoData == undefined ) {
-        if ( !warningWasSet ) console.log(" WARNING: sampler is active, but no audio was detected after 20 seconds -- check your audiofile or your microphone and make sure you've clicked in the window and gave it access! Halting.")
+        if ( !warningWasSet ) console.warn(" WARNING: sampler is active, but no audio was detected after 20 seconds -- check your audiofile or your microphone and make sure you've clicked in the window and gave it access! Halting.")
         warningWasSet = true
         _self.tempodata_bpm = 128
         // return
@@ -504,6 +578,7 @@ function AudioAnalysis( _renderer, _options ) {
         }
         html += ']<br/>'
       })
+
       if (document.getElementById('info') != null) {
         document.getElementById('info').html = html
       }

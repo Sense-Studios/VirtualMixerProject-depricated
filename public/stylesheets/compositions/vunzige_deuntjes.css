@@ -1,0 +1,71 @@
+test {
+  margin: 0;
+  padding: 0; }
+
+#menu {
+  position: absolute;
+  top: 60px;
+  left: 100px;
+  z-index: 10;
+  background-color: #e3e3e3cc;
+  max-width: 640px;
+  padding: 12px;
+  border-radius: 8px; }
+  #menu .col1 {
+    float: left;
+    display: inline-block;
+    width: calc( 50% - 24px);
+    padding: 4px 12px; }
+  #menu .col2 {
+    float: left;
+    display: inline-block;
+    width: calc( 50% - 24px);
+    padding: 4px 12px; }
+
+.hidden {
+  display: none; }
+
+.pull-right {
+  float: right; }
+
+img.brandlogo {
+  height: 60px; }
+
+span.title {
+  display: inline-block;
+  max-width: 250px;
+  margin-bottom: 12px; }
+
+button {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: orange;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  border: solid 2px black;
+  padding: 6px; }
+
+.play_button {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #ffffff99 !important;
+  padding: 12px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  border: solid 2px black;
+  padding: 6px;
+  background-image: url(https://cdn.onlinewebfonts.com/svg/download_111103.png) !important;
+  padding: 6px;
+  background-image: url(https://cdn.onlinewebfonts.com/svg/download_111103.png) !important;
+  background-size: 56% auto !important;
+  background-position: center !important;
+  top: 60px !important;
+  right: 200px !important; }
+
+input[type=radio] {
+  float: left;
+  margin-right: 12px; }
+
+/*# sourceMappingURL=vunzige_deuntjes.css.map */

@@ -1,7 +1,7 @@
 /**
  * @summary
  *    A mixer mixes two sources together.
- *    Mixer example on codepen: 
+ *    Mixer example on codepen:
  *    <a href="https://codepen.io/xangadix/pen/zewydR" target="_blank">codepen</a>
  *
  * @description

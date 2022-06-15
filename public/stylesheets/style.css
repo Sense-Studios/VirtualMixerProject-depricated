@@ -42,7 +42,7 @@ body {
   top: calc( 50% - 50px);
   right: calc( 50% - 50px);
   background-color: transparent;
-  background-image: url("https://image.flaticon.com/icons/svg/49/49669.svg");
+  background-image: url("https://cdn.onlinewebfonts.com/svg/download_68580.png");
   background-size: contain;
   background-repeat: no-repeat;
   width: 100px;
@@ -50,7 +50,8 @@ body {
   z-index: 1000;
   border: none;
   pointer-events: all;
-  cursor: pointer; }
+  cursor: pointer;
+  filter: invert(1); }
   .play_button:active {
     outline: none;
     border: none; }

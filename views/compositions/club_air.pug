@@ -1,0 +1,58 @@
+doctype html
+html
+	head
+		title Awesome Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/club_air.css')
+	body 
+		//a.logo(href='/')
+		button.play_button#play_button
+		div#menu.hidden
+			h2 Choose your flavour!
+			p if you want to change your options, just press the ` button 
+			div
+				input(type='radio', name="drone", value="justbpm")
+				span.title Play with a set bpm 
+			div
+				input(type='radio', name="drone", value="radio")
+				span.title Play with automatic mixing on music 
+			div
+				input(type='radio', name="drone", value="mic")
+				span.title Play while listening to the microphone
+			div
+				input(type='radio', name="drone", value="go", checked=true)
+				span.title Just keep doing what you are doing
+			
+			br
+			br
+			
+			div
+				input#bpm_val(value='128')
+				| &nbsp;&nbsp;bpm
+							
+			br
+			div
+				input#mod_val(value='0.5')
+				| &nbsp;&nbsp;beats
+
+			br
+			div
+				input#shift_val(value='0.25')
+				| &nbsp;&nbsp;shift
+
+			br
+			hr
+			button#gotime.pull-right GO!
+			br
+			br
+
+		canvas#glcanvas
+		//.blink
+		//.payoff
+		//	| <h3>vunzige_deuntjes</small></h3>
+		//	| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+		//	| <small>If you don't hear any music, click somewhere on the screen</small>
+		script(src='/compositions/club_air.js')
+		include ../partials/analytics

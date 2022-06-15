@@ -1,0 +1,109 @@
+doctype html
+html
+	head
+		title Vunzige Virtual Mixer
+		script(src='/javascripts/build/vendor.js')
+		script(src='/javascripts/build/mixer.js')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/compositions/vunzige_deuntjes.css')
+	body 
+		//a.logo(href='/')
+		button.play_button#play_button
+		
+		div#menu.hidden
+			h2 VirtualMixProject
+			img.brandlogo.sense_logo(src="/images/sense.png")
+			img.brandlogo.veejays_logo(src="/images/veejays.png")
+			pre Version: 0.3
+			hr 
+			
+			div.col1
+
+				p if you want to change these options, just press the <strong>p</strong> button to return to the menu
+				small Note: the menu is not available in full-screen mode!
+				br
+				br
+				
+				div
+					input(type='radio', name="drone", value="mic")
+					span.title 
+						| Respond to microphone 
+						br
+						| Play while listening 
+						br
+						| to the microphone	
+				br
+				
+				div
+					input(type='radio', name="drone", value="go", checked=true)
+					span.title Use a music stream
+				br
+			
+			div.col2
+				div 
+					p 
+						| use <strong>P</strong> to return to this menu, 
+						br
+						br
+						| while playing use <strong> 0 - 9 </strong> to select a program
+						br
+						br
+						| <strong>0</strong> is a logo-only black screen 
+						br
+						br
+						| <strong>1-9</strong> are ever faster presets
+						br
+						br
+						small
+							| press <strong>C</strong> to Change the current videos, 
+							| use <strong>R</strong> to Reset the mixer
+							| and <strong>F5</strong> refreshes the page.
+			
+			
+			div(style="clear:both;")
+			hr
+			button#gotime.pull-right GO!			
+			  
+			br
+			br
+
+			//div
+				//input#bpm_val(value='128')
+				//| &nbsp;&nbsp;bpm
+				//br
+				//small 
+				//	br
+				//	| set any bpm you like
+							
+			//br
+			//div
+				//input#mod_val(value='0.5')
+				//| &nbsp;&nbsp;beats 
+				//br
+				//small 
+				//	br
+				//	| bpm mod lets you adjust the reaction to the bpm. 
+				//	| A higher number is faster, try values like 0.25, 0.5, 1, 2 etc.
+
+			//br
+			//div
+				//input#shift_val(value='0.25')
+				//| &nbsp;&nbsp;shift
+				//br
+				//small 
+				//	br
+				//	| shifts the phase of the different mixers for a more interesting result. 
+				//	| In principle a value between 0 and 1, where 1 is overlap completely and 0.5 is exactly after each other.
+				//	| try values like 0.25, 0.5, 1 etc.
+					
+			//br
+
+		canvas#glcanvas
+		//.blink
+		//.payoff
+		//	| <h3>vunzige_deuntjes</small></h3>
+		//	| Part of the <a href='https://virtualmixproject.com/''> Virtual Mixer Project </a><br>
+		//	| <small>If you don't hear any music, click somewhere on the screen</small>
+		
+		script(src='/compositions/vunzige_deuntjes.js')
+		include ../partials/analytics

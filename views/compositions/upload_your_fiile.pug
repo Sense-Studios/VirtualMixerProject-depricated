@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  // h1= title
+  // p Wikommen to #{title}
+  // a(href='http://www.xangadix.net') with a link
+
+  h1
+    input(type="file", id="upload")
+  <audio id="audio" controls style="display:none">
+    <source src="" id="src" />
+  </audio>
+
+  canvas#glcanvas
+  .blink
+  //#info(style="width:50%;word-break:break-all;")
+
+  // YOUR CODE
+  script(src='/compositions/mixer5.js')
+
+  // YOUR STYLE
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  include ../partials/analytics

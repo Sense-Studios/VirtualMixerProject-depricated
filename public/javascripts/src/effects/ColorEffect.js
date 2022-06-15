@@ -286,6 +286,64 @@ vec4 coloreffect ( vec4 src, int currentcoloreffect, float extra, vec2 vUv ) {
     return src;
   }
 
+  // greenkey
+  if ( currentcoloreffect == 80 ) {
+    float temp_g = src.g;
+
+    //if ( src.g > 0.99 ) { // 135
+    if ( src.g > 0.2 && src.r < 0.2 && src.b < 0.2 ){
+      src.r = 0.0;
+      src.g = 0.0;
+      src.b = 0.0;
+      src.a = 0.0;
+    }
+
+    if ( src.g > 0.2 && src.r < 0.2 && src.b < 0.2 ){
+      src.r + src.g + src.b > extra * 3.0? src.rgb = vec3( 1.0, 1.0, 1.0 ) : src.rgb = vec3( 0.0, 0.0, 0.0 );
+    }
+
+
+    float maxrb = max( src.r, src.b );
+    float k = clamp( (src.g-maxrb)*5.0, 0.0, 1.0 );
+
+    //float ll = length( src );
+    //src.g = min( src.g, maxrb*0.8 );
+    //src = ll*normalize(src);
+
+    return vec4( mix(src.xyz, vec3(0.0, 0.0, 0.0), k), src.a );
+
+    //return vec4( src.xyz, src.a );
+    //return src;
+  }
+
+  // greenkey 2
+  if ( currentcoloreffect == 81 ) {
+
+    float maxrb = max( src.r, src.b );
+    float k = clamp( (src.g-maxrb)*5.0, 0.0, 1.0 );
+
+    //
+
+    //float ll = length( src );
+    //src.g = min( src.g, maxrb*0.8 );
+    //src = ll*normalize(src);
+
+    //else
+
+    //float dg = src.g;
+    //src.g = min( src.g, maxrb*0.8 );
+    //src += dg - src.g;
+
+    //#endif
+
+    vec3 bg = src.xyz;
+    bg.r = 0.0;
+    bg.g = 0.0;
+    bg.b = 0.0;
+
+    return vec4( mix(src.xyz, bg, k), mix( 1.0, 0.0, k) );
+    //return src;
+  }
 
   if ( currentcoloreffect == 70 ) {
     return src;

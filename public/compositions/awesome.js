@@ -16,6 +16,8 @@ var mixer1 = new Mixer( renderer, { source1: source1, source2: source2 });
 var audioanalysis1 = new AudioAnalysis( renderer, { audio: '/radio/nsb' } )
 //var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'http://37.220.36.51:8906/;?type=http&nocache=' + Math.round( Math.random() * 100000 )  } )
 //var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'https://nsbradio.co.uk/play.php' } )
+//var audioanalysis1 = new AudioAnalysis( renderer, { audio: 'https://443-1.autopo.st/130/;' } )
+
 
 var filemanager = new FileManager( source1 )
 filemanager.load_set("/sets/programs_awesome.json")
