@@ -51,7 +51,7 @@
     "node-sass-middleware": "0.11.0",
     "pug": ">=3.0.1",
     "pug-code-gen": ">=2.0.3",
-    "socket.io": "^4.1.0",
+    "socket.io": "^4.5.3",
     "xmlhttprequest-ssl": ">=1.6.2",
     "y18n": ">=3.2.2",
     "yargs-parser": ">=5.0.0-security.0",
