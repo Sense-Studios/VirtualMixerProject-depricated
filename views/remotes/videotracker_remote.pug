@@ -14,7 +14,7 @@ html
     link(rel='stylesheet', href='/stylesheets/remotes/videotracker_remote.css')
       
   body
-    audio#knightrider(src="/audio/knightrider.mp3")
+    audio#audio_player(src="/audio/knightrider.mp3")
       
     header      
       input#bpm_display(type="number", value="128")
@@ -30,6 +30,8 @@ html
       input#loop_sheet_checkbox(type="checkbox")
       | Loop
       
+      .pull-right 
+        input#mp3_file(value="", placeholder="/audio/my_file.mp3")
     
     #page1_player.tracker_grid_container.selected
 

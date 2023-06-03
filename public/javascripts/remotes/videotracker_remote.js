@@ -19,15 +19,16 @@ var update = function() {
     selectedElements = document.querySelectorAll('td[data-row="'+current_row_id+'"]')
     selectedElements.forEach( (item, i)=> checkEntry(item, i)  )
 
-    if (document.getElementById('knightrider').paused ) {
-      document.getElementById('knightrider').currentTime = 0
-      document.getElementById('knightrider').play()
+    // document.getElementById('mp3_file')
+    if (document.getElementById('audio_player').paused ) {
+      document.getElementById('audio_player').currentTime = 0
+      document.getElementById('audio_player').play()
     }
 
     if (elm.scrollTop >= 1024) {
        elm.scrollTop = 0
-       document.getElementById('knightrider').currentTime = 0
-       document.getElementById('knightrider').play()
+       document.getElementById('audio_player').currentTime = 0
+       document.getElementById('audio_player').play()
 
        if (!document.getElementById('loop_sheet_checkbox').checked) {
          // go_to_next_sheet(_index)
@@ -51,8 +52,8 @@ var update = function() {
     elm.scrollBy(0,16)
 
   }else{
-    if ( !document.getElementById('knightrider').paused ) {
-      document.getElementById('knightrider').pause()
+    if ( !document.getElementById('audio_player').paused ) {
+      document.getElementById('audio_player').pause()
     }
 
     elm.scrollTop = Math.round( ( elm.scrollTop / 16 ) ) * 16
@@ -191,6 +192,7 @@ function updatebpm() {
   tap_bpm.tap()
   bpm = tap_bpm.bpm
   document.getElementById('bpm_display').value = Math.round(bpm*100)/100
+  saved_file.bpm = Math.round(bpm*100)/100
 }
 
 // -----------------------------------------------------------------------------
@@ -212,6 +214,10 @@ function import_sheet( _data ) {
   }
 
   fill_values( saved_file.sheet_data[current_sheet] )
+  document.getElementById('bpm_display').value = saved_file.bpm
+  document.getElementById('mp3_file').value = saved_file.mp3
+  bpm = saved_file.bpm
+  // loop = saved_file loop
 
   INSTRUMENTS = []
   saved_file.instruments.forEach(function( instrument, i ) {   INSTRUMENTS.push(instrument.url) })
@@ -225,11 +231,14 @@ function export_sheet() {
   alert("exported to clipboard!")
 }
 
+document.getElementById('mp3_file').onchange = function() {
+  saved_file.mp3 = document.getElementById('mp3_file').value
+}
+
 document.getElementById('tracker_back').onclick = function() {
   document.getElementById('page1_player').classList.add('selected')
   document.getElementById('page2_instrument').classList.remove('selected')
 }
-
 
 // -----------------------------------------------------------------------------
 var instrument_preview_interval = setInterval(function(){})

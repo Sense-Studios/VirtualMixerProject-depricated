@@ -26,6 +26,12 @@ header {
 audio {
   display: none; }
 
+.pull-right {
+  float: right; }
+
+.pull-left {
+  float: left; }
+
 .scrollable {
   overflow-y: auto; }
 
@@ -174,7 +180,7 @@ audio {
       font-family: monospace;
       background: #333333;
       color: #F5F5F5;
-      filter: drop-shadow(0px 0.2px 1px #000000FF); }
+      filter: drop-shadow(0px 0.2px 1px #888); }
     #tracker table td.cell {
       width: 12vw; }
     #tracker table td span.selected {
