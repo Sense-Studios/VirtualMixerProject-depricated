@@ -1,5 +1,10 @@
 # VirtualMixerProject
 
+```
+IMPORTANG: This repository has been depricated, please refer to https://github.com/Sense-Studios/VirtualMixerProject
+thank you
+```
+
 The VirtualMixerProject is a virtual video mixer that can be built through a chainable interface and runs in WebGL. There is a website: [VirtualMixerProject.com](https://virtualmixproject.com/). There you can find examples and 'channels', which are basically auto-mixed sets of video files. or gifs. Or images. Or solid colors or ...
 
 ![logo](https://virtualmixproject.com/images/vmp_demo/vmp_logo.png)
